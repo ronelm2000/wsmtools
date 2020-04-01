@@ -1,0 +1,20 @@
+{
+  "profiles": {
+    "HoTDParser": {
+      "commandName": "Project",
+      "commandLineArgs": "https://heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
+    },
+    "wstools for Konosuba": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/konosuba_booster_pack.html"
+    },
+    "wstools export CyaRon": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/wDdTKywNh"
+    },
+    "wstools Export CyaRon Deck": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/wDdTKywNh"
+    }
+  }
+}

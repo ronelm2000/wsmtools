@@ -1,0 +1,64 @@
+﻿using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+using Montage.Weiss.Tools.API;
+using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Utilities;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Montage.Weiss.Tools.Impls.PostProcessors
+{
+    /// <summary>
+    /// Applies post-processing by searching in yuyutei for images of the cards and inserting them in.
+    /// </summary>
+    public class YuyuteiPostProcessor : ICardPostProcessor
+    {
+        private readonly ILogger Log = Serilog.Log.ForContext<YuyuteiPostProcessor>();
+
+        public int Priority => 0;
+
+        public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
+        {
+            var yuyuteiSellPage = "https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=";
+            var cardUnitListItemSelector = "#main .card_unit";
+            var cardUnitImageSelector = ".image_box > a > .image > img";
+            var cardUnitSerialSelector = ".headline > p.id";
+            var firstCard = await originalCards.FirstAsync();
+            var setCode = firstCard.Set;
+            var lang = firstCard.Language;
+
+            if (lang == CardLanguage.English) // Yuyutei Inquiry will just crash
+            { 
+                await foreach (var card in originalCards) yield return card;
+                yield break;
+            }
+            
+            Log.Information("Starting...");
+
+            yuyuteiSellPage += HttpUtility.UrlEncode(setCode);
+            Log.Information("Loading: {yuyuteiSellPage}", yuyuteiSellPage);
+            IDocument yuyuteiSearchPage = await new Uri(yuyuteiSellPage).DownloadHTML( ("Referer", "https://yuyu-tei.jp/") );
+
+            var cardUnitListItems = yuyuteiSearchPage.QuerySelectorAll(cardUnitListItemSelector);
+            var serialImagePairs = cardUnitListItems
+                .Select(div => (serialDiv: div.QuerySelector(cardUnitSerialSelector), imageDiv: div.QuerySelector<IHtmlImageElement>(cardUnitImageSelector)))
+                .Select(pair => (Serial: pair.serialDiv.InnerHtml.Trim(), ImageUri: pair.imageDiv.Source.Replace("ws/90_126", "ws/front")))
+                .ToDictionary(pair => pair.Serial, pair => pair.ImageUri)
+                ;
+
+            await foreach (var originalCard in originalCards)
+            {
+                var res = originalCard.Clone();
+                var imgUrl = new Uri(serialImagePairs[res.Serial]);
+                res.Images.Add(imgUrl);
+                Log.Information("Attached to {serial}: {imgUrl}", res.Serial, imgUrl);
+                yield return res;
+            }
+            Log.Information("Ended.");
+            yield break;
+        }
+    }
+}

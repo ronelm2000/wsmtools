@@ -1,0 +1,88 @@
+﻿using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+using Montage.Weiss.Tools.API;
+using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Utilities;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace Montage.Weiss.Tools.Impls.PostProcessors
+{
+    public class JKTCGPostProcessor : ICardPostProcessor
+    {
+        private readonly ILogger Log = Serilog.Log.ForContext<JKTCGPostProcessor>();
+        private readonly Regex LinkMatcher = new Regex(@"(http:\/\/jktcg.com\/)(EN-.+-)(.+)");
+
+        public int Priority => 0;
+
+        public IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
+        {
+            var firstCard = originalCards.FirstAsync().Result;
+            var lang = firstCard.Language;
+            if (lang == CardLanguage.Japanese) return originalCards;
+            else return Process(firstCard, originalCards);
+        }
+
+        private async IAsyncEnumerable<WeissSchwarzCard> Process(WeissSchwarzCard firstCard, IAsyncEnumerable<WeissSchwarzCard> originalCards)
+        {
+            Log.Information("Starting...");
+            var menu = await "http://jktcg.com/MenuLeftEN.html"
+                .WithHTMLHeaders()
+                .GetHTMLAsync();
+            var pair = CardListURLFrom(menu, firstCard);
+            var cardList = await pair.url
+                .WithHTMLHeaders()
+                .GetHTMLAsync();
+            var setID = firstCard.Set;
+            var cardImages = cardList.QuerySelectorAll<IHtmlImageElement>("a > img")
+                .Select(ele => ele.Source.Replace("\t", ""))
+                .ToDictionary(str => (setID + "-" + str.AsSpan().Slice(c => c.LastIndexOf('_') + 1, c => c.LastIndexOf(".")).ToString()).ToLower());
+//                .ToLookup(ele => ele
+
+            await foreach (var card in originalCards)
+            {
+                var res = card.Clone();
+                try
+                {
+                    var imgURL = cardImages[res.Serial.ToLower()];
+                    res.Images.Add(new Uri(imgURL));
+                    Log.Information("Attached image to {serial}: {imgURL}", res.Serial, imgURL);
+                }
+                catch (KeyNotFoundException)
+                {
+                    Log.Warning("Tried to post-process {serial} when the URL for {setID} was loaded. Skipping.", res.Serial, setID);
+                }
+                yield return res;
+            }
+
+            Log.Information("Finished.");
+            yield break;
+        }
+
+        private (string setLinkWithUnderscores, string url) CardListURLFrom(IDocument menu, WeissSchwarzCard firstCard)
+        {
+            var setID = firstCard.Set;
+            var setLink = menu.Links.Cast<IHtmlAnchorElement>()
+                                        .Where(ele => LinkMatcher.IsMatch(ele.Href))
+                                        .Where(ele => ele.Href.Contains(firstCard.SID))
+                                        .FirstOrDefault();
+            if (setLink == null)
+            {
+                Log.Error("Cannot find a link that matches {SID} using this list of links: {@items}", firstCard.SID, menu.Links.Cast<IHtmlAnchorElement>().Select(ele => ele.Href).ToList());
+                throw new Exception();
+            }
+            
+            var enPreString = "EN-";
+            var setLinkWithUnderscores = setLink.Href.AsSpan()
+                .Slice(x => x.IndexOf(enPreString))
+                .ToString()
+                .Replace("-", "_");
+
+            return (setLinkWithUnderscores, $"http://jktcg.com/WS_EN/{setLinkWithUnderscores}/{setLinkWithUnderscores}.html");
+        }
+    }
+}

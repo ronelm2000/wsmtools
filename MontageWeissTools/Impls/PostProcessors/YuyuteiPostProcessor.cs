@@ -54,9 +54,14 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             await foreach (var originalCard in originalCards)
             {
                 var res = originalCard.Clone();
-                var imgUrl = new Uri(serialImagePairs[res.Serial]);
-                res.Images.Add(imgUrl);
-                Log.Information("Attached to {serial}: {imgUrl}", res.Serial, imgUrl);
+                if (serialImagePairs.TryGetValue(res.Serial, out var urlLink)) {
+                    var imgUrl = new Uri(urlLink);
+                    res.Images.Add(imgUrl);
+                    Log.Information("Attached to {serial}: {imgUrl}", res.Serial, urlLink);
+                } else
+                {
+                    Log.Warning("Yuyutei did not have an image for {serial}, you should check for other image sources and add it manually.", res.Serial);
+                }
                 yield return res;
             }
             Log.Information("Ended.");

@@ -22,6 +22,10 @@
     "wstools for Buggy Deck": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/b7eQKO8kW"
+    },
+    "wsools export Grasaia": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/Qy4yuqC8f"
     }
   }
 }

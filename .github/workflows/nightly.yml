@@ -28,5 +28,5 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
-        name: x64-binary
-        path: MontageWeissTools/bin/Release/netcoreapp3.1/win-x64/publish/wsmtools.exe
+        name: wstools.exe
+        path: MontageWeissTools/bin/Release/netcoreapp3.1/win-x64/publish/wstools.exe

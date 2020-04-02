@@ -11,10 +11,10 @@ For now this tool is barebones (in its alpha stage, so expect some bugs), but I'
 * Export decks for use into another format.
 
 ### Supported Exporters ###
-* Tabletop Simulator
+* [Tabletop Simulator](https://steamcommunity.com/sharedfiles/filedetails/?id=1321170886)
 
 ### Supported Deck Parsers ###
-* Encore Decks
+* [Encore Decks](https://www.encoredecks.com/)
 
 ---------
 

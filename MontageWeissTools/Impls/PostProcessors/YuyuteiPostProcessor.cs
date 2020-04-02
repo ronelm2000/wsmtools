@@ -27,7 +27,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             var cardUnitImageSelector = ".image_box > a > .image > img";
             var cardUnitSerialSelector = ".headline > p.id";
             var firstCard = await originalCards.FirstAsync();
-            var setCode = firstCard.Set;
+            var setCode = firstCard.ReleaseID;
             var lang = firstCard.Language;
 
             if (lang == CardLanguage.English) // Yuyutei Inquiry will just crash
@@ -43,9 +43,11 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             IDocument yuyuteiSearchPage = await new Uri(yuyuteiSellPage).DownloadHTML( ("Referer", "https://yuyu-tei.jp/") );
 
             var cardUnitListItems = yuyuteiSearchPage.QuerySelectorAll(cardUnitListItemSelector);
+
             var serialImagePairs = cardUnitListItems
                 .Select(div => (serialDiv: div.QuerySelector(cardUnitSerialSelector), imageDiv: div.QuerySelector<IHtmlImageElement>(cardUnitImageSelector)))
                 .Select(pair => (Serial: pair.serialDiv.InnerHtml.Trim(), ImageUri: pair.imageDiv.Source.Replace("ws/90_126", "ws/front")))
+                .Distinct(pair => pair.Serial)             // Dev Notes: https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=BD%2fW54 gave me cancer.
                 .ToDictionary(pair => pair.Serial, pair => pair.ImageUri)
                 ;
 

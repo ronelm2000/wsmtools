@@ -37,7 +37,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             var cardList = await pair.url
                 .WithHTMLHeaders()
                 .GetHTMLAsync();
-            var setID = firstCard.Set;
+            var releaseID = firstCard.ReleaseID;
             var cardImages = cardList.QuerySelectorAll<IHtmlImageElement>("a > img")
                 .Select(ele => (
                     Serial: GetSerial(ele),
@@ -57,7 +57,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 }
                 catch (KeyNotFoundException)
                 {
-                    Log.Warning("Tried to post-process {serial} when the URL for {setID} was loaded. Skipping.", res.Serial, setID);
+                    Log.Warning("Tried to post-process {serial} when the URL for {releaseID} was loaded. Skipping.", res.Serial, releaseID);
                 }
                 yield return res;
             }
@@ -76,14 +76,17 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         private (string setLinkWithUnderscores, string url) CardListURLFrom(IDocument menu, WeissSchwarzCard firstCard)
         {
-            var setID = firstCard.Set;
+            var ogReleaseID = firstCard.ReleaseID;
+            var releaseIDs = new List<string>();
+            releaseIDs.Add(firstCard.ReleaseID);
+            if (ogReleaseID.StartsWith("EN-")) releaseIDs.Add(ogReleaseID.Substring(3));
             var setLink = menu.Links.Cast<IHtmlAnchorElement>()
                                         .Where(ele => LinkMatcher.IsMatch(ele.Href))
-                                        .Where(ele => ele.Href.Contains(firstCard.SID))
+                                        .Where(ele => releaseIDs.Any(s => ele.Href.Contains(s)))
                                         .FirstOrDefault();
             if (setLink == null)
             {
-                Log.Error("Cannot find a link that matches {SID} using this list of links: {@items}", firstCard.SID, menu.Links.Cast<IHtmlAnchorElement>().Select(ele => ele.Href).ToList());
+                Log.Error("Cannot find a link that matches {SID} using this list of links: {@items}", ogReleaseID, menu.Links.Cast<IHtmlAnchorElement>().Select(ele => ele.Href).ToList());
                 throw new Exception();
             }
             

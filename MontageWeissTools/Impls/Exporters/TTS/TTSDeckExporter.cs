@@ -28,9 +28,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
         private ILogger Log = Serilog.Log.ForContext<TTSDeckExporter>();
 
         public string[] Alias => new [] { "tts", "tabletopsim" };
-
         
-
         public async Task Export(WeissSchwarzDeck deck, string destinationFolderOrURL)
         {
             var count = deck.Ratios.Keys.Count;
@@ -42,6 +40,8 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                 .ToList();
 
             var resultFolder = Path.CreateDirectory(destinationFolderOrURL);
+
+            var fileNameFriendlyDeckName = deck.Name.AsFileNameFriendly();
 
             var imageDictionary = await deck.Ratios.Keys
                 .OrderBy(c => c.Serial)
@@ -81,7 +81,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                             ctx.DrawImage(imageDictionary[serialList[i]], point, 1);
                         });
                     }
-                    var newPNG = $"deck_{deck.Name.ToLower()}.png";
+                    var newPNG = $"deck_{fileNameFriendlyDeckName.ToLower()}.png";
                     var deckPNG = resultFolder.Combine(newPNG);
                     Log.Information("Finished drawing all cards in serial order; saving image...");
                     deckPNG.Open(fullGrid.SaveAsPng);
@@ -114,7 +114,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
             var saveState = JsonConvert.DeserializeObject<SaveState>(Encoding.UTF8.GetString(TTSResources.CustomObject));
             saveState.ObjectStates[0].LuaScript = finalTemplateLUA;
 
-            var nameOfObject = $"Deck Generator ({deck.Name})";
+            var nameOfObject = $"Deck Generator ({fileNameFriendlyDeckName})";
             var deckGeneratorPath = resultFolder.Combine($"{nameOfObject}.json");
             deckGeneratorPath.Open(s =>
             {

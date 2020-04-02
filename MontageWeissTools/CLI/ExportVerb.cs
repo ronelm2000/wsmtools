@@ -20,10 +20,10 @@ namespace Montage.Weiss.Tools.CLI
         [Value(1, HelpText = "Indicates the destination; usually a folder.", Default = "./Export/")]
         public string Destination { get; set; }
 
-        [Option("parser", HelpText = "Manually sets the deck parser to use.", Default = "encoredecks")]
+        [Option("parser", HelpText = "Manually sets the deck parser to use. Possible values: encoredecks", Default = "encoredecks")]
         public string Parser { get; set; }
 
-        [Option("exporter", HelpText = "Manually sets the deck exporter to use.", Default = "tabletopsim")]
+        [Option("exporter", HelpText = "Manually sets the deck exporter to use. Possible values: tabletopsim", Default = "tabletopsim")]
         public string Exporter { get; set; }
 
         private readonly ILogger Log = Serilog.Log.ForContext<ExportVerb>();

@@ -56,20 +56,37 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 result.Name.JP = DynamicExtensions.AsOptional(setCard.locale.NP).name;
                 (List<object>, List<object>) attributes = (setCard.locale.EN.attributes, setCard.locale.NP.attributes);
                 result.Traits = TranslateTraits(attributes).ToList();
-                result.Effect = ((List<object>)setCard.ability).Cast<string>().ToArray();
+                result.Effect = ((List<object>)DynamicExtensions.AsOptional(setCard)?.ability)?.Cast<string>().ToArray();
                 result.Rarity = setCard.rarity;
                 result.Side = TranslateSide(setCard.side);
                 result.Level = (int?) setCard.level;
                 result.Cost = (int?) setCard.cost;
-                result.Power = (int?) setCard.power;
+                result.Power = (int?) setCard.power;    
                 result.Soul = (int?) setCard.soul;
 
-                var fullSetID = setCard.set.ToString() + "/" + setCard.side.ToString() + setCard.release.ToString();
-                result.Serial = fullSetID + "-" + setCard.sid.ToString();
+                result.Serial = WeissSchwarzCard.GetSerial(setCard.set.ToString(), setCard.side.ToString(), setCard.lang.ToString(), setCard.release.ToString(), setCard.sid.ToString());
+
+                /*
+
+                setCard.set.ToString();
+            if (setCard.lang == "EN" && !((string)setCard.release.ToString()).Contains("E"))
+            {
+                // This is a DX set; make serial adjustments.
+                fullSetID += "/EN-" + setCard.side.ToString();
+            } else
+            {
+                // Proceed as normal
+                fullSetID += "/" + setCard.side.ToString();
+            }
+            fullSetID += setCard.release.ToString();
+            result.Serial = fullSetID + "-" + setCard.sid.ToString();
+
+*/
+
 
                 result.Type = TranslateType(setCard.cardtype);
                 result.Color = TranslateColor(setCard.colour);
-                result.Remarks = $"Parsed: {this.GetType().Name}";
+                result.Remarks = $"Parsed: {this.GetType().Name}";  
                 yield return result;
             }
             // Get 

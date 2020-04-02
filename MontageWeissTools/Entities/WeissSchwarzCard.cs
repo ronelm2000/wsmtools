@@ -26,13 +26,9 @@ namespace Montage.Weiss.Tools.Entities
         public string Remarks { get; set; }
 
         /// <summary>
-        /// Computes for the Set Code based on the Serial.
+        /// Gets the Full Release ID
         /// </summary>
-        public string Set => Serial.Substring(0, Serial.IndexOf('-'));
-        /// <summary>
-        /// Gets the Set ID.
-        /// </summary>
-        public string SID => Serial.AsSpan().Slice(s => s.IndexOf('/') + 1, s => s.IndexOf('-')).ToString();
+        public string ReleaseID => ParseRID(); // Serial.AsSpan().Slice(s => s.IndexOf('/') + 1); s => s.IndexOf('-')).ToString();
 
         public CardLanguage Language => TranslateToLanguage();
 
@@ -51,9 +47,32 @@ namespace Montage.Weiss.Tools.Entities
             if (serial.Contains("-E")) return CardLanguage.English;
             else if (serial.Contains("WX")) return CardLanguage.English;
             else if (serial.Contains("SX")) return CardLanguage.English;
+            else if (serial.Contains("/EN-")) return CardLanguage.English;
             else return CardLanguage.Japanese;
         }
+        private string ParseRID()
+        {
+            var span = Serial.AsSpan().Slice(s => s.IndexOf('/') + 1);
+            var endAdjustment = (span.StartsWith("EN")) ? 3 : 0;
+            return span.Slice(0, span.Slice(endAdjustment).IndexOf('-') + endAdjustment).ToString();
+        }
 
+        public static string GetSerial(string subset, string side, string lang, string releaseID, string setID)
+        {
+            string fullSetID = subset;
+            if (lang == "EN" && !setID.Contains("E"))
+            {
+                // This is a DX set; make serial adjustments.
+                fullSetID += "/EN-" + side;
+            }
+            else
+            {
+                // Proceed as normal
+                fullSetID += "/" + side;
+            }
+            fullSetID += releaseID;
+            return fullSetID + "-" + setID;
+        }
     }
 
     public static class CardEnumExtensions

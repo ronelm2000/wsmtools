@@ -20,11 +20,20 @@ namespace Montage.Weiss.Tools.Utilities
                         .Replace("\b", "\\\b")
                         .Replace("\n", "\\\n")
                         .Replace("\t", "\\\t")
-                        .Replace("\r", "\\\r");
-                        
+                        .Replace("\r", "\\\r");                
         }
 
-        public static SpanCursor AsSpanCursor(this string parent, string separator = "\n")
+        public static string AsFileNameFriendly(this string str, char replacement = '_')
+        {
+            var res = str;
+            foreach (var c in System.IO.Path.GetInvalidFileNameChars())
+                res = res.Replace(c, '_');
+            res = res.Replace('\\', '_');
+            res = res.Replace('/', '_');
+            return res;
+        }
+
+    public static SpanCursor AsSpanCursor(this string parent, string separator = "\n")
         {
             return new SpanCursor(separator, () => parent.AsSpan());
         }

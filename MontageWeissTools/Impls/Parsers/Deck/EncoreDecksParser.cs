@@ -1,6 +1,7 @@
 ﻿using Flurl;
 using Flurl.Http;
 using Lamar;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic.FileIO;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.CLI;
@@ -91,9 +92,12 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
             res.Name = deckJSON.name;
 
             using (var db = _database())
-                foreach (dynamic card in deckJSON.cards) {
-                    string fullSetID = card.set.ToString() + "/" + card.side.ToString() + card.release.ToString();
-                    string serial = fullSetID + "-" + card.sid.ToString();
+            {
+                await db.Database.MigrateAsync();
+
+                foreach (dynamic card in deckJSON.cards)
+                {
+                    string serial = WeissSchwarzCard.GetSerial(card.set.ToString(), card.side.ToString(), card.lang.ToString(), card.release.ToString(), card.sid.ToString());
                     WeissSchwarzCard wscard = await db.WeissSchwarzCards.FindAsync(serial);
                     if (wscard == null)
                     {
@@ -110,6 +114,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
                     //Log.Information("Parsed: {@wscard}", wscard);
 
                 }
+            }
             var simpleRatios = res.AsSimpleDictionary();
             Log.Information("Deck Parsed: {@simpleRatios}", simpleRatios);
             Log.Information("Cards in Deck: {@count}", simpleRatios.Values.Sum());

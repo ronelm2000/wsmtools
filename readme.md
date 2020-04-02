@@ -23,7 +23,7 @@ For now this tool is barebones (in its alpha stage, so expect some bugs), but I'
   ```ps
   ./wstools export your_encore_decks_deck_link_here
   ```
-2. You will get the following: `deck.your deck name.png`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
+2. You will get the following on your Exports folder: `deck.your deck name.png`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
 3. The `Deck Generator` files go into your Save Objects folder (typically `%HOMEDRIVE%%HOMEPATH%\Documents\My Games\Tabletop Simulator\Saves\Saved Objects`)
 4. The `deck.your deck name.png` should be uploaded (imgur or Steam Cloud using Tabletop Simulator)
 5. Open Tabletop Simulator (Single-Player will do)

@@ -21,7 +21,7 @@ For now this tool is barebones (in its alpha stage, so expect some bugs), but I'
 *I know you're probably just here just so that you can quickly netdeck into TTS; so how do you do it?*
 1. Execute this lovely command.
   ```ps
-  ./wstools export <your_encore_decks_link_here>
+  ./wstools export your_encore_decks_deck_link_here
   ```
 2. You will get the following: `deck.your deck name.png`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
 3. The `Deck Generator` files go into your Save Objects folder (typically `%HOMEDRIVE%%HOMEPATH%\Documents\My Games\Tabletop Simulator\Saves\Saved Objects`)
@@ -30,5 +30,5 @@ For now this tool is barebones (in its alpha stage, so expect some bugs), but I'
 5. Load the Saved Object (and make sure no other Deck Generators are loaded!)
 6. In the chat command, type:
   ```ps
-  +generate <url_of_your_deck> <url_of_your_sleeves>
+  +generate url_of_your_deck url_of_your_sleeves
   ```

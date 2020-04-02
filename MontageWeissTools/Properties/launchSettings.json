@@ -8,10 +8,6 @@
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/wDdTKywNh"
     },
-    "wstools Export CyaRon Deck": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/wDdTKywNh"
-    },
     "wstools for LLS": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
@@ -26,6 +22,10 @@
     "wsools export Grasaia": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/Qy4yuqC8f"
+    },
+    "wstools for Madoka": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/3fqflHO1_"
     }
   }
 }

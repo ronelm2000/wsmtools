@@ -103,21 +103,28 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                             .Trim()
                             .ToEnum<CardColor>()
                             .Value;
-            res.Side = cursor.ReadLine().Slice(
-                            c => c.IndexOf(sideText) + sideText.Length,
-                            c => c.IndexOf(sideText) + sideText.Length + c.Slice(c.IndexOf(sideText) + sideText.Length).IndexOf(' ')
-                            )
-                            .Trim()
-                            .ToEnum<CardSide>()
-                            .Value;
 
-            var sideString = res.Side.ToString();
-            res.Type = cursor.ReadLine().Slice(
-                            c => c.IndexOf(sideString, StringComparison.CurrentCultureIgnoreCase) + sideString.Length
-                            )
-                            .Trim()
-                            .ToEnum<CardType>()
-                            .Value;
+            try
+            {
+                res.Side = cursor.ReadLine().Slice(
+                                c => c.IndexOf(sideText) + sideText.Length,
+                                c => c.IndexOf(sideText) + sideText.Length + c.Slice(c.IndexOf(sideText) + sideText.Length).IndexOf(' ')
+                                )
+                                .Trim()
+                                .ToEnum<CardSide>()
+                                .Value;
+
+                var sideString = res.Side.ToString();
+                res.Type = cursor.ReadLine().Slice(
+                                c => c.IndexOf(sideString, StringComparison.CurrentCultureIgnoreCase) + sideString.Length
+                                )
+                                .Trim()
+                                .ToEnum<CardType>()
+                                .Value;
+            } catch (Exception)
+            {
+                (res.Side, res.Type) = HandleCorrections(res.Serial);
+            }
 
             cursor.Next();
 
@@ -206,6 +213,21 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
             Log.Information("Extracted: {serial}", res.Serial);
             return res;
+        }
+
+        /// <summary>
+        /// Handle exceptional corrections that are caused by HOTC being absolutely wrong.
+        /// </summary>
+        /// <param name="serial"></param>
+        /// <returns></returns>
+        private (CardSide, CardType)  HandleCorrections(string serial)
+        {
+            return serial switch
+            {
+                "MR/W59-075" => (CardSide.Weiss, CardType.Climax),
+                "MR/W59-076" => (CardSide.Weiss, CardType.Climax),
+                _ => throw new NotImplementedException()
+            };
         }
 
         private string Clean(string hotcEffectText)

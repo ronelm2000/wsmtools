@@ -27,6 +27,6 @@ jobs:
       run: dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true
     - name: Upload Artifact
     - uses: actions/upload-artifact@v1
-        with:
-          name: x64-binary
-          path: MontageWeissTools/bin/Release/netcoreapp3.1/win-x64/publish/wsmtools.exe
+      with:
+        name: x64-binary
+        path: MontageWeissTools/bin/Release/netcoreapp3.1/win-x64/publish/wsmtools.exe

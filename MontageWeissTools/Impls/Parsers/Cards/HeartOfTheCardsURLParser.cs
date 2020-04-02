@@ -74,29 +74,33 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             var soulText = "Soul: ";
             var traitsText = "Traits: ";
             var triggersText = "Triggers: ";
-            var flavorText = "Flavor: ";
-            var rulesTextText = "TEXT: ";
+            var flavorText = "Flavor:";
+            var rulesTextText = "TEXT:";
 
-            while (!cursor.ReadLine().StartsWith(cardNoText))
+            while (!cursor.CurrentLine.StartsWith(cardNoText))
                 cursor.Next();
-
-            //            ReadOnlySpan<char> cardNoLine = cursor.ReadLine();
-            res.Serial = cursor.ReadLine().Slice(
+            var linesToCardNoText = cursor.LineNumber;
+            //            ReadOnlySpan<char> cardNoLine = cursor.CurrentLine;
+            res.Serial = cursor.CurrentLine.Slice(
                             c => c.IndexOf(cardNoText) + cardNoText.Length,
                             c => c.IndexOf(rarityText)
                             )
                             .Trim()
                             .ToString();
-            res.Rarity = cursor.ReadLine().Slice(c => c.IndexOf(rarityText) + rarityText.Length).Trim().ToString();
+            res.Rarity = cursor.CurrentLine.Slice(c => c.IndexOf(rarityText) + rarityText.Length).Trim().ToString();
 
             cursor.MoveUp();
-            // Log.Information("+1 above Card No: {line}", cursor.ReadLine().ToString());
+            // Log.Information("+1 above Card No: {line}", cursor.CurrentLine.ToString());
             res.Name = new MultiLanguageString();
-            res.Name["jp"] = cursor.ReadLine().ToString();
-            cursor.MoveUp();
-            res.Name["en"] = cursor.ReadLine().ToString();
-            cursor.Next(3);
-            res.Color = cursor.ReadLine().Slice(
+            res.Name["jp"] = cursor.CurrentLine.ToString();
+            if (cursor.LineNumber > 1)
+            {
+                cursor.MoveUp();
+                res.Name["en"] = cursor.CurrentLine.ToString();
+            }
+            //cursor.Next(3);
+            cursor.Next(linesToCardNoText - 1);
+            res.Color = cursor.CurrentLine.Slice(
                             c => c.IndexOf(colorText) + colorText.Length,
                             c => c.IndexOf(sideText)
                             )
@@ -106,7 +110,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
             try
             {
-                res.Side = cursor.ReadLine().Slice(
+                res.Side = cursor.CurrentLine.Slice(
                                 c => c.IndexOf(sideText) + sideText.Length,
                                 c => c.IndexOf(sideText) + sideText.Length + c.Slice(c.IndexOf(sideText) + sideText.Length).IndexOf(' ')
                                 )
@@ -115,7 +119,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                                 .Value;
 
                 var sideString = res.Side.ToString();
-                res.Type = cursor.ReadLine().Slice(
+                res.Type = cursor.CurrentLine.Slice(
                                 c => c.IndexOf(sideString, StringComparison.CurrentCultureIgnoreCase) + sideString.Length
                                 )
                                 .Trim()
@@ -131,28 +135,28 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             switch (res.Type)
             {
                 case CardType.Character:
-                    res.Power = cursor.ReadLine().Slice(
+                    res.Power = cursor.CurrentLine.Slice(
                             c => c.IndexOf(powerText) + powerText.Length,
                             c => c.IndexOf(soulText)
                         )
                         .Trim()
                         .AsParsed<int>(int.TryParse);
 
-                    res.Soul = cursor.ReadLine().Slice(
+                    res.Soul = cursor.CurrentLine.Slice(
                             c => c.IndexOf(soulText) + soulText.Length
                         )
                         .Trim()
                         .AsParsed<int>(int.TryParse);
                     goto case CardType.Event;
                 case CardType.Event:
-                    res.Level = cursor.ReadLine().Slice(
+                    res.Level = cursor.CurrentLine.Slice(
                             c => c.IndexOf(levelText) + levelText.Length,
                             c => c.IndexOf(costText)
                         )
                         .Trim()
                         .AsParsed<int>(int.TryParse);
 
-                    res.Cost = cursor.ReadLine().Slice(
+                    res.Cost = cursor.CurrentLine.Slice(
                             c => c.IndexOf(costText) + costText.Length,
                             c => c.IndexOf(powerText)
                         )
@@ -165,7 +169,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
             cursor.Next();
 
-            res.Traits = cursor.ReadLine()
+            res.Traits = cursor.CurrentLine
                 .Slice(c => c.IndexOf(traitsText) + traitsText.Length)
                 .Trim()
                 .ToString()
@@ -176,22 +180,20 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
             cursor.Next();
 
-            var stringTriggers = cursor.ReadLine()
+            var stringTriggers = cursor.CurrentLine
                 .Slice(c => c.IndexOf(triggersText) + triggersText.Length)
                 .ToString();
             res.Triggers = TranslateTriggers(stringTriggers.Trim());
 
             cursor.Next();
 
-            res.Flavor = cursor.ReadLine().Slice(c => c.IndexOf(flavorText) + flavorText.Length).ToString();
-            cursor.Next();
-            while (!cursor.ReadLine().StartsWith(rulesTextText))
+            res.Flavor = cursor.CurrentLine.Slice(c => c.IndexOf(flavorText) + flavorText.Length).ToString();
+            while (cursor.Next() && !cursor.CurrentLine.StartsWith(rulesTextText))
             {
-                res.Flavor += " " + cursor.ReadLine().ToString();
-                cursor.Next();
+                res.Flavor += " " + cursor.CurrentLine.ToString();
             }
 
-            var stringEffect = cursor.ReadAll()
+            var stringEffect = cursor.LinesUntilEOS
                 .Slice(c => c.IndexOf(rulesTextText) + rulesTextText.Length)
                 .Trim()
                 .ToString();

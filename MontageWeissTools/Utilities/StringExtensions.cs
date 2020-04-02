@@ -46,7 +46,7 @@ namespace Montage.Weiss.Tools.Utilities
 
         public static ReadOnlySpan<char> Slice(this ReadOnlySpan<char> original, ReadOnlySpanCursor start)
         {
-            return original.Slice(start(original));
+            return original.Slice(Math.Min(original.Length, start(original)));
         }
 
         public static T? AsParsed<T>(this ReadOnlySpan<char> original, SpanOptionalFunction<T> spanFunction) where T : struct
@@ -82,35 +82,45 @@ namespace Montage.Weiss.Tools.Utilities
                 this._parent = parent;
             }
 
-            public ReadOnlySpan<char> ReadLine()
+            public ReadOnlySpan<char> CurrentLine
             {
-                var length = _parent().Slice(_cursor + 1).IndexOf(_separator) + 1; //, _cursor + 1) - _cursor;
-                Log.Debug("Length: {length}", length);
-                if (length > -1)
-                    return _parent().Slice(_cursor + 1, length).Trim();
-                else
-                    return _parent().Slice(_cursor + 1).Trim();
+                get
+                {
+                    var length = _parent().Slice(_cursor + 1).IndexOf(_separator) + 1; //, _cursor + 1) - _cursor;
+                    Log.Debug("Length: {length}", length);
+                    if (length > -1)
+                        return _parent().Slice(_cursor + 1, length).Trim();
+                    else
+                        return _parent().Slice(_cursor + 1).Trim();
+                }
             }
 
-            public ReadOnlySpan<char> ReadAll()
+            /// <summary>
+            /// The current line and all succeeding lines until the end of the parent Span (or string).
+            /// </summary>
+            public ReadOnlySpan<char> LinesUntilEOS
             {
-                return _parent().Slice(_cursor + 1).Trim();
+                get
+                {
+                    return _parent().Slice(_cursor + 1).Trim();
+                }
             }
 
             public void MoveUp()
             {
                 if (_cursor - 1 >= 0)
                 {
-                    _cursor = _parent().Slice(0, _cursor - 1).LastIndexOf(_separator);
-                    _lineNumber++;
+                    _cursor = _parent().Slice(0, _cursor).LastIndexOf(_separator);
+                    _lineNumber--;
                 }
                 Log.Debug("Cursor: {_cursor}", _cursor);
             }
 
 
-            public void Next()
+            public bool Next()
             {
                 //                _cursor = _parent.IndexOf(_separator, _cursor + 1);
+                var previousCursor = _cursor;
                 _cursor = _cursor + _parent().Slice(_cursor + 1).IndexOf(_separator) + 1;
                 if (_cursor > 0)
                     _lineNumber++;
@@ -118,6 +128,7 @@ namespace Montage.Weiss.Tools.Utilities
                     _lineNumber = 1;
                 //_cursor = _cursor + _parent().Slice(_cursor + 1).IndexOf(_separator);
                 Log.Debug("Next Cursor: {_cursor}", _cursor);
+                return previousCursor < _cursor;
             }
 
             public void Previous(int lines = 1)

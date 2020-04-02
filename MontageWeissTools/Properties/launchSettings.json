@@ -26,6 +26,10 @@
     "wstools for Madoka": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/3fqflHO1_"
+    },
+    "wstools for CG": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/idolm@ster_cinderella_girls_2nd_season_booster_pack.html"
     }
   }
 }

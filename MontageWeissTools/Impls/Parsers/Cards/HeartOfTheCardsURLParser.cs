@@ -20,7 +20,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 Log.Information("Not compatible because not a url: {urlOrFile}", urlOrFile);
                 return false;
             }
-            if (url.Authority != "heartofthecards.com")
+            if (url.Authority != "heartofthecards.com" && url.Authority != "www.heartofthecards.com")
             {
                 Log.Information("Not compatible because {Authority} is not heartofthecards.com", url.Authority);
                 return false;

@@ -14,7 +14,10 @@
     },
     "wstools for LLS": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
+      "commandLineArgs": "parse https://www.heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
+    },
+    "wstools": {
+      "commandName": "Project"
     }
   }
 }

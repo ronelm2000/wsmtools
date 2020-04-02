@@ -1,6 +1,7 @@
 ﻿using Montage.Weiss.Tools.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Montage.Weiss.Tools.Entities
 {
@@ -35,6 +36,23 @@ namespace Montage.Weiss.Tools.Entities
             foreach (var val in resources)
                 newMLS.resources.Add(val.Key, val.Value);
             return newMLS;
+        }
+
+        /// <summary>
+        /// Attempts to resolve this object into a string as much as it can.
+        /// </summary>
+        /// <returns></returns>
+        internal string AsNonEmptyString()
+        {
+            StringBuilder sb = new StringBuilder();
+            if (EN != null)
+                sb.Append(EN);
+            else
+                sb.Append(JP);
+
+            if (JP != null)
+                sb.Append($" ({JP})");
+            return sb.ToString();
         }
 
         /*

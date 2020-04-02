@@ -1,0 +1,54 @@
+{
+  "SaveName": "",
+  "GameMode": "",
+  "Gravity": 0.5,
+  "PlayArea": 0.5,
+  "Date": "",
+  "Table": "",
+  "Sky": "",
+  "Note": "",
+  "Rules": "",
+  "XmlUI": "",
+  "LuaScript": "",
+  "LuaScriptState": "",
+  "ObjectStates": [
+    {
+      "Name": "PiecePack_Suns",
+      "Transform": {
+        "posX": 0,
+        "posY": 0,
+        "posZ": 0,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0,
+        "scaleX": 0.25,
+        "scaleY": 0.25,
+        "scaleZ": 0.25
+      },
+      "Nickname": "Deck Generator Tool",
+      "Description": "This tool uses a script to name and give descriptions to cards. Generated with wstools.",
+      "GMNotes": "",
+      "ColorDiffuse": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "Locked": false,
+      "Grid": true,
+      "Snap": true,
+      "IgnoreFoW": false,
+      "Autoraise": true,
+      "Sticky": true,
+      "Tooltip": true,
+      "GridProjection": false,
+      "HideWhenFaceDown": false,
+      "Hands": false,
+      "MeshIndex": 6,
+      "XmlUI": "",
+      "LuaScript": "",
+      "GUID": ""
+    }
+  ],
+  "TabStates": {},
+  "VersionNumber": ""
+}

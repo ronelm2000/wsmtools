@@ -39,8 +39,11 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 .GetHTMLAsync();
             var setID = firstCard.Set;
             var cardImages = cardList.QuerySelectorAll<IHtmlImageElement>("a > img")
-                .Select(ele => ele.Source.Replace("\t", ""))
-                .ToDictionary(str => (setID + "-" + str.AsSpan().Slice(c => c.LastIndexOf('_') + 1, c => c.LastIndexOf(".")).ToString()).ToLower());
+                .Select(ele => (
+                    Serial: GetSerial(ele),
+                    Source: ele.Source.Replace("\t", "")
+                    ))
+                .ToDictionary(p => p.Serial, p => p.Source);//(setID + "-" + str.AsSpan().Slice(c => c.LastIndexOf('_') + 1, c => c.LastIndexOf(".")).ToString()).ToLower());
 //                .ToLookup(ele => ele
 
             await foreach (var card in originalCards)
@@ -61,6 +64,14 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
             Log.Information("Finished.");
             yield break;
+        }
+
+        private object GetSerial(IHtmlImageElement ele)
+        {
+            Log.Debug("Parent Content: {content}", ele.Parent.TextContent);
+            Log.Debug("Last Ancestor Content: {content}", ele.Ancestors().Last().Text());
+            var innerHTML = ele.ParentElement.ParentElement.InnerHtml;
+            return innerHTML.AsSpan().Slice(c => 1, c => c.Slice(1).IndexOf('\t') + 1).ToString().ToLower();
         }
 
         private (string setLinkWithUnderscores, string url) CardListURLFrom(IDocument menu, WeissSchwarzCard firstCard)

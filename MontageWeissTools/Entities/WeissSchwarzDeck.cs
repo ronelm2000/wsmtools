@@ -11,6 +11,7 @@ namespace Montage.Weiss.Tools.Entities
         public Dictionary<WeissSchwarzCard, int> Ratios { get; set; } = new Dictionary<WeissSchwarzCard, int>();
         public string Remarks { get; set; }
 
+        public int Count => Ratios.Values.Sum();
         internal Dictionary<string,int> AsSimpleDictionary()
         {
             return Ratios.Select(kyd => (kyd.Key.Serial, kyd.Value))

@@ -88,13 +88,15 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
                 .GetJsonAsync<dynamic>();
 
             WeissSchwarzDeck res = new WeissSchwarzDeck();
+            res.Name = deckJSON.name;
 
             using (var db = _database())
                 foreach (dynamic card in deckJSON.cards) {
                     string fullSetID = card.set.ToString() + "/" + card.side.ToString() + card.release.ToString();
                     string serial = fullSetID + "-" + card.sid.ToString();
                     WeissSchwarzCard wscard = await db.WeissSchwarzCards.FindAsync(serial);
-                    if (wscard == null) {
+                    if (wscard == null)
+                    {
                         string setID = card.series;
                         await _parse($"https://www.encoredecks.com/api/series/{setID}/cards");
                         wscard = await db.WeissSchwarzCards.FindAsync(serial);
@@ -110,7 +112,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
                 }
             var simpleRatios = res.AsSimpleDictionary();
             Log.Information("Deck Parsed: {@simpleRatios}", simpleRatios);
-            Log.Information("Cards in Deck: {@count}", simpleRatios.Aggregate(0, (q, kvp) => q + kvp.Value)));
+            Log.Information("Cards in Deck: {@count}", simpleRatios.Values.Sum());
             return res;
         }
 

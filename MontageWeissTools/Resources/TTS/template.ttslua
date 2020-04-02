@@ -1,0 +1,85 @@
+-- Deck Generator Tool v0.0.1
+-- This script was inspired by Card Naming Tool which was created by dzikakulka, 
+-- and co-authored and published by Hiram Abiff.
+-- Created specifically for wstools, do not edit unless you know what you're doing.
+
+deckName = <deck_name_info_placeholder>
+serialsJSON = <serials_placeholder>
+serialInfoJSON = <serial_info_placeholder>
+
+-- Unless looking to troubleshoot, everything below this point should not need to be changed.
+
+function onLoad()
+	print("Deck Generator ("..deckName..")")
+	print("Note: Please ensure there are no other Deck Generators for this session. Also, please upload the deck.png first into the cloud and/or imgur.")
+	print("To generate, type: +generate <url_for_deck>")
+end
+
+
+function onChat(message, player)
+	local command = "+generate"
+    print(message)
+    print(player.color)
+	local subcomm = message:sub(1, #command)
+	if subcomm == command then
+		print("Running Generate Deck")
+		local splitStr = split(message)
+		local back = splitStr[3]
+		if back == nil then back = "https://i.imgur.com/fRYj5tS.jpg" end
+		generateDeck(splitStr[2], back)
+	end
+end
+
+function split(str)
+	local output = {}
+	local index = 1
+	for i in string.gmatch(str, "%S+") do
+		output[index] = i
+		index = index + 1
+	end
+	return output
+end
+
+--function onClick(obj, color, alt_click)
+function generateDeck(faces, back)
+	local serials = JSON.decode(serialsJSON)
+	local serialInfo = JSON.decode(serialInfoJSON)
+	local spawnParameters = {
+		type = "DeckCustom",
+		name = deckname,
+		callback_function = function(obj) onDeckLoaded(obj, deckname, serials, serialInfo) end
+	}
+	local obj = spawnObject(spawnParameters)
+	local customDeckParameters = {
+		face = faces,
+		back = back,
+		unique_back = false,
+		height = math.ceil(#serials / 10.0),
+		number = #serials,
+		back_is_hidden = true,
+	}
+	obj.setCustomObject(customDeckParameters)
+end
+
+function onDeckLoaded(obj, deckname, serials, serialInfo)
+	print("Deck Loaded.")
+	for i = 1, #serials, 1 do
+		local serial = serials[i]
+		local name = serialInfo[serial]["Name"]
+		local description = serialInfo[serial]["Description"]
+		local card = obj.takeObject({
+			position = obj.positionToWorld({0, 0.5, 0}),
+			smooth = true,
+			top = false
+		})
+		renameCard(card, name, description, i)
+	end
+	print("Deck Successfully Generated. Once all files are accounted for, please save that object for reuse.")
+end
+
+function renameCard(card, name, description, ix)
+	card.setName(name)
+	card.setDescription(description)
+	--card.setPositionSmooth({0, ix * 0.125, 0})
+	--Wait.frames(function() card.setPositionSmooth({0, ix * 0.0125,0}) end, ix)
+end

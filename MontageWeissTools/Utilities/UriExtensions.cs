@@ -88,6 +88,16 @@ namespace Montage.Weiss.Tools.Utilities
             });
         }
 
+        public static IFlurlRequest WithImageHeaders(this Uri url)
+        {
+            return url.AbsoluteUri.WithHeaders(new
+            {
+                User_Agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36",
+                Accept = "*/*",
+                Referer = url.Authority
+            });
+        }
+
         public static async Task<IDocument> GetHTMLAsync(this IFlurlRequest flurlReq)
         {
             //var content = wc.DownloadString(uri);

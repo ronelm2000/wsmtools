@@ -13,6 +13,17 @@ namespace Montage.Weiss.Tools.Utilities
         public delegate bool SpanOptionalFunction<T>(ReadOnlySpan<char> original, out T outvar);
         public delegate R FuncOut<I,T,R>(I original, out T outvar);
 
+        public static string EscapeQuotes(this string str)
+        {
+            return str  .Replace("\\", "\\\\")
+                        .Replace("\"", "\\\"")
+                        .Replace("\b", "\\\b")
+                        .Replace("\n", "\\\n")
+                        .Replace("\t", "\\\t")
+                        .Replace("\r", "\\\r");
+                        
+        }
+
         public static SpanCursor AsSpanCursor(this string parent, string separator = "\n")
         {
             return new SpanCursor(separator, () => parent.AsSpan());

@@ -60,10 +60,18 @@ namespace Montage.Weiss.Tools
 
         private static Task Display(IEnumerable<Error> errors)
         {
+            var makeCLIAppear = false;
             foreach (Error error in errors)
             {
-                Log.Error("{@Error}", error);
+                if (error is HelpVerbRequestedError || error is NoVerbSelectedError)
+                {
+                    Console.WriteLine("This is a CLI (Command Line Interface). You must use PowerShell or Command Prompt to use all of this application's functionalities.");
+                    makeCLIAppear = true;
+                }
+                else if (!(error is HelpVerbRequestedError))
+                    Log.Error("{@Error}", error);
             }
+            if (makeCLIAppear) Console.ReadKey(false);
             return Task.CompletedTask;
         }
 

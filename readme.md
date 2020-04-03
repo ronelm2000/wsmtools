@@ -18,7 +18,7 @@ registering on GitHub.
 
 #### Supported Deck Parsers ####
 * [Encore Decks](https://www.encoredecks.com/)
-* [HOTC](https://heartofthecards.com/ws/)
+* HOTC ... technically.
 
 ---------
 
@@ -42,8 +42,10 @@ registering on GitHub.
 ---------
 
 ### Known Issues ###
-* Some decks from EncoreDecks will be untranslated. This is true for all sets without a community translation.
-  In order to resolve this, you must use HOTC translations by running the following command first.
+* Some decks from Encore Decks will be untranslated. This is true for all sets without a community translation.
+  In order to resolve this, you must (begrudgingly) use HOTC translations by running the following command first.
+  Personally, I discourage anyone with a 10-foot pole to use it because they don't like people using their translations
+  at all, but the tools are there if you really want to.
   ```ps
   ./wstools parse url_of_translations_summary_html_page
   ```
@@ -52,6 +54,7 @@ registering on GitHub.
   ![Yes, that one link which is printed](https://i.imgur.com/FkukMso.png)
 * HOTC's Weiss Promos and Schwarz Promos are currently an unsupported use case as they contain all promos
   from every single set for that particular side. Future support may include parsing that page as well, but
-  given their design, almost any compromises leads to an uptick in unneeded calls on their site.
-* Some HOTC have the wierdest problems, like this from Magia Record. Please report them if seen.
+  given their design and their copyright, almost any compromises leads to an uptick in unneeded calls on their site.
+* Some HOTC pages have the wierdest problems, like this from Magia Record. Please report them if seen.
+
   ![Why!?!](https://i.imgur.com/NdpGGp0.png)

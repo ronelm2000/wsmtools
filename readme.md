@@ -24,19 +24,19 @@ registering on GitHub.
 
 *I know you're probably just here just so that you can quickly netdeck into TTS; so how do you do it?*
 1. Execute this lovely command on PowerShell.
-  ```ps
-  ./wstools export your_encore_decks_deck_link_here
-  ```
+   ```ps
+   ./wstools export your_encore_decks_deck_link_here
+   ```
 2. You will get the following on your Exports folder: `deck.your deck name.png`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
 3. The `Deck Generator` files go into your Save Objects folder (typically `%HOMEDRIVE%%HOMEPATH%\Documents\My Games\Tabletop Simulator\Saves\Saved Objects`)
 4. The `deck.your deck name.png` should be uploaded (imgur or Steam Cloud using Tabletop Simulator)
 5. Open Tabletop Simulator (Single-Player will do)
-5. Load the Saved Object (and make sure no other Deck Generators are loaded!)
-6. In the chat command, type:
-  ```ps
-  +generate url_of_your_deck url_of_your_sleeves
-  ```
-7. You should be able to create decks like this:
+6. Load the Saved Object (and make sure no other Deck Generators are loaded!)
+7. In the chat command, type:
+   ```ps
+   +generate url_of_your_deck url_of_your_sleeves
+   ```
+8. You should be able to create decks like this:
    ![Tho why do you need effects for decks with English art?](https://i.imgur.com/WuRpf9I.png)
 
 ---------
@@ -48,6 +48,7 @@ registering on GitHub.
   ./wstools parse url_of_translations_summary_html_page
   ```
   The HTML page is usually in this link.
+
   ![Yes, that one link which is printed](https://i.imgur.com/FkukMso.png)
 * HOTC's Weiss Promos and Schwarz Promos are currently an unsupported use case as they contain all promos
   from every single set for that particular side. Future support may include parsing that page as well, but

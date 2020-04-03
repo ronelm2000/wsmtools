@@ -54,6 +54,8 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                 .SelectAwait(async (wsc) => (card: wsc, stream: await wsc.Images.Last().WithImageHeaders().GetStreamAsync()))
                 .ToDictionaryAsync(p => p.card, p => Image.Load(p.stream));
 
+            var newPNG = $"deck_{fileNameFriendlyDeckName.ToLower()}.png";
+            var deckPNG = resultFolder.Combine(newPNG);
 
             using (var _ = imageDictionary.GetDisposer())
             {
@@ -81,8 +83,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                             ctx.DrawImage(imageDictionary[serialList[i]], point, 1);
                         });
                     }
-                    var newPNG = $"deck_{fileNameFriendlyDeckName.ToLower()}.png";
-                    var deckPNG = resultFolder.Combine(newPNG);
+
                     Log.Information("Finished drawing all cards in serial order; saving image...");
                     deckPNG.Open(fullGrid.SaveAsPng);
 
@@ -132,6 +133,9 @@ namespace Montage.Weiss.Tools.Impls.Exporters
             }, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite);
 
             Log.Information("Done! Relevant Files have been saved in: {path}", resultFolder.FullPath);
+
+            if (Console.IsOutputRedirected) // Enable Non-Interactive Path Passthrough of the deck png
+                Console.Write(deckPNG.FullPath);
 
             //throw new NotImplementedException();
         }

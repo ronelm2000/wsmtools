@@ -16,17 +16,25 @@ namespace Montage.Weiss.Tools
     {
         public static async Task Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Is(LogEventLevel.Debug)
-                .WriteTo.Console(
-                    restrictedToMinimumLevel: LogEventLevel.Information,
-                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
-                    )
+            var config = new LoggerConfiguration().MinimumLevel.Is(LogEventLevel.Debug)
                 .WriteTo.Debug(
                     restrictedToMinimumLevel: LogEventLevel.Debug,
                     outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
-                    )
-                .CreateLogger();
+                );
+
+            if (!Console.IsOutputRedirected)
+                config = config.WriteTo.Console(
+                                restrictedToMinimumLevel: LogEventLevel.Information,
+                                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
+                                );
+            else
+                config = config.WriteTo.File(
+                        "./wstools.out.log",
+                        restrictedToMinimumLevel: LogEventLevel.Information,
+                        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
+                        );
+
+            Serilog.Log.Logger = config.CreateLogger();
 
             Log.Information("Starting...");
 

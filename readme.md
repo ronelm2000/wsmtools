@@ -2,7 +2,7 @@ WSMTools (Weiss Schwarz Montage Tools)
 ===========
 ![.NET Core](https://github.com/ronelm2000/wsmtools/workflows/.NET%20Core/badge.svg)
 
-This a tool intended to parse through and export data regarding to Weiss Schwarz cards; specifically, this tool's intention is to make querying, parsing, and exporting cards from various sources easier, as
+This a CLI (Command Line Interface) tool intended to parse through, process, and export data regarding to Weiss Schwarz cards; specifically, this tool's intention is to make querying, parsing, and exporting cards from various sources easier, as
 well as provide APIs to expand on that functionality.
 
 For now this tool is barebones (in its alpha stage, so expect some bugs), but I'm hoping it will be able to perform the following:
@@ -10,16 +10,20 @@ For now this tool is barebones (in its alpha stage, so expect some bugs), but I'
 * Parse decks using the local database.
 * Export decks for use into another format.
 
-### Supported Exporters ###
+There are no releases for now, but you can get the [latest build](https://github.com/ronelm2000/wsmtools/actions) by
+registering on GitHub. 
+
+#### Supported Exporters ####
 * [Tabletop Simulator](https://steamcommunity.com/sharedfiles/filedetails/?id=1321170886)
 
-### Supported Deck Parsers ###
+#### Supported Deck Parsers ####
 * [Encore Decks](https://www.encoredecks.com/)
+* [HOTC](https://heartofthecards.com/ws/)
 
 ---------
 
 *I know you're probably just here just so that you can quickly netdeck into TTS; so how do you do it?*
-1. Execute this lovely command.
+1. Execute this lovely command on PowerShell.
   ```ps
   ./wstools export your_encore_decks_deck_link_here
   ```
@@ -32,3 +36,21 @@ For now this tool is barebones (in its alpha stage, so expect some bugs), but I'
   ```ps
   +generate url_of_your_deck url_of_your_sleeves
   ```
+7. You should be able to create decks like this:
+   ![Tho why do you need effects for decks with English art?](https://i.imgur.com/WuRpf9I.png)
+
+---------
+
+### Known Issues ###
+* Some decks from EncoreDecks will be untranslated. This is true for all sets without a community translation.
+  In order to resolve this, you must use HOTC translations by running the following command first.
+  ```ps
+  ./wstools parse url_of_translations_summary_html_page
+  ```
+  The HTML page is usually in this link.
+  ![Yes, that one link which is printed](https://i.imgur.com/FkukMso.png)
+* HOTC's Weiss Promos and Schwarz Promos are currently an unsupported use case as they contain all promos
+  from every single set for that particular side. Future support may include parsing that page as well, but
+  given their design, almost any compromises leads to an uptick in unneeded calls on their site.
+* Some HOTC have the wierdest problems, like this from Magia Record. Please report them if seen.
+  ![Why!?!](https://i.imgur.com/NdpGGp0.png)

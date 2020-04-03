@@ -68,7 +68,6 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
             {
                 Log.Error("The URL does not point to a valid image. Inspection failed.");
                 return null;
-
             }
             catch (Exception e)
             {

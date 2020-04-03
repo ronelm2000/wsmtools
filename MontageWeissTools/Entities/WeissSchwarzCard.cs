@@ -25,6 +25,8 @@ namespace Montage.Weiss.Tools.Entities
         public List<Uri> Images { get; set; } = new List<Uri>();
         public string Remarks { get; set; }
 
+        //public readonly WeissSchwarzCard Empty = new WeissSchwarzCard();
+
         /// <summary>
         /// Gets the Full Release ID
         /// </summary>
@@ -45,8 +47,10 @@ namespace Montage.Weiss.Tools.Entities
         {
             var serial = Serial;
             if (serial.Contains("-E")) return CardLanguage.English;
-            else if (serial.Contains("WX")) return CardLanguage.English;
-            else if (serial.Contains("SX")) return CardLanguage.English;
+            else if (serial.Contains("-PE")) return CardLanguage.English;
+            else if (serial.Contains("-TE")) return CardLanguage.English;
+            else if (serial.Contains("-WX")) return CardLanguage.English;
+            else if (serial.Contains("-SX")) return CardLanguage.English;
             else if (serial.Contains("/EN-")) return CardLanguage.English;
             else return CardLanguage.Japanese;
         }

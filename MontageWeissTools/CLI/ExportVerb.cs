@@ -40,11 +40,18 @@ namespace Montage.Weiss.Tools.CLI
 
             var deck = await parser.Parse(Source);
 
-            var exporter = ioc.GetAllInstances<IDeckExporter>()
-                .Where(exporter => exporter.Alias.Contains(Exporter))
-                .First();
+            deck = await ioc.GetAllInstances<IExportedDeckInspector>()
+                .ToAsyncEnumerable()
+                .AggregateAwaitAsync(deck, async (d, inspector) => await inspector.Inspect(d, false));
 
-            await exporter.Export(deck, Destination);
+            if (deck != WeissSchwarzDeck.Empty)
+            {
+                var exporter = ioc.GetAllInstances<IDeckExporter>()
+                    .Where(exporter => exporter.Alias.Contains(Exporter))
+                    .First();
+
+                await exporter.Export(deck, Destination);
+            }
         }
     }
 }

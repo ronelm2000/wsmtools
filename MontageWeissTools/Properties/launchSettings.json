@@ -21,7 +21,7 @@
     },
     "wsools export Grasaia": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/Qy4yuqC8f"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/aTnKOs3Jx"
     },
     "wstools for Madoka": {
       "commandName": "Project",
@@ -34,6 +34,10 @@
     "wstools help": {
       "commandName": "Project",
       "commandLineArgs": "help"
+    },
+    "wstools export GS": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/_ubLZmZ73"
     }
   }
 }

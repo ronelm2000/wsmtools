@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true --version-suffix 'rc{{GITHUB_RUN_NUMBER}}'
+      run: dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true --version-suffix 'rc$GITHUB_RUN_NUMBER'
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:

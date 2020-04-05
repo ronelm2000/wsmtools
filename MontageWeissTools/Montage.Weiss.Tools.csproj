@@ -8,7 +8,7 @@
     <Product>Weiss Schwarz Montage Tools (wsmtools)</Product>
     <AssemblyVersion>0.0.1.0</AssemblyVersion>
     <FileVersion>0.0.1.0</FileVersion>
-    <Version>0.0.2.1-$(VersionSuffix)</Version>
+    <Version>0.0.2.1</Version>
     <PackageId>wsmtools</PackageId>
     <Authors>ronelm2000</Authors>
     <Company>ronelm2000</Company>

@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Montage.Weiss.Tools", "Mont
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BB5C3BE8-6A5C-4C2F-9DAD-9C12D150F90F}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\nightly.yml = .github\workflows\nightly.yml
 		readme.md = readme.md
 	EndProjectSection
 EndProject

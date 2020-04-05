@@ -24,9 +24,9 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true
+      run: dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true --version-suffix 'rc{{GITHUB_RUN_NUMBER}}'
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
-        name: wstools.exe
+        name: wstools
         path: MontageWeissTools/bin/Release/netcoreapp3.1/win-x64/publish/wstools.exe

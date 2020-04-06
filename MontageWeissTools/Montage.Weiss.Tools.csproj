@@ -16,6 +16,7 @@
     <Authors>ronelm2000</Authors>
     <Company>ronelm2000</Company>
     <NoWin32Manifest>true</NoWin32Manifest>
+    <Copyright>Copyright (c) 2020 ronelm2000 / Weiss Schwarz (c) Bushiroad All Rights Reserved.</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

@@ -2,6 +2,8 @@ WSMTools (Weiss Schwarz Montage Tools)
 ===========
 ![.NET Core](https://github.com/ronelm2000/wsmtools/workflows/.NET%20Core/badge.svg)
 
+Weiss Schwarz ©bushiroad All Rights Reserved.
+
 This a CLI (Command Line Interface) tool intended to parse through, process, and export data regarding to Weiss Schwarz cards; specifically, this tool's intention is to make querying, parsing, and exporting cards from various sources easier, as
 well as provide APIs to expand on that functionality.
 

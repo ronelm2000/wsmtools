@@ -21,11 +21,11 @@
     },
     "wsools export Grasaia": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/aTnKOs3Jx"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/aTnKOs3Jx --out ShareX"
     },
     "wstools for Madoka": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/3fqflHO1_"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/3fqflHO1_ --out \"C:\\Program Files\\ShareX\\ShareX.exe\""
     },
     "wstools for CG": {
       "commandName": "Project",
@@ -38,6 +38,10 @@
     "wstools export GS": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/_ubLZmZ73"
+    },
+    "wstools parse DC3": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/api/series/5d6d4e057cd9b718cd3a0d2b/cards"
     }
   }
 }

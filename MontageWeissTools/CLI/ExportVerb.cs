@@ -15,18 +15,37 @@ namespace Montage.Weiss.Tools.CLI
     public class ExportVerb : IVerbCommand
     {
         [Value(0, HelpText = "Indicates the source file/url.")]
-        public string Source { get; set; }
+        public string Source { get; }
         
         [Value(1, HelpText = "Indicates the destination; usually a folder.", Default = "./Export/")]
-        public string Destination { get; set; }
+        public string Destination { get; }
 
         [Option("parser", HelpText = "Manually sets the deck parser to use. Possible values: encoredecks", Default = "encoredecks")]
-        public string Parser { get; set; }
+        public string Parser { get; }
 
         [Option("exporter", HelpText = "Manually sets the deck exporter to use. Possible values: tabletopsim", Default = "tabletopsim")]
-        public string Exporter { get; set; }
+        public string Exporter { get; }
+
+        [Option("out", HelpText = "For some exporters, gives an out command to execute after exporting.", Default = "")]
+        public string OutCommand { get; }
 
         private readonly ILogger Log = Serilog.Log.ForContext<ExportVerb>();
+
+        /// <summary>
+        /// For the IOC
+        /// </summary>
+        public ExportVerb()
+        { 
+        }
+
+        public ExportVerb(string source, string destination, string parser, string exporter, string outCommand)
+        {
+            Source = source;
+            Destination = destination;
+            Parser = parser;
+            Exporter = exporter;
+            OutCommand = outCommand;
+        }
 
         public async Task Run(IContainer ioc)
         {
@@ -50,7 +69,7 @@ namespace Montage.Weiss.Tools.CLI
                     .Where(exporter => exporter.Alias.Contains(Exporter))
                     .First();
 
-                await exporter.Export(deck, Destination);
+                await exporter.Export(deck, this);
             }
         }
     }

@@ -52,9 +52,11 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             {
                 WeissSchwarzCard result = new WeissSchwarzCard();
                 result.Name = new MultiLanguageString();
-                result.Name.EN = DynamicExtensions.AsOptional(setCard.locale.EN).name;
-                result.Name.JP = DynamicExtensions.AsOptional(setCard.locale.NP).name;
-                (List<object>, List<object>) attributes = (setCard.locale.EN.attributes, setCard.locale.NP.attributes);
+                var enOptional = DynamicExtensions.AsOptional(setCard.locale.EN);
+                var jpOptional = DynamicExtensions.AsOptional(setCard.locale.NP);
+                result.Name.EN = enOptional.name;
+                result.Name.JP = jpOptional.name;
+                (List<object>, List<object>) attributes = (enOptional.attributes, jpOptional.attributes);
                 result.Traits = TranslateTraits(attributes).ToList();
                 result.Effect = ((List<object>)DynamicExtensions.AsOptional(setCard)?.ability)?.Cast<string>().ToArray();
                 result.Rarity = setCard.rarity;
@@ -131,9 +133,10 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
         private IEnumerable<MultiLanguageString> TranslateTraits((List<object> EN, List<object> JP) attributes)
         {
-            var maxlength = Math.Max(attributes.EN.Count, attributes.JP.Count);
-            var enSpan = attributes.EN;
-            var jpSpan = attributes.JP;
+            var nullCheckedAttributes = (EN: attributes.EN ?? Enumerable.Empty<object>().ToList(), JP: attributes.JP ?? Enumerable.Empty<object>().ToList());
+            var maxlength = Math.Max(nullCheckedAttributes.EN.Count, nullCheckedAttributes.JP.Count);
+            var enSpan = nullCheckedAttributes.EN;
+            var jpSpan = nullCheckedAttributes.JP;
             for (int i = 0; i < maxlength; i++)
             {
                 MultiLanguageString str = new MultiLanguageString();

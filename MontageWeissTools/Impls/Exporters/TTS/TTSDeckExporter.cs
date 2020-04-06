@@ -1,6 +1,7 @@
 ﻿using Fluent.IO;
 using Flurl.Http;
 using Montage.Weiss.Tools.API;
+using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Exporters.TTS;
 using Montage.Weiss.Tools.Resources;
@@ -14,6 +15,7 @@ using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 //using System.IO;
 //using System.IO;
 using System.Linq;
@@ -29,7 +31,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
 
         public string[] Alias => new [] { "tts", "tabletopsim" };
         
-        public async Task Export(WeissSchwarzDeck deck, string destinationFolderOrURL)
+        public async Task Export(WeissSchwarzDeck deck, ExportVerb parent)
         {
             var count = deck.Ratios.Keys.Count;
             int rows = (int) Math.Ceiling(deck.Count / 10d);
@@ -39,7 +41,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                 .SelectMany(c => Enumerable.Range(0, deck.Ratios[c]).Select(i => c))
                 .ToList();
 
-            var resultFolder = Path.CreateDirectory(destinationFolderOrURL);
+            var resultFolder = Path.CreateDirectory(parent.Destination);
 
             var fileNameFriendlyDeckName = deck.Name.AsFileNameFriendly();
 
@@ -87,9 +89,12 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                     Log.Information("Finished drawing all cards in serial order; saving image...");
                     deckPNG.Open(fullGrid.SaveAsPng);
 
+                    if (Console.IsOutputRedirected) // Enable Non-Interactive Path stdin Passthrough of the deck png
+                        using (var stdout = Console.OpenStandardOutput())
+                            fullGrid.SaveAsPng(stdout);
+
                     Log.Information("Done! Result PNG: {png}", deckPNG.FullPath);
 
-//                    resultFolder.CreateFile("deck.png", fullGrid.SaveAsPng);
                 }
             }
 
@@ -134,10 +139,29 @@ namespace Montage.Weiss.Tools.Impls.Exporters
 
             Log.Information("Done! Relevant Files have been saved in: {path}", resultFolder.FullPath);
 
-            if (Console.IsOutputRedirected) // Enable Non-Interactive Path Passthrough of the deck png
-                Console.Write(deckPNG.FullPath);
+            if (parent.OutCommand != "")
+            {
+                var cmd = $"{parent.OutCommand} {deckPNG.FullPath}";
+                Log.Information("Executing {command}", cmd);
+                System.Diagnostics.Process process = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+                startInfo.FileName = parent.OutCommand;
+                startInfo.Arguments = $"\"{deckPNG.FullPath.EscapeQuotes()}\"";
+                //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                //startInfo.RedirectStandardOutput = true;
+                process.StartInfo = startInfo;
 
-            //throw new NotImplementedException();
+                try
+                {
+                    if (process.Start())
+                        Log.Information("Command executed successfully.");
+//                        while (!process.HasExited)
+//                            Console.WriteLine(await process.StandardOutput.ReadLineAsync());
+                } catch (Win32Exception)
+                {
+                    Log.Warning("Command specified in --out failed; execute it manually.");
+                }
+            }
         }
 
         /*

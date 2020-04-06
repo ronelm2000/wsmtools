@@ -27,8 +27,12 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                 Log.Warning("Do you wish to continue? [Y/N] (Default is N)");
                 if (ConsoleUtils.Prompted(isNonInteractive))
                     return deck;
+                else
+                    return WeissSchwarzDeck.Empty;
+            } else
+            {
+                return deck;
             }
-            return WeissSchwarzDeck.Empty;
         }
     }
 }

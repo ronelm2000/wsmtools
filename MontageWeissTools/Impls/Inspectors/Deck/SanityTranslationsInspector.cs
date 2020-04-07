@@ -33,7 +33,12 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                 if (ConsoleUtils.Prompted(isNonInteractive))
                     return deck;
                 else
+                {
+                    Log.Information("Operation cancelled.");
+                    Log.Information("If you need to add card data from other sources, use this command: {command}", "wstools parse link_url");
+                    Log.Information("For more information, please see: {url}", new Uri("https://github.com/ronelm2000/wsmtools"));
                     return WeissSchwarzDeck.Empty;
+                }
             } else
             {
                 return deck;

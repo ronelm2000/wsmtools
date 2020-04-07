@@ -8,6 +8,7 @@ using Serilog;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace Montage.Weiss.Tools
         {
             Serilog.Log.Logger = BootstrapLogging().CreateLogger();
 
-            Log.Information("Starting...");
+            Log.Information("Starting... (Trace Listeners: {listeners})", System.Diagnostics.Trace.Listeners.Count);
 
             var container = Bootstrap();
 
@@ -43,7 +44,7 @@ namespace Montage.Weiss.Tools
                                 outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
                             );
 
-            if (!Console.IsOutputRedirected)
+            if (!IsOutputRedirected)
                 config = config.WriteTo.Console(
                                 restrictedToMinimumLevel: LogEventLevel.Information,
                                 outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
@@ -57,11 +58,16 @@ namespace Montage.Weiss.Tools
             return config;
         }
 
+        /// <summary>
+        /// Indicates if stdout piping is being used and it's not dotnet test
+        /// </summary>
+        public static bool IsOutputRedirected => Console.IsOutputRedirected && System.Diagnostics.Trace.Listeners.Count < 2;
+
         public static Container Bootstrap()
         {
             return new Container(x =>
             {
-                x.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));
+                //x.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));
                 x.AddSingleton<ILogger>(Serilog.Log.Logger);
                 x.Scan(s =>
                 {

@@ -89,7 +89,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                     Log.Information("Finished drawing all cards in serial order; saving image...");
                     deckPNG.Open(fullGrid.SaveAsPng);
 
-                    if (Console.IsOutputRedirected) // Enable Non-Interactive Path stdin Passthrough of the deck png
+                    if (Program.IsOutputRedirected) // Enable Non-Interactive Path stdin Passthrough of the deck png
                         using (var stdout = Console.OpenStandardOutput())
                             fullGrid.SaveAsPng(stdout);
 

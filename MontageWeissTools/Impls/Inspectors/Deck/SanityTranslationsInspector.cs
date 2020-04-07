@@ -41,6 +41,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                 }
             } else
             {
+                await Task.CompletedTask; //placebo way to stop warning about async/await
                 return deck;
             }
         }

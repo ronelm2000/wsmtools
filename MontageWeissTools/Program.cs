@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Serilog;
@@ -12,29 +13,11 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools
 {
-    class Program
+    public class Program
     {
         public static async Task Main(string[] args)
         {
-            var config = new LoggerConfiguration().MinimumLevel.Is(LogEventLevel.Debug)
-                .WriteTo.Debug(
-                    restrictedToMinimumLevel: LogEventLevel.Debug,
-                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
-                );
-
-            if (!Console.IsOutputRedirected)
-                config = config.WriteTo.Console(
-                                restrictedToMinimumLevel: LogEventLevel.Information,
-                                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
-                                );
-            else
-                config = config.WriteTo.File(
-                        "./wstools.out.log",
-                        restrictedToMinimumLevel: LogEventLevel.Information,
-                        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
-                        );
-
-            Serilog.Log.Logger = config.CreateLogger();
+            Serilog.Log.Logger = BootstrapLogging().CreateLogger();
 
             Log.Information("Starting...");
 
@@ -52,10 +35,34 @@ namespace Montage.Weiss.Tools
             await Task.CompletedTask;
         }
 
-        private static Container Bootstrap()
+        public static LoggerConfiguration BootstrapLogging()
+        {
+            var config = new LoggerConfiguration().MinimumLevel.Is(LogEventLevel.Debug)
+                            .WriteTo.Debug(
+                                restrictedToMinimumLevel: LogEventLevel.Debug,
+                                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
+                            );
+
+            if (!Console.IsOutputRedirected)
+                config = config.WriteTo.Console(
+                                restrictedToMinimumLevel: LogEventLevel.Information,
+                                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
+                                );
+            else
+                config = config.WriteTo.File(
+                        "./wstools.out.log",
+                        restrictedToMinimumLevel: LogEventLevel.Information,
+                        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
+                        );
+            return config;
+        }
+
+        public static Container Bootstrap()
         {
             return new Container(x =>
             {
+                x.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));
+                x.AddSingleton<ILogger>(Serilog.Log.Logger);
                 x.Scan(s =>
                 {
                     s.AssemblyContainingType<Program>();

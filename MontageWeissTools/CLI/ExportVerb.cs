@@ -29,6 +29,9 @@ namespace Montage.Weiss.Tools.CLI
         [Option("out", HelpText = "For some exporters, gives an out command to execute after exporting.", Default = "")]
         public string OutCommand { get; }
 
+        [Option("noninteractive", HelpText = "When set to true, there will be no prompts. Default options will be used.", Default = false)]
+        public bool NonInteractive { get; }
+
         private readonly ILogger Log = Serilog.Log.ForContext<ExportVerb>();
 
         /// <summary>
@@ -38,13 +41,14 @@ namespace Montage.Weiss.Tools.CLI
         { 
         }
 
-        public ExportVerb(string source, string destination, string parser, string exporter, string outCommand)
+        public ExportVerb(string source, string destination = "./Export/", string parser = "encoredecks", string exporter = "tabletopsim", string outCommand = "", bool nonInteractive = false)
         {
             Source = source;
             Destination = destination;
             Parser = parser;
             Exporter = exporter;
             OutCommand = outCommand;
+            NonInteractive = nonInteractive;
         }
 
         public async Task Run(IContainer ioc)
@@ -61,7 +65,7 @@ namespace Montage.Weiss.Tools.CLI
 
             deck = await ioc.GetAllInstances<IExportedDeckInspector>()
                 .ToAsyncEnumerable()
-                .AggregateAwaitAsync(deck, async (d, inspector) => await inspector.Inspect(d, false));
+                .AggregateAwaitAsync(deck, async (d, inspector) => await inspector.Inspect(d, NonInteractive));
 
             if (deck != WeissSchwarzDeck.Empty)
             {

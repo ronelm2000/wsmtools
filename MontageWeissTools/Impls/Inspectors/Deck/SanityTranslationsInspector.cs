@@ -12,7 +12,12 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 {
     public class SanityTranslationsInspector : IExportedDeckInspector
     {
-        public readonly ILogger Log = Serilog.Log.ForContext<SanityImageInspector>();
+        public readonly ILogger Log; // = Serilog.Log.ForContext<SanityTranslationsInspector>();
+
+        public SanityTranslationsInspector (ILogger log)
+        {
+            Log = log.ForContext<SanityTranslationsInspector>();
+        }
 
         public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, bool isNonInteractive)
         {

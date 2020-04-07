@@ -82,11 +82,8 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
             var localPath = uri.LocalPath;
             var deckID = localPath.Substring(localPath.LastIndexOf('/') + 1);
             Log.Information("Deck ID: {deckID}", deckID);
-            dynamic deckJSON = await encoreDecksDeckAPIURL
-                .AppendPathSegment(deckID)
-                .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
-                .WithHeader("Accept", "text/plain")
-                .GetJsonAsync<dynamic>();
+
+            dynamic deckJSON = await GetDeckJSON(encoreDecksDeckAPIURL, deckID);
 
             WeissSchwarzDeck res = new WeissSchwarzDeck();
             res.Name = deckJSON.name;
@@ -119,6 +116,24 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
             Log.Information("Deck Parsed: {@simpleRatios}", simpleRatios);
             Log.Information("Cards in Deck: {@count}", simpleRatios.Values.Sum());
             return res;
+        }
+
+        async Task<dynamic> GetDeckJSON(string encoreDecksDeckAPIURL, string deckID)
+        {
+            do try
+                {
+                    return await encoreDecksDeckAPIURL
+                                    .AppendPathSegment(deckID)
+                                    .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
+                                    .WithHeader("Accept", "text/plain")
+                                    .GetJsonAsync<dynamic>();
+                }
+                catch (FlurlHttpException ex)
+                {
+                    Log.Information(ex.Message);
+                    Log.Information("Retrying...");
+
+                } while (true);
         }
 
         private IEnumerable<string[]> ParseCSV(string csvFile, Action<TextFieldParser> builder)

@@ -1,4 +1,5 @@
 ﻿using Montage.Weiss.Tools.Utilities;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,8 @@ namespace Montage.Weiss.Tools.Entities
 {
     public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>
     {
+        private static ILogger Log;
+
         public string Serial { get; set; }
         public MultiLanguageString Name { get; set; }
         public List<MultiLanguageString> Traits { get; set; }
@@ -27,12 +30,18 @@ namespace Montage.Weiss.Tools.Entities
 
         //public readonly WeissSchwarzCard Empty = new WeissSchwarzCard();
 
+        public WeissSchwarzCard()
+        {
+            Log ??= Serilog.Log.ForContext<WeissSchwarzCard>();
+        }
+
         /// <summary>
         /// Gets the Full Release ID
         /// </summary>
-        public string ReleaseID => ParseRID(); // Serial.AsSpan().Slice(s => s.IndexOf('/') + 1); s => s.IndexOf('-')).ToString();
+        public string ReleaseID => ParseRID(Serial); // Serial.AsSpan().Slice(s => s.IndexOf('/') + 1); s => s.IndexOf('-')).ToString();
 
         public CardLanguage Language => TranslateToLanguage();
+
 
 
         public WeissSchwarzCard Clone()
@@ -52,11 +61,26 @@ namespace Montage.Weiss.Tools.Entities
             else if (serial.Contains("-WX")) return CardLanguage.English;
             else if (serial.Contains("-SX")) return CardLanguage.English;
             else if (serial.Contains("/EN-")) return CardLanguage.English;
+            else if (serial.Contains("/BSF")) return CardLanguage.English; // BSF is the English version of WCS for Spring
+            else if (serial.Contains("/BCS")) return CardLanguage.English; // BCS is the English version of WCS for Winter
             else return CardLanguage.Japanese;
         }
-        private string ParseRID()
+
+        public static SerialTuple ParseSerial(string serial)
         {
-            var span = Serial.AsSpan().Slice(s => s.IndexOf('/') + 1);
+            SerialTuple res = new SerialTuple();
+            res.NeoStandardCode = serial.Substring(0, serial.IndexOf('/'));
+            var slice = serial.AsSpan().Slice(serial.IndexOf('/'));
+            res.ReleaseID = ParseRID(serial);
+            slice = slice.Slice(res.ReleaseID.Length + 2);
+            res.SetID = slice.ToString();
+            //res.
+            return res;
+        }
+
+        private static string ParseRID(string serial)
+        {
+            var span = serial.AsSpan().Slice(s => s.IndexOf('/') + 1);
             var endAdjustment = (span.StartsWith("EN")) ? 3 : 0;
             return span.Slice(0, span.Slice(endAdjustment).IndexOf('-') + endAdjustment).ToString();
         }
@@ -76,6 +100,20 @@ namespace Montage.Weiss.Tools.Entities
             }
             fullSetID += releaseID;
             return fullSetID + "-" + setID;
+        }
+    }
+
+    public struct SerialTuple
+    {
+        public string NeoStandardCode;
+        public string ReleaseID;
+        public string SetID;
+
+        public void Deconstruct(out string NeoStandardCode, out string ReleaseID, out string SetID)
+        {
+            NeoStandardCode = this.NeoStandardCode;
+            ReleaseID = this.ReleaseID;
+            SetID = this.SetID;
         }
     }
 

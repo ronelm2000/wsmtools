@@ -51,7 +51,7 @@ jobs:
         asset_name: wsmtools.zip
         asset_content_type: application/zip
     - name: Add Release Artifact (linux-x64)
-      id: upload-release-asset 
+      id: upload-release-asset-2 
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -24,12 +24,20 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
             foreach (var card in keyCards)
             {
                 Log.Information("{serial} has no image URL. This deck cannot be exported without an image. Do you want to supply an image instead? [Y/N] (Default is N)", card.Serial);
-                if (Prompted(isNonInteractive) && inspectedDeck.ReplaceCard(card, await AddImageFromConsole(card)))
-                    Log.Information("Checking for other missing images (if any)...");
+                if (Prompted(isNonInteractive))
+                {
+                    if (inspectedDeck.ReplaceCard(card, await AddImageFromConsole(card)))
+                        Log.Information("Checking for other missing images (if any)...");
+                    else
+                        return WeissSchwarzDeck.Empty;
+                }
                 else
-                    inspectedDeck = WeissSchwarzDeck.Empty;
+                {
+                    Log.Information("Selected No; inspection failed.");
+                    return WeissSchwarzDeck.Empty;
+                }
             }
-            Log.Debug("Ending...");
+            Log.Debug("Finished inspection.");
             return inspectedDeck;
         }
 

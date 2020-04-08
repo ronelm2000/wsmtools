@@ -22,7 +22,15 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         public bool IsCompatible(List<WeissSchwarzCard> cards)
         {
-            return cards.Select(c => c.ReleaseID).Count() == 1 && cards.First().Language == CardLanguage.Japanese;
+            if (cards.First().Language != CardLanguage.Japanese)
+                return false;
+            else if (cards.Select(c => c.ReleaseID).Count() > 1)
+            {
+                Log.Warning("Yuyutei Image Post-Processor is disabled for sets with multiple Release IDs; please add those images manually when prompted.");
+                return false;
+            }
+            else
+                return true;
         }
 
         public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)

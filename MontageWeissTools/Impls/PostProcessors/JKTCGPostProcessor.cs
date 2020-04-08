@@ -21,7 +21,24 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         public bool IsCompatible(List<WeissSchwarzCard> cards)
         {
-            return cards.Select(c => c.ReleaseID).Count() == 1 && cards.First().Language == CardLanguage.English;
+            if (cards.First().Language != CardLanguage.English)
+                return false;
+
+            var allReleaseIDs = cards.Select(c => c.ReleaseID).ToArray();
+            if (allReleaseIDs.Length == 2 && allReleaseIDs.Contains("W53") && allReleaseIDs.Contains("WE27"))
+            {
+                Log.Information("JKTCG Image Post-Processor is normally disabled for sets with multiple Release IDs.");
+                Log.Information("But the set W53 is located in WE27 for JKTCG, so this Post-Processor is deemed compatible.");
+                return true;
+            }
+            else if (allReleaseIDs.Length > 1)
+            {
+                Log.Warning("JKTCG Image Post-Processor is disabled for sets with multiple Release IDs; please add those images manually when prompted.");
+                return false;
+            } else
+            {
+                return true;
+            }
         }
 
         public IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)

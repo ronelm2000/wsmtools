@@ -49,15 +49,11 @@ namespace Montage.Weiss.Tools.Test
         }
         */
 
-        private static LoggerConfiguration BootstrapLogging(Func<LoggerConfiguration, LoggerConfiguration> additionalActions = null)
+        public static LoggerConfiguration BootstrapLogging(Func<LoggerConfiguration, LoggerConfiguration> additionalActions = null)
         {
             additionalActions ??= (lc => lc);
             var config = new LoggerConfiguration().MinimumLevel.Is(LogEventLevel.Debug)
                                 .WriteTo.Trace(
-                                    restrictedToMinimumLevel: LogEventLevel.Debug,
-                                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
-                                )
-                                .WriteTo.Console(
                                     restrictedToMinimumLevel: LogEventLevel.Debug,
                                     outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
                                 );

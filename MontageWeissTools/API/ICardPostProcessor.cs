@@ -15,6 +15,13 @@ namespace Montage.Weiss.Tools.API
         public int Priority { get; }
 
         /// <summary>
+        /// Indicates if the list of cards exported are compatible for this post-processor in the first place.
+        /// </summary>
+        /// <param name="cards"></param>
+        /// <returns></returns>
+        public bool IsCompatible(List<WeissSchwarzCard> cards);
+
+        /// <summary>
         /// Applies post-processing on a card.
         /// </summary>
         /// <param name="original"></param>

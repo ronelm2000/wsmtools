@@ -19,6 +19,11 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         public int Priority => 0;
 
+        public bool IsCompatible(List<WeissSchwarzCard> cards)
+        {
+            return cards.Select(c => c.ReleaseID).Count() == 1 && cards.First().Language == CardLanguage.English;
+        }
+
         public IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
         {
             var firstCard = originalCards.FirstAsync().Result;

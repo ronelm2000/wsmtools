@@ -20,6 +20,11 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         public int Priority => 0;
 
+        public bool IsCompatible(List<WeissSchwarzCard> cards)
+        {
+            return cards.Select(c => c.ReleaseID).Count() == 1 && cards.First().Language == CardLanguage.Japanese;
+        }
+
         public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
         {
             var yuyuteiSellPage = "https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=";

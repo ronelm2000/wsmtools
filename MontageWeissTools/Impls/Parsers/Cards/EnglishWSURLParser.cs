@@ -116,8 +116,9 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
         public async IAsyncEnumerable<WeissSchwarzCard> Parse(string urlOrFile)
         {
-            var uri = new Uri(urlOrFile);
+            Log.Information("Starting...");
 
+            var uri = new Uri(urlOrFile);
             using (var fc = new FlurlClient().EnableCookies())
             {
                 fc.Settings.BeforeCall = this.Debug;
@@ -161,6 +162,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 //Log.Information("Debug: {content}", wsSearchPage.DocumentElement.OuterHtml);
             }
 
+            Log.Information("Ending...");
             yield break;
         }
 

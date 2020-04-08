@@ -2,6 +2,8 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Montage.Weiss.Tools.Entities
@@ -42,7 +44,7 @@ namespace Montage.Weiss.Tools.Entities
 
         public CardLanguage Language => TranslateToLanguage();
 
-
+        public static IEqualityComparer<WeissSchwarzCard> SerialComparer { get; internal set; } = new WeissSchwarzCardSerialComparerImpl();
 
         public WeissSchwarzCard Clone()
         {
@@ -100,6 +102,20 @@ namespace Montage.Weiss.Tools.Entities
             }
             fullSetID += releaseID;
             return fullSetID + "-" + setID;
+        }
+    }
+
+    internal class WeissSchwarzCardSerialComparerImpl : IEqualityComparer<WeissSchwarzCard>
+    {
+        public bool Equals([AllowNull] WeissSchwarzCard x, [AllowNull] WeissSchwarzCard y)
+        {
+            if (x == null) return y == null;
+            else return x.Serial == y.Serial;
+        }
+
+        public int GetHashCode([DisallowNull] WeissSchwarzCard obj)
+        {
+            return obj.Serial.GetHashCode();
         }
     }
 

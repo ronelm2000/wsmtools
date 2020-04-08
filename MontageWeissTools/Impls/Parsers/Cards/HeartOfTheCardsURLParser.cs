@@ -65,7 +65,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             var res = new WeissSchwarzCard();
 
             var cardNoText = "Card No.: ";
-            var rarityText = "Rarity: ";
+            var rarityText = "Rarity:";
             var colorText = "Color: ";
             var sideText = "Side: ";
             var levelText = "Level: ";
@@ -87,8 +87,13 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                             )
                             .Trim()
                             .ToString();
-            res.Rarity = cursor.CurrentLine.Slice(c => c.IndexOf(rarityText) + rarityText.Length).Trim().ToString();
-
+            try
+            {
+                res.Rarity = cursor.CurrentLine.Slice(c => c.IndexOf(rarityText) + rarityText.Length).Trim().ToString();
+            } catch (Exception e)
+            {
+                res.Rarity = HandleRarityCorrections(res.Serial, e);
+            }
             cursor.MoveUp();
             // Log.Information("+1 above Card No: {line}", cursor.CurrentLine.ToString());
             res.Name = new MultiLanguageString();
@@ -100,13 +105,19 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             }
             //cursor.Next(3);
             cursor.Next(linesToCardNoText - 1);
-            res.Color = cursor.CurrentLine.Slice(
-                            c => c.IndexOf(colorText) + colorText.Length,
-                            c => c.IndexOf(sideText)
-                            )
-                            .Trim()
-                            .ToEnum<CardColor>()
-                            .Value;
+            try
+            {
+                res.Color = cursor.CurrentLine.Slice(
+                                c => c.IndexOf(colorText) + colorText.Length,
+                                c => c.IndexOf(sideText)
+                                )
+                                .Trim()
+                                .ToEnum<CardColor>()
+                                .Value;
+            } catch (Exception e)
+            {
+                res.Color = HandleColorCorrections(res.Serial, e);
+            }
 
             try
             {
@@ -215,6 +226,25 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
             Log.Information("Extracted: {serial}", res.Serial);
             return res;
+        }
+
+        private CardColor HandleColorCorrections(string serial, Exception innerException)
+        {
+            return serial switch
+            {
+                "SG/W70-106" => CardColor.Blue,
+                _ => throw new NotImplementedException($"Unsupported color correction for {serial}.", innerException)
+            };
+        }
+
+        private string HandleRarityCorrections(string serial, Exception innerException)
+        {
+            return serial switch
+            {
+                // https://ws-tcg.com/cardlist/?cardno=LS/W05-124&l
+                "LS/W05-124" => "PR",
+                _ => throw new NotImplementedException($"Unsupported rarity correction for {serial}.", innerException)
+            };
         }
 
         /// <summary>

@@ -42,6 +42,10 @@
     "wstools parse DC3": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/api/series/5d6d4e057cd9b718cd3a0d2b/cards"
+    },
+    "wstools parse PRs": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/schwarz_promos.html"
     }
   }
 }

@@ -28,7 +28,7 @@ namespace Montage.Weiss.Tools.CLI
                 .First()
                 .Parse(URI)
                 .ToListAsync();
-            var cards = cardList.ToAsyncEnumerable();
+            var cards = cardList.Distinct(WeissSchwarzCard.SerialComparer).ToAsyncEnumerable();
 
             var postProcessors = container.GetAllInstances<ICardPostProcessor>()
                 .Where(procesor => procesor.IsCompatible(cardList))

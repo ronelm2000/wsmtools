@@ -23,15 +23,15 @@ namespace Montage.Weiss.Tools.CLI
             //Log.Information("Successful! The options are {@Options}", options);
             //var uri = new Uri(URI);
 
-            var cards = (await container.GetAllInstances<ICardSetParser>()
+            var cardList = await container.GetAllInstances<ICardSetParser>()
                 .Where(parser => parser.IsCompatible(URI))
                 .First()
                 .Parse(URI)
-                .ToListAsync())
-                .ToAsyncEnumerable()
-                ;
+                .ToListAsync();
+            var cards = cardList.ToAsyncEnumerable();
 
             var postProcessors = container.GetAllInstances<ICardPostProcessor>()
+                .Where(procesor => procesor.IsCompatible(cardList))
                 .OrderBy(processor => processor.Priority);
 
             cards = postProcessors.Aggregate(cards, (pp, cs) => cs.Process(pp));

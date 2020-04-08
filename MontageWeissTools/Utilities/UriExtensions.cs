@@ -88,6 +88,16 @@ namespace Montage.Weiss.Tools.Utilities
             });
         }
 
+        public static IFlurlRequest WithHTMLHeaders(this IFlurlRequest req)
+        {
+            return req.WithHeaders(new
+            {
+                User_Agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36",
+                Accept = "*/*",
+                Accept_Language = "en-US,en;q=0.8"
+            });
+        }
+
         public static IFlurlRequest WithImageHeaders(this Uri url)
         {
             return url.AbsoluteUri.WithHeaders(new
@@ -112,6 +122,21 @@ namespace Montage.Weiss.Tools.Utilities
                 req.Content(stream, true);
             });
 
+        }
+
+        public static async Task<IDocument> RecieveHTML(this Task<HttpResponseMessage> flurlReq)
+        {
+            var config = Configuration.Default.WithDefaultLoader()
+                    .WithCss()
+                    ;
+            var context = BrowsingContext.New(config);
+            var resReq = await flurlReq;
+            var stream = await resReq.Content.ReadAsStreamAsync(); //.ReceiveStream();
+            return await context.OpenAsync(req =>
+            {
+                req.Address(resReq.RequestMessage.RequestUri.AbsoluteUri);
+                req.Content(stream, true);
+            });
         }
 
     }

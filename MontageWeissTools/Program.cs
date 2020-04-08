@@ -20,7 +20,7 @@ namespace Montage.Weiss.Tools
         {
             Serilog.Log.Logger = BootstrapLogging().CreateLogger();
 
-            Log.Information("Starting... (Trace Listeners: {listeners})", System.Diagnostics.Trace.Listeners.Count);
+            Log.Information("Starting...");
 
             var container = Bootstrap();
 

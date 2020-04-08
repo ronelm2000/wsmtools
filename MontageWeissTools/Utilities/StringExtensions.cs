@@ -1,7 +1,10 @@
-﻿using Serilog;
+﻿using AngleSharp;
+using AngleSharp.Dom;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Utilities
 {
@@ -33,7 +36,15 @@ namespace Montage.Weiss.Tools.Utilities
             return res;
         }
 
-    public static SpanCursor AsSpanCursor(this string parent, string separator = "\n")
+        public static async Task<IDocument> ParseHTML(this string content)
+        {
+            var config = AngleSharp.Configuration.Default.WithCss();
+            var context = AngleSharp.BrowsingContext.New(config);
+            //Create a virtual request to specify the document to load (here from our fixed string)
+            return await context.OpenAsync(req => req.Content(content));
+        }
+
+        public static SpanCursor AsSpanCursor(this string parent, string separator = "\n")
         {
             return new SpanCursor(separator, () => parent.AsSpan());
         }

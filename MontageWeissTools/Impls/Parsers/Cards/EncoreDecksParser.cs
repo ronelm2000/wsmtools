@@ -19,26 +19,34 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
     public class EncoreDecksParser : ICardSetParser
     {
         private readonly Regex encoreDecksAPIMatcher = new Regex(@"https:\/\/www\.encoredecks\.com\/api\/series\/(.+)\/cards");
+        private readonly Regex encoreDecksSiteSetMatcher = new Regex(@"https:\/\/www.encoredecks\.com\/?.+&set=([a-f0-9]+).*");
         private readonly ILogger Log = Serilog.Log.ForContext<EncoreDecksParser>();
 
         public bool IsCompatible(string urlOrFile)
         {
-            Log.Information("Is Compatible? {urlOrFile}", urlOrFile);
-             if (encoreDecksAPIMatcher.IsMatch(urlOrFile))
+            //Log.Information("Is Compatible? {urlOrFile}", urlOrFile);
+            if (encoreDecksAPIMatcher.IsMatch(urlOrFile))
             {
-                Log.Information("Yes");
+                Log.Information("Compatibility Passed for: {urlOrFile}", urlOrFile);
+                return true;
+            }
+            else if (encoreDecksSiteSetMatcher.IsMatch(urlOrFile))
+            {
+                Log.Information("Compatibility Passed for: {urlOrFile}", urlOrFile);
                 return true;
             }
             else
             {
-                Log.Information("No");
+                Log.Information("Compatibility Failed for: {urlOrFile}", urlOrFile);
                 return false;
             }
-            //            throw new NotImplementedException();
         }
 
         public async IAsyncEnumerable<WeissSchwarzCard> Parse(string urlOrFile)
         {
+            if (encoreDecksSiteSetMatcher.IsMatch(urlOrFile))
+                urlOrFile = TransformIntoAPIFormat(urlOrFile);
+
             IList<dynamic> setCards = null;
             do try
                 {
@@ -95,7 +103,11 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             yield break;
         }
 
-
+        private string TransformIntoAPIFormat(string urlOrFile)
+        {
+            Log.Information("Converting URL into API link...");
+            return $"https://www.encoredecks.com/api/series/{encoreDecksSiteSetMatcher.Match(urlOrFile).Groups[1]}/cards";
+        }
 
         private CardColor TranslateColor(string color)
         {

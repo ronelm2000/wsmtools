@@ -46,6 +46,10 @@
     "wstools parse PRs": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/schwarz_promos.html"
+    },
+    "wstools parse ED Site Link": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5c7b08307cd9b718cdbd059c"
     }
   }
 }

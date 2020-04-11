@@ -10,6 +10,9 @@ using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json;
 using Serilog;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
@@ -29,9 +32,12 @@ namespace Montage.Weiss.Tools.Impls.Exporters
     {
         private ILogger Log = Serilog.Log.ForContext<TTSDeckExporter>();
 
+        private (IImageEncoder, IImageFormat) _pngEncoder = (new PngEncoder(), PngFormat.Instance);
+        private (IImageEncoder, IImageFormat) _jpegEncoder = (new JpegEncoder(), JpegFormat.Instance);
+
         public string[] Alias => new [] { "tts", "tabletopsim" };
         
-        public async Task Export(WeissSchwarzDeck deck, ExportVerb parent)
+        public async Task Export(WeissSchwarzDeck deck, IExportInfo info)
         {
             var count = deck.Ratios.Keys.Count;
             int rows = (int) Math.Ceiling(deck.Count / 10d);
@@ -41,7 +47,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                 .SelectMany(c => Enumerable.Range(0, deck.Ratios[c]).Select(i => c))
                 .ToList();
 
-            var resultFolder = Path.CreateDirectory(parent.Destination);
+            var resultFolder = Path.CreateDirectory(info.Destination);
 
             var fileNameFriendlyDeckName = deck.Name.AsFileNameFriendly();
 
@@ -53,11 +59,12 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                     Log.Information("Loading Images: ({i}/{count}) [{serial}]", i, count, p.Serial);
                     return p;
                 })
-                .SelectAwait(async (wsc) => (card: wsc, stream: await wsc.Images.Last().WithImageHeaders().GetStreamAsync()))
+                .SelectAwait(async (wsc) => (card: wsc, stream: await wsc.GetImageStreamAsync()))
                 .ToDictionaryAsync(p => p.card, p => Image.Load(p.stream));
 
-            var newPNG = $"deck_{fileNameFriendlyDeckName.ToLower()}.png";
-            var deckPNG = resultFolder.Combine(newPNG);
+            var (encoder, format) = info.Flags.Any(s => s.ToLower() == "png") == true ? _pngEncoder : _jpegEncoder;
+            var newImageFilename = $"deck_{fileNameFriendlyDeckName.ToLower()}.{format.FileExtensions.First()}";
+            var deckImagePath = resultFolder.Combine(newImageFilename);
 
             using (var _ = imageDictionary.GetDisposer())
             {
@@ -85,16 +92,15 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                             ctx.DrawImage(imageDictionary[serialList[i]], point, 1);
                         });
                     }
-
+                   
                     Log.Information("Finished drawing all cards in serial order; saving image...");
-                    deckPNG.Open(fullGrid.SaveAsPng);
+                    deckImagePath.Open(s => fullGrid.Save(s, encoder));
 
                     if (Program.IsOutputRedirected) // Enable Non-Interactive Path stdin Passthrough of the deck png
                         using (var stdout = Console.OpenStandardOutput())
-                            fullGrid.SaveAsPng(stdout);
+                            fullGrid.Save(stdout, encoder);
 
-                    Log.Information("Done! Result PNG: {png}", deckPNG.FullPath);
-
+                    Log.Information($"Done! Result PNG: {deckImagePath.FullPath}");
                 }
             }
 
@@ -137,16 +143,16 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                     img.SaveAsPng(s);
             }, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite);
 
-            Log.Information("Done! Relevant Files have been saved in: {path}", resultFolder.FullPath);
+            Log.Information($"Done! Relevant Files have been saved in: {resultFolder.FullPath}");
 
-            if (parent.OutCommand != "")
+            if (info.OutCommand != "")
             {
-                var cmd = $"{parent.OutCommand} {deckPNG.FullPath}";
+                var cmd = $"{info.OutCommand} {deckImagePath.FullPath}";
                 Log.Information("Executing {command}", cmd);
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.FileName = parent.OutCommand;
-                startInfo.Arguments = $"\"{deckPNG.FullPath.EscapeQuotes()}\"";
+                startInfo.FileName = info.OutCommand;
+                startInfo.Arguments = $"\"{deckImagePath.FullPath.EscapeQuotes()}\"";
                 //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
                 //startInfo.RedirectStandardOutput = true;
                 process.StartInfo = startInfo;
@@ -163,28 +169,5 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                 }
             }
         }
-
-        /*
-        bool IsPathDirectory(string path)
-        {
-            if (path == null) throw new ArgumentNullException("path");
-            path = path.Trim();
-
-            if (Directory.Exists(path))
-                return true;
-
-            if (File.Exists(path))
-                return false;
-
-            // neither file nor directory exists. guess intention
-
-            // if has trailing slash then it's a directory
-            if (new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }.Any(x => path.EndsWith(x)))
-                return true; // ends with slash
-
-            // if has extension then its a file; directory otherwise
-            return string.IsNullOrWhiteSpace(Path.GetExtension(path));
-        }
-        */
     }
 }

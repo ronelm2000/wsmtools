@@ -1,9 +1,14 @@
-﻿using Montage.Weiss.Tools.Utilities;
+﻿using Flurl.Http;
+using Montage.Weiss.Tools.Utilities;
 using Serilog;
+using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Entities
 {
@@ -28,6 +33,14 @@ namespace Montage.Weiss.Tools.Entities
         public string[] Effect { get; set; }
         public List<Uri> Images { get; set; } = new List<Uri>();
         public string Remarks { get; set; }
+        
+        /// <summary>
+        /// File Path Relative Link into a cached image. This property is usually assigned exactly once by
+        /// <see cref="IExportedDeckInspector">Deck Inspectors</see>
+        /// </summary>
+        [JsonIgnore]
+        [NotMapped]
+        public string CachedImagePath { get; set; }
 
         //public readonly WeissSchwarzCard Empty = new WeissSchwarzCard();
 
@@ -51,6 +64,23 @@ namespace Montage.Weiss.Tools.Entities
             newCard.Name = this.Name.Clone();
             newCard.Traits = this.Traits.Select(s => s.Clone()).ToList();
             return newCard;
+        }
+
+        public async Task<System.IO.Stream> GetImageStreamAsync()
+        {
+            if (!String.IsNullOrWhiteSpace(CachedImagePath) && !CachedImagePath.Contains(".."))
+                try
+                {
+                    return System.IO.File.OpenRead(CachedImagePath);
+                }
+                catch (System.IO.FileNotFoundException)
+                {
+                    Log.Warning("Cannot find cache file: {cacheImagePath}.", CachedImagePath);
+                    Log.Warning("Falling back on remote URL.");
+
+                }
+                catch (Exception) { }
+            return await Images.Last().WithImageHeaders().GetStreamAsync();
         }
         
         private CardLanguage TranslateToLanguage()

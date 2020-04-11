@@ -14,7 +14,7 @@ namespace Montage.Weiss.Tools.CLI
     [Verb("parse", HelpText = "Exports a card release set into the local database, so that it may be used to export decks later.")]
     public class ParseVerb : IVerbCommand
     {
-        [Value(0, HelpText = "URL to parse. Compatible Formats are: HOTC Set Translation links, and Encore Decks Set API links.")]
+        [Value(0, HelpText = "URL to parse. Compatible Formats are found at https://github.com/ronelm2000/wsmtools/")]
         public string URI { get; set; }
 
         public async Task Run(IContainer container)

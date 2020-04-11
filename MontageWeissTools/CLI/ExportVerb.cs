@@ -12,43 +12,38 @@ using System.Threading.Tasks;
 namespace Montage.Weiss.Tools.CLI
 {
     [Verb("export", HelpText = "Exports a file from one format to another, typically into files for Tabletop Simulator, for example.")]
-    public class ExportVerb : IVerbCommand
+    public class ExportVerb : IVerbCommand, IExportInfo
     {
         [Value(0, HelpText = "Indicates the source file/url.")]
-        public string Source { get; }
+        public string Source { get; set;  }
         
         [Value(1, HelpText = "Indicates the destination; usually a folder.", Default = "./Export/")]
-        public string Destination { get; }
+        public string Destination { get; set; }
 
         [Option("parser", HelpText = "Manually sets the deck parser to use. Possible values: encoredecks", Default = "encoredecks")]
-        public string Parser { get; }
+        public string Parser { get; set; }
 
         [Option("exporter", HelpText = "Manually sets the deck exporter to use. Possible values: tabletopsim", Default = "tabletopsim")]
-        public string Exporter { get; }
+        public string Exporter { get; set; }
 
         [Option("out", HelpText = "For some exporters, gives an out command to execute after exporting.", Default = "")]
-        public string OutCommand { get; }
+        public string OutCommand { get; set; }
+        
+        [Option("with", HelpText = "For some exporters, enables various flags. See each exporter for details.", Separator = ',', Default = new string[] { })]
+        public IEnumerable<string> Flags { get; set; }
 
         [Option("noninteractive", HelpText = "When set to true, there will be no prompts. Default options will be used.", Default = false)]
-        public bool NonInteractive { get; }
+        public bool NonInteractive { get; set; }
 
         private readonly ILogger Log = Serilog.Log.ForContext<ExportVerb>();
+
+        private static readonly IEnumerable<string> Empty = new string[] { };
 
         /// <summary>
         /// For the IOC
         /// </summary>
         public ExportVerb()
         { 
-        }
-
-        public ExportVerb(string source, string destination = "./Export/", string parser = "encoredecks", string exporter = "tabletopsim", string outCommand = "", bool nonInteractive = false)
-        {
-            Source = source;
-            Destination = destination;
-            Parser = parser;
-            Exporter = exporter;
-            OutCommand = outCommand;
-            NonInteractive = nonInteractive;
         }
 
         public async Task Run(IContainer ioc)

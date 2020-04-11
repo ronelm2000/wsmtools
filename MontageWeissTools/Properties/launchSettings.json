@@ -6,7 +6,7 @@
     },
     "wstools export CyaRon": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/wDdTKywNh --out \"C:\\Program Files\\ShareX\\ShareX.exe\"\"C:\\Program Files\\ShareX\\ShareX.exe\""
+      "commandLineArgs": "export https://www.encoredecks.com/deck/wDdTKywNh --with png"
     },
     "wstools for LLS": {
       "commandName": "Project",

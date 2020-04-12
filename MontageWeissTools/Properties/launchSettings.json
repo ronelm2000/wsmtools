@@ -25,7 +25,7 @@
     },
     "wstools for Madoka": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/3fqflHO1_ --out \"C:\\Program Files\\ShareX\\ShareX.exe\""
+      "commandLineArgs": "export https://www.encoredecks.com/deck/3fqflHO1_ --out sharex"
     },
     "wstools for CG": {
       "commandName": "Project",

@@ -147,11 +147,15 @@ namespace Montage.Weiss.Tools.Impls.Exporters
 
             if (info.OutCommand != "")
             {
-                var cmd = $"{info.OutCommand} {deckImagePath.FullPath}";
+                var fullOutCommand = info.OutCommand;
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT && fullOutCommand.ToLower() == "sharex")
+                    fullOutCommand = InstalledApplications.GetApplictionInstallPath("ShareX") + @"ShareX.exe";
+
+                var cmd = $"{fullOutCommand} {deckImagePath.FullPath}";
                 Log.Information("Executing {command}", cmd);
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.FileName = info.OutCommand;
+                startInfo.FileName = fullOutCommand;
                 startInfo.Arguments = $"\"{deckImagePath.FullPath.EscapeQuotes()}\"";
                 //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
                 //startInfo.RedirectStandardOutput = true;

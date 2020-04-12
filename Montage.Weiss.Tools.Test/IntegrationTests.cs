@@ -31,7 +31,11 @@ namespace Montage.Weiss.Tools.Test
                 URI = "https://heartofthecards.com/translations/love_live!_sunshine_vol._2_booster_pack.html"
             }.Run(ioc);
 
-            var parseCommand = new ExportVerb("https://www.encoredecks.com/deck/wDdTKywNh", nonInteractive: true);
+            var parseCommand = new ExportVerb()
+            {
+                Source = "https://www.encoredecks.com/deck/wDdTKywNh",
+                NonInteractive = true
+            };
             await parseCommand.Run(ioc);
         }
 

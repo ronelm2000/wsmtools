@@ -68,6 +68,7 @@ namespace Montage.Weiss.Tools.Entities
 
         public async Task<System.IO.Stream> GetImageStreamAsync()
         {
+            int retry = 0;
             if (!String.IsNullOrWhiteSpace(CachedImagePath) && !CachedImagePath.Contains(".."))
                 try
                 {
@@ -80,7 +81,14 @@ namespace Montage.Weiss.Tools.Entities
 
                 }
                 catch (Exception) { }
-            return await Images.Last().WithImageHeaders().GetStreamAsync();
+            do try
+                {
+                    return await Images.Last().WithImageHeaders().GetStreamAsync();
+                }
+                catch (Exception e) {
+                    if (retry++ > 9) throw e;
+                } 
+            while (true);
         }
         
         private CardLanguage TranslateToLanguage()

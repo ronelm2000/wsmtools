@@ -1,6 +1,7 @@
 WSMTools (Weiss Schwarz Montage Tools)
 ===========
 ![.NET Core](https://github.com/ronelm2000/wsmtools/workflows/.NET%20Core/badge.svg)
+[![CodeFactor](https://www.codefactor.io/repository/github/ronelm2000/wsmtools/badge)](https://www.codefactor.io/repository/github/ronelm2000/wsmtools)
 
 Weiss Schwarz ©bushiroad All Rights Reserved.
 

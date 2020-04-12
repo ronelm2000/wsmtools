@@ -78,7 +78,6 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             ("<img src=\"../partimages/bounce.gif\">", "【BOUNCE】") 
         };
 
-
         public bool IsCompatible(string urlOrFile)
         {
             try
@@ -181,8 +180,6 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             res.Remarks = $"Extractor: {this.GetType().Name}";
             return res;
         }
-
-
 
         private async Task AssignUnitAsync(WeissSchwarzCard card, IElement span)
         {
@@ -303,6 +300,5 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
         {
             //Log.Debug(call.RequestBody);
         }
-       
     }
 }

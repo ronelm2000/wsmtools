@@ -21,6 +21,11 @@ namespace Montage.Weiss.Tools.Utilities
             return path.Files();
         }
 
+        public static System.IO.Stream GetStream(this Path path)
+        {
+            return System.IO.File.OpenRead(path.FullPath);
+        }
+
         /// 
         /// <summary>
         /// Creates a file under the first path in the set.

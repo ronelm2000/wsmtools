@@ -14,7 +14,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 {
     public class SanityImageInspector : IExportedDeckInspector
     {
-        public readonly ILogger Log = Serilog.Log.ForContext<SanityImageInspector>();
+        private readonly ILogger Log = Serilog.Log.ForContext<SanityImageInspector>();
 
         public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, bool isNonInteractive)
         {
@@ -55,7 +55,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                 {
                     Log.Information("Image can be loaded. Is the ratio reasonable?");
                     var aspectRatio = (img.Width * 1.0d) / img.Height;
-                    if (aspectRatio - (5 / 7.0d) > double.Epsilon)
+                    if (Math.Floor(aspectRatio * 100) - 71 <= 1)
                     {
                         Log.Information("Image Ratio ({aspectRatio}) isn't correct. Failed inspection.", aspectRatio);
                         return null;

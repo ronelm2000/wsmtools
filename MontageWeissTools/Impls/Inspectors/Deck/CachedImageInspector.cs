@@ -16,7 +16,8 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
     {
         private readonly ILogger Log = Serilog.Log.ForContext<SanityImageInspector>();
         private readonly string _imageCachePath = "./Images/";
-     
+
+        public int Priority => 1;
 
         public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, bool isNonInteractive)
         {
@@ -58,7 +59,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
         {
             try
             {
-                Log.Information($"Inspecting cache image candidate: {relativeFileName}");
+                Log.Debug($"Inspecting cache image candidate: {relativeFileName}");
                 Image fixedImage = null;
                 var res = serialImage;
                 using (System.IO.Stream s = serialImage.GetStream())
@@ -69,13 +70,13 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                     var aspectRatio = (img.Width * 1.0d) / img.Height;
                     if (Math.Floor(aspectRatio * 100) - 71 >= 1)
                     {
-                        Log.Warning("Image Ratio ({aspectRatio}) isn't correct (it must be approx. 0.71428571428); Not using cached image.", aspectRatio);
+                        Log.Warning("Image Ratio ({aspectRatio}) isn't correct (it must be approx. 0.71428571428); Not using cached image ({relativeFileName}).", aspectRatio, relativeFileName);
                         return null;
                     }
 
                     if (img.Width < 400)
                     {
-                        Log.Warning("The image is of low quality; Not using cached image.");
+                        Log.Warning("The image is of low quality; Not using cached image ({relativeFileName}).", relativeFileName);
                         return null;
                     }                    
                 }
@@ -99,12 +100,12 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
             }
             catch (UnknownImageFormatException)
             {
-                Log.Debug("The URL does not point to a valid image. Inspection failed.");
+                Log.Debug("The URL does not point to a valid image. Card Image Inspection failed ({relativeFileName}).", relativeFileName);
                 return null;
             }
             catch (Exception e)
             {
-                Log.Debug("Other reason occurred: {e}", e);
+                Log.Debug("Other reason occurred: {e}. Card Image Inspection Failed ({relativeFileName})", e, relativeFileName);
                 return null;
             }
         }

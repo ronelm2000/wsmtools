@@ -16,14 +16,16 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
     {
         private readonly ILogger Log = Serilog.Log.ForContext<SanityImageInspector>();
 
+        public int Priority => 0;
+
         public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, bool isNonInteractive)
         {
             Log.Debug("Starting...");
-            var keyCards = deck.Ratios.Keys.Where(c => (!c.Images?.Any()) ?? false);
+            var keyCards = deck.Ratios.Keys.Where(c => ((!c.Images?.Any()) ?? false) && String.IsNullOrWhiteSpace(c.CachedImagePath));
             var inspectedDeck = deck.Clone();
             foreach (var card in keyCards)
             {
-                Log.Information("{serial} has no image URL. This deck cannot be exported without an image. Do you want to supply an image instead? [Y/N] (Default is N)", card.Serial);
+                Log.Information("{serial} has no image URL nor a cached image. This deck cannot be exported without an image. Do you want to supply an image instead? [Y/N] (Default is N)", card.Serial);
                 if (Prompted(isNonInteractive))
                 {
                     if (inspectedDeck.ReplaceCard(card, await AddImageFromConsole(card)))

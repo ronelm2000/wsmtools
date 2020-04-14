@@ -9,6 +9,16 @@ namespace Montage.Weiss.Tools.API
     public interface IExportedDeckInspector
     {
         /// <summary>
+        /// Gets the Priority of a particular issue.
+        /// This value must be 0 except for the following conditions:
+        /// <list type="bullet">
+        /// <item>You have an inspector that needs to be done before a particular inspector.</item>
+        /// <item>You have an inspector that needs to be  done only after a particular inspector.</item>
+        /// </list>
+        /// </summary>
+        public int Priority { get; }
+
+        /// <summary>
         /// Inspects via analysis if the deck can be exported at all. Implementatations of this class should never open new URLs, unless via direct
         /// user intervention, or if the parser command is used. Returns false if the inspection fails.
         /// </summary>

@@ -59,6 +59,7 @@ namespace Montage.Weiss.Tools.CLI
             var deck = await parser.Parse(Source);
 
             deck = await ioc.GetAllInstances<IExportedDeckInspector>()
+                .OrderByDescending(inspector => inspector.Priority)
                 .ToAsyncEnumerable()
                 .AggregateAwaitAsync(deck, async (d, inspector) => await inspector.Inspect(d, NonInteractive));
 

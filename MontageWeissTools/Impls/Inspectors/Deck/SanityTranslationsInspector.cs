@@ -14,6 +14,8 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
     {
         public readonly ILogger Log; // = Serilog.Log.ForContext<SanityTranslationsInspector>();
 
+        public int Priority => 0;
+
         public SanityTranslationsInspector (ILogger log)
         {
             Log = log.ForContext<SanityTranslationsInspector>();

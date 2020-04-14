@@ -78,7 +78,6 @@ namespace Montage.Weiss.Tools.Entities
                 {
                     Log.Warning("Cannot find cache file: {cacheImagePath}.", CachedImagePath);
                     Log.Warning("Falling back on remote URL.");
-
                 }
                 catch (Exception) { }
             do try

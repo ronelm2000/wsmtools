@@ -14,7 +14,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 {
     public class CachedImageInspector : IExportedDeckInspector
     {
-        private readonly ILogger Log = Serilog.Log.ForContext<SanityImageInspector>();
+        private readonly ILogger Log = Serilog.Log.ForContext<CachedImageInspector>();
         private readonly string _imageCachePath = "./Images/";
 
         public int Priority => 1;

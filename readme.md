@@ -30,24 +30,31 @@ registering on GitHub.
 ---------
 
 *I know you're probably just here just so that you can quickly netdeck into TTS; so how do you do it?*
-1. Execute this lovely command on PowerShell.
+01. Install [ShareX](https://getsharex.com/) (Do not use the portable edition).
+02. Extract [the binaries](https://github.com/ronelm2000/wsmtools/releases) into the folder of your choice.
+03. Open PowerShell on that folder. This can be done by holding [Shift] then Right-Click while on the folder.
+    ![I like dark mode Windows Explorer](https://i.imgur.com/MBc4zzr.png)
+04. Execute this lovely command.
    ```ps
-   ./wstools export your_encore_decks_deck_link_here
+   ./wstools export your_encore_decks_deck_link_here --out sharex
    ```
-2. You will be warned if any of the following are true.
+05. You will be warned if any of the following are true.
    * Your deck contains cards without English translations.
    * Your deck contains cards which have no saved image link. You will be prompted for an image link if you continue.
-3. You will get the following on your Exports folder: `deck.your deck name.png`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
-4. The `Deck Generator` files go into your Save Objects folder (typically `%HOMEDRIVE%%HOMEPATH%\Documents\My Games\Tabletop Simulator\Saves\Saved Objects`)
-5. The `deck.your deck name.png` should be uploaded (imgur or Steam Cloud using Tabletop Simulator)
-6. Open Tabletop Simulator (Single-Player will do)
-7. Load the Saved Object (and make sure no other Deck Generators are loaded!)
-8. In the chat command, type:
-   ```ps
-   +generate url_of_your_deck url_of_your_sleeves
-   ```
-9. You should be able to create decks like this:
-   ![Tho why do you need effects for decks with English art?](https://i.imgur.com/WuRpf9I.png)
+06. You will get the following on your Exports folder: `deck_your deck name.jpg`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
+07. Put the `Deck Generator` files into your Save Objects folder (typically `%HOMEDRIVE%%HOMEPATH%\Documents\My Games\Tabletop Simulator\Saves\Saved Objects`)
+08. The `deck_your deck name.jpg` will be automatically uploaded with ShareX. (If using imgur, some [Imgur API Rate Limits](https://apidocs.imgur.com/?version=latest) may apply.)
+    - Once finished, your deck's image URL can be copied from ShareX.
+    - To copy the image URL, right-click on the uploaded task, and go to Copy > URL.
+      ![I like ShareX this way; it's so convinient](https://i.imgur.com/q0L7Aqr.png)
+09. Open Tabletop Simulator (Single-Player will do)
+10. Load the Saved Object (and make sure no other Deck Generators are loaded!)
+11. In the chat command, type:
+    ```ps
+    +generate url_of_your_deck url_of_your_sleeves
+    ```
+12. You should be able to create decks like this:
+    ![Tho why do you need effects for decks with English art?](https://i.imgur.com/WuRpf9I.png)
 
 ---------
 
@@ -62,12 +69,13 @@ registering on GitHub.
   The HTML page is usually in this link.
 
   ![Yes, that one link which is printed](https://i.imgur.com/FkukMso.png)
-* ~~HOTC's Weiss Promos and Schwarz Promos are currently an unsupported use case as they contain all promos
-  from every single set for that particular side. Future support may include parsing that page as well, but
-  given their design and their copyright, almost any compromises leads to an uptick in unneeded calls on their site.~~
-  Resolved, you should be able to export them, but they will have no images. This is done intentionally so that all image
-  post-processors will not load 10 or more images at once. Please add them manually.
+* HOTC's Weiss Promos and Schwarz Promos may be parsed successfully, but image post-processing will be disabled.
+  Please add the images manually in the `./Images/` subfolder. The format for the image file must be
+  `serial_with_only_underscores.jpg` (png, jfif, and jpeg is also valid). 
+ 
+  Example filename: `F35_W65_034.jpg`
 
-* Some HOTC pages have the wierdest problems, like this from Magia Record. Please report them if seen.
+* Some HOTC pages may not parse successfully due to translation errors, like this from Magia Record.
+  Please report them if seen.
 
   ![Why!?!](https://i.imgur.com/NdpGGp0.png)

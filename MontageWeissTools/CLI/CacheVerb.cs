@@ -90,7 +90,7 @@ namespace Montage.Weiss.Tools.CLI
                 }
             } catch (InvalidOperationException e) when (e.Message == "Sequence contains no elements")
             {
-                Log.Warning("Cannot be cached as no images URLs were found: {serial}", card.Serial);
+                Log.Warning("Cannot be cached as no image URLs were found: {serial}", card.Serial);
             }
         }
 

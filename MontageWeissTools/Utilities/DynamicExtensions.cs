@@ -27,8 +27,7 @@ namespace Montage.Weiss.Tools.Utilities
             try
             {
                 var objAsDictionary = (IDictionary<string, object>)obj;
-                if (objAsDictionary.TryGetValue(binder.Name, out object innerResult))
-                //if (obj.TryGetMember(binder, out object innerResult))
+                if (objAsDictionary != null && objAsDictionary.TryGetValue(binder.Name, out object innerResult))
                     result = innerResult;
                 else
                     result = null;

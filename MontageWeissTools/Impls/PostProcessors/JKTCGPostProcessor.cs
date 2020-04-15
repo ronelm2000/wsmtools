@@ -24,7 +24,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             if (cards.First().Language != CardLanguage.English)
                 return false;
 
-            var allReleaseIDs = cards.Select(c => c.ReleaseID).ToArray();
+            var allReleaseIDs = cards.Select(c => c.ReleaseID).Distinct().ToArray();
             if (allReleaseIDs.Length == 2 && allReleaseIDs.Contains("W53") && allReleaseIDs.Contains("WE27"))
             {
                 Log.Information("JKTCG Image Post-Processor is normally disabled for sets with multiple Release IDs.");

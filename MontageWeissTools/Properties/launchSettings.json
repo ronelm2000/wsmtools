@@ -50,6 +50,10 @@
     "wstools parse ED Site Link": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5c7b08307cd9b718cdbd059c"
+    },
+    "wstools parse Fantasia": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/fujimi_fantasia_bunko_booster_pack.html"
     }
   }
 }

@@ -24,7 +24,8 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         {
             if (cards.First().Language != CardLanguage.Japanese)
                 return false;
-            else if (cards.Select(c => c.ReleaseID).Count() > 1)
+            var list = cards.Select(c => c.ReleaseID).Distinct().ToList();
+            if (list.Count > 1)
             {
                 Log.Warning("Yuyutei Image Post-Processor is disabled for sets with multiple Release IDs; please add those images manually when prompted.");
                 return false;

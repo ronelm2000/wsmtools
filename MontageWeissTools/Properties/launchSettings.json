@@ -58,6 +58,10 @@
     "wstools cache W02": {
       "commandName": "Project",
       "commandLineArgs": "cache W02 JP"
+    },
+    "wstools export Fantasia Deck": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/WCiCTn736"
     }
   }
 }

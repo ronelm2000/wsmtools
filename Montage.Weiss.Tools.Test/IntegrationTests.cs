@@ -7,6 +7,7 @@ using Serilog;
 using Serilog.Events;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test
@@ -30,6 +31,9 @@ namespace Montage.Weiss.Tools.Test
             {
                 URI = "https://heartofthecards.com/translations/love_live!_sunshine_vol._2_booster_pack.html"
             }.Run(ioc);
+
+            var testSerial = await ioc.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync("LSS/W69-006");
+            Assert.IsTrue(testSerial.Images.Any());
 
             var parseCommand = new ExportVerb()
             {

@@ -93,7 +93,11 @@ namespace Montage.Weiss.Tools.Entities
         private CardLanguage TranslateToLanguage()
         {
             var serial = Serial;
-            if (serial.Contains("-E")) return CardLanguage.English;
+            if (serial.Contains("-E"))
+            {
+                if (!IsExceptionalSerial(serial)) return CardLanguage.English;
+                else return CardLanguage.Japanese;
+            }
             else if (serial.Contains("-PE")) return CardLanguage.English;
             else if (serial.Contains("-TE")) return CardLanguage.English;
             else if (serial.Contains("-WX")) return CardLanguage.English;
@@ -102,6 +106,14 @@ namespace Montage.Weiss.Tools.Entities
             else if (serial.Contains("/BSF")) return CardLanguage.English; // BSF is the English version of WCS for Spring
             else if (serial.Contains("/BCS")) return CardLanguage.English; // BCS is the English version of WCS for Winter
             else return CardLanguage.Japanese;
+        }
+
+        private static bool IsExceptionalSerial(string serial)
+        {
+            var (NeoStandardCode, ReleaseID, SetID) = ParseSerial(serial);
+            if (ReleaseID == "W02" && SetID.StartsWith("E")) return true; // https://heartofthecards.com/code/cardlist.html?pagetype=ws&cardset=wslbexeb is an exceptional serial.
+            else return false;
+            throw new NotImplementedException();
         }
 
         public static SerialTuple ParseSerial(string serial)

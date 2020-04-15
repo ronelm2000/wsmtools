@@ -16,24 +16,24 @@ namespace Montage.Weiss.Tools.CLI
     {
         [Value(0, HelpText = "Indicates the source file/url.")]
         public string Source { get; set;  }
-        
+
         [Value(1, HelpText = "Indicates the destination; usually a folder.", Default = "./Export/")]
-        public string Destination { get; set; }
+        public string Destination { get; set; } = "./Export/";
 
         [Option("parser", HelpText = "Manually sets the deck parser to use. Possible values: encoredecks", Default = "encoredecks")]
-        public string Parser { get; set; }
+        public string Parser { get; set; } = "encoredecks";
 
         [Option("exporter", HelpText = "Manually sets the deck exporter to use. Possible values: tabletopsim", Default = "tabletopsim")]
-        public string Exporter { get; set; }
+        public string Exporter { get; set; } = "tabletopsim";
 
         [Option("out", HelpText = "For some exporters, gives an out command to execute after exporting.", Default = "")]
-        public string OutCommand { get; set; }
-        
+        public string OutCommand { get; set; } = "";
+
         [Option("with", HelpText = "For some exporters, enables various flags. See each exporter for details.", Separator = ',', Default = new string[] { })]
-        public IEnumerable<string> Flags { get; set; }
+        public IEnumerable<string> Flags { get; set; } = new string[] { };
 
         [Option("noninteractive", HelpText = "When set to true, there will be no prompts. Default options will be used.", Default = false)]
-        public bool NonInteractive { get; set; }
+        public bool NonInteractive { get; set; } = false;
 
         private readonly ILogger Log = Serilog.Log.ForContext<ExportVerb>();
 

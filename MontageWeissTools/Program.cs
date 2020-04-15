@@ -23,7 +23,7 @@ namespace Montage.Weiss.Tools
             Log.Information("Starting...");
 
             var container = Bootstrap();
-
+            Log.Debug(container.WhatDoIHave(serviceType: typeof(IVerbCommand)));
             Log.Debug(container.WhatDoIHave(serviceType: typeof(IDeckParser)));
             Log.Debug(container.WhatDoIHave(serviceType: typeof(ICardSetParser)));
 

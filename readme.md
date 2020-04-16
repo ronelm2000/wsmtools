@@ -39,8 +39,8 @@ registering on GitHub.
    ./wstools export your_encore_decks_deck_link_here --out sharex
    ```
 05. You will be warned if any of the following are true.
-   * Your deck contains cards without English translations.
-   * Your deck contains cards which have no saved image link. You will be prompted for an image link if you continue.
+    * Your deck contains cards without English translations.
+    * Your deck contains cards which have no saved image link. You will be prompted for an image link if you continue.
 06. You will get the following on your Exports folder: `deck_your deck name.jpg`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
 07. Put the `Deck Generator` files into your Save Objects folder (typically `%HOMEDRIVE%%HOMEPATH%\Documents\My Games\Tabletop Simulator\Saves\Saved Objects`)
 08. The `deck_your deck name.jpg` will be automatically uploaded with ShareX. (If using imgur, some [Imgur API Rate Limits](https://apidocs.imgur.com/?version=latest) may apply.)

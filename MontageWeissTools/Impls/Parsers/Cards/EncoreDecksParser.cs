@@ -76,24 +76,6 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
                 result.Serial = WeissSchwarzCard.GetSerial(setCard.set.ToString(), setCard.side.ToString(), setCard.lang.ToString(), setCard.release.ToString(), setCard.sid.ToString());
 
-                /*
-
-                setCard.set.ToString();
-            if (setCard.lang == "EN" && !((string)setCard.release.ToString()).Contains("E"))
-            {
-                // This is a DX set; make serial adjustments.
-                fullSetID += "/EN-" + setCard.side.ToString();
-            } else
-            {
-                // Proceed as normal
-                fullSetID += "/" + setCard.side.ToString();
-            }
-            fullSetID += setCard.release.ToString();
-            result.Serial = fullSetID + "-" + setCard.sid.ToString();
-
-*/
-
-
                 result.Type = TranslateType(setCard.cardtype);
                 result.Color = TranslateColor(setCard.colour);
                 result.Remarks = $"Parsed: {this.GetType().Name}";  

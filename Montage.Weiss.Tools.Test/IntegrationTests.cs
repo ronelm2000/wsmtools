@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Test.Commons;
 using Serilog;
 using Serilog.Events;
 using System;
@@ -20,7 +21,7 @@ namespace Montage.Weiss.Tools.Test
         [TestMethod("Full Integration Test (Typical Use Case)")]
         public async Task FullTestRun()
         {
-            Serilog.Log.Logger = BootstrapLogging().CreateLogger();
+            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             ioc = Program.Bootstrap();
 
             await new ParseVerb(){ 
@@ -56,18 +57,6 @@ namespace Montage.Weiss.Tools.Test
             });
         }
         */
-
-        public static LoggerConfiguration BootstrapLogging(Func<LoggerConfiguration, LoggerConfiguration> additionalActions = null)
-        {
-            additionalActions ??= (lc => lc);
-            var config = new LoggerConfiguration().MinimumLevel.Is(LogEventLevel.Debug)
-                                .WriteTo.Trace(
-                                    restrictedToMinimumLevel: LogEventLevel.Debug,
-                                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
-                                );
-            config = additionalActions(config);
-            return config;
-        }
         
     }
 }

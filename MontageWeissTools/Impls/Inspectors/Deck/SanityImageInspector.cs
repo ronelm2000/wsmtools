@@ -18,7 +18,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 
         public int Priority => 0;
 
-        public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, bool isNonInteractive)
+        public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, InspectionOptions options)
         {
             Log.Debug("Starting...");
             var keyCards = deck.Ratios.Keys.Where(c => ((!c.Images?.Any()) ?? false) && String.IsNullOrWhiteSpace(c.CachedImagePath));
@@ -26,9 +26,9 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
             foreach (var card in keyCards)
             {
                 Log.Information("{serial} has no image URL nor a cached image. This deck cannot be exported without an image. Do you want to supply an image instead? [Y/N] (Default is N)", card.Serial);
-                if (Prompted(isNonInteractive))
+                if (ConsoleUtils.Prompted(options.IsNonInteractive, false))
                 {
-                    if (inspectedDeck.ReplaceCard(card, await AddImageFromConsole(card)))
+                    if (inspectedDeck.ReplaceCard(card, await AddImageFromConsole(card, options)))
                         Log.Information("Checking for other missing images (if any)...");
                     else
                         return WeissSchwarzDeck.Empty;
@@ -43,7 +43,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
             return inspectedDeck;
         }
 
-        private async Task<WeissSchwarzCard> AddImageFromConsole(WeissSchwarzCard card)
+        private async Task<WeissSchwarzCard> AddImageFromConsole(WeissSchwarzCard card, InspectionOptions options)
         {
             var modifiedCard = card.Clone();
             Log.Information("Please enter a new image URL: ");
@@ -67,7 +67,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                         if (img.Width < 400)
                         {
                             Log.Warning("The image is of low quality; this may not be good for exporting purposes. Continue? [Y/N] (Default is N)");
-                            if (!Prompted(false)) return null;
+                            if (!ConsoleUtils.Prompted(options.IsNonInteractive, options.NoWarning)) return null;
                         }
                         modifiedCard.Images.Add(newURI);
                         Log.Information("All preliminary tests passed. Modified {card}.", card.Serial);
@@ -87,6 +87,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
             return modifiedCard;
         }
 
+        /*
         private bool Prompted(bool isNonInteractive)
         {
             if (isNonInteractive) return false;
@@ -94,5 +95,6 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
             Console.Write("\r");
             return result;
         }
+        */
     }
 }

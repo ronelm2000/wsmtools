@@ -35,6 +35,9 @@ namespace Montage.Weiss.Tools.CLI
         [Option("noninteractive", HelpText = "When set to true, there will be no prompts. Default options will be used.", Default = false)]
         public bool NonInteractive { get; set; } = false;
 
+        [Option("nowarn", HelpText = "When set to true, all warning prompts will default to yes without user input. This flag when set ignores noninteractive flag during warnings (and is automatically true).", Default = false)]
+        public bool NoWarning { get; set; } = false;
+
         private readonly ILogger Log = Serilog.Log.ForContext<ExportVerb>();
 
         private static readonly IEnumerable<string> Empty = new string[] { };
@@ -48,20 +51,25 @@ namespace Montage.Weiss.Tools.CLI
 
         public async Task Run(IContainer ioc)
         {
+            if (NoWarning) NonInteractive = true;
+
             Log.Information("Running...");
 
             var parser = ioc.GetAllInstances<IDeckParser>()
                 .Where(parser => parser.IsCompatible(Source))
                 .OrderByDescending(parser => parser.Priority)
-                //                .Where(parser => parser.Alias.Contains(Parser) && parser.IsCompatible(Source))
                 .First();
 
             var deck = await parser.Parse(Source);
-
+            var inspectionOptions = new InspectionOptions()
+            {
+                IsNonInteractive = this.NonInteractive,
+                NoWarning = this.NoWarning
+            };
             deck = await ioc.GetAllInstances<IExportedDeckInspector>()
                 .OrderByDescending(inspector => inspector.Priority)
                 .ToAsyncEnumerable()
-                .AggregateAwaitAsync(deck, async (d, inspector) => await inspector.Inspect(d, NonInteractive));
+                .AggregateAwaitAsync(deck, async (d, inspector) => await inspector.Inspect(d, inspectionOptions));
 
             if (deck != WeissSchwarzDeck.Empty)
             {

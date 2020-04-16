@@ -33,6 +33,7 @@ namespace Montage.Weiss.Tools.Utilities
                 res = res.Replace(c, '_');
             res = res.Replace('\\', '_');
             res = res.Replace('/', '_');
+            res = res.Replace(' ', '_');
             return res;
         }
 

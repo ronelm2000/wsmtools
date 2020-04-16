@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Weiss.Tools.Impls.Parsers.Cards;
+using Montage.Weiss.Tools.Test.Commons;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Montage.Weiss.Tools.Test.ENWS
         [TestMethod("EN WS Parser Test")]
         public async Task TestParser()
         {
-            Serilog.Log.Logger = IntegrationTests.BootstrapLogging().CreateLogger();
+            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             var stream = new EnglishWSURLParser().Parse("https://en.ws-tcg.com/cardlist/list/?cardno=CCS/BSF2019-02");
             await foreach (var card in stream)
                 Log.Information("Card: {@card}", card);

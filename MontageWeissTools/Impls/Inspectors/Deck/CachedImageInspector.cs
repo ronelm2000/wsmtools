@@ -19,7 +19,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 
         public int Priority => 1;
 
-        public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, bool isNonInteractive)
+        public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, InspectionOptions options)
         {
             Log.Information("Starting...");
             var imageFolder = Path.Get(_imageCachePath);
@@ -49,9 +49,6 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
             {
                 // Do nothing.
             }
-            
-
-            await Task.CompletedTask;
             return deck;
         }
 
@@ -80,7 +77,6 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                         return null;
                     }                    
                 }
-
                 if (fixedImage != null)
                 {
                     var newImage = Path.Get(_imageCachePath, serialImage.FileNameWithoutExtension + ".jpg");
@@ -96,7 +92,6 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                 {
                     return serialImage;
                 }
-
             }
             catch (UnknownImageFormatException)
             {

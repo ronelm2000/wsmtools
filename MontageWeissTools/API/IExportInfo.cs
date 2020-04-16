@@ -13,7 +13,5 @@ namespace Montage.Weiss.Tools.API
         string OutCommand { get; }
         public IEnumerable<string> Flags { get; }
         public bool NonInteractive { get; }
-
-
     }
 }

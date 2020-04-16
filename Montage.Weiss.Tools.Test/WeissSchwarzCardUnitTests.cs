@@ -1,6 +1,7 @@
 ﻿using Flurl.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Test.Commons;
 using Montage.Weiss.Tools.Utilities;
 using SixLabors.ImageSharp;
 using System;
@@ -42,7 +43,7 @@ namespace Montage.Weiss.Tools.Test.ENWS
         [Ignore]
         public void TestShareX()
         {
-            Serilog.Log.Logger = IntegrationTests.BootstrapLogging().CreateLogger();
+            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             var Log = Serilog.Log.Logger.ForContext<WeissSchwarzCardUnitTests>();
             Log.Information(InstalledApplications.GetApplictionInstallPath("ShareX"));
         }
@@ -51,7 +52,7 @@ namespace Montage.Weiss.Tools.Test.ENWS
         [Ignore]
         public async Task TestEncoreDecksGifsAsync()
         {
-            Serilog.Log.Logger = IntegrationTests.BootstrapLogging().CreateLogger();
+            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             var Log = Serilog.Log.Logger.ForContext<WeissSchwarzCardUnitTests>();
             var url = new Uri("https://www.encoredecks.com/images/JP/W69/039.gif");
             using (var img = Image.Load(await url.WithImageHeaders().GetStreamAsync()))

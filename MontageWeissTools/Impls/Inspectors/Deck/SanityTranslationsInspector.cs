@@ -21,7 +21,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
             Log = log.ForContext<SanityTranslationsInspector>();
         }
 
-        public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, bool isNonInteractive)
+        public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, InspectionOptions options)
         {
             var allEmptyTranslations = deck.Ratios.Keys.Where(card => String.IsNullOrWhiteSpace(card.Name.EN))
                                                         .Select(card => card.ReleaseID)
@@ -32,7 +32,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                 Log.Warning("The following sets (based on Release ID) do not have proper English translations: {allEmptyTranslations}", allEmptyTranslations.ToList());
                 Log.Warning("This may result in a deck generator with only Japanese text.");
                 Log.Warning("Do you wish to continue? [Y/N] (Default is N)");
-                if (ConsoleUtils.Prompted(isNonInteractive))
+                if (ConsoleUtils.Prompted(options.IsNonInteractive, options.NoWarning))
                     return deck;
                 else
                 {

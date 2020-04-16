@@ -6,7 +6,7 @@ namespace Montage.Weiss.Tools.API
 {
     public interface ICardSetParser
     {
-        bool IsCompatible(string urlOrLocalFile);
+        bool IsCompatible(IParseInfo parseInfo);
         IAsyncEnumerable<WeissSchwarzCard> Parse(string urlOrLocalFile);
     }
 }

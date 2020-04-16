@@ -12,19 +12,20 @@ using System.Threading.Tasks;
 namespace Montage.Weiss.Tools.CLI
 {
     [Verb("parse", HelpText = "Exports a card release set into the local database, so that it may be used to export decks later.")]
-    public class ParseVerb : IVerbCommand
+    public class ParseVerb : IVerbCommand, IParseInfo
     {
         [Value(0, HelpText = "URL to parse. Compatible Formats are found at https://github.com/ronelm2000/wsmtools/")]
         public string URI { get; set; }
 
+        [Option("with", HelpText = "Provides a hint as to what parser should be used.", Default = new string[] { })]
+        public IEnumerable<string> ParserHints { get; set; }
+
         public async Task Run(IContainer container)
         {
             var Log = Serilog.Log.ForContext<ParseVerb>();
-            //Log.Information("Successful! The options are {@Options}", options);
-            //var uri = new Uri(URI);
 
             var cardList = await container.GetAllInstances<ICardSetParser>()
-                .Where(parser => parser.IsCompatible(URI))
+                .Where(parser => parser.IsCompatible(this))
                 .First()
                 .Parse(URI)
                 .ToListAsync();

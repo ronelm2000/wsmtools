@@ -78,8 +78,9 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             ("<img src=\"../partimages/bounce.gif\">", "【BOUNCE】") 
         };
 
-        public bool IsCompatible(string urlOrFile)
+        public bool IsCompatible(IParseInfo info)
         {
+            var urlOrFile = info.URI;
             try
             {
                 var uri = new Uri(urlOrFile);

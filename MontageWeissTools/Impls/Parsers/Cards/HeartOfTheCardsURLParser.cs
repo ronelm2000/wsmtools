@@ -13,8 +13,9 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
     {
         private ILogger Log = Serilog.Log.ForContext<HeartOfTheCardsURLParser>();
 
-        public bool IsCompatible(String urlOrFile)
+        public bool IsCompatible(IParseInfo info)
         {
+            var urlOrFile = info.URI;
             if (!Uri.TryCreate(urlOrFile, UriKind.Absolute, out Uri url))
             {
                 Log.Information("Not compatible because not a url: {urlOrFile}", urlOrFile);

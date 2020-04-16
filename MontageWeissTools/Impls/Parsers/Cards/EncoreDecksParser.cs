@@ -22,9 +22,9 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
         private readonly Regex encoreDecksSiteSetMatcher = new Regex(@"https:\/\/www.encoredecks\.com\/?.+&set=([a-f0-9]+).*");
         private readonly ILogger Log = Serilog.Log.ForContext<EncoreDecksParser>();
 
-        public bool IsCompatible(string urlOrFile)
+        public bool IsCompatible(IParseInfo info)
         {
-            //Log.Information("Is Compatible? {urlOrFile}", urlOrFile);
+            var urlOrFile = info.URI;
             if (encoreDecksAPIMatcher.IsMatch(urlOrFile))
             {
                 Log.Information("Compatibility Passed for: {urlOrFile}", urlOrFile);
@@ -37,7 +37,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             }
             else
             {
-                Log.Information("Compatibility Failed for: {urlOrFile}", urlOrFile);
+                Log.Debug("Compatibility Failed for: {urlOrFile}", urlOrFile);
                 return false;
             }
         }

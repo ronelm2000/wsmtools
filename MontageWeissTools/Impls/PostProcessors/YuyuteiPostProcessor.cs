@@ -54,7 +54,8 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
             yuyuteiSellPage += HttpUtility.UrlEncode(setCode);
             Log.Information("Loading: {yuyuteiSellPage}", yuyuteiSellPage);
-            IDocument yuyuteiSearchPage = await new Uri(yuyuteiSellPage).DownloadHTML( ("Referer", "https://yuyu-tei.jp/") );
+
+            IDocument yuyuteiSearchPage = await new Uri(yuyuteiSellPage).DownloadHTML(("Referer", "https://yuyu-tei.jp/")).WithRetries(10);
 
             var cardUnitListItems = yuyuteiSearchPage.QuerySelectorAll(cardUnitListItemSelector);
 

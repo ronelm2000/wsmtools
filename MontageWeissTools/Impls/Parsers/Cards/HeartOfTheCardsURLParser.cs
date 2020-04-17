@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
 using Montage.Weiss.Tools.API;
+using Fluent.IO;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 {
@@ -18,38 +19,55 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             var urlOrFile = info.URI;
             if (!Uri.TryCreate(urlOrFile, UriKind.Absolute, out Uri url))
             {
-                Log.Information("Not compatible because not a url: {urlOrFile}", urlOrFile);
-                return false;
+                Log.Debug("Not compatible because not a url: {urlOrFile}", urlOrFile);
+                return IsCompatibleAsHOTCTextFile(info);
             }
             if (url.Authority != "heartofthecards.com" && url.Authority != "www.heartofthecards.com")
             {
-                Log.Information("Not compatible because {Authority} is not heartofthecards.com", url.Authority);
+                Log.Debug("Not compatible because {Authority} is not heartofthecards.com", url.Authority);
                 return false;
             }
 
             if (!url.AbsolutePath.StartsWith("/translations/"))
             {
-                Log.Information("Not compatible because {AbsolutePath} does not start with /translations.", url.AbsolutePath);
+                Log.Debug("Not compatible because {AbsolutePath} does not start with /translations.", url.AbsolutePath);
                 return false;
             }
             if (url.AbsolutePath == "/translations/")
             {
-                Log.Information("Not compatible because absolute path cannot be /translations/ itself; please provide a set html.");
+                Log.Debug("Not compatible because absolute path cannot be /translations/ itself; please provide a set html.");
                 return false;
             }
             Log.Information("Selected.");
             return true;
         }
 
+        private bool IsCompatibleAsHOTCTextFile(IParseInfo info)
+        {
+            if (!info.ParserHints.Select(s => s.ToLower()).Contains("hotc"))
+                return false;
+            Log.Information("Checking if this is a local .txt file instead...");
+            var possiblyPath = Path.Get(info.URI);
+            return possiblyPath.Exists && possiblyPath.Extension == ".txt";
+        }
+
         public async IAsyncEnumerable<WeissSchwarzCard> Parse(String url)
         {
             Log.Information("Starting. URI: {url}", url);
-            var html = await new Uri(url).DownloadHTML();
-            var preSelector = "td > pre";
-            var textToProcess = html.QuerySelector(preSelector);
+            string textToProcess = null;
+            if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            {
+                var html = await new Uri(url).DownloadHTML();
+                var preSelector = "td > pre";
+                textToProcess = html.QuerySelector(preSelector).TextContent;
+            }
+            else
+            {
+                textToProcess = Path.Get(url).Read();
+            }
             var majorSeparator = "================================================================================";
             
-            var results = textToProcess.TextContent.Split(majorSeparator)
+            var results = textToProcess.Split(majorSeparator)
                 .AsEnumerable()
                 .Skip(1)
                 .SkipLast(1)
@@ -105,7 +123,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 res.Name["en"] = cursor.CurrentLine.ToString();
             }
             //cursor.Next(3);
-            cursor.Next(linesToCardNoText - 1);
+            cursor.Next(linesToCardNoText - cursor.LineNumber + 1);
             try
             {
                 res.Color = cursor.CurrentLine.Slice(

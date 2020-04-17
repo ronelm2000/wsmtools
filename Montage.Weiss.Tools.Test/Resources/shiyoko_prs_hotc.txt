@@ -1,0 +1,36 @@
+﻿Random Text Information May Be Inserted Here.
+For example, you can put some author notes or links to your discord server
+as ads or something.
+================================================================================
+
+Interesting Titles Participating!
+気になるタイトル続々参戦！
+Card No.: CGS/WS01-P01  Rarity: PR
+Color: Blue   Side: Weiss  Climax
+Level: 0   Cost: 0   Power: 0   Soul: 0
+Traits: None
+Triggers: 2 Soul 
+Flavor: Hey, you should Weiss Schwarz too!
+TEXT: [A] When this is placed from hand to the Climax Zone, remove all cards in
+your Library and Waiting Room from the game, and use a new deck with a
+different sleeve as that Library as Library, and continue the game. For the
+rest of the game, whenever a card from the old deck would be placed in the
+Waiting Room, instead remove it from the game.
+*This card cannot be used in official and sanctioned tournaments.
+
+================================================================================
+
+Shiyoko, Shiro-Kuro Fes 2016
+しろくろフェス2016 しよ子
+Card No.: CGS/WS01-P02  Rarity: PR
+Color: Blue   Side: Weiss  Character
+Level: 0   Cost: 0   Power: 2000   Soul: 1
+Traits: カードゲーム (Card Game), 和服 (Yukata)
+Triggers: None
+Flavor: Let's...... Let's...... Let's......
+TEXT: [C] If there are no other Characters in your Front Row, this gains +1500
+Power.
+[A] At the start of your Opponent's Attack Phase, you may move this to an empty
+Front Row Center Slot.
+
+================================================================================

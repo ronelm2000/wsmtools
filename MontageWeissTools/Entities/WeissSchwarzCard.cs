@@ -100,8 +100,8 @@ namespace Montage.Weiss.Tools.Entities
             }
             else if (serial.Contains("-PE")) return CardLanguage.English;
             else if (serial.Contains("-TE")) return CardLanguage.English;
-            else if (serial.Contains("-WX")) return CardLanguage.English;
-            else if (serial.Contains("-SX")) return CardLanguage.English;
+            else if (serial.Contains("/WX")) return CardLanguage.English;
+            else if (serial.Contains("/SX")) return CardLanguage.English;
             else if (serial.Contains("/EN-")) return CardLanguage.English;
             else if (serial.Contains("/BSF")) return CardLanguage.English; // BSF is the English version of WCS for Spring
             else if (serial.Contains("/BCS")) return CardLanguage.English; // BCS is the English version of WCS for Winter

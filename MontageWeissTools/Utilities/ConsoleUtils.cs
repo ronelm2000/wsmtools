@@ -20,7 +20,7 @@ namespace Montage.Weiss.Tools.Utilities
             return result;
         }
 
-        public static async Task RunExecutable(string path, params string[] parameters)
+        public static void RunExecutable(string path, params string[] parameters)
         {
             Log ??= Serilog.Log.ForContext(typeof(ConsoleUtils));
             path = TransformShortcuts(path);

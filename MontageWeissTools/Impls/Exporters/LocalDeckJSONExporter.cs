@@ -49,7 +49,8 @@ namespace Montage.Weiss.Tools.Impls.Exporters
 
         private async Task ExecuteCommandAsync(string outCommand, Path jsonFilename)
         {
-            await ConsoleUtils.RunExecutable(outCommand, $"\"{jsonFilename.FullPath}\"");
+            ConsoleUtils.RunExecutable(outCommand, $"\"{jsonFilename.FullPath}\"");
+            await Task.CompletedTask;
         }
     }
 }

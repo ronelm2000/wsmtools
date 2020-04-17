@@ -83,35 +83,37 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             var urlOrFile = info.URI;
             try
             {
-                var uri = new Uri(urlOrFile);
-                if (uri.Authority != "en.ws-tcg.com")
+                if (!Uri.TryCreate(urlOrFile, UriKind.Absolute, out var uri))
+                {
+                    Log.Debug("Not a URI. Failed compatibility check.", urlOrFile);
+                    return false;
+                }
+                else if (uri.Authority != "en.ws-tcg.com")
                 {
                     Log.Debug("The site is not EN WSTCG website. Failed compatibility check.");
                     return false;
-                } else if (uri.AbsolutePath != "/cardlist/list/")
+                }
+                else if (uri.AbsolutePath != "/cardlist/list/")
                 {
                     Log.Debug("The site is not based on the cardlist. Failed compatibility check.");
                     return false;
-                } else if (!uri.Query.StartsWith("?cardno="))
+                }
+                else if (!uri.Query.StartsWith("?cardno="))
                 {
                     Log.Debug("The site is not based on the cardlist (not having a compatible query). Failed compatibility check.");
                     return false;
-                } else
+                }
+                else
                 {
                     return true;
                 }
-            }
-            catch (UriFormatException)
-            {
-                Log.Debug("Not a URI. Failed compatibility check.", urlOrFile);
             }
             catch (Exception e)
             {
                 Log.Debug("Unspecified Error during compatibility checking.");
                 Log.Debug(e.Message);
+                return false;
             }
-            return false;
-
         }
 
         public async IAsyncEnumerable<WeissSchwarzCard> Parse(string urlOrFile)

@@ -87,7 +87,6 @@ namespace Montage.Weiss.Tools.Utilities
             SpanEnumerator _parent;
             public int LineNumber => _lineNumber;
 
-
             public SpanCursor(string separator, SpanEnumerator parent)
             {
                 this._separator = separator;
@@ -128,7 +127,6 @@ namespace Montage.Weiss.Tools.Utilities
                 Log.Debug("Cursor: {_cursor}", _cursor);
             }
 
-
             public bool Next()
             {
                 //                _cursor = _parent.IndexOf(_separator, _cursor + 1);
@@ -153,8 +151,6 @@ namespace Montage.Weiss.Tools.Utilities
                 for (int i = 0; i < lines; i++) Next();
 
             }
-
         }
-
     }
 }

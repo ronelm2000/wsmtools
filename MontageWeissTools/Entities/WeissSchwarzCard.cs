@@ -138,18 +138,27 @@ namespace Montage.Weiss.Tools.Entities
         public static string GetSerial(string subset, string side, string lang, string releaseID, string setID)
         {
             string fullSetID = subset;
-            if (lang == "EN" && !setID.Contains("E"))
+            if (TryGetExceptionalSetFormat(lang, side + releaseID, out var formatter))
             {
-                // This is a DX set; make serial adjustments.
-                fullSetID += "/EN-" + side;
+                return formatter((subset, side, lang, releaseID, setID));
+            }
+            else if (lang == "EN" && !setID.Contains("E") && !releaseID.StartsWith("X"))
+            {
+                return $"{subset}/EN-{side}{releaseID}-{setID}"; // This is a DX set serial adjustment.
             }
             else
             {
-                // Proceed as normal
-                fullSetID += "/" + side;
+                return $"{subset}/{side}{releaseID}-{setID}";
             }
-            fullSetID += releaseID;
-            return fullSetID + "-" + setID;
+        }
+
+        private static bool TryGetExceptionalSetFormat(string lang, string fullReleaseID, out Func<(string subset, string side, string lang, string releaseID, string setID), string> formatter)
+        {
+            formatter = (lang, fullReleaseID) switch {
+                ("EN", "S04") => (tuple) => $"{tuple.subset}/EN-{tuple.side}{tuple.releaseID}-{tuple.setID}",
+                _ => null
+            };
+            return formatter != null;
         }
     }
 

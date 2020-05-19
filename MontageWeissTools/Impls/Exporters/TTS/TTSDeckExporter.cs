@@ -111,7 +111,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                                 card => new
                                 {
                                     Name = card.Name.AsNonEmptyString() + $" [{card.Serial}]",
-                                    Description = $"Traits: {card.Traits.Select(t => t.AsNonEmptyString()).ConcatAsString(" - ")}\n" +
+                                    Description = $"Type: {card.TypeToString()+ "\n"}" + $"Traits: {card.Traits.Select(t => t.AsNonEmptyString()).ConcatAsString(" - ")}\n" +
                                       $"Effect: {card.Effect.ConcatAsString("\n")}"
                                 });
 

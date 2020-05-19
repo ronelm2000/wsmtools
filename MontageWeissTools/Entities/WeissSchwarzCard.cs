@@ -160,6 +160,22 @@ namespace Montage.Weiss.Tools.Entities
             };
             return formatter != null;
         }
+
+        public string TypeToString(){
+            string res = "";
+            switch(this.Type){
+                case CardType.Character:
+                    res = "CH";
+                    break; 
+                case CardType.Event:
+                    res = "EV";
+                    break; 
+                case CardType.Climax:
+                    res = "CX";
+                    break; 
+            }
+            return res;
+        }
     }
 
     internal class WeissSchwarzCardSerialComparerImpl : IEqualityComparer<WeissSchwarzCard>

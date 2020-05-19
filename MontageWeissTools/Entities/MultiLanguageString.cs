@@ -50,8 +50,8 @@ namespace Montage.Weiss.Tools.Entities
             else
                 sb.Append(JP);
 
-            if (JP != null)
-                sb.Append($" ({JP})");
+            // if (JP != null)
+            //     sb.Append($" ({JP})");
             return sb.ToString();
         }
 

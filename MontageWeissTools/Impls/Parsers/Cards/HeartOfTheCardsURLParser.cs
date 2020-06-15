@@ -203,7 +203,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 .Slice(c => c.IndexOf(traitsText) + traitsText.Length)
                 .Trim()
                 .ToString()
-                .Split(",")
+                .SplitWithRegex(@"([^(]+)\(([^\)]+)\),{0,1}")
                 .Select(this.ParseTrait)
                 .Where(o => o != null)
                 .ToList();
@@ -297,6 +297,15 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             result["jp"] = group[1].Value.Trim();
             result["en"] = group[3].Value.Trim();
             Log.Debug("All Groups: {@groups}", group.OfType<Group>().Select(g => g.Value).ToArray());
+            return result;
+        }
+
+        private MultiLanguageString ParseTrait(Match match)
+        {
+            MultiLanguageString result = new MultiLanguageString();
+            result["jp"] = match.Groups[1].Value.Trim();
+            result["en"] = match.Groups[2].Value.Trim();
+            Log.Debug("All Groups: {@groups}", match.Groups.OfType<Group>().Select(g => g.Value).ToArray());
             return result;
         }
 

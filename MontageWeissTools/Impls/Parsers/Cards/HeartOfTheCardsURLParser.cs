@@ -201,27 +201,29 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             cursor.Next();
             if (cursor.CurrentLine.ToString().Contains(traitsText))
             {
-
                 res.Traits = cursor.CurrentLine
-                .Slice(c => c.IndexOf(traitsText) + traitsText.Length)
-                .Trim()
-                .ToString()
-                .Split(",")
-                .Select(this.ParseTrait)
-                .Where(o => o != null)
-                .ToList();
+                    .Slice(c => c.IndexOf(traitsText) + traitsText.Length)
+                    .Trim()
+                    .ToString()
+                    .SplitWithRegex(@"([^(]+)\(([^\)]+)\),{0,1}")
+                    .Select(this.ParseTrait)
+                    .Where(o => o != null)
+                    .ToList();
+            }
             else if (cursor.CurrentLine.ToString().Contains(trait1Text))
-                {
-                    res.Traits = cursor.CurrentLine
-                        .Slice(c => c.IndexOf(trait1Text) + trait1Text.Length)
-                        .Trim()
-                        .ToString()
-                        .Split("      Trait 2: ")
-                        .Select(this.ParseTrait)
-                        .Where(o => o != null)
-                        .ToList();
-                }
-                cursor.Next();
+            {
+                res.Traits = cursor.CurrentLine
+                    .Slice(c => c.IndexOf(trait1Text) + trait1Text.Length)
+                    .Trim()
+                    .ToString()
+                    .Split("Trait 2: ")
+                    .SelectMany(s => s.Trim().SplitWithRegex(@"([^(]+)\(([^\)]+)\),{0,1}")) //TODO: Duplicate Regex, may be identical with traitMatcher.
+                    .Select(this.ParseTrait)
+                    .Where(o => o != null)
+                    .ToList();
+            }
+            
+            cursor.Next();
 
             var stringTriggers = cursor.CurrentLine
                 .Slice(c => c.IndexOf(triggersText) + triggersText.Length)

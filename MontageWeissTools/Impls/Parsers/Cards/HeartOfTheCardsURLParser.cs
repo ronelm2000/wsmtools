@@ -92,6 +92,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             var powerText = "Power: ";
             var soulText = "Soul: ";
             var traitsText = "Traits: ";
+            var trait1Text = "Trait 1: ";
             var triggersText = "Triggers: ";
             var flavorText = "Flavor:";
             var rulesTextText = "TEXT:";
@@ -198,17 +199,29 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             }
 
             cursor.Next();
+            if (cursor.CurrentLine.ToString().Contains(traitsText))
+            {
 
-            res.Traits = cursor.CurrentLine
+                res.Traits = cursor.CurrentLine
                 .Slice(c => c.IndexOf(traitsText) + traitsText.Length)
                 .Trim()
                 .ToString()
-                .SplitWithRegex(@"([^(]+)\(([^\)]+)\),{0,1}")
+                .Split(",")
                 .Select(this.ParseTrait)
                 .Where(o => o != null)
                 .ToList();
-
-            cursor.Next();
+            else if (cursor.CurrentLine.ToString().Contains(trait1Text))
+                {
+                    res.Traits = cursor.CurrentLine
+                        .Slice(c => c.IndexOf(trait1Text) + trait1Text.Length)
+                        .Trim()
+                        .ToString()
+                        .Split("      Trait 2: ")
+                        .Select(this.ParseTrait)
+                        .Where(o => o != null)
+                        .ToList();
+                }
+                cursor.Next();
 
             var stringTriggers = cursor.CurrentLine
                 .Slice(c => c.IndexOf(triggersText) + triggersText.Length)

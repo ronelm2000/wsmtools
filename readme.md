@@ -19,9 +19,11 @@ registering on GitHub.
 
 #### Supported Exporters ####
 * [Tabletop Simulator](https://steamcommunity.com/sharedfiles/filedetails/?id=1321170886)
+* Local Deck JSON
 
 #### Supported Deck Parsers ####
 * [Encore Decks](https://www.encoredecks.com/)
+* Local Deck JSON
 
 #### Supported Card Set Parsers ####
 * HOTC

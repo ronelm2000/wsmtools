@@ -3,7 +3,10 @@ using AngleSharp.Dom;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Utilities
@@ -24,6 +27,11 @@ namespace Montage.Weiss.Tools.Utilities
                         .Replace("\n", "\\\n")
                         .Replace("\t", "\\\t")
                         .Replace("\r", "\\\r");                
+        }
+
+        public static IEnumerable<Match> SplitWithRegex(this string str, string regex)
+        {
+            return (new Regex(regex)).Matches(str);
         }
 
         public static string AsFileNameFriendly(this string str, char replacement = '_')

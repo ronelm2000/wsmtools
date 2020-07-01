@@ -118,7 +118,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
             var serialStringList = serialList.Select(c => c.Serial).ToList();
 
             var finalTemplateLUA = Encoding.UTF8.GetString(TTSResources.template)
-                .Replace("<deck_name_info_placeholder>", $"\"{deck.Name}\"")
+                .Replace("<deck_name_info_placeholder>", $"\"{deck.Name.AsFileNameFriendly()}\"")
                 .Replace("<serials_placeholder>", $"\"{JsonConvert.SerializeObject(serialStringList).EscapeQuotes()}\"")
                 .Replace("<serial_info_placeholder>", $"\"{JsonConvert.SerializeObject(serialDictionary).EscapeQuotes()}\"")
                 ;

@@ -36,6 +36,12 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 Log.Information("But the set W53 is located in WE27 for JKTCG, so this Post-Processor is deemed compatible.");
                 return true;
             }
+            if (allReleaseIDs.Length == 2 && allReleaseIDs.Contains("S58") && allReleaseIDs.Contains("EN-S58"))
+            {
+                Log.Information("JKTCG Image Post-Processor is normally disabled for sets with multiple Release IDs.");
+                Log.Information("But the set S58 is located in EN-S58 for JKTCG, so this Post-Processor is deemed compatible.");
+                return true;
+            }
             else if (allReleaseIDs.Length > 1)
             {
                 Log.Warning("JKTCG Image Post-Processor is disabled for sets with multiple Release IDs; please add those images manually when prompted.");

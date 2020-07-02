@@ -62,6 +62,10 @@
     "wstools export Fantasia Deck": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/WCiCTn736 --exporter local"
+    },
+    "wstools parse NGNL": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?lang=EN&neoset=5d7e742b21e8c57bffb3ecfe&page=1&set=5cbf21157cd9b718cdd40820"
     }
   }
 }

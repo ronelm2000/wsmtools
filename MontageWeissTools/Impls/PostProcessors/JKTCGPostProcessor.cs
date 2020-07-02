@@ -16,6 +16,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
     {
         private readonly ILogger Log = Serilog.Log.ForContext<JKTCGPostProcessor>();
         private readonly Regex LinkMatcher = new Regex(@"(http:\/\/jktcg.com\/)(EN-.+-)(.+)");
+        private readonly string[] globalReleasePrefixes = { "BSF", "BCS" };
 
         public int Priority => 0;
 
@@ -24,7 +25,11 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             if (cards.First().Language != CardLanguage.English)
                 return false;
 
-            var allReleaseIDs = cards.Select(c => c.ReleaseID).Distinct().ToArray();
+            var allReleaseIDs = cards.Select(c => c.ReleaseID)
+                .Distinct()
+                .Where(rid => !rid.StartsWithAny(globalReleasePrefixes)) // Remove all global prefixes as those are assigned on the same page as the main set.
+                .ToArray();
+
             if (allReleaseIDs.Length == 2 && allReleaseIDs.Contains("W53") && allReleaseIDs.Contains("WE27"))
             {
                 Log.Information("JKTCG Image Post-Processor is normally disabled for sets with multiple Release IDs.");

@@ -49,7 +49,7 @@ registering on GitHub.
 08. The `deck_your deck name.jpg` will be automatically uploaded with ShareX. (If using imgur, some [Imgur API Rate Limits](https://apidocs.imgur.com/?version=latest) may apply.)
     - Once finished, your deck's image URL can be copied from ShareX.
     - To copy the image URL, right-click on the uploaded task, and go to Copy > URL.
-      ![I like ShareX this way; it's so convinient](https://i.imgur.com/q0L7Aqr.png)
+      ![I like ShareX this way; it's so convenient](https://i.imgur.com/Sw2H9qm.png)
 09. Open Tabletop Simulator (Single-Player will do)
 10. Load the Saved Object (and make sure no other Deck Generators are loaded!)
 11. In the chat command, type:

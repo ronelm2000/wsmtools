@@ -17,7 +17,7 @@
     },
     "wstools for Buggy Deck": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/b7eQKO8kW"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/jbfHKPURJ"
     },
     "wsools export Grasaia": {
       "commandName": "Project",
@@ -62,6 +62,30 @@
     "wstools export Fantasia Deck": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/WCiCTn736 --exporter local"
+    },
+    "wstools export Prillya": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/hzUnV5mRI"
+    },
+    "wstools export Batman Ninja": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE"
+    },
+    "wstools export P4": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/tyjlBPJDK --exporter local"
+    },
+    "wstools parse W73": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/bang_dream!_vol._2_booster_pack.html"
+    },
+    "wstools NGNL": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/api/series/5cbf21157cd9b718cdd40820/cards"
+    },
+    "wstools parse BDML": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5cf701347cd9b718cdf21469"
     }
   }
 }

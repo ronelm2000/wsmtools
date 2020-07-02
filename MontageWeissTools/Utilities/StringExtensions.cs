@@ -29,6 +29,11 @@ namespace Montage.Weiss.Tools.Utilities
                         .Replace("\r", "\\\r");                
         }
 
+        public static bool StartsWithAny(this string str, IEnumerable<string> values)
+        {
+            return values.Any(v => str.StartsWith(v));
+        }
+
         public static IEnumerable<Match> SplitWithRegex(this string str, string regex)
         {
             return (new Regex(regex)).Matches(str);

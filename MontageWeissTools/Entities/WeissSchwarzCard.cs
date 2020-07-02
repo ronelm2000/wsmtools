@@ -142,6 +142,10 @@ namespace Montage.Weiss.Tools.Entities
             {
                 return formatter((subset, side, lang, releaseID, setID));
             }
+            else if (TryGetExceptionalCardFormat(lang, setID, out var formatter2))
+            {
+                return formatter2((subset, side, lang, releaseID, setID));
+            }
             else if (lang == "EN" && !setID.Contains("E") && !releaseID.StartsWith("X"))
             {
                 return $"{subset}/EN-{side}{releaseID}-{setID}"; // This is a DX set serial adjustment.
@@ -156,6 +160,17 @@ namespace Montage.Weiss.Tools.Entities
         {
             formatter = (lang, fullReleaseID) switch {
                 ("EN", "S04") => (tuple) => $"{tuple.subset}/EN-{tuple.side}{tuple.releaseID}-{tuple.setID}",
+                _ => null
+            };
+            return formatter != null;
+        }
+
+        private static bool TryGetExceptionalCardFormat(string lang, string setID, out Func<(string subset, string side, string lang, string releaseID, string setID), string> formatter)
+        {
+            formatter = (lang, setID) switch
+            {
+                ValueTuple<string,string> tuple when tuple.Item1 == "EN" && tuple.Item2.Contains("-") => (tuple) 
+                    => $"{tuple.subset}/{tuple.setID}",
                 _ => null
             };
             return formatter != null;

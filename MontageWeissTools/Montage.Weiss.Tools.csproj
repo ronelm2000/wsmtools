@@ -32,6 +32,8 @@
     <Compile Remove="Migrations\20200328175703_SecondInitialSetup.Designer.cs" />
     <Compile Remove="Migrations\20200328183816_ThirdInitialSetup.cs" />
     <Compile Remove="Migrations\20200328183816_ThirdInitialSetup.Designer.cs" />
+    <TrimmerRootAssembly Include="System.Net.WebClient" />
+    <TrimmerRootAssembly Include="System.Web.HttpUtility" />
   </ItemGroup>
 
   <ItemGroup>

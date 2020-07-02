@@ -27,7 +27,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
             var allReleaseIDs = cards.Select(c => c.ReleaseID)
                 .Distinct()
-                .Where(rid => rid.StartsWithAny(globalReleasePrefixes)) // Remove all global prefixes as those are assigned on the same page as the main set.
+                .Where(rid => !rid.StartsWithAny(globalReleasePrefixes)) // Remove all global prefixes as those are assigned on the same page as the main set.
                 .ToArray();
 
             if (allReleaseIDs.Length == 2 && allReleaseIDs.Contains("W53") && allReleaseIDs.Contains("WE27"))

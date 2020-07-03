@@ -83,6 +83,9 @@ namespace Montage.Weiss.Tools.CLI
                 using (System.IO.Stream netStream = await card.GetImageStreamAsync())
                 using (Image img = Image.Load(netStream))
                 {
+                    var imageDirectoryPath = Path.Get(_IMAGE_CACHE_PATH);
+                    if (!imageDirectoryPath.Exists) imageDirectoryPath.CreateDirectory();
+
                     img.Metadata.ExifProfile ??= new ExifProfile();
                     img.Metadata.ExifProfile.SetValue(SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifTag.Copyright, card.Images.Last().Authority);
                     var savePath = Path.Get(_IMAGE_CACHE_PATH).Combine($"{card.Serial.Replace('-', '_').AsFileNameFriendly()}.jpg");

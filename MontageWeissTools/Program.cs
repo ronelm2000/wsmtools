@@ -89,7 +89,7 @@ namespace Montage.Weiss.Tools
                     Console.WriteLine("This is a CLI (Command Line Interface). You must use PowerShell or Command Prompt to use all of this application's functionalities.");
                     makeCLIAppear = true;
                 }
-                else if (!(error is HelpVerbRequestedError))
+                else if (!(error is HelpVerbRequestedError || error is VersionRequestedError || error is BadVerbSelectedError))
                     Log.Error("{@Error}", error);
             }
             if (makeCLIAppear) Console.ReadKey(false);

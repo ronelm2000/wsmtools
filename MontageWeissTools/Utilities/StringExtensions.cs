@@ -143,10 +143,10 @@ namespace Montage.Weiss.Tools.Utilities
 
             public bool Next()
             {
-                //                _cursor = _parent.IndexOf(_separator, _cursor + 1);
                 var previousCursor = _cursor;
-                _cursor = _cursor + _parent().Slice(_cursor + 1).IndexOf(_separator) + 1;
-                if (_cursor > 0)
+                var diff = _parent().Slice(_cursor + 1).IndexOf(_separator);
+                _cursor = _cursor + diff + 1;
+                if (diff >= 0)
                     _lineNumber++;
                 else
                 {
@@ -154,7 +154,6 @@ namespace Montage.Weiss.Tools.Utilities
                     _isLastLine = true;
                 //    _lineNumber = 1;
                 }
-                //_cursor = _cursor + _parent().Slice(_cursor + 1).IndexOf(_separator);
                 Log.Debug("Next Cursor: {_cursor}", _cursor);
                 return previousCursor < _cursor;
             }

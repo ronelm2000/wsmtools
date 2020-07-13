@@ -1,5 +1,7 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using Lamar.IoC.Instances;
+using LamarCodeGeneration.Frames;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -20,6 +22,11 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         public int Priority => 0;
 
+        private static readonly string rarityClassPrefix = "rarity_";
+        private static readonly string cardUnitListItemSelector = "#main .card_unit";
+        private static readonly string cardUnitImageSelector = ".image_box > a > .image > img";
+        private static readonly string cardUnitSerialSelector = ".headline > p.id";
+
         public bool IsCompatible(List<WeissSchwarzCard> cards)
         {
             if (cards.First().Language != CardLanguage.Japanese)
@@ -37,9 +44,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
         {
             var yuyuteiSellPage = "https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=";
-            var cardUnitListItemSelector = "#main .card_unit";
-            var cardUnitImageSelector = ".image_box > a > .image > img";
-            var cardUnitSerialSelector = ".headline > p.id";
+
             var firstCard = await originalCards.FirstAsync();
             var setCode = firstCard.ReleaseID;
             var lang = firstCard.Language;
@@ -59,17 +64,17 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
             var cardUnitListItems = yuyuteiSearchPage.QuerySelectorAll(cardUnitListItemSelector);
 
-            var serialImagePairs = cardUnitListItems
-                .Select(div => (serialDiv: div.QuerySelector(cardUnitSerialSelector), imageDiv: div.QuerySelector<IHtmlImageElement>(cardUnitImageSelector)))
-                .Select(pair => (Serial: pair.serialDiv.InnerHtml.Trim(), ImageUri: pair.imageDiv.Source.Replace("ws/90_126", "ws/front")))
-                .Distinct(pair => pair.Serial)             // Dev Notes: https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=BD%2fW54 gave me cancer.
-                .ToDictionary(pair => pair.Serial, pair => pair.ImageUri)
+            var serialImageTriplets = cardUnitListItems
+                .Select(div => this.CreateTrio(div))
+                .Select(trio => this.Serialize(trio))
+                .Distinct(trio => (trio.Serial, trio.Rarity))             // Dev Notes: https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=BD%2fW54 gave me cancer.
+                .ToDictionary(trio => (trio.Serial, trio.Rarity), pair => pair.ImageUri)
                 ;
 
             await foreach (var originalCard in originalCards)
             {
                 var res = originalCard.Clone();
-                if (serialImagePairs.TryGetValue(res.Serial, out var urlLink)) {
+                if (serialImageTriplets.TryGetValue( (res.Serial, res.Rarity), out var urlLink)) {
                     var imgUrl = new Uri(urlLink);
                     res.Images.Add(imgUrl);
                     Log.Information("Attached to {serial}: {imgUrl}", res.Serial, urlLink);
@@ -82,5 +87,29 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             Log.Information("Ended.");
             yield break;
         }
+
+        private (IElement serialDiv, IHtmlImageElement imageDiv, string rarityClass) CreateTrio(IElement div)
+        {
+            return (serialDiv: div.QuerySelector(cardUnitSerialSelector),
+                        imageDiv: div.QuerySelector<IHtmlImageElement>(cardUnitImageSelector),
+                        rarityClass: div.ClassList.Where(s => s.StartsWith(rarityClassPrefix)).Select(s => s.Substring(rarityClassPrefix.Length)).First()
+                   );
+            //return FixExceptionalYuyuteiTrios(initialResult);
+        }
+
+        private (string Serial, string Rarity, string ImageUri) Serialize((IElement serialDiv, IHtmlImageElement imageDiv, string rarityClass) trio)
+        {
+            var res = ( Serial: trio.serialDiv.InnerHtml.Trim(),
+                        Rarity: trio.rarityClass,
+                        ImageUri: trio.imageDiv.Source.Replace("ws/90_126", "ws/front")
+                        );
+            return res switch {
+                // Fix Exceptional Serial on GU/57 caused by the serial being the same serial in SEC and in normal rarity.
+                var tup when tup.Rarity == "SEC" && tup.Serial.StartsWith("GU/W57") => (tup.Serial + tup.Rarity, tup.Rarity, tup.ImageUri),
+                _ => res
+            };
+        }
+
+
     }
 }

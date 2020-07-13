@@ -23,10 +23,10 @@ namespace Montage.Weiss.Tools.Utilities
         {
             return str  .Replace("\\", "\\\\")
                         .Replace("\"", "\\\"")
-                        .Replace("\b", "\\\b")
-                        .Replace("\n", "\\\n")
-                        .Replace("\t", "\\\t")
-                        .Replace("\r", "\\\r");                
+                        .Replace("\b", "\\b")
+                        .Replace("\n", "\\n")
+                        .Replace("\t", "\\t")
+                        .Replace("\r", "\\r");                
         }
 
         public static bool StartsWithAny(this string str, IEnumerable<string> values)
@@ -96,6 +96,7 @@ namespace Montage.Weiss.Tools.Utilities
             private string _separator;
             private int _cursor = -1;
             private int _lineNumber = 1;
+            private bool _isLastLine = false;
 
             SpanEnumerator _parent;
             public int LineNumber => _lineNumber;
@@ -113,9 +114,9 @@ namespace Montage.Weiss.Tools.Utilities
                     var length = _parent().Slice(_cursor + 1).IndexOf(_separator) + 1; //, _cursor + 1) - _cursor;
                     Log.Debug("Length: {length}", length);
                     if (length > -1)
-                        return _parent().Slice(_cursor + 1, length).Trim();
+                        return _parent().Slice(_cursor + 1, length).TrimEnd("\r\n");
                     else
-                        return _parent().Slice(_cursor + 1).Trim();
+                        return _parent().Slice(_cursor + 1).TrimEnd("\r\n");
                 }
             }
 
@@ -132,7 +133,7 @@ namespace Montage.Weiss.Tools.Utilities
 
             public void MoveUp()
             {
-                if (_cursor - 1 >= 0)
+                if (_cursor - 1 >= 0 && !_isLastLine)
                 {
                     _cursor = _parent().Slice(0, _cursor).LastIndexOf(_separator);
                     _lineNumber--;
@@ -148,7 +149,11 @@ namespace Montage.Weiss.Tools.Utilities
                 if (_cursor > 0)
                     _lineNumber++;
                 else
-                    _lineNumber = 1;
+                {
+                    _cursor = previousCursor;
+                    _isLastLine = true;
+                //    _lineNumber = 1;
+                }
                 //_cursor = _cursor + _parent().Slice(_cursor + 1).IndexOf(_separator);
                 Log.Debug("Next Cursor: {_cursor}", _cursor);
                 return previousCursor < _cursor;

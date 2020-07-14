@@ -75,7 +75,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             var serialImageTriplets = cardUnitListItems
                 .Select(div => this.CreateTrio(div))
                 .Select(trio => this.Serialize(trio))
-                .Distinct(trio => (trio.Serial, trio.Rarity))             // Dev Notes: https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=BD%2fW54 gave me cancer.
+                .Distinct(trio => trio.Serial + " " + trio.Rarity)             // Dev Notes: https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=BD%2fW54 gave me cancer.
                 .ToDictionary(trio => (trio.Serial, trio.Rarity), pair => pair.ImageUri)
                 ;
 
@@ -136,6 +136,10 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             return res switch {
                 // Fix Exceptional Serial on GU/57 caused by the serial being the same serial in SEC and in normal rarity.
                 var tup when tup.Rarity == "SEC" && tup.Serial.StartsWith("GU/W57") => (tup.Serial + tup.Rarity, tup.Rarity, tup.ImageUri),
+                // Fix Exceptional CC rarity when it's supposed to be a regular C for all Extra Boosters
+                var tup when (tup.Serial.Contains("/WE") || tup.Serial.Contains("/SE")) 
+                           && tup.Rarity.EndsWith("CC") 
+                  => (tup.Serial, tup.Rarity.Substring(0, tup.Rarity.Length - 2) + "C", tup.ImageUri),
                 _ => res
             };
         }

@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using Lamar;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -19,6 +20,14 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         private readonly string[] globalReleasePrefixes = { "BSF", "BCS" };
 
         public int Priority => 0;
+
+        // Dependencies
+        private readonly Func<CardDatabaseContext> _database;
+
+        public JKTCGPostProcessor(IContainer container)
+        {
+            _database = () => container.GetInstance<CardDatabaseContext>();
+        }
 
         public bool IsCompatible(List<WeissSchwarzCard> cards)
         {
@@ -71,7 +80,30 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                     Source: ele.Source.Replace("\t", "")
                     ))
                 .ToDictionary(p => p.Serial, p => p.Source);//(setID + "-" + str.AsSpan().Slice(c => c.LastIndexOf('_') + 1, c => c.LastIndexOf(".")).ToString()).ToLower());
-//                .ToLookup(ele => ele
+
+            /* Commented for future use
+            Log.Information("Getting all PRs on card database without a YYT image link...");
+            using (var db = _database())
+            {
+                var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
+                    .Where(c => c.ReleaseID == releaseID
+                                && c.Language == CardLanguage.English
+                                && c.Rarity == "PR"
+                                && !c.Images.Any(u => u.Authority == "jktcg.com")
+                    );
+                await foreach (var prCard in prCards)
+                {
+                    if (cardImages.TryGetValue(prCard.Serial, out var urlLink))
+                    {
+                        var imgUrl = new Uri(urlLink);
+                        prCard.Images.Add(imgUrl);
+                        db.Update(prCard);
+                        Log.Information("Attached to {serial}: {imgUrl}", prCard.Serial, urlLink);
+                    }
+                }
+                await db.SaveChangesAsync();
+            }
+            */
 
             await foreach (var card in originalCards)
             {

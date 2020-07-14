@@ -1,7 +1,7 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using Lamar;
 using Lamar.IoC.Instances;
-using LamarCodeGeneration.Frames;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -26,6 +26,14 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         private static readonly string cardUnitListItemSelector = "#main .card_unit";
         private static readonly string cardUnitImageSelector = ".image_box > a > .image > img";
         private static readonly string cardUnitSerialSelector = ".headline > p.id";
+
+        // Dependencies
+        private readonly Func<CardDatabaseContext> _database;
+
+        public YuyuteiPostProcessor(IContainer container)
+        {
+            _database = () => container.GetInstance<CardDatabaseContext>();
+        }
 
         public bool IsCompatible(List<WeissSchwarzCard> cards)
         {
@@ -54,7 +62,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 await foreach (var card in originalCards) yield return card;
                 yield break;
             }
-            
+
             Log.Information("Starting...");
 
             yuyuteiSellPage += HttpUtility.UrlEncode(setCode);
@@ -70,6 +78,28 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 .Distinct(trio => (trio.Serial, trio.Rarity))             // Dev Notes: https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=BD%2fW54 gave me cancer.
                 .ToDictionary(trio => (trio.Serial, trio.Rarity), pair => pair.ImageUri)
                 ;
+
+            Log.Information("Getting all PRs on card database without a YYT image link...");
+            using (var db = _database())
+            {
+                var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
+                    .Where(c =>     c.ReleaseID == setCode 
+                                &&  c.Language == lang 
+                                &&  c.Rarity == "PR" 
+                                && !c.Images.Any(u => u.Authority == "yuyu-tei.jp")
+                    );
+                await foreach (var prCard in prCards)
+                {
+                    if (serialImageTriplets.TryGetValue((prCard.Serial, prCard.Rarity), out var urlLink))
+                    {
+                        var imgUrl = new Uri(urlLink);
+                        prCard.Images.Add(imgUrl);
+                        db.Update(prCard);
+                        Log.Information("Attached to {serial}: {imgUrl}", prCard.Serial, urlLink);
+                    }
+                }
+                await db.SaveChangesAsync();
+            }
 
             await foreach (var originalCard in originalCards)
             {

@@ -41,7 +41,7 @@
     },
     "wstools parse PRs": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/schwarz_promos.html"
+      "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
     },
     "wstools parse ED Site Link": {
       "commandName": "Project",

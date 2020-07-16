@@ -142,7 +142,7 @@ namespace Montage.Weiss.Tools.Entities
             {
                 return formatter((subset, side, lang, releaseID, setID));
             }
-            else if (TryGetExceptionalCardFormat(lang, setID, out var formatter2))
+            else if (TryGetExceptionalCardFormat(lang, releaseID, setID, out var formatter2))
             {
                 return formatter2((subset, side, lang, releaseID, setID));
             }
@@ -165,12 +165,12 @@ namespace Montage.Weiss.Tools.Entities
             return formatter != null;
         }
 
-        private static bool TryGetExceptionalCardFormat(string lang, string setID, out Func<(string subset, string side, string lang, string releaseID, string setID), string> formatter)
+        private static bool TryGetExceptionalCardFormat(string lang, string releaseID, string setID, out Func<(string subset, string side, string lang, string releaseID, string setID), string> formatter)
         {
-            formatter = (lang, setID) switch
+            formatter = (lang, releaseID, setID) switch
             {
-                ValueTuple<string,string> tuple when tuple.Item1 == "EN" && tuple.Item2.Contains("-") => (tuple) 
-                    => $"{tuple.subset}/{tuple.setID}",
+                ("EN", "X01", "X02") => (tuple) => "BNJ/BCS2019-02",
+                var tuple when tuple.lang == "EN" && tuple.setID.Contains("-") => (tuple) => $"{tuple.subset}/{tuple.setID}",
                 _ => null
             };
             return formatter != null;

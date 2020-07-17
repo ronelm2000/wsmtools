@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.CLI
 {
-    [Verb("export-db", HelpText = "Exports a file from one format to another, typically into files for Tabletop Simulator, for example.")]
+    [Verb("export-db", HelpText = "Exports the card database using a specified exporter algorithm.")]
     public class DatabaseExportVerb : IVerbCommand, IDatabaseExportInfo
     {
         [Value(0, HelpText = "Indicates the destination; usually a folder.", Default = "./Export/")]

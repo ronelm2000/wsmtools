@@ -205,7 +205,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                     .Slice(c => c.IndexOf(traitsText) + traitsText.Length)
                     .Trim()
                     .ToString()
-                    .SplitWithRegex(@"([^(]+)\(([^\)]+)\),{0,1}")
+                    .SplitWithRegex(traitMatcher)
                     .Select(this.ParseTrait)
                     .Where(o => o != null)
                     .ToList();
@@ -217,7 +217,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                     .Trim()
                     .ToString()
                     .Split("Trait 2: ")
-                    .SelectMany(s => s.Trim().SplitWithRegex(@"([^(]+)\(([^\)]+)\),{0,1}")) //TODO: Duplicate Regex, may be identical with traitMatcher.
+                    .SelectMany(s => s.Trim().SplitWithRegex(traitMatcher))
                     .Select(this.ParseTrait)
                     .Where(o => o != null)
                     .ToList();
@@ -301,7 +301,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             return hotcEffectText.Trim().Replace("\n", " ").Replace("\r", "");
         }
 
-        private static readonly Regex traitMatcher = new Regex(@"([^\(]+)(\()([^\)]+)(\))[,]{0,1}");
+        private static readonly Regex traitMatcher = new Regex(@"([^\(]+)\(((?:[^()]|(?<Open>[(])|(?<-Open>[)]))*(?(Open)(?!)))\),{0,1}");
 
         private MultiLanguageString ParseTrait(String traitString)
         {

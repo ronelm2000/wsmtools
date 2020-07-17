@@ -39,6 +39,11 @@ namespace Montage.Weiss.Tools.Utilities
             return (new Regex(regex)).Matches(str);
         }
 
+        public static IEnumerable<Match> SplitWithRegex(this string str, Regex regex)
+        {
+            return regex.Matches(str);
+        }
+
         public static string AsFileNameFriendly(this string str, char replacement = '_')
         {
             var res = str;

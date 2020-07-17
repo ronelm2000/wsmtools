@@ -102,6 +102,10 @@
     "export db": {
       "commandName": "Project",
       "commandLineArgs": "export-db"
+    },
+    "parse DAL": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/date_a_live_booster_pack.html"
     }
   }
 }

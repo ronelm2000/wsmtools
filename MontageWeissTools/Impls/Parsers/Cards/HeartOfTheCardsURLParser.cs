@@ -321,7 +321,10 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             result["jp"] = match.Groups[1].Value.Trim();
             result["en"] = match.Groups[2].Value.Trim();
             Log.Debug("All Groups: {@groups}", match.Groups.OfType<Group>().Select(g => g.Value).ToArray());
-            return result;
+            if (result["jp"] == "特徴なし") // No Traits
+                return null;
+            else
+                return result;
         }
 
         private bool IsValidTrait(string traitString)

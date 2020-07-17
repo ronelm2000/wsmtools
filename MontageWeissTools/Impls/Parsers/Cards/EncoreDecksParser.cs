@@ -129,15 +129,25 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
         {
             var nullCheckedAttributes = (EN: attributes.EN ?? Enumerable.Empty<object>().ToList(), JP: attributes.JP ?? Enumerable.Empty<object>().ToList());
             var maxlength = Math.Max(nullCheckedAttributes.EN.Count, nullCheckedAttributes.JP.Count);
-            var enSpan = nullCheckedAttributes.EN;
-            var jpSpan = nullCheckedAttributes.JP;
-            for (int i = 0; i < maxlength; i++)
-            {
-                MultiLanguageString str = new MultiLanguageString();
-                str.EN = (i < enSpan.Count) ? enSpan[i].ToString() : null;
-                str.JP = (i < jpSpan.Count) ? jpSpan[i].ToString() : null;
-                yield return str;
-            }
+            var enSpan = nullCheckedAttributes.EN.ToArray();
+            var jpSpan = nullCheckedAttributes.JP.ToArray();
+            var maxLength = Math.Max(enSpan.Length, jpSpan.Length);
+            Array.Resize(ref enSpan, maxLength);
+            Array.Resize(ref jpSpan, maxLength);
+            return enSpan.Zip(jpSpan, Construct).Where(mls => mls != null);
+        }
+
+        private MultiLanguageString Construct(object traitEN, object traitJP)
+        {
+            MultiLanguageString str = new MultiLanguageString();
+            str.EN = traitEN?.ToString();
+            str.JP = traitJP?.ToString();
+            str.EN = (String.IsNullOrWhiteSpace(str.EN) || str.EN == "-") ? null : str.EN;
+            str.JP = (String.IsNullOrWhiteSpace(str.JP)) ? null : str.JP;
+            if (str.EN == null && str.JP == null)
+                return null;
+            else
+                return str;
         }
     }
 }

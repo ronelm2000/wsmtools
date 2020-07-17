@@ -40,7 +40,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Database.Cockatrice
             var result = query;
             if (releaseIDLimitations.Length > 0)
                 result = result.Where(card => releaseIDLimitations.Contains(card.ReleaseID));
-            return result;
+            return result.Where(card => card.Images.Count > 0);
         }
     }
 
@@ -79,6 +79,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Database.Cockatrice
                     newCckCard.Props.LevelCost = $"{card.Level}/{card.Cost}";
                     newCckCard.Props.PowerSoul = $"{card.Power ?? 0}/{card.Soul ?? 0}";
                     newCckCard.Props.Type = $"{card.Traits.Select(TranslateTrait).Prepend(card.Type.ToString()).ConcatAsString(" - ")}";
+                    newCckCard.Props.MainType = card.Type.ToString();
                     newCckCard.Text = FormatText(card);
                     tempCardList.Add(newCckCard);
                 } catch (Exception e)
@@ -170,6 +171,8 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Database.Cockatrice
         public string LevelCost;
         [XmlElement("type")]
         public string Type;
+        [XmlElement("maintype")]
+        public string MainType;
         [XmlElement("pt")]
         public string PowerSoul;
     }

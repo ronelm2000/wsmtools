@@ -22,8 +22,6 @@ namespace Montage.Weiss.Tools
         {
             Serilog.Log.Logger = BootstrapLogging().CreateLogger();
 
-            await CheckLatestVersion();
-
             Log.Information("Starting...");
 
             var container = Bootstrap();
@@ -34,7 +32,10 @@ namespace Montage.Weiss.Tools
             var verbs = container.GetAllInstances<IVerbCommand>().Select(a => a.GetType()).ToArray();
             var result = CommandLine.Parser.Default.ParseArguments(args, verbs); //
             await result.MapResult<IVerbCommand, Task>(
-                (verb) => verb.Run(container),
+                async (verb) => {
+                    await CheckLatestVersion();
+                    await verb.Run(container);
+                },
                 (errors) => Display(errors)
             );
             await Task.CompletedTask;

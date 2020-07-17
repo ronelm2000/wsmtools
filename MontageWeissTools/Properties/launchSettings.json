@@ -98,6 +98,10 @@
     "Parse GU EP": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/is_the_order_a_rabbit_extra_pack.html"
+    },
+    "export db": {
+      "commandName": "Project",
+      "commandLineArgs": "export-db"
     }
   }
 }

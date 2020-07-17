@@ -11,20 +11,22 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.CLI
 {
-    [Verb("export", HelpText = "Exports a file from one format to another, typically into files for Tabletop Simulator, for example.")]
-    public class ExportVerb : IVerbCommand, IExportInfo
+    [Verb("export-db", HelpText = "Exports a file from one format to another, typically into files for Tabletop Simulator, for example.")]
+    public class DatabaseExportVerb : IVerbCommand, IDatabaseExportInfo
     {
-        [Value(0, HelpText = "Indicates the source file/url.")]
-        public string Source { get; set;  }
-
-        [Value(1, HelpText = "Indicates the destination; usually a folder.", Default = "./Export/")]
+        [Value(0, HelpText = "Indicates the destination; usually a folder.", Default = "./Export/")]
         public string Destination { get; set; } = "./Export/";
 
-        [Option("parser", HelpText = "Manually sets the deck parser to use. Possible values: encoredecks", Default = "encoredecks")]
-        public string Parser { get; set; } = "encoredecks";
+        [Option("rids", HelpText = "Limits the range of the database export to a few RIDs (Release IDs).", Separator = ',', Default = new string[] { })]
+        public IEnumerable<string> ReleaseIDs { get; set; } = new string[] { };
 
-        [Option("exporter", HelpText = "Manually sets the deck exporter to use. Possible values: tabletopsim, local", Default = "tabletopsim")]
-        public string Exporter { get; set; } = "tabletopsim";
+        [Value(0, HelpText = "Indicates the source file/url. Default value: ./cards.db", Default = "./cards.db")]
+        public string Source { get; set; } = "./cards.db";
+
+        public string Parser => null;
+
+        [Option("exporter", HelpText = "Manually sets the database exporter to use. Possible values: cockatrice", Default = "cockatrice")]
+        public string Exporter { get; set; } = "cockatrice";
 
         [Option("out", HelpText = "For some exporters, gives an out command to execute after exporting.", Default = "")]
         public string OutCommand { get; set; } = "";
@@ -38,14 +40,14 @@ namespace Montage.Weiss.Tools.CLI
         [Option("nowarn", HelpText = "When set to true, all warning prompts will default to yes without user input. This flag when set ignores noninteractive flag during warnings (and is automatically true).", Default = false)]
         public bool NoWarning { get; set; } = false;
 
-        private readonly ILogger Log = Serilog.Log.ForContext<ExportVerb>();
+        private readonly ILogger Log = Serilog.Log.ForContext<DatabaseExportVerb>();
 
         private static readonly IEnumerable<string> Empty = new string[] { };
 
         /// <summary>
         /// For the IOC
         /// </summary>
-        public ExportVerb()
+        public DatabaseExportVerb()
         { 
         }
 
@@ -55,10 +57,17 @@ namespace Montage.Weiss.Tools.CLI
 
             Log.Information("Running...");
 
-            var parser = ioc.GetAllInstances<IDeckParser>()
-                .Where(parser => parser.IsCompatible(Source))
-                .OrderByDescending(parser => parser.Priority)
-                .First();
+            using (var database = new CardDatabaseContext(new AppConfig() { DbName = Source }))
+            {
+                var exporter = ioc.GetAllInstances<IDatabaseExporter>()
+                    .Where(exporter => exporter.Alias.Contains(Exporter))
+                    .First();
+
+                await exporter.Export(database, this);
+            }
+
+
+            /*
 
             var deck = await parser.Parse(Source);
             var inspectionOptions = new InspectionOptions()
@@ -79,6 +88,7 @@ namespace Montage.Weiss.Tools.CLI
 
                 await exporter.Export(deck, this);
             }
+            */
         }
     }
 }

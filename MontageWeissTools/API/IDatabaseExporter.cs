@@ -9,6 +9,6 @@ namespace Montage.Weiss.Tools.API
     public interface IDatabaseExporter
     {
         public string[] Alias { get; }
-        public Task Export(CardDatabaseContext database, IExportInfo info);
+        public Task Export(CardDatabaseContext database, IDatabaseExportInfo info);
     }
 }

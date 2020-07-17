@@ -66,7 +66,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 result.Name.JP = jpOptional.name;
                 (List<object>, List<object>) attributes = (enOptional.attributes, jpOptional.attributes);
                 result.Traits = TranslateTraits(attributes).ToList();
-                result.Effect = ((List<object>)DynamicExtensions.AsOptional(setCard)?.ability)?.Cast<string>().ToArray();
+                result.Effect = ((List<object>)enOptional.ability)?.Cast<string>().ToArray();
                 result.Rarity = setCard.rarity;
                 result.Side = TranslateSide(setCard.side);
                 result.Level = (int?) setCard.level;

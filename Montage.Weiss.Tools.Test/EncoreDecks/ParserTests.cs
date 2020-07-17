@@ -41,6 +41,7 @@ namespace Montage.Weiss.Tools.Test.EncoreDecks
             var batmanNinja = await new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards") //
                 .ToDictionaryAsync(c => c.Serial);
             Assert.IsTrue(batmanNinja["BNJ/SX01-T07"].Traits.Count == 0);
+            Assert.IsTrue(batmanNinja["BNJ/SX01-A13"].Traits.Count == 0);
             Assert.IsTrue(batmanNinja["BNJ/SX01-078b"].Traits.Select(mls => mls.EN).All(trait => new[] { "Sengoku", "Weapon" }.Contains(trait)));
         }
     }

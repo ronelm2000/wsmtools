@@ -137,12 +137,19 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             return enSpan.Zip(jpSpan, Construct).Where(mls => mls != null);
         }
 
+        private static readonly string[] NULL_TRAITS = new[]
+        {
+            "-",
+            "0",
+            "－"
+        };
+
         private MultiLanguageString Construct(object traitEN, object traitJP)
         {
             MultiLanguageString str = new MultiLanguageString();
             str.EN = traitEN?.ToString();
             str.JP = traitJP?.ToString();
-            str.EN = (String.IsNullOrWhiteSpace(str.EN) || str.EN == "-") ? null : str.EN;
+            str.EN = (String.IsNullOrWhiteSpace(str.EN) || NULL_TRAITS.Contains(str.EN)) ? null : str.EN;
             str.JP = (String.IsNullOrWhiteSpace(str.JP)) ? null : str.JP;
             if (str.EN == null && str.JP == null)
                 return null;

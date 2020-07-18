@@ -13,13 +13,17 @@ For now this tool is barebones (in its alpha stage, so expect some bugs), but I'
 * Parse cards into a local database for querying.
 * Parse decks using the local database.
 * Export decks for use into another format.
+* Export the entire local database (or part of it) into another format.
 
-Somewhat stable pre-releases are on the [appropriate link](https://github.com/ronelm2000/wsmtools/releases), but if you're having some issues with them, you can also try the [latest build](https://github.com/ronelm2000/wsmtools/actions) by
+Somewhat stable releases are on the [appropriate link](https://github.com/ronelm2000/wsmtools/releases), but if you're having some issues with them, you can also try the [latest build](https://github.com/ronelm2000/wsmtools/actions) by
 registering on GitHub. 
 
-#### Supported Exporters ####
+#### Supported Deck Exporters ####
 * [Tabletop Simulator](https://steamcommunity.com/sharedfiles/filedetails/?id=1321170886)
 * Local Deck JSON
+
+#### Supported Database Exporters ####
+* [Cockatrice](https://github.com/longagofaraway/Cockatrice)
 
 #### Supported Deck Parsers ####
 * [Encore Decks](https://www.encoredecks.com/)
@@ -42,7 +46,7 @@ registering on GitHub.
    ./wstools export your_encore_decks_deck_link_here --out sharex
    ```
 05. You will be warned if any of the following are true.
-    * Your deck contains cards without English translations.
+    * Your deck contains cards without an English translation.
     * Your deck contains cards which have no saved image link. You will be prompted for an image link if you continue.
 06. You will get the following on your Exports folder: `deck_your deck name.jpg`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
 07. Put the `Deck Generator` files into your Save Objects folder (typically `%HOMEDRIVE%%HOMEPATH%\Documents\My Games\Tabletop Simulator\Saves\Saved Objects`)
@@ -82,3 +86,6 @@ registering on GitHub.
   Please report them if seen.
 
   ![Why!?!](https://i.imgur.com/NdpGGp0.png)
+
+### Building ###
+The only requirement for now is having Visual Studio 2019. For any prior version of VS, ensure you have a compatible .NET Core 3.1 SDK.

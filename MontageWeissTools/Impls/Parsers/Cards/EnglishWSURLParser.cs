@@ -59,7 +59,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             ("partimages/soul.gif", Trigger.Soul),
             ("partimages/bounce.gif", Trigger.Bounce),
             ("partimages/shot.gif", Trigger.Shot),
-            // Choice is unsupported by ENWS for now
+            ("partimages/choice.gif", Trigger.Choice),
             ("partimages/treasure.gif", Trigger.GoldBar),
             ("partimages/stock.gif", Trigger.Bag),
             ("partimages/standby.gif", Trigger.Standby),

@@ -44,5 +44,18 @@ namespace Montage.Weiss.Tools.Test.EncoreDecks
             Assert.IsTrue(batmanNinja["BNJ/SX01-A13"].Traits.Count == 0);
             Assert.IsTrue(batmanNinja["BNJ/SX01-078b"].Traits.Select(mls => mls.EN).All(trait => new[] { "Sengoku", "Weapon" }.Contains(trait)));
         }
+
+        [TestMethod("BDML Climax Trigger Test")]
+        public async Task TestClimaxTriggers()
+        {
+            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+            Lamar.Container ioc = Program.Bootstrap();
+            var bdml = await new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/?page=1&set=5cf701347cd9b718cdf21469")
+                .ToDictionaryAsync(c => c.Serial);
+            Assert.IsTrue(bdml["BD/EN-W03-125"].Triggers.Length == 2);
+            Assert.IsTrue(bdml["BD/EN-W03-125"].Triggers.Contains(Trigger.Gate));
+            Assert.IsTrue(bdml["BD/EN-W03-126"].Triggers.Contains(Trigger.Book));
+
+        }
     }
 }

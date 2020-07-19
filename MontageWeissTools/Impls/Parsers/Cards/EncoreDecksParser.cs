@@ -73,6 +73,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 result.Cost = (int?) setCard.cost;
                 result.Power = (int?) setCard.power;    
                 result.Soul = (int?) setCard.soul;
+                result.Triggers = TranslateTriggers(setCard.trigger);
 
                 result.Serial = WeissSchwarzCard.GetSerial(setCard.set.ToString(), setCard.side.ToString(), setCard.lang.ToString(), setCard.release.ToString(), setCard.sid.ToString());
 
@@ -155,6 +156,31 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 return null;
             else
                 return str;
+        }
+
+        private Trigger[] TranslateTriggers(List<object> triggers) => triggers.Select(o => o.ToString()).Select(TranslateTrigger).ToArray();
+
+        private Trigger TranslateTrigger(string trigger)
+        {
+            return trigger.ToLower() switch
+            {
+                // Yellow
+                "soul" => Trigger.Soul,
+                "shot" => Trigger.Shot,
+                "return" => Trigger.Bounce,
+                "wind" => Trigger.Bounce,
+                "choice" => Trigger.Choice,
+                // Green
+                "treasure" => Trigger.GoldBar,
+                "bag" => Trigger.Bag,
+                "pool" => Trigger.Bag,
+                // Red
+                "comeback" => Trigger.Door,
+                "standby" => Trigger.Standby,
+                // Blue
+                "draw" => Trigger.Book,
+                "gate" => Trigger.Gate
+            };
         }
     }
 }

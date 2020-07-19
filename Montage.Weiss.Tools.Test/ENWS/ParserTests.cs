@@ -24,6 +24,5 @@ namespace Montage.Weiss.Tools.Test.ENWS
             await foreach (var card in stream)
                 Log.Information("Card: {@card}", card);
         }
-
     }
 }

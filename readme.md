@@ -3,8 +3,9 @@ WSMTools (Weiss Schwarz Montage Tools)
 ![.NET Core](https://github.com/ronelm2000/wsmtools/workflows/.NET%20Core/badge.svg)
 [![CodeFactor](https://www.codefactor.io/repository/github/ronelm2000/wsmtools/badge)](https://www.codefactor.io/repository/github/ronelm2000/wsmtools)
 [![Gitter](https://badges.gitter.im/wsmtools/community.svg)](https://gitter.im/wsmtools/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Downloads](https://img.shields.io/github/downloads/ronelm2000/wsmtools/total.svg)](https://tooomm.github.io/github-release-stats/?username=ronelm2000&repository=wsmtools)
 
-Weiss Schwarz ©bushiroad All Rights Reserved.
+Weiss Schwarz Â©bushiroad All Rights Reserved.
 
 This a CLI (Command Line Interface) tool intended to parse through, process, and export data regarding to Weiss Schwarz cards; specifically, this tool's intention is to make querying, parsing, and exporting cards from various sources easier, as
 well as provide APIs to expand on that functionality.
@@ -87,5 +88,5 @@ registering on GitHub.
 
   ![Why!?!](https://i.imgur.com/NdpGGp0.png)
 
-### Building ###
+### Build ###
 The only requirement for now is having Visual Studio 2019. For any prior version of VS, ensure you have a compatible .NET Core 3.1 SDK.

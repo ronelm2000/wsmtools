@@ -40,7 +40,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
         public async Task Export(WeissSchwarzDeck deck, IExportInfo info)
         {
             var count = deck.Ratios.Keys.Count;
-            int rows = (int) Math.Ceiling(deck.Count / 10d);
+            int rows = (int)Math.Ceiling(deck.Count / 10d);
 
             var serialList = deck.Ratios.Keys
                 .OrderBy(c => c.Serial)
@@ -68,14 +68,14 @@ namespace Montage.Weiss.Tools.Impls.Exporters
 
             using (var _ = imageDictionary.GetDisposer())
             {
-                var minimumBounds = imageDictionary .Select(p => (p.Value.Width, p.Value.Height))
+                var minimumBounds = imageDictionary.Select(p => (p.Value.Width, p.Value.Height))
                                                     .Aggregate((a, b) => (Math.Min(a.Width, b.Width), Math.Min(a.Height, b.Height)));
 
                 Log.Information("Adjusting image sizing to the minimum bounds: {@minimumBounds}", minimumBounds);
 
                 foreach (var image in imageDictionary.Values)
                     image.Mutate(x => x.Resize(minimumBounds.Width, minimumBounds.Height));
-                
+
                 var grid = (Width: minimumBounds.Width * 10, Height: minimumBounds.Height * rows);
                 Log.Information("Creating Full Grid of {x}x{y}...", grid.Width, grid.Height);
 
@@ -92,7 +92,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                             ctx.DrawImage(imageDictionary[serialList[i]], point, 1);
                         });
                     }
-                   
+
                     Log.Information("Finished drawing all cards in serial order; saving image...");
                     deckImagePath.Open(s => fullGrid.Save(s, encoder));
 
@@ -107,12 +107,11 @@ namespace Montage.Weiss.Tools.Impls.Exporters
             Log.Information("Generating the Custom Object for TTS...");
 
             var serialDictionary = deck.Ratios.Keys
-                .ToDictionary(  card => card.Serial,
+                .ToDictionary(card => card.Serial,
                                 card => new
                                 {
-                                    Name = card.Name.AsNonEmptyString() + $" [{card.Serial}]",
-                                    Description = $"Type: {card.TypeToString()+ "\n"}" + $"Traits: {card.Traits.Select(t => t.AsNonEmptyString()).ConcatAsString(" - ")}\n" +
-                                      $"Effect: {card.Effect.ConcatAsString("\n")}"
+                                    Name = card.Name.AsNonEmptyString() + $" [{card.Serial}][{card.Type.AsShortString()}]",
+                                    Description = FormatDescription(card)
                                 });
 
             var serialStringList = serialList.Select(c => c.Serial).ToList();
@@ -138,7 +137,8 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                 }
             }, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.ReadWrite);
             var deckGeneratorImage = resultFolder.Combine($"{nameOfObject}.png");
-            deckGeneratorImage.Open(s => {
+            deckGeneratorImage.Open(s =>
+            {
                 using (Image img = Image.Load(TTSResources.WeissSchwarzLogo))
                     img.SaveAsPng(s);
             }, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite);
@@ -165,12 +165,22 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                 {
                     if (process.Start())
                         Log.Information("Command executed successfully.");
-//                        while (!process.HasExited)
-//                            Console.WriteLine(await process.StandardOutput.ReadLineAsync());
-                } catch (Win32Exception)
+                    //                        while (!process.HasExited)
+                    //                            Console.WriteLine(await process.StandardOutput.ReadLineAsync());
+                }
+                catch (Win32Exception)
                 {
                     Log.Warning("Command specified in --out failed; execute it manually.");
                 }
+            }
+
+            static string FormatDescription(WeissSchwarzCard card)
+            {
+                return $"Type: {card.TypeToString()}\n" 
+                    +  $"Traits: {card.Traits.Select(t => t.AsNonEmptyString()).ConcatAsString(" - ")}\n"
+                    + ((card.Type == CardType.Character) ? $"P/S: {card.Power}P/{card.Soul}S\t" : "")
+                    + ((card.Type != CardType.Climax) ? $"Lv/Co: {card.Level}/{card.Cost}\n" : "")
+                    + $"Effect: {card.Effect.ConcatAsString("\n")}";
             }
         }
     }

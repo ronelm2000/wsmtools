@@ -64,6 +64,7 @@ namespace Montage.Weiss.Tools
             {
                 Log.Warning("Unable to check the latest version (likely due to internet connection issues).");
                 Log.Warning("If it is, some features of wsmtools may be unusable due to the need of an internet connection.");
+                Log.Debug("Technical Details: {@e}", e);
             }
         }
 

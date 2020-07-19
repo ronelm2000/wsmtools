@@ -242,6 +242,14 @@ namespace Montage.Weiss.Tools.Entities
             return null;
             //return values.Where(e => stringSpan.StartsWith(e.ToString(), StringComparison.CurrentCultureIgnoreCase)).First();
         }
+
+        public static string AsShortString(this CardType cardType) => cardType switch
+        {
+            CardType.Character => "CH",
+            CardType.Event => "EV",
+            CardType.Climax => "CX",
+            var str => throw new Exception($"Cannot parse {typeof(CardType).Name} from {str}")
+        };
     }
     public enum CardType
     {

@@ -179,7 +179,8 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 "standby" => Trigger.Standby,
                 // Blue
                 "draw" => Trigger.Book,
-                "gate" => Trigger.Gate
+                "gate" => Trigger.Gate,
+                var str => throw new Exception($"Cannot parse {typeof(Trigger).Name} from {str}")
             };
         }
     }

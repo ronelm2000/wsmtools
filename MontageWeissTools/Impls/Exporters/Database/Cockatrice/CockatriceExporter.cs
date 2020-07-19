@@ -80,6 +80,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Database.Cockatrice
                     newCckCard.Props.PowerSoul = $"{card.Power ?? 0}/{card.Soul ?? 0}";
                     newCckCard.Props.Type = $"{card.Traits.Select(TranslateTrait).Prepend(card.Type.ToString()).ConcatAsString(" - ")}";
                     newCckCard.Props.MainType = card.Type.ToString();
+                    newCckCard.Props.Triggers = card.Triggers?.Select(t => t.ToString()).ConcatAsString(" - ") ?? "";
                     newCckCard.Text = FormatText(card);
                     tempCardList.Add(newCckCard);
                 } catch (Exception e)
@@ -96,9 +97,9 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Database.Cockatrice
         private static string FormatText(WeissSchwarzCard card)
         {
             var result = "";
-            if (!String.IsNullOrWhiteSpace(card.Flavor))
-                result += $"{card.Flavor}\n";
             result += card.Effect.ConcatAsString("\n");
+            if (!String.IsNullOrWhiteSpace(card.Flavor))
+                result += $"\n\n{card.Flavor}";
             return result;
         }
 
@@ -175,6 +176,8 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Database.Cockatrice
         public string MainType;
         [XmlElement("pt")]
         public string PowerSoul;
+        [XmlElement("triggers")]
+        public string Triggers;
     }
 
     public class CockatriceCardSetRelationship

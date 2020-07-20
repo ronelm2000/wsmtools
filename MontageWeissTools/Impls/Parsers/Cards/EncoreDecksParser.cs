@@ -176,6 +176,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 "pool" => Trigger.Bag,
                 // Red
                 "comeback" => Trigger.Door,
+                "salvage" => Trigger.Door,
                 "standby" => Trigger.Standby,
                 // Blue
                 "draw" => Trigger.Book,

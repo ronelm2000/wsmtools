@@ -12,7 +12,7 @@ serialInfoJSON = <serial_info_placeholder>
 function onLoad()
 	print("Deck Generator ("..deckName..")")
 	print("Note: Please ensure there are no other Deck Generators for this session. Also, please upload the deck.png first into the cloud and/or imgur.")
-	print("To generate, type: +generate <url_for_deck>")
+	print("To generate, type: +generate <url_for_deck> [<url_for_sleeves>]")
 end
 
 

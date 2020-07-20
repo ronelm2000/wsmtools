@@ -59,7 +59,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
                 result.Name = cockatriceDeck.DeckName;
                 result.Remarks = cockatriceDeck.Comments;
                 result.Ratios = cockatriceDeck.Ratios.Ratios.Select(Translate).ToDictionary(p => p.card, p => p.amount);
-                return result;
+                return await Task.FromResult(result);
             }
         }
 

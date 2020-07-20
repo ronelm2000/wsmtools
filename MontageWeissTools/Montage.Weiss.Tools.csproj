@@ -89,10 +89,6 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Impls\Exporters\Deck\" />
-  </ItemGroup>
-
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>

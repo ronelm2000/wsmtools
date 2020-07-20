@@ -106,6 +106,18 @@
     "parse DAL": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/date_a_live_booster_pack.html"
+    },
+    "export Batman Ninja via Cockatrice": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE --exporter cockatrice"
+    },
+    "export nanana.cod to Local JSON": {
+      "commandName": "Project",
+      "commandLineArgs": "export ./Export/Na_Na_Na_Na_Batman.cod --exporter local"
+    },
+    "Export HHW": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E"
     }
   }
 }

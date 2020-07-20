@@ -178,7 +178,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
             {
                 return $"Type: {card.TypeToString()}\n" 
                     +  $"Traits: {card.Traits.Select(t => t.AsNonEmptyString()).ConcatAsString(" - ")}\n"
-                    + ((card.Type == CardType.Character) ? $"P/S: {card.Power}P/{card.Soul}S\t" : "")
+                    + ((card.Type == CardType.Character) ? $"P/S: {card.Power}P/{card.Soul}S || " : "")
                     + ((card.Type != CardType.Climax) ? $"Lv/Co: {card.Level}/{card.Cost}\n" : "")
                     + $"Effect: {card.Effect.ConcatAsString("\n")}";
             }

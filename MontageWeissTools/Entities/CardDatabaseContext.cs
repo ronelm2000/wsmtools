@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Entities
 {
@@ -39,6 +40,11 @@ namespace Montage.Weiss.Tools.Entities
         {
             options.UseSqlite($"Data Source={_config.DbName}");
 
+        }
+
+        internal async Task<WeissSchwarzCard> FindNonFoil(WeissSchwarzCard card)
+        {
+            return await WeissSchwarzCards.FindAsync(WeissSchwarzCard.RemoveFoil(card.Serial));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

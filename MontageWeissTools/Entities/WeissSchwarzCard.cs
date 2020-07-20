@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Entities
@@ -15,6 +16,7 @@ namespace Montage.Weiss.Tools.Entities
     public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>
     {
         private static ILogger Log;
+        private static string[] foilRarities = new[] { "SR", "SSR", "RRR", "SPM", "SPa", "SPb", "SP", "SSP", "SEC", "XR" };
 
         public string Serial { get; set; }
         public MultiLanguageString Name { get; set; }
@@ -53,8 +55,8 @@ namespace Montage.Weiss.Tools.Entities
         /// Gets the Full Release ID
         /// </summary>
         public string ReleaseID => ParseRID(Serial); // Serial.AsSpan().Slice(s => s.IndexOf('/') + 1); s => s.IndexOf('-')).ToString();
-
         public CardLanguage Language => TranslateToLanguage();
+        public bool IsFoil => foilRarities.Contains(Rarity);
 
         public static IEqualityComparer<WeissSchwarzCard> SerialComparer { get; internal set; } = new WeissSchwarzCardSerialComparerImpl();
 
@@ -114,6 +116,19 @@ namespace Montage.Weiss.Tools.Entities
             if (ReleaseID == "W02" && SetID.StartsWith("E")) return true; // https://heartofthecards.com/code/cardlist.html?pagetype=ws&cardset=wslbexeb is an exceptional serial.
             else return false;
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns a new serial which is the non-foil version.
+        /// </summary>
+        /// <param name="serial"></param>
+        /// <returns></returns>
+        internal static string RemoveFoil(string serial)
+        {
+            var parsedSerial = ParseSerial(serial);
+            var regex = new Regex(@"([A-Z]*)([0-9]+)([a-z]*)([a-zA-Z]*)");
+            if (regex.Match(parsedSerial.SetID) is Match m) parsedSerial.SetID = $"{m.Groups[1]}{m.Groups[2]}{m.Groups[3]}";
+            return parsedSerial.AsString();
         }
 
         public static SerialTuple ParseSerial(string serial)
@@ -218,6 +233,11 @@ namespace Montage.Weiss.Tools.Entities
             NeoStandardCode = this.NeoStandardCode;
             ReleaseID = this.ReleaseID;
             SetID = this.SetID;
+        }
+
+        internal string AsString()
+        {
+            return $"{NeoStandardCode}/{ReleaseID}-{SetID}";
         }
     }
 

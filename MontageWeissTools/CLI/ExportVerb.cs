@@ -66,19 +66,20 @@ namespace Montage.Weiss.Tools.CLI
                 IsNonInteractive = this.NonInteractive,
                 NoWarning = this.NoWarning
             };
-            deck = await ioc.GetAllInstances<IExportedDeckInspector>()
-                .OrderByDescending(inspector => inspector.Priority)
+            var exporter = ioc.GetAllInstances<IDeckExporter>()
+                .Where(exporter => exporter.Alias.Contains(Exporter))
+                .First();
+
+            var inspectors = ioc.GetAllInstances<IExportedDeckInspector>().AsEnumerable();
+            if (exporter is IFilter<IExportedDeckInspector> filter)
+                inspectors = inspectors.Where(filter.IsIncluded);
+
+            deck = await inspectors.OrderByDescending(inspector => inspector.Priority)
                 .ToAsyncEnumerable()
                 .AggregateAwaitAsync(deck, async (d, inspector) => await inspector.Inspect(d, inspectionOptions));
 
             if (deck != WeissSchwarzDeck.Empty)
-            {
-                var exporter = ioc.GetAllInstances<IDeckExporter>()
-                    .Where(exporter => exporter.Alias.Contains(Exporter))
-                    .First();
-
                 await exporter.Export(deck, this);
-            }
         }
     }
 }

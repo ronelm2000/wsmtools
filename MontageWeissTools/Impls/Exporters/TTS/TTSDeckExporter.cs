@@ -176,10 +176,12 @@ namespace Montage.Weiss.Tools.Impls.Exporters
 
             static string FormatDescription(WeissSchwarzCard card)
             {
-                return $"Type: {card.TypeToString()}\n" 
-                    +  $"Traits: {card.Traits.Select(t => t.AsNonEmptyString()).ConcatAsString(" - ")}\n"
-                    + ((card.Type == CardType.Character) ? $"P/S: {card.Power}P/{card.Soul}S || " : "")
-                    + ((card.Type != CardType.Climax) ? $"Lv/Co: {card.Level}/{card.Cost}\n" : "")
+                return $"Type: {card.TypeToString()}\n"
+                    + ((card.Type == CardType.Character) ? (
+                        $"Traits: {card.Traits.Select(t => t.AsNonEmptyString()).ConcatAsString(" - ")}\n"
+                      + $"P/S: {card.Power}P/{card.Soul}S || "
+                        ) : "")
+                    + ((card.Type != CardType.Climax) ? $"Lv/Co: {card.Level}/{card.Cost}\n" : $"Triggers: {card.Triggers.Select(c => c.ToString()).ConcatAsString(" - ")}\n")
                     + $"Effect: {card.Effect.ConcatAsString("\n")}";
             }
         }

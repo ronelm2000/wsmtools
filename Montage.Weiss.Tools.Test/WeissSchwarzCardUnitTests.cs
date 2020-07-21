@@ -39,6 +39,35 @@ namespace Montage.Weiss.Tools.Test.ENWS
             await Task.CompletedTask;
         }
 
+        [TestMethod("English Set Test")]
+        public async Task TestEnglishSetTypes()
+        {
+            var serials = new[] {
+               "LSS/W69-E054",
+               "BD/EN-W03-026BDR",
+               "CCS/BSF2019-02",
+               "NK/W30-E076",
+               "BNJ/SX01-T17SP",
+               "LSS/W69-054"
+            };
+            var expectedOutput = new EnglishSetType?[]
+            {
+                EnglishSetType.JapaneseImport,
+                EnglishSetType.EnglishEdition,
+                EnglishSetType.EnglishOriginal,
+                EnglishSetType.EnglishEdition,
+                EnglishSetType.EnglishOriginal,
+                null
+            };
+
+            for (int i = 0; i < serials.Length; i++)
+            {
+                var setType = WeissSchwarzCard.GetEnglishSetType(serials[i]);
+                Assert.IsTrue(expectedOutput[i] == setType);
+            }
+            await Task.CompletedTask;
+        }
+
         [TestMethod]
         [Ignore]
         public void TestShareX()

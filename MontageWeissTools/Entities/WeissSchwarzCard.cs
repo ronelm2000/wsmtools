@@ -2,6 +2,7 @@
 using Montage.Weiss.Tools.Utilities;
 using Serilog;
 using SixLabors.ImageSharp;
+using SixLabors.Shapes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,7 +17,11 @@ namespace Montage.Weiss.Tools.Entities
     public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>
     {
         private static ILogger Log;
-        private static string[] foilRarities = new[] { "SR", "SSR", "RRR", "SPM", "SPa", "SPb", "SP", "SSP", "SEC", "XR" };
+        private static string[] foilRarities = new[] { "SR", "SSR", "RRR", "SPM", "SPa", "SPb", "SP", "SSP", "SEC", "XR", "BDR" };
+        private static string[] englishEditedPrefixes = new[] { "EN-", "S25", "W30" };
+        private static string[] englishOriginalPrefixes = new[] { "Wx", "SX", "BSF", "BCS" };
+
+        public static IEqualityComparer<WeissSchwarzCard> SerialComparer { get; internal set; } = new WeissSchwarzCardSerialComparerImpl();
 
         public string Serial { get; set; }
         public MultiLanguageString Name { get; set; }
@@ -55,10 +60,11 @@ namespace Montage.Weiss.Tools.Entities
         /// Gets the Full Release ID
         /// </summary>
         public string ReleaseID => ParseRID(Serial); // Serial.AsSpan().Slice(s => s.IndexOf('/') + 1); s => s.IndexOf('-')).ToString();
-        public CardLanguage Language => TranslateToLanguage();
+        public CardLanguage Language => GetLanguage(Serial);
+        public EnglishSetType? EnglishSetType => GetEnglishSetType(Language, ReleaseID);
         public bool IsFoil => foilRarities.Contains(Rarity);
-
-        public static IEqualityComparer<WeissSchwarzCard> SerialComparer { get; internal set; } = new WeissSchwarzCardSerialComparerImpl();
+        //public bool IsEnglishEdited => GetIsEnglishEdited(Language, ReleaseID);
+        //public bool IsEnglishOriginal => ReleaseID is string rid && englishOriginalPrefixes.Any(c => c.StartsWith(rid));
 
         public WeissSchwarzCard Clone()
         {
@@ -92,9 +98,34 @@ namespace Montage.Weiss.Tools.Entities
             while (true);
         }
         
-        private CardLanguage TranslateToLanguage()
+        private static bool IsExceptionalSerial(string serial)
         {
-            var serial = Serial;
+            var (NeoStandardCode, ReleaseID, SetID) = ParseSerial(serial);
+            if (ReleaseID == "W02" && SetID.StartsWith("E")) return true; // https://heartofthecards.com/code/cardlist.html?pagetype=ws&cardset=wslbexeb is an exceptional serial.
+            else return false;
+            throw new NotImplementedException();
+        }
+
+        public static EnglishSetType? GetEnglishSetType(string serial)
+        {
+            return GetEnglishSetType(GetLanguage(serial), ParseRID(serial));
+        }
+
+        private static EnglishSetType? GetEnglishSetType(CardLanguage language, string releaseID)
+        {
+            if (language != CardLanguage.English) return null;
+            else if (englishEditedPrefixes.Any(prefix => releaseID.StartsWith(prefix))) return Entities.EnglishSetType.EnglishEdition;
+            else if (englishOriginalPrefixes.Any(prefix => releaseID.StartsWith(prefix))) return Entities.EnglishSetType.EnglishOriginal;
+            else return Entities.EnglishSetType.JapaneseImport;
+        }
+
+        /// <summary>
+        /// Infers the Language of a Weiss Schwarz valid serial.
+        /// </summary>
+        /// <param name="serial"></param>
+        /// <returns></returns>
+        internal static CardLanguage GetLanguage(string serial)
+        {
             if (serial.Contains("-E"))
             {
                 if (!IsExceptionalSerial(serial)) return CardLanguage.English;
@@ -110,14 +141,6 @@ namespace Montage.Weiss.Tools.Entities
             else return CardLanguage.Japanese;
         }
 
-        private static bool IsExceptionalSerial(string serial)
-        {
-            var (NeoStandardCode, ReleaseID, SetID) = ParseSerial(serial);
-            if (ReleaseID == "W02" && SetID.StartsWith("E")) return true; // https://heartofthecards.com/code/cardlist.html?pagetype=ws&cardset=wslbexeb is an exceptional serial.
-            else return false;
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Returns a new serial which is the non-foil version.
         /// </summary>
@@ -129,6 +152,17 @@ namespace Montage.Weiss.Tools.Entities
             var regex = new Regex(@"([A-Z]*)([0-9]+)([a-z]*)([a-zA-Z]*)");
             if (regex.Match(parsedSerial.SetID) is Match m) parsedSerial.SetID = $"{m.Groups[1]}{m.Groups[2]}{m.Groups[3]}";
             return parsedSerial.AsString();
+        }
+
+        internal static string AsJapaneseSerial(string serial)
+        {
+            var lang = GetLanguage(serial);
+            var serialTuple = ParseSerial(serial);
+            if (GetEnglishSetType(lang, serialTuple.ReleaseID) != Entities.EnglishSetType.JapaneseImport) return serial;
+            var regex = new Regex(@"(P|T)?(E)(.+)");
+            var match = regex.Match(serialTuple.SetID);
+            serialTuple.SetID = $"{match.Groups[1]}{match.Groups[3]}";
+            return serialTuple.AsString();
         }
 
         public static SerialTuple ParseSerial(string serial)
@@ -271,6 +305,14 @@ namespace Montage.Weiss.Tools.Entities
             var str => throw new Exception($"Cannot parse {typeof(CardType).Name} from {str}")
         };
     }
+
+    public enum EnglishSetType
+    {
+        JapaneseImport,
+        EnglishEdition,
+        EnglishOriginal
+    }
+
     public enum CardType
     {
         Character,

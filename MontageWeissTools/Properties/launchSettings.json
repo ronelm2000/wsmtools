@@ -118,6 +118,10 @@
     "Export HHW": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E"
+    },
+    "Export HHW via Cockatrice": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter cockatrice"
     }
   }
 }

@@ -41,9 +41,9 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck
         {
             Log.Information("Serializing: {name}", deck.Name);
 
-            Log.Information("Replacing all foils with non-foils...");
             using (var db = _database())
             {
+                Log.Information("Replacing all foils with non-foils...");
                 foreach (var card in deck.Ratios.Keys)
                     if (card.IsFoil) deck.ReplaceCard(card, await db.FindNonFoil(card));
             }
@@ -83,7 +83,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck
         {
             return new CockatriceSerialAmountPair()
             {
-                Serial = cardAmountPair.Key.Serial,
+                Serial = WeissSchwarzCard.AsJapaneseSerial(cardAmountPair.Key.Serial),
                 Amount = cardAmountPair.Value
             };
         }

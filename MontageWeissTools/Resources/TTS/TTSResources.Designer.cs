@@ -102,13 +102,13 @@ namespace Montage.Weiss.Tools.Resources.TTS {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;Defaults&gt;
-        ///  &lt;Panel class=&quot;Window&quot; width=&quot;400&quot; height=&quot;175&quot; color=&quot;#FFFFFF40&quot; outline=&quot;#404040&quot;/&gt;
-        ///  &lt;Panel class=&quot;TopBar&quot; height=&quot;30&quot; rectAlignment=&quot;UpperCenter&quot; color=&quot;#191970&quot;/&gt;
-        ///  &lt;Text class=&quot;WindowTitle&quot; fontSize=&quot;18&quot; height=&quot;20&quot; fontStyle=&quot;Bold&quot; rectAlignment=&quot;UpperCenter&quot; color=&quot;#FFFFFF&quot; /&gt;
-        ///  &lt;Button class=&quot;topButtons&quot; width=&quot;20&quot; height=&quot;20&quot; rectAlignment=&quot;UpperRight&quot; color=&quot;#eeeeee&quot;/&gt;
+        ///    &lt;Panel class=&quot;Window&quot; width=&quot;400&quot; height=&quot;175&quot; color=&quot;#FFFFFF40&quot; outline=&quot;#404040&quot; /&gt;
+        ///    &lt;Panel class=&quot;TopBar&quot; height=&quot;30&quot; rectAlignment=&quot;UpperCenter&quot; color=&quot;#191970&quot; /&gt;
+        ///    &lt;Text class=&quot;WindowTitle&quot; fontSize=&quot;18&quot; height=&quot;20&quot; fontStyle=&quot;Bold&quot; rectAlignment=&quot;UpperCenter&quot; color=&quot;#FFFFFF&quot; /&gt;
+        ///    &lt;Button class=&quot;topButtons&quot; width=&quot;20&quot; height=&quot;20&quot; rectAlignment=&quot;UpperRight&quot; color=&quot;#eeeeee&quot; /&gt;
         ///&lt;/Defaults&gt;
         ///
-        ///&lt;Panel class=&quot;Window&quot; id=&quot;deckGeneratorWindow&quot; allowDragging=&quot;True&quot; returnToOriginalPositionWhenR [rest of string was truncated]&quot;;.
+        ///&lt;Panel class=&quot;Window&quot; id=&quot;deckGeneratorWindow&quot; allowDragging=&quot;True&quot; returnToOriginalPo [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string XMLUITemplate {
             get {

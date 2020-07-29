@@ -7,7 +7,6 @@ namespace Montage.Weiss.Tools.API
     public interface IDeckExporter
     {
         public string[] Alias { get; }
-        public Task Export(WeissSchwarzDeck deck, IExportInfo info);// destinationFolderOrURL);
-
+        public Task Export(WeissSchwarzDeck deck, IExportInfo info);
     }
 }

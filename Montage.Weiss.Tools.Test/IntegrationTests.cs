@@ -43,20 +43,5 @@ namespace Montage.Weiss.Tools.Test
             };
             await parseCommand.Run(ioc);
         }
-
-        /*
-        private static Container Bootstrap(Action<ServiceRegistry> additionalActions)
-        {
-            return new Container(x =>
-            {
-                x.AddTransient<ExportVerb>();
-                x.AddTransient<ParseVerb>();
-                x.AddDbContext<CardDatabaseContext>();
-                x.AddLogging(l => l.AddSerilog(dispose: true));
-                additionalActions(x);
-            });
-        }
-        */
-        
     }
 }

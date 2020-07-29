@@ -55,7 +55,6 @@ namespace Montage.Weiss.Tools.Test.EncoreDecks
             Assert.IsTrue(bdml["BD/EN-W03-125"].Triggers.Length == 2);
             Assert.IsTrue(bdml["BD/EN-W03-125"].Triggers.Contains(Trigger.Gate));
             Assert.IsTrue(bdml["BD/EN-W03-126"].Triggers.Contains(Trigger.Book));
-
         }
     }
 }

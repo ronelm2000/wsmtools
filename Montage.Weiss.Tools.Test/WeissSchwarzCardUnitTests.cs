@@ -89,6 +89,5 @@ namespace Montage.Weiss.Tools.Test.ENWS
                 Log.Information("Image Loaded.");
             }
         }
-
     }
 }

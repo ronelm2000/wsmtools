@@ -63,7 +63,6 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                 Log.Information("Operation cancelled.");
                 Log.Information("Please ensure that the deck uses Japanese cards.");
                 return true;
-
             }
         }
         public bool IsIncluded(IDeckExporter item)

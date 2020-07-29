@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test.HOTC
 {
-
     [TestClass]
     public class ParserTests
     {

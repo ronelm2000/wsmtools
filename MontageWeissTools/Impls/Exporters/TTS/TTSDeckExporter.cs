@@ -66,43 +66,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
             var newImageFilename = $"deck_{fileNameFriendlyDeckName.ToLower()}.{format.FileExtensions.First()}";
             var deckImagePath = resultFolder.Combine(newImageFilename);
 
-            using (var _ = imageDictionary.GetDisposer())
-            {
-                var minimumBounds = imageDictionary.Select(p => (p.Value.Width, p.Value.Height))
-                                                    .Aggregate((a, b) => (Math.Min(a.Width, b.Width), Math.Min(a.Height, b.Height)));
-
-                Log.Information("Adjusting image sizing to the minimum bounds: {@minimumBounds}", minimumBounds);
-
-                foreach (var image in imageDictionary.Values)
-                    image.Mutate(x => x.Resize(minimumBounds.Width, minimumBounds.Height));
-
-                var grid = (Width: minimumBounds.Width * 10, Height: minimumBounds.Height * rows);
-                Log.Information("Creating Full Grid of {x}x{y}...", grid.Width, grid.Height);
-
-                using (var fullGrid = new Image<Rgba32>(minimumBounds.Width * 10, minimumBounds.Height * rows))
-                {
-                    for (int i = 0; i < serialList.Count; i++)
-                    {
-                        var x = i % 10;
-                        var y = i / 10;
-                        var point = new Point(x * minimumBounds.Width, y * minimumBounds.Height);
-
-                        fullGrid.Mutate(ctx =>
-                        {
-                            ctx.DrawImage(imageDictionary[serialList[i]], point, 1);
-                        });
-                    }
-
-                    Log.Information("Finished drawing all cards in serial order; saving image...");
-                    deckImagePath.Open(s => fullGrid.Save(s, encoder));
-
-                    if (Program.IsOutputRedirected) // Enable Non-Interactive Path stdin Passthrough of the deck png
-                        using (var stdout = Console.OpenStandardOutput())
-                            fullGrid.Save(stdout, encoder);
-
-                    Log.Information($"Done! Result PNG: {deckImagePath.FullPath}");
-                }
-            }
+            GenerateDeckImage(rows, serialList, imageDictionary, encoder, deckImagePath);
 
             Log.Information("Generating the Custom Object for TTS...");
 
@@ -116,14 +80,16 @@ namespace Montage.Weiss.Tools.Impls.Exporters
 
             var serialStringList = serialList.Select(c => c.Serial).ToList();
 
-            var finalTemplateLUA = Encoding.UTF8.GetString(TTSResources.template)
+            var finalTemplateLUA = TTSResources.LuaTemplate
                 .Replace("<deck_name_info_placeholder>", $"\"{deck.Name.EscapeQuotes()}\"")
                 .Replace("<serials_placeholder>", $"\"{JsonConvert.SerializeObject(serialStringList).EscapeQuotes()}\"")
                 .Replace("<serial_info_placeholder>", $"\"{JsonConvert.SerializeObject(serialDictionary).EscapeQuotes()}\"")
                 ;
 
+            var finalTemplateUIXML = TTSResources.XMLUITemplate;
             var saveState = JsonConvert.DeserializeObject<SaveState>(Encoding.UTF8.GetString(TTSResources.CustomObject));
             saveState.ObjectStates[0].LuaScript = finalTemplateLUA;
+            saveState.ObjectStates[0].XmlUI = finalTemplateUIXML;
 
             var nameOfObject = $"Deck Generator ({fileNameFriendlyDeckName})";
             var deckGeneratorPath = resultFolder.Combine($"{nameOfObject}.json");
@@ -183,6 +149,47 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                         ) : "")
                     + ((card.Type != CardType.Climax) ? $"Lv/Co: {card.Level}/{card.Cost}\n" : $"Triggers: {card.Triggers.Select(c => c.ToString()).ConcatAsString(" - ")}\n")
                     + $"Effect: {card.Effect.ConcatAsString("\n")}";
+            }
+        }
+
+        private void GenerateDeckImage(int rows, List<WeissSchwarzCard> serialList, Dictionary<WeissSchwarzCard, Image> imageDictionary, IImageEncoder encoder, Path deckImagePath)
+        {
+            using (var _ = imageDictionary.GetDisposer())
+            {
+                var minimumBounds = imageDictionary.Select(p => (p.Value.Width, p.Value.Height))
+                                                    .Aggregate((a, b) => (Math.Min(a.Width, b.Width), Math.Min(a.Height, b.Height)));
+
+                Log.Information("Adjusting image sizing to the minimum bounds: {@minimumBounds}", minimumBounds);
+
+                foreach (var image in imageDictionary.Values)
+                    image.Mutate(x => x.Resize(minimumBounds.Width, minimumBounds.Height));
+
+                var grid = (Width: minimumBounds.Width * 10, Height: minimumBounds.Height * rows);
+                Log.Information("Creating Full Grid of {x}x{y}...", grid.Width, grid.Height);
+
+                using (var fullGrid = new Image<Rgba32>(minimumBounds.Width * 10, minimumBounds.Height * rows))
+                {
+                    for (int i = 0; i < serialList.Count; i++)
+                    {
+                        var x = i % 10;
+                        var y = i / 10;
+                        var point = new Point(x * minimumBounds.Width, y * minimumBounds.Height);
+
+                        fullGrid.Mutate(ctx =>
+                        {
+                            ctx.DrawImage(imageDictionary[serialList[i]], point, 1);
+                        });
+                    }
+
+                    Log.Information("Finished drawing all cards in serial order; saving image...");
+                    deckImagePath.Open(s => fullGrid.Save(s, encoder));
+
+                    if (Program.IsOutputRedirected) // Enable Non-Interactive Path stdin Passthrough of the deck png
+                        using (var stdout = Console.OpenStandardOutput())
+                            fullGrid.Save(stdout, encoder);
+
+                    Log.Information($"Done! Result PNG: {deckImagePath.FullPath}");
+                }
             }
         }
     }

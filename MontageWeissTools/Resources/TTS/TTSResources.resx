@@ -121,10 +121,13 @@
   <data name="CustomObject" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>saved_object.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="template" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>template.ttslua;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="LuaTemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>template.ttslua;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="WeissSchwarzLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ws_logo.bmp;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="XMLUITemplate" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>template.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

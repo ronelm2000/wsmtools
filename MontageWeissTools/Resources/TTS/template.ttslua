@@ -8,13 +8,81 @@ serialsJSON = <serials_placeholder>
 serialInfoJSON = <serial_info_placeholder>
 
 -- Unless looking to troubleshoot, everything below this point should not need to be changed.
+windowName = "deckGeneratorWindow"
+defaultCharacterSleevesURL = "https://i.imgur.com/fRYj5tS.jpg"
 
 function onLoad()
 	print("Deck Generator ("..deckName..")")
 	print("Note: Please ensure there are no other Deck Generators for this session. Also, please upload the deck.png first into the cloud and/or imgur.")
 	print("To generate, type: +generate <url_for_deck> [<url_for_sleeves>]")
+	print("There is also a UI now which I highly recommend.")
+	Wait.frames(afterLoad, 1)
 end
 
+function afterLoad()
+	oldGlobalUIXML = UI.getXml()
+	uiCharaSleeves = defaultCharacterSleevesURL
+	UI.setXml(self.UI.getXml())
+	Wait.frames(adjustButtons, 1)
+end
+
+function adjustButtons()
+	selfGUID = self.getGUID()
+	--print(self.getGUID())
+	makeRelative("closeButton", "onClick")
+	makeRelative("generateButton", "onClick")
+	makeRelative("deckImageText", "onValueChanged")
+	makeRelative("charaSleevesText", "onValueChanged")
+	self.UI.hide(windowName)
+	Wait.frames(addVariables, 1)
+end
+
+function addVariables()
+	UI.setAttribute(windowName, "active", "true")
+	UI.setAttribute("deckNameText", "Text", deckName)
+end
+
+function onDestroy()
+	UI.setXml(oldGlobalUIXML)
+end
+
+function makeRelative(button, eventAttribute)
+	Wait.Frames(function() UI.setAttribute(button, eventAttribute, selfGUID.."/"..self.UI.getAttribute(button, eventAttribute)) end, 1)
+end
+
+-- Function to close the window
+function close(player, value, id)
+	UI.hide(windowName)
+end
+
+function minimize(player, value, id)
+	-- Is the size of the window bigger than its top bar?
+	if(tonumber(UI.getAttribute(windowName, "Height")) > tonumber(UI.getAttribute("TopBar", "Height"))) then
+	  UI.setAttribute(windowName, "OffsetXY", "0 135") -- Offset is set to (Height - Height_of_Top_Bar) /2
+	  UI.setAttribute(windowName, "Height", tonumber(UI.getAttribute("TopBar", "Height")))
+	else
+	  UI.setAttribute(windowName,"OffsetXY", "0 0")
+	  UI.setAttribute(windowName, "Height", 300)
+	end
+end
+
+function setDeckImage(player, value, id)
+	uiDeckImage = value
+end
+
+function setCharacterSleeves(player, value, id)
+	uiCharaSleeves = value
+	if (uiCharaSleeves == "") then 
+		uiCharaSleeves = defaultCharacterSleevesURL
+	end
+end
+
+function generateDeckViaUI(player, value, id)
+	if (uiDeckImage ~= nil) then
+		print("stub"..uiDeckImage.." - "..uiCharaSleeves)
+		generateDeck(uiDeckImage, uiCharaSleeves)
+	end
+end
 
 function onChat(message, player)
 	local command = "+generate"
@@ -25,7 +93,7 @@ function onChat(message, player)
 		print("Running Generate Deck")
 		local splitStr = split(message)
 		local back = splitStr[3]
-		if back == nil then back = "https://i.imgur.com/fRYj5tS.jpg" end
+		if back == nil then back = defaultCharacterSleevesURL end
 		generateDeck(splitStr[2], back)
 	end
 end

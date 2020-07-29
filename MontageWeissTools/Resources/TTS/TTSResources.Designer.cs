@@ -71,12 +71,22 @@ namespace Montage.Weiss.Tools.Resources.TTS {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to -- Deck Generator Tool v0.0.1
+        ///-- This script was inspired by Card Naming Tool which was created by dzikakulka, 
+        ///-- and co-authored and published by Hiram Abiff.
+        ///-- Created specifically for wstools, do not edit unless you know what you&apos;re doing.
+        ///
+        ///deckName = &lt;deck_name_info_placeholder&gt;
+        ///serialsJSON = &lt;serials_placeholder&gt;
+        ///serialInfoJSON = &lt;serial_info_placeholder&gt;
+        ///
+        ///-- Unless looking to troubleshoot, everything below this point should not need to be changed.
+        ///windowName = &quot;deckGeneratorWindow&quot;
+        ///defaul [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static byte[] template {
+        internal static string LuaTemplate {
             get {
-                object obj = ResourceManager.GetObject("template", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("LuaTemplate", resourceCulture);
             }
         }
         
@@ -87,6 +97,22 @@ namespace Montage.Weiss.Tools.Resources.TTS {
             get {
                 object obj = ResourceManager.GetObject("WeissSchwarzLogo", resourceCulture);
                 return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;Defaults&gt;
+        ///  &lt;Panel class=&quot;Window&quot; width=&quot;400&quot; height=&quot;175&quot; color=&quot;#FFFFFF40&quot; outline=&quot;#404040&quot;/&gt;
+        ///  &lt;Panel class=&quot;TopBar&quot; height=&quot;30&quot; rectAlignment=&quot;UpperCenter&quot; color=&quot;#191970&quot;/&gt;
+        ///  &lt;Text class=&quot;WindowTitle&quot; fontSize=&quot;18&quot; height=&quot;20&quot; fontStyle=&quot;Bold&quot; rectAlignment=&quot;UpperCenter&quot; color=&quot;#FFFFFF&quot; /&gt;
+        ///  &lt;Button class=&quot;topButtons&quot; width=&quot;20&quot; height=&quot;20&quot; rectAlignment=&quot;UpperRight&quot; color=&quot;#eeeeee&quot;/&gt;
+        ///&lt;/Defaults&gt;
+        ///
+        ///&lt;Panel class=&quot;Window&quot; id=&quot;deckGeneratorWindow&quot; allowDragging=&quot;True&quot; returnToOriginalPositionWhenR [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string XMLUITemplate {
+            get {
+                return ResourceManager.GetString("XMLUITemplate", resourceCulture);
             }
         }
     }

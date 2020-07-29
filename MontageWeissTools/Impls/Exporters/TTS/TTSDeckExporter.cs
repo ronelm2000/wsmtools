@@ -66,7 +66,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
             var newImageFilename = $"deck_{fileNameFriendlyDeckName.ToLower()}.{format.FileExtensions.First()}";
             var deckImagePath = resultFolder.Combine(newImageFilename);
 
-            GenerateDeckImage(rows, serialList, imageDictionary, encoder, deckImagePath);
+            GenerateDeckImage(info, rows, serialList, imageDictionary, encoder, deckImagePath);
 
             Log.Information("Generating the Custom Object for TTS...");
 
@@ -152,28 +152,35 @@ namespace Montage.Weiss.Tools.Impls.Exporters
             }
         }
 
-        private void GenerateDeckImage(int rows, List<WeissSchwarzCard> serialList, Dictionary<WeissSchwarzCard, Image> imageDictionary, IImageEncoder encoder, Path deckImagePath)
+        private void GenerateDeckImage(IExportInfo info, int rows, List<WeissSchwarzCard> serialList, Dictionary<WeissSchwarzCard, Image> imageDictionary, IImageEncoder encoder, Path deckImagePath)
         {
             using (var _ = imageDictionary.GetDisposer())
             {
-                var minimumBounds = imageDictionary.Select(p => (p.Value.Width, p.Value.Height))
-                                                    .Aggregate((a, b) => (Math.Min(a.Width, b.Width), Math.Min(a.Height, b.Height)));
-
-                Log.Information("Adjusting image sizing to the minimum bounds: {@minimumBounds}", minimumBounds);
-
+                var selection = imageDictionary.Select(p => (p.Value.Width, p.Value.Height));
+                (int Width, int Height) bounds = (0, 0);
+                if (info.Flags.Contains("upscaling"))
+                {
+                    bounds = selection.Aggregate((a, b) => (Math.Max(a.Width, b.Width), Math.Max(a.Height, b.Height)));
+                    Log.Information("Adjusting image sizing to the maximum bounds: {@minimumBounds}", bounds);
+                }
+                else
+                {
+                    bounds = selection.Aggregate((a, b) => (Math.Min(a.Width, b.Width), Math.Min(a.Height, b.Height)));
+                    Log.Information("Adjusting image sizing to the minimum bounds: {@minimumBounds}", bounds);
+                }
                 foreach (var image in imageDictionary.Values)
-                    image.Mutate(x => x.Resize(minimumBounds.Width, minimumBounds.Height));
+                    image.Mutate(x => x.Resize(bounds.Width, bounds.Height));
 
-                var grid = (Width: minimumBounds.Width * 10, Height: minimumBounds.Height * rows);
+                var grid = (Width: bounds.Width * 10, Height: bounds.Height * rows);
                 Log.Information("Creating Full Grid of {x}x{y}...", grid.Width, grid.Height);
 
-                using (var fullGrid = new Image<Rgba32>(minimumBounds.Width * 10, minimumBounds.Height * rows))
+                using (var fullGrid = new Image<Rgba32>(bounds.Width * 10, bounds.Height * rows))
                 {
                     for (int i = 0; i < serialList.Count; i++)
                     {
                         var x = i % 10;
                         var y = i / 10;
-                        var point = new Point(x * minimumBounds.Width, y * minimumBounds.Height);
+                        var point = new Point(x * bounds.Width, y * bounds.Height);
 
                         fullGrid.Mutate(ctx =>
                         {

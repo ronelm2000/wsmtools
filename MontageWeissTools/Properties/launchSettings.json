@@ -122,6 +122,21 @@
     "Export HHW via Cockatrice": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter cockatrice"
+    },
+    "Export 5th Phase KC": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.heartofthecards.com/translations/kantai_collection_5th_phase_booster_pack.html"
+    },
+    "Export Deck from KC 5th Phase": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/SgPpc-bC7"
+    },
+    "Parse Schwarz Promos": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.heartofthecards.com/translations/schwarz_promos.html"
+    },
+    "Parse KC 5th Phase TD": {
+      "commandName": "Executable"
     }
   }
 }

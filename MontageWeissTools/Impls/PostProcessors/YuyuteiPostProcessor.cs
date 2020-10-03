@@ -138,8 +138,8 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 var tup when tup.Rarity == "SEC" && tup.Serial.StartsWith("GU/W57") => (tup.Serial + tup.Rarity, tup.Rarity, tup.ImageUri),
                 // Fix Exceptional CC rarity when it's supposed to be a regular C for all Extra Boosters
                 var tup when (tup.Serial.Contains("/WE") || tup.Serial.Contains("/SE")) 
-                           && tup.Rarity.EndsWith("CC") 
-                  => (tup.Serial, tup.Rarity.Substring(0, tup.Rarity.Length - 2) + "C", tup.ImageUri),
+                           && (tup.Rarity.EndsWith("CC") || tup.Rarity.EndsWith("CU"))
+                  => (tup.Serial, tup.Rarity.Substring(0, tup.Rarity.Length - 2) + tup.Rarity.Last(), tup.ImageUri),
                 _ => res
             };
         }

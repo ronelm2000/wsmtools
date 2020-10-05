@@ -336,6 +336,9 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             if (triggerString.StartsWith("None")) return new Trigger[] { };
             if (triggerString.StartsWith("2 Soul")) return new Trigger[] { Trigger.Soul, Trigger.Soul };
             triggerString = triggerString.Replace("Draw", "Book");
+            triggerString = triggerString.Replace("Salvage", "Door");
+            triggerString = triggerString.Replace("Treasure", "GoldBar");
+            triggerString = triggerString.Replace("Stock", "Bag");
             return triggerString.Split(" ")
                 .Select(s => s.AsSpan().ToEnum<Trigger>())
                 .Where(e => e.HasValue)

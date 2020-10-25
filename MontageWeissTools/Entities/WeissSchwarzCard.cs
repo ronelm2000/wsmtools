@@ -76,7 +76,6 @@ namespace Montage.Weiss.Tools.Entities
 
         public async Task<System.IO.Stream> GetImageStreamAsync()
         {
-            int retry = 0;
             if (!String.IsNullOrWhiteSpace(CachedImagePath) && !CachedImagePath.Contains(".."))
                 try
                 {

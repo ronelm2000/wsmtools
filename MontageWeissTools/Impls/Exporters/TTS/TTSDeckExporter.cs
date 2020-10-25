@@ -1,5 +1,6 @@
 ﻿using Fluent.IO;
 using Flurl.Http;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
@@ -56,11 +57,11 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                 .ToAsyncEnumerable()
                 .Select((p, i) =>
                 {
-                    Log.Information("Loading Images: ({i}/{count}) [{serial}]", i, count, p.Serial);
+                    Log.Information("Loading Images: ({i}/{count}) [{serial}]", i+1, count, p.Serial);
                     return p;
                 })
                 .SelectAwait(async (wsc) => (card: wsc, stream: await wsc.GetImageStreamAsync()))
-                .ToDictionaryAsync(p => p.card, p => Image.Load(p.stream));
+                .ToDictionaryAsync(p => p.card, p => PreProcess(Image.Load(p.stream)));
 
             var (encoder, format) = info.Flags.Any(s => s.ToLower() == "png") == true ? _pngEncoder : _jpegEncoder;
             var newImageFilename = $"deck_{fileNameFriendlyDeckName.ToLower()}.{format.FileExtensions.First()}";
@@ -150,6 +151,16 @@ namespace Montage.Weiss.Tools.Impls.Exporters
                     + ((card.Type != CardType.Climax) ? $"Lv/Co: {card.Level}/{card.Cost}\n" : $"Triggers: {card.Triggers.Select(c => c.ToString()).ConcatAsString(" - ")}\n")
                     + $"Effect: {card.Effect.ConcatAsString("\n")}";
             }
+        }
+
+        private Image PreProcess(Image image)
+        {
+            if (image.Height < image.Width)
+            {
+                Log.Debug("Image is probably incorrectly oriented, rotating it 90 degs. clockwise to compensate.");
+                image.Mutate(ipc => ipc.Rotate(90));
+            }
+            return image;
         }
 
         private void GenerateDeckImage(IExportInfo info, int rows, List<WeissSchwarzCard> serialList, Dictionary<WeissSchwarzCard, Image> imageDictionary, IImageEncoder encoder, Path deckImagePath)

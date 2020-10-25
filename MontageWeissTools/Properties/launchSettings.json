@@ -1,31 +1,8 @@
 {
   "profiles": {
-    "wstools for Konosuba": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/konosuba_booster_pack.html"
-    },
-    "wstools export CyaRon": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/wDdTKywNh --with png"
-    },
-    "wstools for LLS": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
-    },
-    "wstools": {
-      "commandName": "Project"
-    },
-    "wstools for Buggy Deck": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/jbfHKPURJ"
-    },
     "wsools export Grasaia": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/aTnKOs3Jx --out ShareX"
-    },
-    "wstools for Madoka": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/3fqflHO1_ --out sharex"
     },
     "wstools for CG": {
       "commandName": "Project",
@@ -137,6 +114,22 @@
     },
     "Parse KC 5th Phase TD": {
       "commandName": "Executable"
+    },
+    "Parse Aobuta S1": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/rascal_does_not_dream_of_bunny_girl_senpai_booster_pack.html"
+    },
+    "Parse Aobuta Movie": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/rascal_does_not_dream_of_a_dreaming_girl_booster_pack.html"
+    },
+    "Export Aobuta DeckLog": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://decklog.bushiroad.com/view/FHL4 --with upscaling"
+    },
+    "Parse Weiss Promos": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
     }
   }
 }

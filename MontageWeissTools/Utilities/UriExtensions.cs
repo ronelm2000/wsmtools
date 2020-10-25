@@ -68,8 +68,27 @@ namespace Montage.Weiss.Tools.Utilities
                         .WithCss()
                         ;
                 var context = BrowsingContext.New(config);
-                return await context.OpenAsync(req => req.Content(content));
+                return await context.OpenAsync(req =>
+                {
+                    req.Content(content);
+                    req.Address(uri);
+                });
             }
+        }
+
+        public static IFlurlRequest WithReferrer(this string urlString, string referrerUrl)
+        {
+            return urlString.AllowAnyHttpStatus().WithReferrer(referrerUrl);
+        }
+
+        public static IFlurlRequest WithReferrer(this Flurl.Url urlString, string referrerUrl)
+        {
+            return urlString.AllowAnyHttpStatus().WithReferrer(referrerUrl);
+        }
+
+        public static IFlurlRequest WithReferrer(this IFlurlRequest request, string referrerUrl)
+        {
+            return request.WithHeader("Referer", referrerUrl);
         }
 
         public static IFlurlRequest WithRESTHeaders(this string urlString)
@@ -80,7 +99,7 @@ namespace Montage.Weiss.Tools.Utilities
 
         public static IFlurlRequest WithHTMLHeaders(this string urlString)
         {
-            return urlString.WithHeaders(new 
+            return urlString.WithHeaders(new
             {
                 User_Agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36",
                 Accept = "*/*",
@@ -102,7 +121,7 @@ namespace Montage.Weiss.Tools.Utilities
         {
             return url.AbsoluteUri.WithHeaders(new
             {
-                User_Agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36",
+                User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
                 Accept = "*/*",
                 Referer = url.Authority
             });
@@ -128,6 +147,7 @@ namespace Montage.Weiss.Tools.Utilities
         {
             var config = Configuration.Default.WithDefaultLoader()
                     .WithCss()
+                    //.With(I)
                     ;
             var context = BrowsingContext.New(config);
             var resReq = await flurlReq;

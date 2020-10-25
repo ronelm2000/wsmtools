@@ -88,14 +88,13 @@ namespace Montage.Weiss.Tools.Entities
                     Log.Warning("Falling back on remote URL.");
                 }
                 catch (Exception) { }
-            do try
-                {
-                    return await Images.Last().WithImageHeaders().GetStreamAsync();
-                }
-                catch (Exception e) {
-                    if (retry++ > 9) throw e;
-                } 
-            while (true);
+            var url = Images.Last();
+            Log.Debug("Loading URL: {url}", url.AbsoluteUri);
+            return await url    .WithImageHeaders()
+                                .WithReferrer(url.AbsoluteUri)
+                                .GetAsync()
+                                .WithRetries(10)
+                                .ReceiveStream();
         }
         
         private static bool IsExceptionalSerial(string serial)

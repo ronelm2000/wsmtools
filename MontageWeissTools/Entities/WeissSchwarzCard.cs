@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -89,11 +90,12 @@ namespace Montage.Weiss.Tools.Entities
                 catch (Exception) { }
             var url = Images.Last();
             Log.Debug("Loading URL: {url}", url.AbsoluteUri);
-            return await url    .WithImageHeaders()
+            var bytes = await url.WithImageHeaders()
                                 .WithReferrer(url.AbsoluteUri)
                                 .GetAsync()
                                 .WithRetries(10)
-                                .ReceiveStream();
+                                .ReceiveBytes();
+            return new MemoryStream(bytes);
         }
         
         private static bool IsExceptionalSerial(string serial)

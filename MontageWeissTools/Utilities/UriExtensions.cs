@@ -119,12 +119,7 @@ namespace Montage.Weiss.Tools.Utilities
 
         public static IFlurlRequest WithImageHeaders(this Uri url)
         {
-            return url.AbsoluteUri.WithHeaders(new
-            {
-                User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
-                Accept = "*/*",
-                Referer = url.Authority
-            });
+            return url.AbsoluteUri.WithTimeout(TimeSpan.FromSeconds(45));
         }
 
         public static async Task<IDocument> GetHTMLAsync(this IFlurlRequest flurlReq)

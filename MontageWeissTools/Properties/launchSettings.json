@@ -130,6 +130,10 @@
     "Parse Weiss Promos": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
+    },
+    "Export GFB COD": {
+      "commandName": "Project",
+      "commandLineArgs": "export \"R:\\\\Downloads\\\\GFB.cod\""
     }
   }
 }

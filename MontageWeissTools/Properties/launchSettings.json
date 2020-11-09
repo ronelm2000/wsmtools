@@ -134,6 +134,10 @@
     "Export GFB COD": {
       "commandName": "Project",
       "commandLineArgs": "export \"R:\\\\Downloads\\\\GFB.cod\""
+    },
+    "Parse GFB vol. 2": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html"
     }
   }
 }

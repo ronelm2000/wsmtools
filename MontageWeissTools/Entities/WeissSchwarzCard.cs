@@ -93,7 +93,7 @@ namespace Montage.Weiss.Tools.Entities
             var bytes = await url.WithImageHeaders()
                                 .WithReferrer(url.AbsoluteUri)
                                 .GetAsync()
-                                .WithRetries(10)
+                                .WithRetries(100)
                                 .ReceiveBytes();
             return new MemoryStream(bytes);
         }

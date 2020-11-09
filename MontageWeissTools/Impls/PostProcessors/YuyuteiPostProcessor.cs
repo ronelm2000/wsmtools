@@ -27,6 +27,9 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         private static readonly string cardUnitImageSelector = ".image_box > a > .image > img";
         private static readonly string cardUnitSerialSelector = ".headline > p.id";
 
+        // Exceptional Sets
+        private static string[] gfbException = new[] { "W33", "W38" };
+
         // Dependencies
         private readonly Func<CardDatabaseContext> _database;
 
@@ -40,7 +43,11 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             if (cards.First().Language != CardLanguage.Japanese)
                 return false;
             var list = cards.Select(c => c.ReleaseID).Distinct().ToList();
-            if (list.Count > 1)
+            if (IsExceptional(list))
+            {
+                return true;
+            }
+            else if (list.Count > 1)
             {
                 Log.Warning("Yuyutei Image Post-Processor is disabled for sets with multiple Release IDs; please add those images manually when prompted.");
                 return false;
@@ -49,11 +56,24 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 return true;
         }
 
+        private bool IsExceptional(List<string> releaseIDList)
+        {
+            if (releaseIDList.OrderBy(s => s).SequenceEqual(gfbException))
+            {
+                Log.Information("This is normally not allowed, but GFB vol. 2 has cards from GFB vol. 1, so YYT should allow this.");
+                return true;
+            }
+            else
+                return false;
+        }
+
         public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
         {
             var yuyuteiSellPage = "https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=";
 
-            var firstCard = await originalCards.FirstAsync();
+            var cards = await originalCards.ToArrayAsync();
+
+            var firstCard = cards.Skip(Math.Min(cards.Length - 1, 10)).First(); // wtf GFB. Why you do this to me.
             var setCode = firstCard.ReleaseID;
             var lang = firstCard.Language;
 

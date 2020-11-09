@@ -43,5 +43,18 @@ namespace Montage.Weiss.Tools.Test
             };
             await parseCommand.Run(ioc);
         }
+
+        [TestMethod("Exceptional Set Test (GFB vol. 2)")]
+        public async Task GFBTestRun()
+        {
+            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+            ioc = Program.Bootstrap();
+
+            await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html" }.Run(ioc);
+            await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html" }.Run(ioc);
+
+            var testSerial = await ioc.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync("GF/W38-020");
+            Assert.IsTrue(testSerial.Images.Any());
+        }
     }
 }

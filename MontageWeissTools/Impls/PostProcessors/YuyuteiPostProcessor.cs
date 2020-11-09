@@ -121,7 +121,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 await db.SaveChangesAsync();
             }
 
-            await foreach (var originalCard in originalCards)
+            foreach (var originalCard in cards)
             {
                 var res = originalCard.Clone();
                 if (serialImageTriplets.TryGetValue( (res.Serial, res.Rarity), out var urlLink)) {

@@ -67,22 +67,6 @@ namespace Montage.Weiss.Tools.Impls.Utilities
 
     public static class Policies
     {
-        /*
-        private static IAsyncPolicy<HttpResponseMessage> UnwrapPolicy
-        {
-            get
-            {
-                return Policy //
-                    .HandleInner<TaskCanceledException>(e => e.InnerException != null) //
-                    .FallbackAsync<HttpResponseMessage>(async (e,c,t) =>
-                    {
-                        throw e.InnerException;
-                        return Task.FromResult<HttpResponseMessage>(null);
-                    });
-            }
-        };
-        */
-
         private static AsyncTimeoutPolicy<HttpResponseMessage> TimeoutPolicy
         {
             get
@@ -102,15 +86,11 @@ namespace Montage.Weiss.Tools.Impls.Utilities
             {
                 return Policy
                     .HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
-                    .Or<Exception>()
-                    /*
-                    .Or<TimeoutRejectedException>()
-                    .Or<FlurlHttpException>()
-                    .OrInner<TaskCanceledException>(e => e.InnerException != null)
-                    .OrInner<IOException>(e => e.InnerException != null)
-                    .OrInner<SocketException>(e => e.SocketErrorCode == SocketError.TimedOut)
-                    .OrInner<SocketException>(e => e.SocketErrorCode == SocketError.OperationAborted)
-                    */
+                    .Or<TimeoutException>()
+                    .Or<SocketException>(e => e.SocketErrorCode == SocketError.TimedOut)
+                    .Or<SocketException>(e => e.SocketErrorCode == SocketError.OperationAborted)
+                    
+                    // TODO: Need the ability to set these timeouts on a configuration table.
                     .WaitAndRetryAsync(new[]
                         {
                         TimeSpan.FromSeconds(1),
@@ -122,17 +102,31 @@ namespace Montage.Weiss.Tools.Impls.Utilities
                         TimeSpan.FromSeconds(60),
                         TimeSpan.FromSeconds(120),
                         TimeSpan.FromSeconds(240),
+                        /*
                         TimeSpan.FromSeconds(480),
                         TimeSpan.FromSeconds(600),
                         TimeSpan.FromSeconds(1200),
+                        */
                         },
                         (delegateResult, retryCount, context) =>
                         {
                             var log = Serilog.Log.ForContext<PolicyHandler>();
-                            //Log.Debug($"Exception?: {JsonSerializer.Serialize(delegateResult.Exception)}");
-                            log.Warning($"Timeout / Exception reached, attempting after {retryCount}");
+                            if (delegateResult.Exception != null)
+                                Log.Debug($"Exception: \n{delegateResult.Exception.ToString()}");
+
+                            log.Warning($"Retryting after {retryCount} {Translate(delegateResult.Exception)}");
                         });
             }
+        }
+
+        private static string Translate(Exception exception)
+        {
+            if (exception is SocketException se)
+                return $"[Socket Exception ({se.ErrorCode} - {se.SocketErrorCode})";
+            else if (exception is TimeoutException)
+                return "[Timeout]";
+            else
+                return "";
         }
 
         public static IAsyncPolicy<HttpResponseMessage> PolicyStrategy => RetryPolicy; //Policy.WrapAsync(RetryPolicy, TimeoutPolicy);

@@ -6,6 +6,8 @@ using System;
 using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +16,27 @@ namespace Montage.Weiss.Tools.Utilities
     public static class UriExtensions
     {
         static readonly HttpClient client = new HttpClient();
+        static readonly IFlurlClient customizedClient = new FlurlClient(new HttpClient(new HttpClientHandler()
+                {
+                    ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) => LogErrorButContinue(msg,cert,chain,errors)
+                }
+                )
+            );
+
+        private static bool LogErrorButContinue(HttpRequestMessage msg, X509Certificate2 cert, X509Chain chain, SslPolicyErrors errors)
+        {
+            if (errors != SslPolicyErrors.None)
+                if (cert.Thumbprint == "cf0b1d5c188a542271330ad489d9c7bde9a8abd0")
+                {
+                    Log.Warning("There is an known error certifcate error with www.encoredecks.com. This is ignored tempoaririly as I contact the developer.");
+                    return true;
+                } else
+                {
+                    return false;
+                }
+            else
+                return true;
+        }
 
         public static async Task<IDocument> DownloadHTML(this Uri uri)
         {
@@ -91,11 +114,18 @@ namespace Montage.Weiss.Tools.Utilities
             return request.WithHeader("Referer", referrerUrl);
         }
 
-        public static IFlurlRequest WithRESTHeaders(this string urlString)
+
+
+        public static IFlurlRequest WithRESTHeaders(this IFlurlRequest request)
         {
-            return urlString.WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
+            return request  .WithClient(customizedClient)
+                            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
                             .WithHeader("Accept", "text/plain");
         }
+        public static IFlurlRequest WithRESTHeaders(this string urlString) => new FlurlRequest(urlString).WithRESTHeaders();
+        public static IFlurlRequest WithRESTHeaders(this Uri url) => new FlurlRequest(url).WithRESTHeaders();
+        public static IFlurlRequest WithRESTHeaders(this Flurl.Url url) => new FlurlRequest(url).WithRESTHeaders();
+
 
         public static IFlurlRequest WithHTMLHeaders(this string urlString)
         {

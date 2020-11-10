@@ -114,7 +114,7 @@ namespace Montage.Weiss.Tools.Impls.Utilities
                             if (delegateResult.Exception != null)
                                 Log.Debug($"Exception: \n{delegateResult.Exception.ToString()}");
 
-                            log.Warning($"Retryting after {retryCount} {Translate(delegateResult.Exception)}");
+                            log.Warning($"Retrying after {retryCount} {Translate(delegateResult.Exception)}");
                         });
             }
         }

@@ -120,24 +120,12 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
 
         async Task<dynamic> GetDeckJSON(string encoreDecksDeckAPIURL, string deckID)
         {
-            /*
-            do try
-                {
-            */
             return await encoreDecksDeckAPIURL
                             .AppendPathSegment(deckID)
                             .WithRESTHeaders()
                             .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
                             .WithHeader("Accept", "text/plain")
                             .GetJsonAsync<dynamic>();
-            /*
-                }
-                catch (FlurlHttpException ex)
-                {
-                    Log.Information(ex.Message);
-                    Log.Information("Retrying...");
-                } while (true);
-            */
         }
 
         private IEnumerable<string[]> ParseCSV(string csvFile, Action<TextFieldParser> builder)

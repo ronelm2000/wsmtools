@@ -1,9 +1,11 @@
 ﻿using CommandLine;
+using Flurl.Http;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.Utilities;
 using Octokit;
 using Serilog;
 using Serilog.Events;
@@ -97,6 +99,8 @@ namespace Montage.Weiss.Tools
 
         public static Container Bootstrap()
         {
+            FlurlHttp.Configure(settings => settings.HttpClientFactory = new PollyHttpClientFactory());
+
             return new Container(x =>
             {
                 //x.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));

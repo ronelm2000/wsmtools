@@ -138,6 +138,10 @@
     "Parse GFB vol. 2": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html"
+    },
+    "Cache W38 JP": {
+      "commandName": "Project",
+      "commandLineArgs": "cache w38 jp"
     }
   }
 }

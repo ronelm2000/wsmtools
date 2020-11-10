@@ -90,12 +90,19 @@ namespace Montage.Weiss.Tools.Entities
                 catch (Exception) { }
             var url = Images.Last();
             Log.Debug("Loading URL: {url}", url.AbsoluteUri);
-            var bytes = await url.WithImageHeaders()
+
+            /*
+            var response = await url.WithImageHeaders()
                                 .WithReferrer(url.AbsoluteUri)
-                                .GetAsync()
-                                .WithRetries(100)
-                                .ReceiveBytes();
+                                .GetAsync();
+            Log.Debug("Done, reading content: {url}", url.AbsoluteUri);
+            var bytes = await response.Content.ReadAsByteArrayAsync();
             return new MemoryStream(bytes);
+            */
+            
+            return await url.WithImageHeaders()
+                            .GetAsync()
+                            .ReceiveStream();
         }
         
         private static bool IsExceptionalSerial(string serial)
@@ -103,7 +110,6 @@ namespace Montage.Weiss.Tools.Entities
             var (NeoStandardCode, ReleaseID, SetID) = ParseSerial(serial);
             if (ReleaseID == "W02" && SetID.StartsWith("E")) return true; // https://heartofthecards.com/code/cardlist.html?pagetype=ws&cardset=wslbexeb is an exceptional serial.
             else return false;
-            throw new NotImplementedException();
         }
 
         public static EnglishSetType? GetEnglishSetType(string serial)

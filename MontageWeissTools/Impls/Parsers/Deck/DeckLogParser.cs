@@ -100,7 +100,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
                     {
                         missingSerials.Add(serial);
                         //throw new DeckParsingException($"MISSING_SERIAL_{serial}");
-                        Log.Warning("Serial has been effectively skipped because it's not found on the local db: [{serial}]", serial);
+                        Log.Debug("Serial has been effectively skipped because it's not found on the local db: [{serial}]", serial);
                     }
                 }
             }

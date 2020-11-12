@@ -99,8 +99,6 @@ namespace Montage.Weiss.Tools
 
         public static Container Bootstrap()
         {
-            FlurlHttp.Configure(settings => settings.HttpClientFactory = new PollyHttpClientFactory());
-
             return new Container(x =>
             {
                 //x.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));

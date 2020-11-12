@@ -1,5 +1,8 @@
 ﻿using Flurl.Http;
 using Flurl.Http.Configuration;
+using Lamar;
+using Microsoft.Extensions.DependencyInjection;
+using Montage.Weiss.Tools.Entities;
 using Polly;
 using Polly.Retry;
 using Polly.Timeout;
@@ -9,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
@@ -20,24 +24,44 @@ namespace Montage.Weiss.Tools.Impls.Utilities
 {
     public class PollyHttpClientFactory : DefaultHttpClientFactory
     {
+        private Func<CardDatabaseContext> _db;
+
+        public PollyHttpClientFactory(IContainer ioc)
+        {
+            _db = () => ioc.GetInstance<CardDatabaseContext>();
+            FlurlHttp.Configure(settings => settings.HttpClientFactory = this);
+        }
+
         public override HttpMessageHandler CreateMessageHandler()
         {
-            return new PolicyHandler
+            using (var db = _db())
             {
-                InnerHandler = new TimeoutHandler
+                var maxRetries = db.Settings.Find("http.retries")?.GetValue<int>() ?? 10;
+                return new PolicyHandler(maxRetries)
                 {
-                    InnerHandler = base.CreateMessageHandler()
-                }
-            };  
+                    InnerHandler = new TimeoutHandler
+                    {
+                        InnerHandler = base.CreateMessageHandler()
+                    }
+                };
+            }
         }
     }
 
     public class PolicyHandler : DelegatingHandler
     {
         private ILogger Log = Serilog.Log.ForContext<PolicyHandler>();
+
+        public IAsyncPolicy<HttpResponseMessage> PolicyStrategy { get; set; }
+
+        public PolicyHandler(int maxTimeouts)
+        {
+            this.PolicyStrategy = Policies.GenerateRetryPolicy(maxTimeouts);
+        }
+
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            return Policies.PolicyStrategy.ExecuteAsync(async () => await base.SendAsync(request, cancellationToken));
+            return PolicyStrategy.ExecuteAsync(async () => await base.SendAsync(request, cancellationToken));
         }
     }
 
@@ -80,43 +104,25 @@ namespace Montage.Weiss.Tools.Impls.Utilities
             }
         }
 
-        private static AsyncRetryPolicy<HttpResponseMessage> RetryPolicy
-        {
-            get
-            {
-                return Policy
+        internal static AsyncRetryPolicy<HttpResponseMessage> GenerateRetryPolicy(int maxRetries)
+        {   
+            return Policy
                     .HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
                     .Or<TimeoutException>()
                     .Or<SocketException>(e => e.SocketErrorCode == SocketError.TimedOut)
                     .Or<SocketException>(e => e.SocketErrorCode == SocketError.OperationAborted)
                     
                     // TODO: Need the ability to set these timeouts on a configuration table.
-                    .WaitAndRetryAsync(new[]
-                        {
-                        TimeSpan.FromSeconds(1),
-                        TimeSpan.FromSeconds(2),
-                        TimeSpan.FromSeconds(5),
-                        TimeSpan.FromSeconds(7),
-                        TimeSpan.FromSeconds(14),
-                        TimeSpan.FromSeconds(30),
-                        TimeSpan.FromSeconds(60),
-                        TimeSpan.FromSeconds(120),
-                        TimeSpan.FromSeconds(240),
-                        /*
-                        TimeSpan.FromSeconds(480),
-                        TimeSpan.FromSeconds(600),
-                        TimeSpan.FromSeconds(1200),
-                        */
-                        },
+                    .WaitAndRetryAsync(
+                        Enumerable.Range(0, maxRetries).Select(i => TimeSpan.FromSeconds(Math.Pow(2, i))),
                         (delegateResult, retryCount, context) =>
                         {
                             var log = Serilog.Log.ForContext<PolicyHandler>();
                             if (delegateResult.Exception != null)
                                 Log.Debug($"Exception: \n{delegateResult.Exception.ToString()}");
 
-                            log.Warning($"Retrying after {retryCount} {Translate(delegateResult.Exception)}");
+                            log.Warning($"Retrying after {retryCount} {Policies.Translate(delegateResult.Exception)}");
                         });
-            }
         }
 
         private static string Translate(Exception exception)
@@ -129,6 +135,6 @@ namespace Montage.Weiss.Tools.Impls.Utilities
                 return "";
         }
 
-        public static IAsyncPolicy<HttpResponseMessage> PolicyStrategy => RetryPolicy; //Policy.WrapAsync(RetryPolicy, TimeoutPolicy);
+        //public static IAsyncPolicy<HttpResponseMessage> PolicyStrategy => RetryPolicy; //Policy.WrapAsync(RetryPolicy, TimeoutPolicy);
     }
 }

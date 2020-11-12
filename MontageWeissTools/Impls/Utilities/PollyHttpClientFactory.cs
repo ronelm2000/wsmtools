@@ -24,12 +24,13 @@ namespace Montage.Weiss.Tools.Impls.Utilities
 {
     public class PollyHttpClientFactory : DefaultHttpClientFactory
     {
+        private ILogger Log = Serilog.Log.ForContext<PollyHttpClientFactory>();
         private Func<CardDatabaseContext> _db;
 
         public PollyHttpClientFactory(IContainer ioc)
         {
+            Log.Debug("Starting...");
             _db = () => ioc.GetInstance<CardDatabaseContext>();
-            FlurlHttp.Configure(settings => settings.HttpClientFactory = this);
         }
 
         public override HttpMessageHandler CreateMessageHandler()

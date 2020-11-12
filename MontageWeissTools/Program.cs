@@ -30,6 +30,8 @@ namespace Montage.Weiss.Tools
             Log.Debug(container.WhatDoIHave(serviceType: typeof(IVerbCommand)));
             Log.Debug(container.WhatDoIHave(serviceType: typeof(IDeckParser)));
             Log.Debug(container.WhatDoIHave(serviceType: typeof(ICardSetParser)));
+            FlurlHttp.Configure(settings => settings.HttpClientFactory = container.GetService<PollyHttpClientFactory>());
+
 
             var verbs = container.GetAllInstances<IVerbCommand>().Select(a => a.GetType()).ToArray();
             var result = CommandLine.Parser.Default.ParseArguments(args, verbs); //

@@ -25,7 +25,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
     {
         private readonly ILogger Log;
         private Func<CardDatabaseContext> _database;
-        private System.Text.RegularExpressions.Regex serialParser = new System.Text.RegularExpressions.Regex(@"(.*)(?: - )?(.*)");
+        private System.Text.RegularExpressions.Regex serialParser = new System.Text.RegularExpressions.Regex(@"([^ ]*)(?: - )?(.*)(?:\n)?");
 
         public string[] Alias => new[] { "cockatrice", "cckt3s" };
 

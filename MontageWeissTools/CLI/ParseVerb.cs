@@ -17,7 +17,7 @@ namespace Montage.Weiss.Tools.CLI
         [Value(0, HelpText = "URL to parse. Compatible Formats are found at https://github.com/ronelm2000/wsmtools/")]
         public string URI { get; set; }
 
-        [Option("with", HelpText = "Provides a hint as to what parser should be used.", Default = new string[] { })]
+        [Option("with", HelpText = "Provides a hint as to what parser should be used or if post-processors are skipped (if any).", Default = new string[] { })]
         public IEnumerable<string> ParserHints { get; set; }
 
         public async Task Run(IContainer container)
@@ -32,7 +32,8 @@ namespace Montage.Weiss.Tools.CLI
             var cards = cardList.Distinct(WeissSchwarzCard.SerialComparer).ToAsyncEnumerable();
 
             var postProcessors = container.GetAllInstances<ICardPostProcessor>()
-                .Where(procesor => procesor.IsCompatible(cardList))
+                .Where(processor => processor.IsCompatible(cardList))
+                .Where(processor => (processor is ISkippable<IParseInfo> skippable) ? skippable.IsIncluded(this) : true)
                 .OrderBy(processor => processor.Priority);
 
             cards = postProcessors.Aggregate(cards, (pp, cs) => cs.Process(pp));

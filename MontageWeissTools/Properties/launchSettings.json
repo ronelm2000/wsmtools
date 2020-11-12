@@ -133,11 +133,11 @@
     },
     "Export GFB COD": {
       "commandName": "Project",
-      "commandLineArgs": "export \"R:\\\\Downloads\\\\GFB.cod\""
+      "commandLineArgs": "export \"R:\\\\Downloads\\\\GFB.cod\" --exporter cockatrice"
     },
     "Parse GFB vol. 2": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html"
+      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html --with skip:yyt"
     },
     "Cache W38 JP": {
       "commandName": "Project",

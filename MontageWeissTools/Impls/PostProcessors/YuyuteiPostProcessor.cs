@@ -16,7 +16,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
     /// <summary>
     /// Applies post-processing by searching in yuyutei for images of the cards and inserting them in.
     /// </summary>
-    public class YuyuteiPostProcessor : ICardPostProcessor
+    public class YuyuteiPostProcessor : ICardPostProcessor, ISkippable<IParseInfo>
     {
         private readonly ILogger Log = Serilog.Log.ForContext<YuyuteiPostProcessor>();
 
@@ -65,6 +65,19 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             }
             else
                 return false;
+        }
+
+        public bool IsIncluded(IParseInfo info)
+        {
+            if (info.ParserHints.Select(s => s.ToLower()).Contains("skip:yyt"))
+            {
+                Log.Information("Skipping due to the parser hint [skip:yyt].");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
@@ -163,7 +176,5 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 _ => res
             };
         }
-
-
     }
 }

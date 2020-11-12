@@ -19,6 +19,7 @@ namespace Montage.Weiss.Tools.Entities
 
         public DbSet<WeissSchwarzCard> WeissSchwarzCards { get; set; }
         //public DbSet<MultiLanguageString> MultiLanguageStrings { get; set; }
+        public DbSet<Setting> Settings { get; set; }
 
         public CardDatabaseContext (AppConfig config) {
             Log.Debug("Instantiating with {@AppConfig}.", config);
@@ -77,7 +78,13 @@ namespace Montage.Weiss.Tools.Entities
                     bb.WithOwner();
                 });
             });
-                        
+
+            modelBuilder.Entity<Setting>(b =>
+            {
+                b.HasKey(s => s.Key);
+            });
+
+
            // modelBuilder.Entity<MultiLanguageString>().HasKey(s => s.JP);
 
         }

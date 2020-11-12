@@ -55,7 +55,9 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck
             cckDeck.Ratios = new CockatriceDeckRatio();
             cckDeck.Ratios.Ratios = deck.Ratios.Select(Translate).ToList();
 
-            var resultDeck = Path.CreateDirectory(info.Destination).Combine($"{deck.Name?.AsFileNameFriendly() ?? "deck"}.cod");
+            var deckFilename = deck.Name?.AsFileNameFriendly();
+            if (String.IsNullOrEmpty(deckFilename)) deckFilename = "deck";
+            var resultDeck = Path.CreateDirectory(info.Destination).Combine($"{deckFilename}.cod");
             resultDeck.Open(s => _serializer.Serialize(s, cckDeck),
                                     System.IO.FileMode.Create,
                                     System.IO.FileAccess.Write,

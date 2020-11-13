@@ -28,6 +28,7 @@ registering on GitHub.
 
 #### Supported Deck Parsers ####
 * [Encore Decks](https://www.encoredecks.com/)
+* [DeckLog](https://decklog.bushiroad.com/)
 * Local Deck JSON
 
 #### Supported Card Set Parsers ####
@@ -57,10 +58,7 @@ registering on GitHub.
       ![I like ShareX this way; it's so convenient](https://i.imgur.com/Sw2H9qm.png)
 09. Open Tabletop Simulator (Single-Player will do)
 10. Load the Saved Object (and make sure no other Deck Generators are loaded!)
-11. In the chat command, type:
-    ```ps
-    +generate url_of_your_deck url_of_your_sleeves
-    ```
+11. In the loaded GUI, place the URL Image Link for your Deck and URL Image Link for your characters sleeves where prompted.
 12. You should be able to create decks like this:
     ![Tho why do you need effects for decks with English art?](https://i.imgur.com/WuRpf9I.png)
 
@@ -77,11 +75,9 @@ registering on GitHub.
   The HTML page is usually in this link.
 
   ![Yes, that one link which is printed](https://i.imgur.com/FkukMso.png)
-* HOTC's Weiss Promos and Schwarz Promos may be parsed successfully, but image post-processing will be disabled.
-  Please add the images manually in the `./Images/` subfolder. The format for the image file must be
-  `serial_with_only_underscores.jpg` (png, jfif, and jpeg is also valid). 
- 
-  Example filename: `F35_W65_034.jpg`
+* HOTC's Weiss Promos and Schwarz Promos do not use YYT (yuyutei) images by default, but instead utilizes DeckLog API image links. If you require the YYT's image links for any reason, they will be included if you parse a
+  set from HOTC of the same Release ID. There are also some PRs that are report to have neither DeckLog images nor YYT images. For these instances, if you try to create a deck with them, you will be warned and be asked
+  to include them manually.
 
 * Some HOTC pages may not parse successfully due to translation errors, like this from Magia Record.
   Please report them if seen.

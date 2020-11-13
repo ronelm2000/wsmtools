@@ -270,6 +270,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             return serial switch
             {
                 "SG/W70-106" => CardColor.Blue,
+                "VA/WE30-55" => CardColor.Red,
                 _ => throw new NotImplementedException($"Unsupported color correction for {serial}.", innerException)
             };
         }

@@ -110,10 +110,14 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             try
             {
                 res.Rarity = cursor.CurrentLine.Slice(c => c.IndexOf(rarityText) + rarityText.Length).Trim().ToString();
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 res.Rarity = HandleRarityCorrections(res.Serial, e);
             }
+            if (string.IsNullOrWhiteSpace(res.Rarity))
+                res.Rarity = HandleRarityCorrections(res.Serial, null);
+
             cursor.MoveUp();
             // Log.Information("+1 above Card No: {line}", cursor.CurrentLine.ToString());
             res.Name = new MultiLanguageString();
@@ -222,7 +226,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                     .Where(o => o != null)
                     .ToList();
             }
-            
+
             cursor.Next();
 
             var stringTriggers = cursor.CurrentLine
@@ -260,7 +264,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
             Log.Information("Extracted: {serial}", res.Serial);
             return res;
-        }
+            }
 
         private CardColor HandleColorCorrections(string serial, Exception innerException)
         {

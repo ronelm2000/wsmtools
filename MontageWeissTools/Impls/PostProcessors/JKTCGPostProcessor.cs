@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors
 {
@@ -29,8 +30,9 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             _database = () => container.GetInstance<CardDatabaseContext>();
         }
 
-        public bool IsCompatible(List<WeissSchwarzCard> cards)
+        public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
         {
+            await Task.CompletedTask;
             if (cards.First().Language != CardLanguage.English)
                 return false;
 

@@ -2,6 +2,7 @@
 using AngleSharp.Html.Dom;
 using Lamar;
 using Lamar.IoC.Instances;
+using Microsoft.EntityFrameworkCore;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -118,6 +119,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             Log.Information("Getting all PRs on card database without a YYT image link...");
             using (var db = _database())
             {
+                await db.Database.MigrateAsync();
                 var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
                     .Where(c =>     c.ReleaseID == setCode 
                                 &&  c.Language == lang 

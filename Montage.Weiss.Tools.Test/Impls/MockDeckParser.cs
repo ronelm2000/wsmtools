@@ -13,10 +13,7 @@ namespace Montage.Weiss.Tools.Test.Impls
 
         public int Priority => int.MaxValue;
 
-        public bool IsCompatible(string urlOrFile)
-        {
-            return true;
-        }
+        public Task<bool> IsCompatible(string urlOrFile) => Task.FromResult(true);
 
         public Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile)
         {

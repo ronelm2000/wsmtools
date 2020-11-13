@@ -1,6 +1,7 @@
 ﻿using Flurl.Http;
 using Flurl.Http.Configuration;
 using Lamar;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Montage.Weiss.Tools.Entities;
 using Polly;
@@ -37,6 +38,7 @@ namespace Montage.Weiss.Tools.Impls.Utilities
         {
             using (var db = _db())
             {
+                db.Database.Migrate();
                 var maxRetries = db.Settings.Find("http.retries")?.GetValue<int>() ?? 10;
                 return new PolicyHandler(maxRetries)
                 {

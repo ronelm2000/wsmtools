@@ -18,7 +18,7 @@ namespace Montage.Weiss.Tools.CLI
         public string URI { get; set; }
 
         [Option("with", HelpText = "Provides a hint as to what parser should be used or if post-processors are skipped (if any).", Default = new string[] { })]
-        public IEnumerable<string> ParserHints { get; set; }
+        public IEnumerable<string> ParserHints { get; set; } = new string[] { };
 
         public async Task Run(IContainer container)
         {

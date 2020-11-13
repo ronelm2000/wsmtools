@@ -112,9 +112,6 @@
       "commandName": "Project",
       "commandLineArgs": "parse https://www.heartofthecards.com/translations/schwarz_promos.html"
     },
-    "Parse KC 5th Phase TD": {
-      "commandName": "Executable"
-    },
     "Parse Aobuta S1": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/rascal_does_not_dream_of_bunny_girl_senpai_booster_pack.html"

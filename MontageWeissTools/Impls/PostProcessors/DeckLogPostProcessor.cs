@@ -135,8 +135,9 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 .PostJsonAsync(new { })
                 .ReceiveJson<DLQueryParameters>();
             var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
-            var queries = (cardParams.GetTitleSelectionKeys().Any(a => titleCodes.Except(a).SequenceEqual(Array.Empty<string>()))) ? GenerateSearchJSON(titleCodes) : GenerateSearchJSON(cardData);
-            foreach (var queryData in queries) {
+            IEnumerable<DLCardQuery> queries = GetCardQueries(cardData, cardParams, titleCodes);
+            foreach (var queryData in queries)
+            {
                 int page = 1;
                 Log.Information($"Accessing DeckLog API with the following query data: {JsonConvert.SerializeObject(queryData, Formatting.Indented)}");
                 do
@@ -157,6 +158,22 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 } while (temporaryResults.Count > 29);
             }
             return results;
+        }
+
+        private IEnumerable<DLCardQuery> GetCardQueries(List<WeissSchwarzCard> cardData, DLQueryParameters cardParams, HashSet<string> titleCodes)
+        {
+            //var matchesOneNSTitle = cardParams.GetTitleSelectionKeys().Any(a => titleCodes.Except(a).SequenceEqual(Array.Empty<string>()));
+            var titles = cardParams.GetTitleSelectionKeys().Where(a => titleCodes.Intersect(a).Count() > 0).Select(a => titleCodes.Intersect(a).ToArray()).ToArray();
+            Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
+            Log.Information("All Titles: {@titles}", titles);
+            Log.Information("Removing Sub-Lists...");
+            titles = titles.Where(t1 => titles.All(t2 => t1 == t2 || !t1.Union(t2).ToHashSet().SetEquals(t2))).ToArray();
+            Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
+            Log.Information("All Titles: {@titles}", titles);
+            if (titles.Length < 5)
+                return GenerateSearchJSON(titles.SelectMany(t => t).Distinct());
+            else
+                return GenerateSearchJSON(cardData);
         }
 
         private IEnumerable<DLCardQuery> GenerateSearchJSON(IEnumerable<string> titleCodes)

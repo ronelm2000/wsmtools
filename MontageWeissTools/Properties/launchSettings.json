@@ -26,7 +26,7 @@
     },
     "wstools parse Fantasia": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/fujimi_fantasia_bunko_booster_pack.html"
+      "commandLineArgs": "parse https://heartofthecards.com/translations/fujimi_fantasia_bunko_booster_pack.html --with skip:yyt"
     },
     "wstools cache Fantasia": {
       "commandName": "Project",
@@ -147,6 +147,18 @@
     "Export DC3/W18": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/da_capo_iii_booster_pack.html --with skip:yyt"
+    },
+    "Parse LB vs DC": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/da_capo_vs._little_busters!_extra_pack.html --with skip:yyt"
+    },
+    "Parse Kadokawa Bunko": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/kadokawa_sneaker_bunko_booster_pack.html --with skip:yyt"
+    },
+    "Parse Key 20th Anniv.": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/key_20th_anniversary_booster_pack.html --with skip:yyt"
     }
   }
 }

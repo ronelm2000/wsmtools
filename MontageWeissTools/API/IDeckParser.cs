@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.API
     {
         public string[] Alias { get; }
         public int Priority { get; }
-        public bool IsCompatible(string urlOrFile);
+        public Task<bool> IsCompatible(string urlOrFile);
         public Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile);
     }
 }

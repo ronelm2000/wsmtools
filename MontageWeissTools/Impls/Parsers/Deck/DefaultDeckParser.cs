@@ -14,9 +14,9 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
 
         public int Priority => int.MinValue;
 
-        public bool IsCompatible(string urlOrFile)
+        public Task<bool> IsCompatible(string urlOrFile)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         private readonly ILogger Log = Serilog.Log.ForContext<DefaultDeckParser>();

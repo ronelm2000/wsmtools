@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.API
 {
@@ -10,6 +11,6 @@ namespace Montage.Weiss.Tools.API
     /// <typeparam name="T"></typeparam>
     public interface ISkippable<T>
     {
-        bool IsIncluded(T info);
+        Task<bool> IsIncluded(T info);
     }
 }

@@ -42,8 +42,9 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
             this._database = () => ioc.GetInstance<CardDatabaseContext>();
         }
 
-        public bool IsCompatible(string urlOrFile)
+        public async Task<bool> IsCompatible(string urlOrFile)
         {
+            await Task.CompletedTask;
             if (Uri.TryCreate(urlOrFile, UriKind.Absolute, out _))
             {
                 return urlMatcher.IsMatch(urlOrFile);

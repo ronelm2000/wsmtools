@@ -55,10 +55,11 @@ namespace Montage.Weiss.Tools.CLI
 
             Log.Information("Running...");
 
-            var parser = ioc.GetAllInstances<IDeckParser>()
-                .Where(parser => parser.IsCompatible(Source))
+            var parser = await ioc.GetAllInstances<IDeckParser>()
+                .ToAsyncEnumerable()
+                .WhereAwait(async parser => await parser.IsCompatible(Source))
                 .OrderByDescending(parser => parser.Priority)
-                .First();
+                .FirstAsync();
 
             var deck = await parser.Parse(Source);
             var inspectionOptions = new InspectionOptions()

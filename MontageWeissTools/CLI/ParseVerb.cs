@@ -32,11 +32,12 @@ namespace Montage.Weiss.Tools.CLI
             var cards = cardList.Distinct(WeissSchwarzCard.SerialComparer).ToAsyncEnumerable();
 
             var postProcessors = container.GetAllInstances<ICardPostProcessor>()
-                .Where(processor => processor.IsCompatible(cardList))
-                .Where(processor => (processor is ISkippable<IParseInfo> skippable) ? skippable.IsIncluded(this) : true)
+                .ToAsyncEnumerable()
+                .WhereAwait(async processor => await processor.IsCompatible(cardList))
+                .WhereAwait(async processor => (processor is ISkippable<IParseInfo> skippable) ? await skippable.IsIncluded(this) : true)
                 .OrderBy(processor => processor.Priority);
 
-            cards = postProcessors.Aggregate(cards, (pp, cs) => cs.Process(pp));
+            cards = await postProcessors.AggregateAsync(cards, (pp, cs) => cs.Process(pp));
 
             using (var db = container.GetInstance<CardDatabaseContext>())
             {

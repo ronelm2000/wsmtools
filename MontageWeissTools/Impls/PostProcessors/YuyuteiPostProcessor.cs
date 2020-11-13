@@ -9,6 +9,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors
@@ -38,8 +39,9 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             _database = () => container.GetInstance<CardDatabaseContext>();
         }
 
-        public bool IsCompatible(List<WeissSchwarzCard> cards)
+        public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
         {
+            await Task.CompletedTask;
             if (cards.First().Language != CardLanguage.Japanese)
                 return false;
             var list = cards.Select(c => c.ReleaseID).Distinct().ToList();
@@ -67,8 +69,9 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 return false;
         }
 
-        public bool IsIncluded(IParseInfo info)
+        public async Task<bool> IsIncluded(IParseInfo info)
         {
+            await Task.CompletedTask;
             if (info.ParserHints.Select(s => s.ToLower()).Contains("skip:yyt"))
             {
                 Log.Information("Skipping due to the parser hint [skip:yyt].");

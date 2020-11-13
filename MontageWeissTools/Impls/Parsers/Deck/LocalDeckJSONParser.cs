@@ -26,8 +26,9 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
         }
 
 
-        public bool IsCompatible(string urlOrFile)
+        public async Task<bool> IsCompatible(string urlOrFile)
         {
+            await Task.CompletedTask;
             var filePath = Path.Get(urlOrFile);
             if (!filePath.Exists)
                 return false;

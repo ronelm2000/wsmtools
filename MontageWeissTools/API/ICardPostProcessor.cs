@@ -1,5 +1,6 @@
 ﻿using Montage.Weiss.Tools.Entities;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.API
 {
@@ -19,7 +20,7 @@ namespace Montage.Weiss.Tools.API
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public bool IsCompatible(List<WeissSchwarzCard> cards);
+        public Task<bool> IsCompatible(List<WeissSchwarzCard> cards);
 
         /// <summary>
         /// Applies post-processing on a card.

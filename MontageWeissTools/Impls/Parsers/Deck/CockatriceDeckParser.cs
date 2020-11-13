@@ -45,9 +45,10 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
             */
         }
 
-        public bool IsCompatible(string urlOrFile)
+        public async Task<bool> IsCompatible(string urlOrFile)
         {
             var file = Fluent.IO.Path.Get(urlOrFile);
+            await Task.CompletedTask;
             return file.Exists && file.Extension == ".cod";
         }
 

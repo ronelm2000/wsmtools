@@ -135,7 +135,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 .PostJsonAsync(new { })
                 .ReceiveJson<DLQueryParameters>();
             var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
-            var queries = (cardParams.GetTitleSelectionKeys().Any(a => titleCodes.SetEquals(a))) ? GenerateSearchJSON(titleCodes) : GenerateSearchJSON(cardData);
+            var queries = (cardParams.GetTitleSelectionKeys().Any(a => titleCodes.Except(a).SequenceEqual(Array.Empty<string>()))) ? GenerateSearchJSON(titleCodes) : GenerateSearchJSON(cardData);
             foreach (var queryData in queries) {
                 int page = 1;
                 Log.Information($"Accessing DeckLog API with the following query data: {JsonConvert.SerializeObject(queryData, Formatting.Indented)}");

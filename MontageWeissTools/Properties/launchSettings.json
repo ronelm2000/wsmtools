@@ -143,6 +143,10 @@
     "Parse GFB vol. 1": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html"
+    },
+    "Export DC3/W18": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/da_capo_iii_booster_pack.html --with skip:yyt"
     }
   }
 }

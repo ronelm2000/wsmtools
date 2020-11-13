@@ -64,6 +64,9 @@ namespace Montage.Weiss.Tools.Entities
         public CardLanguage Language => GetLanguage(Serial);
         public EnglishSetType? EnglishSetType => GetEnglishSetType(Language, ReleaseID);
         public bool IsFoil => foilRarities.Contains(Rarity);
+
+        public string TitleCode => ParseSerial(Serial).NeoStandardCode;
+
         //public bool IsEnglishEdited => GetIsEnglishEdited(Language, ReleaseID);
         //public bool IsEnglishOriginal => ReleaseID is string rid && englishOriginalPrefixes.Any(c => c.StartsWith(rid));
 

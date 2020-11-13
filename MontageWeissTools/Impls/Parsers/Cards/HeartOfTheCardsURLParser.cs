@@ -257,7 +257,6 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 .Replace("\n[ACT]", "\n[A][ACT]")
                 .Split("\n[A]", StringSplitOptions.RemoveEmptyEntries);
             res.Effect = effectSplit.Select(s => Clean(s)).ToArray();
-
             res.Remarks = $"Extractor: {this.GetType().Name}";
             //            foreach (var effect in effectSplit) 
             //                Log.Information("Effect {serial}: {effect}", res.Serial, effect);

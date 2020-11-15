@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Impls.Exporters.TTS;
 using Montage.Weiss.Tools.Resources;
 using Montage.Weiss.Tools.Resources.TTS;
 using Montage.Weiss.Tools.Utilities;
@@ -23,6 +22,7 @@ using System.ComponentModel;
 //using System.IO;
 //using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 //using System.Text.Json;
 using System.Threading.Tasks;
@@ -37,7 +37,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
         private (IImageEncoder, IImageFormat) _jpegEncoder = (new JpegEncoder(), JpegFormat.Instance);
 
         public string[] Alias => new [] { "tts", "tabletopsim" };
-        
+
         public async Task Export(WeissSchwarzDeck deck, IExportInfo info)
         {
             var count = deck.Ratios.Keys.Count;
@@ -94,6 +94,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
 
             var nameOfObject = $"Deck Generator ({fileNameFriendlyDeckName})";
             var deckGeneratorPath = resultFolder.Combine($"{nameOfObject}.json");
+ 
             deckGeneratorPath.Open(s =>
             {
                 using (System.IO.StreamWriter w = new System.IO.StreamWriter(s))
@@ -141,6 +142,9 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
                 }
             }
 
+            if (info.Flags?.Contains("sendtcp", StringComparer.CurrentCultureIgnoreCase) ?? false)
+               await SendDeckGeneratorJSON("localhost", 39999, saveState);
+
             static string FormatDescription(WeissSchwarzCard card)
             {
                 return $"Type: {card.TypeToString()}\n"
@@ -150,6 +154,30 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
                         ) : "")
                     + ((card.Type != CardType.Climax) ? $"Lv/Co: {card.Level}/{card.Cost}\n" : $"Triggers: {card.Triggers.Select(c => c.ToString()).ConcatAsString(" - ")}\n")
                     + $"Effect: {card.Effect.ConcatAsString("\n")}";
+            }
+        }
+
+        public async Task SendDeckGeneratorJSON(string host, int ttsPort, SaveState saveState)
+        {
+            Log.Information("Generating a TTS command...");
+            var serializedObject = JsonConvert.SerializeObject(saveState.ObjectStates[0]).EscapeQuotes();
+            var command = new TTSExternalEditorCommand("-1", $"spawnObjectJSON({{ json = \"{serializedObject}\" }})");
+            Log.Information("Trying to connect to TTS via {ip}:{port}...", host, ttsPort);
+            try
+            {
+                using (var tcpClient = new TcpClient(host, ttsPort))
+                using (var stream = tcpClient.GetStream())
+                using (var writer = new System.IO.StreamWriter(stream))
+                {
+                    Log.Information("Connected. Spawning a Deck Generator in TTS...");
+                    await writer.WriteAsync(JsonConvert.SerializeObject(command));
+                    await writer.FlushAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Warning("Unable to send the Deck Generator directly to TTS; please load the object manually.");
+                Log.Debug("For Debugging...", e);
             }
         }
 

@@ -1,11 +1,14 @@
 ﻿using Flurl.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
 using Montage.Weiss.Tools.Test.Commons;
 using Montage.Weiss.Tools.Utilities;
+using Newtonsoft.Json;
 using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -87,6 +90,35 @@ namespace Montage.Weiss.Tools.Test.ENWS
             using (var img = Image.Load(await url.WithImageHeaders().GetStreamAsync()))
             {
                 Log.Information("Image Loaded.");
+            }
+        }
+
+        [TestMethod]
+        [Ignore]
+        public async Task TestTTSCommand()
+        {
+            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+            var Log = Serilog.Log.Logger.ForContext<WeissSchwarzCardUnitTests>();
+
+            var host = "localhost";
+            var port = 39999;
+
+            //var command = new TTSExternalEditorCommand("-1", "spawnObject({ type = \"rpg_BEAR\" })");
+            var command = new TTSExternalEditorCommand("-1", "spawnObject ({ type = \"rpg_BEAR\" })");
+
+
+            Log.Information("Trying to connect to TTS via {ip}:{port}...", host, port);
+            using (var tcpClient = new TcpClient(host, port))
+            using (var stream = tcpClient.GetStream())
+            using (var writer = new System.IO.StreamWriter(stream))
+            using (var reader = new System.IO.StreamReader(stream))
+            {   
+                var json = JsonConvert.SerializeObject(command);
+                Log.Information($"Running: {json}");
+                await writer.WriteAsync(json);
+                await writer.FlushAsync();
+                string response = await reader.ReadLineAsync();
+                Log.Information("Logging Response: {response}", response);
             }
         }
     }

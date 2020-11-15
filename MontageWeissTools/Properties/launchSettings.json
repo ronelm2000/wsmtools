@@ -130,7 +130,7 @@
     },
     "Export GFB COD": {
       "commandName": "Project",
-      "commandLineArgs": "export \"R:\\\\Downloads\\\\GFB.cod\" --exporter cockatrice"
+      "commandLineArgs": "export \"R:\\\\Downloads\\\\GFB.cod\" --with sendtcp"
     },
     "Parse GFB vol. 2": {
       "commandName": "Project",
@@ -142,7 +142,7 @@
     },
     "Parse GFB vol. 1": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html"
+      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html --with skip:yyt"
     },
     "Export DC3/W18": {
       "commandName": "Project",

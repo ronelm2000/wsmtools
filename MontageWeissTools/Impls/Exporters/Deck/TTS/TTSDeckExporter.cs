@@ -27,7 +27,7 @@ using System.Text;
 //using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Impls.Exporters
+namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
 {
     public class TTSDeckExporter : IDeckExporter
     {

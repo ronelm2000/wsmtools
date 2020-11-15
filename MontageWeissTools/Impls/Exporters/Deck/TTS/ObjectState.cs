@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Montage.Weiss.Tools.Impls.Exporters.TTS
+namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
 {
     public class SaveState //Holds a state of the game
     {

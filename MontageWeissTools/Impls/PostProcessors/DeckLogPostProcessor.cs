@@ -3,6 +3,7 @@ using Flurl.Http;
 using Lamar;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -32,7 +33,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 //        private string defaultRESTCardParamURL = "";
        // private readonly Func<CardDatabaseContext> _db;
         private readonly Func<Task<string>> _getLatestVersion;
-
+        private readonly Func<CookieSession> _cookieSession;
         private string currentVersion;
 
         public int Priority => 1;
@@ -40,9 +41,10 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         public DeckLogPostProcessor(IContainer ioc)
         {
             //_db = () => ioc.GetInstance<CardDatabaseContext>();
+            _cookieSession = () => ioc.GetInstance<GlobalCookieJar>()["https://decklog.bushiroad.com/"];
             _getLatestVersion = async () =>
             {              
-                currentVersion = currentVersion ?? await settings.VersionURL.GetStringAsync();
+                currentVersion = currentVersion ?? await settings.VersionURL.WithCookies(_cookieSession()).GetStringAsync();
                 return currentVersion;
             };
         }
@@ -91,19 +93,6 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             Log.Information("Starting...");
             var titleCodes = cardData.Select(c => c.TitleCode).Distinct().ToArray();
             var deckLogSearchResults = await GetDeckLogSearchResults(cardData);
-            /*
-            Log.Information("Searching for PR cards already in database (if any)...");
-            using (var db = _db())
-            {
-                var query = db.WeissSchwarzCards.AsQueryable();
-                foreach (var titleCode in titleCodes)
-                    query = query.Where(c => c.Serial.StartsWith(titleCode));
-                await foreach (var card in query.Where(c => c.Rarity == "PR").ToAsyncEnumerable())
-                    db.Update(TryMutate(card, deckLogSearchResults));
-                await db.SaveChangesAsync();
-            }
-            */
-
             foreach (var card in cardData)
                 yield return TryMutate(card, deckLogSearchResults);
         }
@@ -132,6 +121,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             var cardParams = await settings.CardParamURL
                 .WithRESTHeaders()
                 .WithReferrer(settings.Referrer)
+                .WithCookies(_cookieSession())
                 .PostJsonAsync(new { })
                 .ReceiveJson<DLQueryParameters>();
             var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
@@ -145,6 +135,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                     Log.Information("Extracting Page {pagenumber}...", page);
                     temporaryResults = await settings.SearchURL.WithRESTHeaders()
                         .WithReferrer(settings.Referrer)
+                        .WithCookies(_cookieSession())
                         .PostJsonAsync(new
                         {
                             param = queryData,

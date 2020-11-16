@@ -104,6 +104,7 @@ namespace Montage.Weiss.Tools
             return new Container(x =>
             {
                 //x.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));
+                x.AddSingleton<GlobalCookieJar>();
                 x.AddSingleton<ILogger>(Serilog.Log.Logger);
                 x.Scan(s =>
                 {

@@ -25,7 +25,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
     /// Implements a Deck Parser that sources deck information from DeckLog.
     /// Note that parsing the deck this way means the deck has no name or description, but the source link will be appended.
     /// </summary>
-    public class DeckLogParser : IDeckParser, IDisposable
+    public class DeckLogParser : IDeckParser
     {
         private Regex urlMatcher = new Regex(@"(.*):\/\/decklog\.bushiroad\.com\/view\/([^\?]*)(.*)");
         private string deckLogApiUrlPrefix = "https://decklog.bushiroad.com/system/app/api/view/";

@@ -1,9 +1,11 @@
 ﻿using CommandLine;
 using Fluent.IO;
+using Flurl.Http;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
 using Serilog;
 using SixLabors.ImageSharp;
@@ -33,6 +35,9 @@ namespace Montage.Weiss.Tools.CLI
             Log.Information("Starting.");
             var language = InterpretLanguage(Language);
             IAsyncEnumerable<WeissSchwarzCard> list = null;
+
+            Func<Flurl.Url, CookieSession> _cookieSession = (url) => ioc.GetInstance<GlobalCookieJar>()[url.Root];
+
 
             using (var db = ioc.GetInstance<CardDatabaseContext>())
             {
@@ -64,7 +69,7 @@ namespace Montage.Weiss.Tools.CLI
                 }
 
                 await foreach (var card in list)
-                    await AddCachedImageAsync(card);
+                    await AddCachedImageAsync(card, _cookieSession);
 
                 Log.Information("Done.");
                 Log.Information("PS: Please refrain from executing this command continuously as this may cause your IP address to get tagged as a DDoS bot.");
@@ -74,13 +79,14 @@ namespace Montage.Weiss.Tools.CLI
             }
         }
 
-        private async Task AddCachedImageAsync(WeissSchwarzCard card)
+        private async Task AddCachedImageAsync(WeissSchwarzCard card, Func<Flurl.Url, CookieSession> _cookieSession)
         {
             try
             {
                 var imgURL = card.Images.Last();
                 Log.Information("Caching: {imgURL}", imgURL);
-                using (System.IO.Stream netStream = await card.GetImageStreamAsync())
+                var session = _cookieSession(imgURL);
+                using (System.IO.Stream netStream = await card.GetImageStreamAsync(session))
                 using (Image img = Image.Load(netStream))
                 {
                     var imageDirectoryPath = Path.Get(_IMAGE_CACHE_PATH);

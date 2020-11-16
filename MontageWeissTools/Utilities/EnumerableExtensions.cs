@@ -13,6 +13,14 @@ namespace Montage.Weiss.Tools.Utilities
             return new DictionaryDisposer<K,V>(originalDictionary);
         }
 
+        public static V Add<K,V>(this IDictionary<K,V> dictionary, K key, V valueToAdd)
+        {
+            if (dictionary.TryAdd(key, valueToAdd))
+                return valueToAdd;
+            else
+                return default(V);
+        }
+
         /// <summary>
         /// Concatenates the entire string enumerable as a single contiguous string.
         /// </summary>

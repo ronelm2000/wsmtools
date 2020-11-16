@@ -77,7 +77,7 @@ namespace Montage.Weiss.Tools.Entities
             return newCard;
         }
 
-        public async Task<System.IO.Stream> GetImageStreamAsync()
+        public async Task<System.IO.Stream> GetImageStreamAsync(CookieSession cookieSession)
         {
             if (!String.IsNullOrWhiteSpace(CachedImagePath) && !CachedImagePath.Contains(".."))
                 try
@@ -103,6 +103,7 @@ namespace Montage.Weiss.Tools.Entities
             */
             
             return await url.WithImageHeaders()
+                            .WithCookies(cookieSession)
                             .GetAsync()
                             .ReceiveStream();
         }

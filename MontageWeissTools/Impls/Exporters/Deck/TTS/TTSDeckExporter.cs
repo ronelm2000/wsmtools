@@ -1,9 +1,11 @@
 ﻿using Fluent.IO;
 using Flurl.Http;
+using Lamar;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Resources;
 using Montage.Weiss.Tools.Resources.TTS;
 using Montage.Weiss.Tools.Utilities;
@@ -17,7 +19,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+//using System.ComponentModel;
 //using System.IO;
 //using System.IO;
 using System.Linq;
@@ -34,8 +36,14 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
 
         private (IImageEncoder, IImageFormat) _pngEncoder = (new PngEncoder(), PngFormat.Instance);
         private (IImageEncoder, IImageFormat) _jpegEncoder = (new JpegEncoder(), JpegFormat.Instance);
+        private readonly Func<Flurl.Url, CookieSession> _cookieSession;
 
         public string[] Alias => new [] { "tts", "tabletopsim" };
+
+        public TTSDeckExporter(IContainer ioc)
+        {
+            _cookieSession = (url) => ioc.GetInstance<GlobalCookieJar>()[url.Root];
+        }
 
         public async Task Export(WeissSchwarzDeck deck, IExportInfo info)
         {
@@ -59,7 +67,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
                     Log.Information("Loading Images: ({i}/{count}) [{serial}]", i+1, count, p.Serial);
                     return p;
                 })
-                .SelectAwait(async (wsc) => (card: wsc, stream: await wsc.GetImageStreamAsync()))
+                .SelectAwait(async (wsc) => (card: wsc, stream: await wsc.GetImageStreamAsync(_cookieSession(wsc.Images.Last()))))
                 .ToDictionaryAsync(p => p.card, p => PreProcess(Image.Load(p.stream)));
 
             var (encoder, format) = info.Flags.Any(s => s.ToLower() == "png") == true ? _pngEncoder : _jpegEncoder;
@@ -135,7 +143,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
                     //                        while (!process.HasExited)
                     //                            Console.WriteLine(await process.StandardOutput.ReadLineAsync());
                 }
-                catch (Win32Exception)
+                catch (System.ComponentModel.Win32Exception)
                 {
                     Log.Warning("Command specified in --out failed; execute it manually.");
                 }

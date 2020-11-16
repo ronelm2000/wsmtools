@@ -35,7 +35,7 @@ namespace Montage.Weiss.Tools.CLI
                 .ToAsyncEnumerable()
                 .WhereAwait(async processor => await processor.IsCompatible(cardList))
                 .WhereAwait(async processor => (processor is ISkippable<IParseInfo> skippable) ? await skippable.IsIncluded(this) : true)
-                .OrderBy(processor => processor.Priority);
+                .OrderByDescending(processor => processor.Priority);
 
             cards = await postProcessors.AggregateAsync(cards, (pp, cs) => cs.Process(pp));
 

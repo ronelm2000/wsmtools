@@ -82,7 +82,7 @@
     },
     "parse DAL": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/date_a_live_booster_pack.html"
+      "commandLineArgs": "parse https://heartofthecards.com/translations/date_a_live_booster_pack.html --with skip:decklog"
     },
     "export Batman Ninja via Cockatrice": {
       "commandName": "Project",
@@ -159,6 +159,10 @@
     "Parse Key 20th Anniv.": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/key_20th_anniversary_booster_pack.html --with skip:yyt"
+    },
+    "Cache DAL": {
+      "commandName": "Project",
+      "commandLineArgs": "cache w79 jp"
     }
   }
 }

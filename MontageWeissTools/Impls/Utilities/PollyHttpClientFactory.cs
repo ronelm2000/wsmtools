@@ -39,13 +39,15 @@ namespace Montage.Weiss.Tools.Impls.Utilities
             using (var db = _db())
             {
                 db.Database.Migrate();
-                var maxRetries = db.Settings.Find("http.retries")?.GetValue<int>() ?? 10;
+                //var maxRetries
                 return new PolicyHandler(maxRetries)
                 {
                     InnerHandler = new TimeoutHandler
                     {
-                        InnerHandler = base.CreateMessageHandler()
-                    }
+                        InnerHandler = base.CreateMessageHandler(),
+                        MaximumRetries = db.Settings.Find("http.retries")?.GetValue<int>() ?? 10,
+                        Timeout = TimeSpan.FromSeconds(db.Settings.Find("http.timeout")?.GetValue<int>() ?? 100)
+            }
                 };
             }
         }
@@ -71,7 +73,9 @@ namespace Montage.Weiss.Tools.Impls.Utilities
     public class TimeoutHandler : DelegatingHandler
     {
         private ILogger Log = Serilog.Log.ForContext<TimeoutHandler>();
-        private static TimeSpan Timeout = TimeSpan.FromMilliseconds(1000);
+
+        public int MaximumRetries { get; internal set; }
+        public TimeSpan Timeout { get; internal set; }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {

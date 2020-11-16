@@ -39,15 +39,14 @@ namespace Montage.Weiss.Tools.Impls.Utilities
             using (var db = _db())
             {
                 db.Database.Migrate();
-                //var maxRetries
+                var maxRetries = db.Settings.Find("http.retries")?.GetValue<int>() ?? 10;
                 return new PolicyHandler(maxRetries)
                 {
                     InnerHandler = new TimeoutHandler
                     {
                         InnerHandler = base.CreateMessageHandler(),
-                        MaximumRetries = db.Settings.Find("http.retries")?.GetValue<int>() ?? 10,
                         Timeout = TimeSpan.FromSeconds(db.Settings.Find("http.timeout")?.GetValue<int>() ?? 100)
-            }
+                    }
                 };
             }
         }

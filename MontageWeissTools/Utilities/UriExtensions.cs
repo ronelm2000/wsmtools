@@ -181,10 +181,11 @@ namespace Montage.Weiss.Tools.Utilities
                     ;
             var context = BrowsingContext.New(config);
             var response = await flurlResponse;
+            var url = response.ResponseMessage.RequestMessage.RequestUri.AbsoluteUri;
             var stream = await response.GetStreamAsync(); //.ReceiveStream();
             return await context.OpenAsync(req =>
             {
-                req.Address(response.ResponseMessage.Headers.Location.AbsoluteUri);
+                req.Address(url);
                 req.Content(stream, true);
             });
         }

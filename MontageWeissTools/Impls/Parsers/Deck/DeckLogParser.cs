@@ -25,13 +25,15 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
     /// Implements a Deck Parser that sources deck information from DeckLog.
     /// Note that parsing the deck this way means the deck has no name or description, but the source link will be appended.
     /// </summary>
-    public class DeckLogParser : IDeckParser
+    public class DeckLogParser : IDeckParser, IDisposable
     {
         private Regex urlMatcher = new Regex(@"(.*):\/\/decklog\.bushiroad\.com\/view\/([^\?]*)(.*)");
         private string deckLogApiUrlPrefix = "https://decklog.bushiroad.com/system/app/api/view/";
         private string awsWeissSchwarzSitePrefix = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";
         private ILogger Log = Serilog.Log.ForContext<DeckLogParser>();
         private readonly Func<CardDatabaseContext> _database;
+
+        private bool disposedValue;
 
         public string[] Alias => new[] { "decklog" };
 
@@ -64,7 +66,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
             var response = await $"{deckLogApiUrlPrefix}{deckID}" //
                 .WithReferrer(sourceUrlOrFile) //
                 .PostJsonAsync(null);
-            var json = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+            var json = JsonConvert.DeserializeObject<dynamic>(await response.GetStringAsync());
             //var json = JsonConverter.CreateDefault().Deserialize<dynamic>(new JsonReader(await response.Content.ReadAsStreamAsync()));
             var newDeck = new WeissSchwarzDeck();
             var missingSerials = new List<string>();

@@ -121,14 +121,16 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             Log.Information("Starting...");
 
             var uri = new Uri(urlOrFile);
-            using (var fc = new FlurlClient().EnableCookies())
+            using (var fc = new FlurlClient())
+            using (var cs = new CookieSession("https://en.ws-tcg.com/"))
             {
                 fc.Settings.BeforeCall = this.Debug;
-                await _WS_SEARCH_PAGE.WithClient(fc).WithHTMLHeaders().GetAsync(); // To get some initial cookies.
+                await _WS_SEARCH_PAGE.WithClient(fc).WithHTMLHeaders().WithCookies(cs).GetAsync(); // To get some initial cookies.
                 var serial = uri.Query.Substring(_CARD_NO_QUERY.Length);
                 var serialID = WeissSchwarzCard.ParseSerial(serial);
                 var wsSearchPage = await _WS_SEARCH_PAGE
                     .WithClient(fc)
+                    .WithCookies(cs)
                     .WithHTMLHeaders()
                     .WithHeader("Referer", _WS_SEARCH_PAGE)
                     .PostUrlEncodedAsync(new Dictionary<string,object>{
@@ -299,7 +301,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 throw new NotImplementedException("Current value is invalid: " + value);
         }
 
-        private void Debug(HttpCall call)
+        private void Debug(FlurlCall call)
         {
             //Log.Debug(call.RequestBody);
         }

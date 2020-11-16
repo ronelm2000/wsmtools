@@ -33,8 +33,6 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
         private ILogger Log = Serilog.Log.ForContext<DeckLogParser>();
         private readonly Func<CardDatabaseContext> _database;
 
-        private bool disposedValue;
-
         public string[] Alias => new[] { "decklog" };
 
         public int Priority => 1;

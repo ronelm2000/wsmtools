@@ -177,7 +177,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
             var stopSignalGUID = Guid.NewGuid();
             var stopCommand = new TTSExternalEditorCommand("-1", $"sendExternalMessage({{ StopID = \"{stopSignalGUID}\" }})");
 
-            Log.Information("Trying to connect to TTS via {ip}:{port}...", host, ttsPort);
+            Log.Information("Trying to connect to TTS via {ip:l}:{port}...", host, ttsPort);
             var tcpServer = new TcpListener(System.Net.IPAddress.Loopback, 39998);
             try
             {
@@ -207,18 +207,22 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
                 await Task.Yield();
                 await task;
             }
+        }
 
-            async Task SendTTSCommand(string host, int ttsPort, TTSExternalEditorCommand command)
-            {
-                using (var tcpClient = new TcpClient(host, ttsPort))
-                using (var stream = tcpClient.GetStream())
-                using (var writer = new System.IO.StreamWriter(stream))
+        async Task SendTTSCommand(string host, int ttsPort, TTSExternalEditorCommand command)
+        {
+            using (var tcpClient = new TcpClient(host, ttsPort))
+            using (var stream = tcpClient.GetStream())
+            using (var writer = new System.IO.StreamWriter(stream))
+                try
                 {
                     await writer.WriteAsync(JsonConvert.SerializeObject(command));
                     await writer.FlushAsync();
-                    tcpClient.Close();
                 }
-            }
+                finally
+                {
+                    tcpClient?.Close();
+                }
         }
 
         private async Task RunAndWaiForTheEndSignal(Guid stopSignalGUID, TcpListener tcpServer)

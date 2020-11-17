@@ -52,10 +52,6 @@
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/hzUnV5mRI"
     },
-    "wstools export Batman Ninja": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE"
-    },
     "wstools export P4": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/tyjlBPJDK --exporter local"
@@ -163,6 +159,10 @@
     "Cache DAL": {
       "commandName": "Project",
       "commandLineArgs": "cache w79 jp"
+    },
+    "Export Batman Ninja": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE --with sendtcp,upscaling --out sharex"
     }
   }
 }

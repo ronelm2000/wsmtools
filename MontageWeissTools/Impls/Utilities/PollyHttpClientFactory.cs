@@ -116,9 +116,7 @@ namespace Montage.Weiss.Tools.Impls.Utilities
                     .HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
                     .Or<TimeoutException>()
                     .Or<SocketException>(e => e.SocketErrorCode == SocketError.TimedOut)
-                    .Or<SocketException>(e => e.SocketErrorCode == SocketError.OperationAborted)
-                    
-                    // TODO: Need the ability to set these timeouts on a configuration table.
+                    .Or<SocketException>(e => e.SocketErrorCode == SocketError.OperationAborted)                    
                     .WaitAndRetryAsync(
                         Enumerable.Range(0, maxRetries).Select(i => TimeSpan.FromSeconds(Math.Pow(2, i))),
                         (delegateResult, retryCount, context) =>

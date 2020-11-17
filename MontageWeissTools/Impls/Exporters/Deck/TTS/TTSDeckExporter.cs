@@ -10,6 +10,7 @@ using Montage.Weiss.Tools.Resources;
 using Montage.Weiss.Tools.Resources.TTS;
 using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
@@ -25,6 +26,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 //using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -168,24 +170,84 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
         {
             Log.Information("Generating a TTS command...");
             var serializedObject = JsonConvert.SerializeObject(saveState.ObjectStates[0]).EscapeQuotes();
-            var command = new TTSExternalEditorCommand("-1", $"spawnObjectJSON({{ json = \"{serializedObject}\" }})");
+            var command = new TTSExternalEditorCommand("-1", 
+                $"spawnObjectJSON({{ json = \"{serializedObject}\" }})\n" +
+                $"return true"
+                );
+            var stopSignalGUID = Guid.NewGuid();
+            var stopCommand = new TTSExternalEditorCommand("-1", $"sendExternalMessage({{ StopID = \"{stopSignalGUID}\" }})");
+
             Log.Information("Trying to connect to TTS via {ip}:{port}...", host, ttsPort);
+            var tcpServer = new TcpListener(System.Net.IPAddress.Loopback, 39998);
             try
+            {
+                tcpServer.Start();
+                var endSignal = WaitForEndSignal();
+                Log.Information("Connected. Spawning a Deck Generator in TTS...");
+                await SendTTSCommand(host, ttsPort, command);
+                await SendTTSCommand(host, ttsPort, stopCommand);
+                await endSignal;
+            }
+            catch (Exception e)
+            {
+                Log.Warning("Unable to send the Deck Generator directly to TTS; please load the object manually.");
+                if (Log.IsEnabled(Serilog.Events.LogEventLevel.Debug))
+                    throw e;
+            } finally
+            {
+                if (tcpServer?.Pending() ?? false)
+                    tcpServer.Stop();
+            }
+
+            async Task WaitForEndSignal()
+            {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(20));
+                var task = Task.Run(async () => await RunAndWaiForTheEndSignal(stopSignalGUID, tcpServer), cts.Token);
+                await Task.Yield();
+                await task;
+            }
+
+            async Task SendTTSCommand(string host, int ttsPort, TTSExternalEditorCommand command)
             {
                 using (var tcpClient = new TcpClient(host, ttsPort))
                 using (var stream = tcpClient.GetStream())
                 using (var writer = new System.IO.StreamWriter(stream))
                 {
-                    Log.Information("Connected. Spawning a Deck Generator in TTS...");
                     await writer.WriteAsync(JsonConvert.SerializeObject(command));
                     await writer.FlushAsync();
+                    tcpClient.Close();
                 }
             }
-            catch (Exception e)
+        }
+
+        private async Task RunAndWaiForTheEndSignal(Guid stopSignalGUID, TcpListener tcpServer)
+        {
+            do
             {
-                Log.Warning("Unable to send the Deck Generator directly to TTS; please load the object manually.");
-                Log.Debug("For Debugging...", e);
-            }
+                using (var tcpRecieverClient = await tcpServer.AcceptTcpClientAsync())
+                using (var recieverStream = tcpRecieverClient.GetStream())
+                using (var reader = new System.IO.StreamReader(recieverStream))
+                    try
+                    {
+                        var data = await reader.ReadToEndAsync();
+                        if (!string.IsNullOrWhiteSpace(data))
+                        {
+                            Log.Debug($"Recieved Data: {data}");
+                            try
+                            {
+                                dynamic json = JsonConvert.DeserializeObject(data);
+                                if (json?.messageID == 4 && json.customMessage?.StopID?.ToString() == stopSignalGUID.ToString())
+                                    return;
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                    finally
+                    {
+                        tcpRecieverClient?.Close();
+                    }
+            } while (true);
         }
 
         private Image PreProcess(Image image)

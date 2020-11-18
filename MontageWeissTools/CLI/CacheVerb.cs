@@ -10,6 +10,7 @@ using Montage.Weiss.Tools.Utilities;
 using Serilog;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,7 +92,11 @@ namespace Montage.Weiss.Tools.CLI
                 {
                     var imageDirectoryPath = Path.Get(_IMAGE_CACHE_PATH);
                     if (!imageDirectoryPath.Exists) imageDirectoryPath.CreateDirectory();
-
+                    if (img.Height < img.Width)
+                    {
+                        Log.Debug("Image is probably incorrectly oriented, rotating it 90 degs. clockwise to compensate.");
+                        img.Mutate(ipc => ipc.Rotate(90));
+                    }
                     img.Metadata.ExifProfile ??= new ExifProfile();
                     img.Metadata.ExifProfile.SetValue(SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifTag.Copyright, card.Images.Last().Authority);
                     var savePath = Path.Get(_IMAGE_CACHE_PATH).Combine($"{card.Serial.Replace('-', '_').AsFileNameFriendly()}.jpg");

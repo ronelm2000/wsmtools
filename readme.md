@@ -28,7 +28,7 @@ registering on GitHub.
 
 #### Supported Deck Parsers ####
 * [Encore Decks](https://www.encoredecks.com/)
-* [DeckLog](https://decklog.bushiroad.com/)
+* [Deck Log](https://decklog.bushiroad.com/)
 * Local Deck JSON
 
 #### Supported Card Set Parsers ####
@@ -43,23 +43,24 @@ registering on GitHub.
 02. Extract [the binaries](https://github.com/ronelm2000/wsmtools/releases) into the folder of your choice.
 03. Open PowerShell on that folder. This can be done by holding [Shift] then Right-Click while on the folder.
     ![I like dark mode Windows Explorer](https://i.imgur.com/MBc4zzr.png)
-04. Execute this lovely command.
+04. Open Tabletop Simulator, and create any game. (Single-Player / Multi-Player / Hotseat)
+05. Execute this command.
    ```ps
-   ./wstools export your_encore_decks_deck_link_here --out sharex
+   ./wstools export your_encore_decks_deck_link_here --with sendtcp --out sharex
    ```
-05. You will be warned if any of the following are true.
-    * Your deck contains cards without an English translation.
+06. You will be warned if any of the following are true.
+    * Your deck contains cards without an English translation. (Proceed to *Known Issues* before continuing.)
     * Your deck contains cards which have no saved image link. You will be prompted for an image link if you continue.
-06. You will get the following on your Exports folder: `deck_your deck name.jpg`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
-07. Put the `Deck Generator` files into your Save Objects folder (typically `%HOMEDRIVE%%HOMEPATH%\Documents\My Games\Tabletop Simulator\Saves\Saved Objects`)
-08. The `deck_your deck name.jpg` will be automatically uploaded with ShareX. (If using imgur, some [Imgur API Rate Limits](https://apidocs.imgur.com/?version=latest) may apply.)
-    - Once finished, your deck's image URL can be copied from ShareX.
-    - To copy the image URL, right-click on the uploaded task, and go to Copy > URL.
-      ![I like ShareX this way; it's so convenient](https://i.imgur.com/Sw2H9qm.png)
-09. Open Tabletop Simulator (Single-Player will do)
-10. Load the Saved Object (and make sure no other Deck Generators are loaded!)
-11. In the loaded GUI, place the URL Image Link for your Deck and URL Image Link for your characters sleeves where prompted.
-12. You should be able to create decks like this:
+07. A UI should open up in your TTS game, with the Deck Name as indicated.
+08. If ShareX was installed properly, your Deck PNG should be uploaded.
+    ![I like ShareX this way; it's so convenient](https://i.imgur.com/Sw2H9qm.png)
+07. *(Optional)* You will get the following on your Exports folder if 07 fails for any reason and/or you need to re-upload images: `deck_your deck name.jpg`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
+    01. Put the `Deck Generator` files into your Save Objects folder (typically `%HOMEDRIVE%%HOMEPATH%\Documents\My Games\Tabletop Simulator\Saves\Saved Objects`)
+    02. Upload `deck_your deck name.jpg` to your image hoster of choice.
+    03. Load the Saved Object (and make sure no other Deck Generators are loaded!)
+08. In the loaded GUI, place the Deck Image URL Link where provided. *(Optional)* Place your Character Sleeves URL Link where provided.
+    - In ShareX, obtain the Deck Image Link by right-click on the uploaded task, and go to Copy > URL.
+09. You should be able to create decks like this:
     ![Tho why do you need effects for decks with English art?](https://i.imgur.com/WuRpf9I.png)
 
 ---------

@@ -1,4 +1,5 @@
-﻿using Montage.Weiss.Tools.Utilities;
+﻿using AngleSharp.Common;
+using Montage.Weiss.Tools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +8,7 @@ namespace Montage.Weiss.Tools.Entities
 {
     public class MultiLanguageString : IExactCloneable<MultiLanguageString>
     {
-        private IDictionary<string, string> resources = new Dictionary<String,String>();
+        private Dictionary<string, string> resources = new Dictionary<String,String>();
 
         public string this[string languageIndex]
         {
@@ -21,12 +22,12 @@ namespace Montage.Weiss.Tools.Entities
 
         public string EN
         {
-            get { return resources["en"]; }
+            get { return resources.GetValueOrDefault("en", null); }
             set { resources["en"] = value; }
         }
         public string JP
         {
-            get { return resources["jp"]; }
+            get { return resources.GetValueOrDefault("jp", null); }
             set { resources["jp"] = value; }
         }
 

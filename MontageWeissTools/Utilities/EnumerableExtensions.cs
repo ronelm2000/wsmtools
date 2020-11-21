@@ -21,6 +21,11 @@ namespace Montage.Weiss.Tools.Utilities
                 return default(V);
         }
 
+        public static IEnumerable<T> TakeUntil<T>(this IEnumerable<T> ienum, Predicate<T> predicateThatMustBeFalse)
+            => ienum.TakeWhile(c => !predicateThatMustBeFalse(c));
+        public static IEnumerable<T> TakeUntil<T>(this IEnumerable<T> ienum, Func<T, int, bool> predicateThatMustBeFalse)
+            => ienum.TakeWhile((c,i) => !predicateThatMustBeFalse(c, i));
+
         /// <summary>
         /// Concatenates the entire string enumerable as a single contiguous string.
         /// </summary>

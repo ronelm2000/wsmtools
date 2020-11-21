@@ -29,6 +29,13 @@ namespace Montage.Weiss.Tools.Utilities
                         .Replace("\r", "\\r");                
         }
 
+        public static string Replace(this string str, Regex regex, string replacementString)
+            => regex.Replace(str, replacementString);
+        public static string Replace(this string str, Regex regex, string replacementString, int count)
+            => regex.Replace(str, replacementString, count);
+        public static string Replace(this string str, Regex regex, MatchEvaluator matchEvaluator)
+            => regex.Replace(str, matchEvaluator);
+
         public static string ReplaceAll(this string str, params (string searchString, string replaceString)[] allReplacements)
         {
             return allReplacements.Aggregate(str, (str, p) => str.Replace(p.searchString, p.replaceString));

@@ -1,31 +1,8 @@
 {
   "profiles": {
-    "wstools for Konosuba": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/konosuba_booster_pack.html"
-    },
-    "wstools export CyaRon": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/wDdTKywNh --with png"
-    },
-    "wstools for LLS": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
-    },
-    "wstools": {
-      "commandName": "Project"
-    },
-    "wstools for Buggy Deck": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/ojg0ImWD_"
-    },
     "wsools export Grasaia": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/aTnKOs3Jx --out ShareX"
-    },
-    "wstools for Madoka": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/3fqflHO1_ --out sharex"
     },
     "wstools for CG": {
       "commandName": "Project",
@@ -41,7 +18,7 @@
     },
     "wstools parse PRs": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/schwarz_promos.html"
+      "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
     },
     "wstools parse ED Site Link": {
       "commandName": "Project",
@@ -49,7 +26,7 @@
     },
     "wstools parse Fantasia": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/fujimi_fantasia_bunko_booster_pack.html"
+      "commandLineArgs": "parse https://heartofthecards.com/translations/fujimi_fantasia_bunko_booster_pack.html --with skip:yyt"
     },
     "wstools cache Fantasia": {
       "commandName": "Project",
@@ -66,14 +43,14 @@
     "wstools parse NGNL": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?lang=EN&neoset=5d7e742b21e8c57bffb3ecfe&page=1&set=5cbf21157cd9b718cdd40820"
-    }
+    },
+    "Parse GU": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/is_the_order_a_rabbit_dear_my_sister_booster_pack.html"
+    },
     "wstools export Prillya": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/hzUnV5mRI"
-    },
-    "wstools export Batman Ninja": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE"
     },
     "wstools export P4": {
       "commandName": "Project",
@@ -90,6 +67,102 @@
     "wstools parse BDML": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5cf701347cd9b718cdf21469"
+    },
+    "Parse GU EP": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/is_the_order_a_rabbit_extra_pack.html"
+    },
+    "export db": {
+      "commandName": "Project",
+      "commandLineArgs": "export-db"
+    },
+    "parse DAL": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/date_a_live_booster_pack.html --with skip:decklog"
+    },
+    "export Batman Ninja via Cockatrice": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE --exporter cockatrice"
+    },
+    "export nanana.cod to Local JSON": {
+      "commandName": "Project",
+      "commandLineArgs": "export ./Export/Na_Na_Na_Na_Batman.cod --exporter local"
+    },
+    "Export HHW": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --with upscaling"
+    },
+    "Export HHW via Cockatrice": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter cockatrice"
+    },
+    "Export 5th Phase KC": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.heartofthecards.com/translations/kantai_collection_5th_phase_booster_pack.html"
+    },
+    "Export Deck from KC 5th Phase": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/SgPpc-bC7"
+    },
+    "Parse Schwarz Promos": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.heartofthecards.com/translations/schwarz_promos.html"
+    },
+    "Parse Aobuta S1": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/rascal_does_not_dream_of_bunny_girl_senpai_booster_pack.html"
+    },
+    "Parse Aobuta Movie": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/rascal_does_not_dream_of_a_dreaming_girl_booster_pack.html"
+    },
+    "Export Aobuta DeckLog": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://decklog.bushiroad.com/view/FHL4 --with upscaling"
+    },
+    "Parse Weiss Promos": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
+    },
+    "Export GFB COD": {
+      "commandName": "Project",
+      "commandLineArgs": "export \"R:\\\\Downloads\\\\GFB.cod\" --with sendtcp"
+    },
+    "Parse GFB vol. 2": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html --with skip:yyt"
+    },
+    "Cache W38 JP": {
+      "commandName": "Project",
+      "commandLineArgs": "cache w38 jp"
+    },
+    "Parse GFB vol. 1": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html --with skip:yyt"
+    },
+    "Export DC3/W18": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/da_capo_iii_booster_pack.html --with skip:yyt"
+    },
+    "Parse LB vs DC": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/da_capo_vs._little_busters!_extra_pack.html --with skip:yyt"
+    },
+    "Parse Kadokawa Bunko": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/kadokawa_sneaker_bunko_booster_pack.html --with skip:yyt"
+    },
+    "Parse Key 20th Anniv.": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://heartofthecards.com/translations/key_20th_anniversary_booster_pack.html --with skip:yyt"
+    },
+    "Cache DAL": {
+      "commandName": "Project",
+      "commandLineArgs": "cache w79 jp"
+    },
+    "Export Batman Ninja": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE --with sendtcp,upscaling --out sharex"
     }
   }
 }

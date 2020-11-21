@@ -24,16 +24,17 @@ namespace Montage.Weiss.Tools.CLI
         {
             var Log = Serilog.Log.ForContext<ParseVerb>();
 
-            var cardList = await container.GetAllInstances<ICardSetParser>()
+            var parser = container.GetAllInstances<ICardSetParser>()
                 .Where(parser => parser.IsCompatible(this))
-                .First()
-                .Parse(URI)
-                .ToListAsync();
+                .First();
+
+            var cardList = await parser.Parse(URI).ToListAsync();
             var cards = cardList.Distinct(WeissSchwarzCard.SerialComparer).ToAsyncEnumerable();
 
             var postProcessors = container.GetAllInstances<ICardPostProcessor>()
                 .ToAsyncEnumerable()
                 .WhereAwait(async processor => await processor.IsCompatible(cardList))
+                .Where(processor => (parser is IFilter<ICardPostProcessor> filter) ? filter.IsIncluded(processor) : true)
                 .WhereAwait(async processor => (processor is ISkippable<IParseInfo> skippable) ? await skippable.IsIncluded(this) : true)
                 .OrderByDescending(processor => processor.Priority);
 

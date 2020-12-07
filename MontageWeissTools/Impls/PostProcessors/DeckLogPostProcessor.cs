@@ -288,7 +288,9 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         {
             public string Version { get; set; } = "20201113.001";
             public string VersionURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/version/";
-            public string ImagePrefix { get; set; } = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";
+            public string ImagePrefix { get; set; } = "https://ws-tcg.com/wordpress/wp-content/images/cardlist/";
+//            public string ImagePrefix { get; set; } = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";
+
             public string Referrer { get; set; } = "https://decklog.bushiroad.com/create?c=2";
             public string SearchURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/search/2";
             public string CardParamURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/cardparam/2";

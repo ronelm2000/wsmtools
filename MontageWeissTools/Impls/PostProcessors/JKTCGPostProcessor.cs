@@ -79,7 +79,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             var cardImages = cardList.QuerySelectorAll<IHtmlImageElement>("a > img")
                 .Select(ele => (
                     Serial: GetSerial(ele),
-                    Source: ele.Source.Replace("\t", "")
+                    Source: ele.GetAncestor<IHtmlAnchorElement>().Href.Replace("\t", "")
                     ))
                 .ToDictionary(p => p.Serial, p => p.Source);//(setID + "-" + str.AsSpan().Slice(c => c.LastIndexOf('_') + 1, c => c.LastIndexOf(".")).ToString()).ToLower());
 

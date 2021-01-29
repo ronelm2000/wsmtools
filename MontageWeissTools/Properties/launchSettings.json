@@ -163,6 +163,10 @@
     "Export Batman Ninja": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE --with sendtcp,upscaling --out sharex"
+    },
+    "Export Deck (#31)": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/gO_JKfCsm"
     }
   }
 }

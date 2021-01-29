@@ -261,6 +261,17 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
                 Log.Debug("Image is probably incorrectly oriented, rotating it 90 degs. clockwise to compensate.");
                 image.Mutate(ipc => ipc.Rotate(90));
             }
+
+            var aspectRatio = (image.Width * 1.0d) / image.Height;
+            var flooredAspectRatio = Math.Floor(aspectRatio * 100);
+            if (flooredAspectRatio < 70)
+            {
+                var magicWeissRatio = 0.71428571428f;
+                image.Mutate(ctx =>
+                {
+                    ctx.Resize(image.Width, (int)Math.Floor(image.Width * magicWeissRatio));
+                });
+            }
             return image;
         }
 

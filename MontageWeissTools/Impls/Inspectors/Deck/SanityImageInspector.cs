@@ -58,7 +58,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                     Log.Information("Image can be loaded. Is the ratio reasonable?");
                     var aspectRatio = (img.Width * 1.0d) / img.Height;
                     var flooredAspectRatio = Math.Floor(aspectRatio * 100);
-                    if (flooredAspectRatio < 70 || flooredAspectRatio > 72)
+                    if (flooredAspectRatio < 67 || flooredAspectRatio > 72)
                     {
                         Log.Information("Image Ratio ({aspectRatio}) isn't correct (it must be approx. 0.71428571428); Failed inspection.", aspectRatio);
                         return null;

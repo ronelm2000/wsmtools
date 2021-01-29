@@ -47,15 +47,11 @@ namespace Montage.Weiss.Tools.CLI
 
                 await foreach (var card in cards)
                 {
-                    // Do nothing for now.
-                    //Log.Information("Card: {@Card}", card);
+                    card.VersionTimestamp = Program.AppVersion;
                     var dups = db.WeissSchwarzCards.AsQueryable<WeissSchwarzCard>().Where(c => c.Serial == card.Serial).ToArray();
                     if (dups.Length > 0)
-                        db.WeissSchwarzCards.RemoveRange(dups);
-
-                    db.Add(card);
-
-                    //db.WeissSchwarzCards.Add(card);
+                        db.WeissSchwarzCards.RemoveRange(dups); // delete all the dups, based on serial.
+                    db.Add(card);                    
                     Log.Information("Added to DB: {serial}", card.Serial);
                 }
 

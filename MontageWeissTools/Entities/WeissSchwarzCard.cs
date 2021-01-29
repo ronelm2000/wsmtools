@@ -39,6 +39,7 @@ namespace Montage.Weiss.Tools.Entities
         public string Flavor { get; set; }
         public string[] Effect { get; set; }
         public List<Uri> Images { get; set; } = new List<Uri>();
+        public string VersionTimestamp { get; set; }
         public string Remarks { get; set; }
         
         /// <summary>

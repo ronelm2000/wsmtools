@@ -154,7 +154,7 @@
     },
     "Parse Key 20th Anniv.": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/key_20th_anniversary_booster_pack.html --with skip:yyt"
+      "commandLineArgs": "parse https://heartofthecards.com/translations/key_20th_anniversary_booster_pack.html"
     },
     "Cache DAL": {
       "commandName": "Project",
@@ -175,6 +175,10 @@
     "Export Deck (#35)": {
       "commandName": "Project",
       "commandLineArgs": "export http://www.encoredecks.com/deck/igwr3tndF"
+    },
+    "Export Deck (#34)": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/JAQjGsFgD"
     }
   }
 }

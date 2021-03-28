@@ -31,7 +31,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 //        private string defaultReferrer = "https://decklog.bushiroad.com/create?c=2";
 //        private string defaultRESTSearchURL = "https://decklog.bushiroad.com/system/app/api/search/2";
 //        private string defaultRESTCardParamURL = "";
-       // private readonly Func<CardDatabaseContext> _db;
+        private readonly Func<CardDatabaseContext> _db;
         private readonly Func<Task<string>> _getLatestVersion;
         private readonly Func<CookieSession> _cookieSession;
         private string currentVersion;
@@ -40,7 +40,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         public DeckLogPostProcessor(IContainer ioc)
         {
-            //_db = () => ioc.GetInstance<CardDatabaseContext>();
+            _db = () => ioc.GetInstance<CardDatabaseContext>();
             _cookieSession = () => ioc.GetInstance<GlobalCookieJar>()["https://decklog.bushiroad.com/"];
             _getLatestVersion = async () =>
             {              
@@ -93,6 +93,27 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             Log.Information("Starting...");
             var titleCodes = cardData.Select(c => c.TitleCode).Distinct().ToArray();
             var deckLogSearchResults = await GetDeckLogSearchResults(cardData);
+            using (var db = _db())
+            {
+                var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
+                    .Where(c => titleCodes.Contains(c.TitleCode)
+                                && c.Language == CardLanguage.Japanese
+                                && c.Rarity == "PR"
+                                && !c.Images.Any(u => u.AbsoluteUri.StartsWith(settings.ImagePrefix))
+                          );
+
+                Log.Information("Post-Processing PRs...");
+                await foreach (var card in prCards)
+                {
+                    var entity = db.Attach(card);
+                    var newCard = TryMutate(entity.Entity, deckLogSearchResults);
+                    entity.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                    Log.Debug("New URL: {cards}", newCard.Images);
+                }
+                var results = await db.SaveChangesAsync();
+                Log.Information("Changed: {results} rows.", results);
+            }
+
             foreach (var card in cardData)
                 yield return TryMutate(card, deckLogSearchResults);
         }
@@ -286,7 +307,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         private class DeckLogSettings
         {
-            public string Version { get; set; } = "20201113.001";
+            public string Version { get; set; } = "20210309.001";
             public string VersionURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/version/";
             public string ImagePrefix { get; set; } = "https://ws-tcg.com/wordpress/wp-content/images/cardlist/";
 //            public string ImagePrefix { get; set; } = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";

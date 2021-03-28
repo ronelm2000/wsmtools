@@ -78,9 +78,12 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 Log.Information("Skipping due to the parser hint [skip:yyt].");
                 return false;
             }
-            else
+            else if (info.ParserHints.Select(s => s.ToLower()).Contains("noskip:yyt"))
             {
                 return true;
+            } else
+            {
+                return false;
             }
         }
 

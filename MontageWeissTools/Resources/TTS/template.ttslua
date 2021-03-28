@@ -16,30 +16,36 @@ function onLoad()
 	print("Note: Please ensure there are no other Deck Generators for this session. Also, please upload the deck.png first into the cloud and/or imgur.")
 	print("To generate, type: +generate <url_for_deck> [<url_for_sleeves>]")
 	print("There is also a UI now which I highly recommend.")
-	Wait.frames(afterLoad, 1)
+	self.addContextMenuItem("Open UI", afterLoad)
+	Wait.condition(afterLoad, checkCondition)
+end
+
+function checkCondition()
+	return self.UI.getXml() != ""
 end
 
 function afterLoad()
 	oldGlobalUIXML = UI.getXml()
+	newUIXML = self.UI.getXml()
 	uiCharaSleeves = defaultCharacterSleevesURL
-	UI.setXml(self.UI.getXml())
+	UI.setXml(newUIXML)
+	self.UI.hide(windowName)
 	Wait.frames(adjustButtons, 1)
 end
 
 function adjustButtons()
 	selfGUID = self.getGUID()
-	--print(self.getGUID())
+--	print("Debug. Adjusting Buttons!")
 	makeRelative("closeButton", "onClick")
 	makeRelative("generateButton", "onClick")
 	makeRelative("deckImageText", "onValueChanged")
 	makeRelative("charaSleevesText", "onValueChanged")
-	self.UI.hide(windowName)
 	Wait.frames(addVariables, 1)
 end
 
 function addVariables()
-	UI.setAttribute(windowName, "active", "true")
 	UI.setAttribute("deckNameText", "Text", deckName)
+	UI.show(windowName)
 end
 
 function onDestroy()
@@ -53,6 +59,7 @@ end
 -- Function to close the window
 function close(player, value, id)
 	UI.hide(windowName)
+	UI.setXml(oldGlobalUIXML)
 end
 
 function minimize(player, value, id)

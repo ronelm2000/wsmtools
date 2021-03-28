@@ -166,7 +166,7 @@
     },
     "Export Deck (#31)": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/gO_JKfCsm"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/gO_JKfCsm --with sendtcp"
     },
     "Prase Batman Ninja (ED)": {
       "commandName": "Project",

@@ -171,6 +171,10 @@
     "Prase Batman Ninja (ED)": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards"
+    },
+    "Export Deck (#35)": {
+      "commandName": "Project",
+      "commandLineArgs": "export http://www.encoredecks.com/deck/igwr3tndF"
     }
   }
 }

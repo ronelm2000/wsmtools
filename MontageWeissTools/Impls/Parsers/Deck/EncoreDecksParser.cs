@@ -48,7 +48,8 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
             if (urlOrFile == null) return false;
 
             return (File.Exists(urlOrFile) && urlOrFile.EndsWith(".csv")) ||
-                urlOrFile.StartsWith("https://www.encoredecks.com/deck/");
+                urlOrFile.StartsWith("https://www.encoredecks.com/deck/") ||
+                urlOrFile.StartsWith("http://www.encoredecks.com/deck/");
         }
 
         public async Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile)

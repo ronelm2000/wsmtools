@@ -18,8 +18,8 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
     /// </summary>
     public class EncoreDecksParser : ICardSetParser
     {
-        private readonly Regex encoreDecksAPIMatcher = new Regex(@"https:\/\/www\.encoredecks\.com\/api\/series\/(.+)\/cards");
-        private readonly Regex encoreDecksSiteSetMatcher = new Regex(@"https:\/\/www.encoredecks\.com\/?.+&set=([a-f0-9]+).*");
+        private readonly Regex encoreDecksAPIMatcher = new Regex(@"http(?:s)?:\/\/www\.encoredecks\.com\/api\/series\/(.+)\/cards");
+        private readonly Regex encoreDecksSiteSetMatcher = new Regex(@"http(?:s)?:\/\/www.encoredecks\.com\/?.+&set=([a-f0-9]+).*");
         private readonly ILogger Log = Serilog.Log.ForContext<EncoreDecksParser>();
 
         public bool IsCompatible(IParseInfo info)

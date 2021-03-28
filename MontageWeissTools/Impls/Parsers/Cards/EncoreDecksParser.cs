@@ -75,12 +75,13 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 result.Soul = (int?) setCard.soul;
                 result.Triggers = TranslateTriggers(setCard.trigger);
 
-                result.Serial = setCard.cardcode;
+                //result.Serial = setCard.cardcode;
                 if (!String.IsNullOrEmpty(setCard.imagepath))
                     result.Images.Add(new Uri($"https://www.encoredecks.com/images/{setCard.imagepath}"));
 
                 // TODO: Delete all methods related with generating serial.
-                // result.Serial = WeissSchwarzCard.GetSerial(setCard.set.ToString(), setCard.side.ToString(), setCard.lang.ToString(), setCard.release.ToString(), setCard.sid.ToString());
+                // TODO: Switch once LLDX checkbox is checked properly. See: https://trello.com/c/WCT94Sk0/2-card-code-needs-to-be-stored-seperatly-from-side-release
+                result.Serial = WeissSchwarzCard.GetSerial(setCard.set.ToString(), setCard.side.ToString(), setCard.lang.ToString(), setCard.release.ToString(), setCard.sid.ToString());
 
                 result.Type = TranslateType(setCard.cardtype);
                 result.Color = TranslateColor(setCard.colour);

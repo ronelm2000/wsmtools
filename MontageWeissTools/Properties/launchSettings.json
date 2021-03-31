@@ -178,7 +178,7 @@
     },
     "Export Deck (#34)": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/JAQjGsFgD"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/JAQjGsFgD --with sendtcp"
     }
   }
 }

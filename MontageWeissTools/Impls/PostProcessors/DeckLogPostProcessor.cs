@@ -25,7 +25,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
     {
         private ILogger Log = Serilog.Log.ForContext<DeckLogPostProcessor>();
 
-        private DeckLogSettings settings = new DeckLogSettings();
+        private readonly DeckLogSettings settings = new DeckLogSettings();
 
 //        private string defaultAwsWeissSchwarzSitePrefix = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";
 //        private string defaultReferrer = "https://decklog.bushiroad.com/create?c=2";
@@ -37,6 +37,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         private string currentVersion;
 
         public int Priority => 1;
+        public DeckLogSettings Settings => settings;
 
         public DeckLogPostProcessor(IContainer ioc)
         {
@@ -59,6 +60,11 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 Log.Warning("Please check with the developer for a newer version that ensures compatibility with the newest version.");
             }
             return true;
+        }
+
+        public async Task<string> GetLatestVersion()
+        {
+            return currentVersion ?? (currentVersion = await settings.VersionURL.WithCookies(_cookieSession()).GetStringAsync());
         }
 
         public async Task<bool> IsIncluded(IParseInfo info)
@@ -305,7 +311,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             Others
         }
 
-        private class DeckLogSettings
+        public class DeckLogSettings
         {
             public string Version { get; set; } = "20210329.002";
             public string VersionURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/version/";

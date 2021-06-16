@@ -77,14 +77,16 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             }  if ((await _getLatestVersion()) != settings.Version)
             {
                 if (info.ParserHints.Contains("nowarn", StringComparer.CurrentCultureIgnoreCase))
+                    Log.Information("Please note that [nowarn] flag is now deprecated as DeckLog is now enabled by default due to several versions of ensured compatibility.");
+                if (info.ParserHints.Contains("strict", StringComparer.CurrentCultureIgnoreCase))
                 {
-                    Log.Warning("Executing due to [nowarn] flag. Expect bugs due to version incompability.");
-                    return true;
+                    Log.Information("Not executing due to [strict] flag.");
+                    return false;
                 }
                 else
                 {
-                    Log.Information("Skipping.");
-                    return false;
+                    Log.Warning("DeckLog is now enabled by default, but expect bugs due to version incompability.");
+                    return true;
                 }
             }
             else
@@ -313,7 +315,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         public class DeckLogSettings
         {
-            public string Version { get; set; } = "20210329.002";
+            public string Version { get; set; } = "20210519.001";
             public string VersionURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/version/";
             public string ImagePrefix { get; set; } = "https://ws-tcg.com/wordpress/wp-content/images/cardlist/";
 //            public string ImagePrefix { get; set; } = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";

@@ -20,7 +20,8 @@ namespace Montage.Weiss.Tools.Test.PostProcessors
             Lamar.Container ioc = Program.Bootstrap();
 
             var deckLogPP = ioc.GetInstance<DeckLogPostProcessor>();
-            Assert.IsTrue(await deckLogPP.GetLatestVersion() == deckLogPP.Settings.Version, "DeckLog API version is outdated; need to check for compatibility.");
+            var latestVersion = await deckLogPP.GetLatestVersion();
+            Assert.IsTrue(latestVersion == deckLogPP.Settings.Version, $"DeckLog API version is outdated; latest version is {latestVersion} need to check for compatibility.");
         }
     }
 }

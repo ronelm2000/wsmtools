@@ -90,7 +90,7 @@
     },
     "Export HHW": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --with upscaling"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --with upscaling,sendtcp"
     },
     "Export HHW via Cockatrice": {
       "commandName": "Project",

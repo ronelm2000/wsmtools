@@ -162,7 +162,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
                       + $"P/S: {card.Power}P/{card.Soul}S || "
                         ) : "")
                     + ((card.Type != CardType.Climax) ? $"Lv/Co: {card.Level}/{card.Cost}\n" : $"Triggers: {card.Triggers.Select(c => c.ToString()).ConcatAsString(" - ")}\n")
-                    + $"Effect: {card.Effect.ConcatAsString("\n")}";
+                    + $"{card.Effect.ConcatAsString("\n")}";
             }
         }
 

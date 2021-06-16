@@ -32,7 +32,11 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                 ("【", "["),
                 ("】", "]"),
                 ("《", "<<"),
-                ("》", ">>")
+                ("》", ">>"),
+                // These are shortcuts from HOTC
+                ("[A]", "[AUTO]"),
+                ("[C]", "[CONT]"),
+                ("[S]", "[ACT]")
                 );
         }
 

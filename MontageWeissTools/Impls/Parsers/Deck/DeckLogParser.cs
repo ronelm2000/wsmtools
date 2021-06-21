@@ -91,13 +91,9 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
                         if (newDeck.Ratios.TryGetValue(card, out int oldVal))
                             newDeck.Ratios[card] = oldVal + quantity;
                         else
-                        {
-                            var url = awsWeissSchwarzSitePrefix + cardJSON.img;
-                            Log.Debug("Adding URL into Images: {url}", url);
-                            card.Images.Add(new Uri(url));
                             newDeck.Ratios.Add(card, quantity);
-                        }
-                    } else
+                    }
+                    else
                     {
                         missingSerials.Add(serial);
                         //throw new DeckParsingException($"MISSING_SERIAL_{serial}");

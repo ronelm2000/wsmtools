@@ -172,7 +172,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                         })
                         .ReceiveJson<List<DLCardEntry>>();
                     foreach (var entry in temporaryResults)
-                        results.Add(entry.Serial + entry.Rarity, entry);
+                        results[entry.Serial + entry.Rarity] = entry;
                     Log.Information("Got {count} results...", temporaryResults?.Count ?? 0);
                     page++;
                 } while (temporaryResults.Count > 29);

@@ -179,6 +179,10 @@
     "Export Deck (#34)": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/JAQjGsFgD --with sendtcp"
+    },
+    "Parse Illya 2wei Hertz": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5d9a1ccc7cd9b718cd5b2200"
     }
   }
 }

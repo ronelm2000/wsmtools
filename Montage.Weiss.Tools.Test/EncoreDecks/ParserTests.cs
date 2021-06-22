@@ -56,5 +56,28 @@ namespace Montage.Weiss.Tools.Test.EncoreDecks
             Assert.IsTrue(bdml["BD/EN-W03-125"].Triggers.Contains(Trigger.Gate));
             Assert.IsTrue(bdml["BD/EN-W03-126"].Triggers.Contains(Trigger.Book));
         }
+
+        [TestMethod("Prisma Illya Serial Test")]
+        public async Task TestPISerials()
+        {
+            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+            Lamar.Container ioc = Program.Bootstrap();
+            var prismaIllyaEN = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
+                .Parse("https://www.encoredecks.com/?page=1&set=5c7b101d7cd9b718cdbd085e")
+                .ToDictionaryAsync(c => c.Serial);
+            Assert.IsTrue(prismaIllyaEN["PI/EN-S04-E038"] != null);
+        }
+
+        [TestMethod("Prisma Illya Akiba Test")]
+        public async Task TestPIAkiba()
+        {
+            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+            Lamar.Container ioc = Program.Bootstrap();
+            var prismaIllyaHertz = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
+                .Parse("https://www.encoredecks.com/api/series/5d9a1ccc7cd9b718cd5b2200/cards")
+                .ToDictionaryAsync(c => c.Serial);
+
+            Assert.IsTrue(prismaIllyaHertz["PI/S40-038"].Name.EN == null);
+        }
     }
 }

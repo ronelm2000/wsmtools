@@ -62,7 +62,8 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 result.Name = new MultiLanguageString();
                 var enOptional = DynamicExtensions.AsOptional(setCard.locale.EN);
                 var jpOptional = DynamicExtensions.AsOptional(setCard.locale.NP);
-                result.Name.EN = enOptional.name;
+                if (((string)enOptional.source)?.ToLower() != "akiba")
+                    result.Name.EN = enOptional.name;
                 result.Name.JP = jpOptional.name;
                 (List<object>, List<object>) attributes = (enOptional.attributes, jpOptional.attributes);
                 result.Traits = TranslateTraits(attributes).ToList();

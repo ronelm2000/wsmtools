@@ -156,7 +156,7 @@ namespace Montage.Weiss.Tools.Entities
         /// </summary>
         /// <param name="serial"></param>
         /// <returns></returns>
-        internal static string RemoveFoil(string serial)
+        public static string RemoveFoil(string serial)
         {
             var parsedSerial = ParseSerial(serial);
             var regex = new Regex(@"([A-Z]*)([0-9]+)([a-z]*)([a-zA-Z]*)");

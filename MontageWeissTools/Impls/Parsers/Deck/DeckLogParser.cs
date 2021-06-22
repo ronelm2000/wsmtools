@@ -29,7 +29,6 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
     {
         private Regex urlMatcher = new Regex(@"(.*):\/\/decklog\.bushiroad\.com\/view\/([^\?]*)(.*)");
         private string deckLogApiUrlPrefix = "https://decklog.bushiroad.com/system/app/api/view/";
-        private string awsWeissSchwarzSitePrefix = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";
         private ILogger Log = Serilog.Log.ForContext<DeckLogParser>();
         private readonly Func<CardDatabaseContext> _database;
 
@@ -84,6 +83,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
                         Log.Warning("serial is null for some reason!");
                     }
                     var card = await db.WeissSchwarzCards.FindAsync(serial);
+                    card = card ?? await WarnAndFindNonFoil(db, serial);
                     int quantity = cardJSON.num;
                     if (card != null)
                     {
@@ -107,6 +107,19 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
             {
                 Log.Debug($"Result Deck: {JsonConvert.SerializeObject(newDeck.AsSimpleDictionary())}");
                 return newDeck;
+            }
+        }
+
+        private async Task<WeissSchwarzCard> WarnAndFindNonFoil(CardDatabaseContext db, string serial)
+        {
+            var nonFoilSerial = WeissSchwarzCard.RemoveFoil(serial);
+            if (nonFoilSerial != serial)
+            {
+                Log.Warning("Unable to find {serial1}; trying to find {serial2} instead.", serial, nonFoilSerial);
+                return await db.WeissSchwarzCards.FindAsync(nonFoilSerial);
+            } else
+            {
+                return null;
             }
         }
     }

@@ -41,6 +41,30 @@ namespace Montage.Weiss.Tools.Test.ENWS
 
             await Task.CompletedTask;
         }
+        
+        [TestMethod("Foil Removal Serial Test")]
+        public async Task TestFoilRemovalSerial()
+        {
+            var serials = new[] {
+               "PI/SE36-40OFR",
+               "BD/EN-W03-026BDR",
+               "CCS/BSF2019-02"
+            };
+
+            var expectedOutputs = new[] {
+               "PI/SE36-40",
+               "BD/EN-W03-026",
+               "CCS/BSF2019-02"
+            };
+
+            for (int i = 0; i < serials.Length; i++)
+            {
+                var output = WeissSchwarzCard.RemoveFoil(serials[i]);
+                Assert.IsTrue(expectedOutputs[i] == output, $"Input: {serials[i]} / Expected Output: {expectedOutputs[i]} / Actual Output: {output}");
+            }
+
+            await Task.CompletedTask;
+        }
 
         [TestMethod("English Set Test")]
         public async Task TestEnglishSetTypes()

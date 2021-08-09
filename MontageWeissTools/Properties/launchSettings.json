@@ -1,44 +1,12 @@
 {
   "profiles": {
-    "wsools export Grasaia": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/aTnKOs3Jx --out ShareX"
-    },
-    "wstools for CG": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/idolm@ster_cinderella_girls_2nd_season_booster_pack.html"
-    },
     "wstools help": {
       "commandName": "Project",
       "commandLineArgs": "help"
     },
-    "wstools export GS": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/_ubLZmZ73"
-    },
     "wstools parse PRs": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
-    },
-    "wstools parse ED Site Link": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5c7b08307cd9b718cdbd059c"
-    },
-    "wstools parse Fantasia": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/fujimi_fantasia_bunko_booster_pack.html --with skip:yyt"
-    },
-    "wstools cache Fantasia": {
-      "commandName": "Project",
-      "commandLineArgs": "cache W65 JP"
-    },
-    "wstools cache W02": {
-      "commandName": "Project",
-      "commandLineArgs": "cache W02 JP"
-    },
-    "wstools export Fantasia Deck": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/WCiCTn736 --exporter local"
     },
     "wstools parse NGNL": {
       "commandName": "Project",
@@ -183,6 +151,18 @@
     "Parse Illya 2wei Hertz": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5d9a1ccc7cd9b718cd5b2200"
+    },
+    "wstools parse Magia Record TV EN": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=608869f81e41dfffbd963099"
+    },
+    "wstools Parse Magia Record EN": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=603beb4b1e41dfffbd183c46"
+    },
+    "wstools Parse Madoka Rebellion": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5c7b0e077cd9b718cdbd0798"
     }
   }
 }

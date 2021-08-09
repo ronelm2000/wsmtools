@@ -33,7 +33,8 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
         {
             await Task.CompletedTask;
-            if (cards.First().Language != CardLanguage.English)
+            var firstCard = cards.First();
+            if (firstCard.Language != CardLanguage.English)
                 return false;
 
             var allReleaseIDs = cards.Select(c => c.ReleaseID)
@@ -51,7 +52,13 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             {
                 Log.Warning("JKTCG Image Post-Processor is disabled for sets with multiple Release IDs; please add those images manually when prompted.");
                 return false;
-            } else
+            }
+            else if (!(await GetSetListURI(firstCard)).HasValue)
+            {
+                Log.Information("Unable to find info from JKTCG; likely a new set, will skip.");
+                return false;
+            }
+            else
             {
                 return true;
             }
@@ -68,11 +75,8 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         private async IAsyncEnumerable<WeissSchwarzCard> Process(WeissSchwarzCard firstCard, IAsyncEnumerable<WeissSchwarzCard> originalCards)
         {
             Log.Information("Starting...");
-            var menu = await "http://jktcg.com/MenuLeftEN.html"
-                .WithHTMLHeaders()
-                .GetHTMLAsync();
-            var pair = CardListURLFrom(menu, firstCard);
-            var cardList = await pair.url
+            (string setLinkWithUnderscores, string url)? pair = await GetSetListURI(firstCard);
+            var cardList = await pair?.url
                 .WithHTMLHeaders()
                 .GetHTMLAsync();
             var releaseID = firstCard.ReleaseID;
@@ -135,7 +139,15 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             return innerHTML.AsSpan().Slice(c => 1, c => c.Slice(1).IndexOf('\t') + 1).ToString().ToLower();
         }
 
-        private (string setLinkWithUnderscores, string url) CardListURLFrom(IDocument menu, WeissSchwarzCard firstCard)
+        private async Task<(string setLinkWithUnderscores, string url)?> GetSetListURI(WeissSchwarzCard firstCard)
+        {
+            var menu = await "http://jktcg.com/MenuLeftEN.html"
+                .WithHTMLHeaders()
+                .GetHTMLAsync();
+            return CardListURLFrom(menu, firstCard);
+        }
+
+        private (string setLinkWithUnderscores, string url)? CardListURLFrom(IDocument menu, WeissSchwarzCard firstCard)
         {
             var ogReleaseID = firstCard.ReleaseID;
             var releaseIDs = new List<string>();
@@ -146,10 +158,10 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                                         .Where(ele => releaseIDs.Any(s => ele.Href.Contains(s)))
                                         .FirstOrDefault();
             if (setLink == null)
-            {
-                Log.Error("Cannot find a link that matches {SID} using this list of links: {@items}", ogReleaseID, menu.Links.Cast<IHtmlAnchorElement>().Select(ele => ele.Href).ToList());
-                throw new Exception();
-            }
+            //{
+            //    Log.Error("Cannot find a link that matches {SID} using this list of links: {@items}", ogReleaseID, menu.Links.Cast<IHtmlAnchorElement>().Select(ele => ele.Href).ToList());
+                return null;
+            //}
             
             var enPreString = "EN-";
             var setLinkWithUnderscores = setLink.Href.AsSpan()

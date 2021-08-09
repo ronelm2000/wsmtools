@@ -102,7 +102,6 @@ namespace Montage.Weiss.Tools.Utilities
         public static IFlurlRequest WithReferrer(this IFlurlRequest request, string referrerUrl) => request.WithHeader("Referer", referrerUrl);
         public static IFlurlRequest WithReferrer(this string urlString, string referrerUrl) => new FlurlRequest(urlString).WithReferrer(referrerUrl);
         public static IFlurlRequest WithReferrer(this Flurl.Url url, string referrerUrl) => new FlurlRequest(url).WithReferrer(referrerUrl);
-        
         public static IFlurlRequest WithRESTHeaders(this IFlurlRequest request)
         {
             return request.WithClient(customizedClient)

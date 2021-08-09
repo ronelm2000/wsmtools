@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Montage.Weiss.Tools.Utilities
+namespace Montage.Card.API.Entities
 {
-    interface IExactCloneable<T>
+    public interface IExactCloneable<T>
     {
         public T Clone();
     }

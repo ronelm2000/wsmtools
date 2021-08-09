@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Internal;
+using Montage.Card.API.Interfaces.Components;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Exporters.Deck;
@@ -13,7 +15,7 @@ using YamlDotNet.Core;
 
 namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 {
-    public class EnglishDeckInspector : IExportedDeckInspector, IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>>
+    public class EnglishDeckInspector : IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>, IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>>
     {
         private readonly ILogger Log = Serilog.Log.ForContext<SanityImageInspector>();
 

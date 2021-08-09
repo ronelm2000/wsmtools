@@ -1,4 +1,6 @@
-﻿using Montage.Weiss.Tools.API;
+﻿using Montage.Card.API.Interfaces.Components;
+using Montage.Card.API.Interfaces.Services;
+using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
 using Montage.Weiss.Tools.Utilities;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 {
-    public class TTSCardCorrector : IExportedDeckInspector, IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>>
+    public class TTSCardCorrector : IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>, IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>>
     {
         public int Priority => 0;
 

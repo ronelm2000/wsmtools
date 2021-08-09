@@ -1,6 +1,8 @@
 ﻿using CommandLine;
 using Lamar;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Components;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Serilog;
@@ -56,7 +58,7 @@ namespace Montage.Weiss.Tools.CLI
 
             Log.Information("Running...");
 
-            var parser = await ioc.GetAllInstances<IDeckParser>()
+            var parser = await ioc.GetAllInstances<IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>>()
                 .ToAsyncEnumerable()
                 .WhereAwait(async parser => await parser.IsCompatible(Source))
                 .OrderByDescending(parser => parser.Priority)
@@ -72,8 +74,9 @@ namespace Montage.Weiss.Tools.CLI
                 .Where(exporter => exporter.Alias.Contains(Exporter))
                 .First();
 
-            var inspectors = ioc.GetAllInstances<IExportedDeckInspector>().Where(i => !(i is IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>> filter) || filter.IsIncluded(exporter));
-            if (exporter is IFilter<IExportedDeckInspector> filter)
+            var inspectors = ioc.GetAllInstances<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>()
+                .Where(i => !(i is IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>> filter) || filter.IsIncluded(exporter));
+            if (exporter is IFilter<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>> filter)
                 inspectors = inspectors.Where(filter.IsIncluded);
 
             deck = await inspectors.OrderByDescending(inspector => inspector.Priority)

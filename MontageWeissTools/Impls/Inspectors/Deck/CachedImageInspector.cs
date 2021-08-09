@@ -1,4 +1,5 @@
 ﻿using Fluent.IO;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 {
-    public class CachedImageInspector : IExportedDeckInspector
+    public class CachedImageInspector : IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>
     {
         private readonly ILogger Log = Serilog.Log.ForContext<CachedImageInspector>();
         private readonly string _imageCachePath = "./Images/";

@@ -1,12 +1,12 @@
-﻿using Montage.Weiss.Tools.Entities;
+﻿using Montage.Card.API.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.API
+namespace Montage.Card.API.Interfaces.Services
 {
-    public interface IExportedDeckInspector
+    public interface IExportedDeckInspector<D,C> where D : IDeck<C> where C : ICard
     {
         /// <summary>
         /// Gets the Priority of a particular issue.
@@ -27,7 +27,7 @@ namespace Montage.Weiss.Tools.API
         /// Customized inspection options that may or may not be used by the inspector. Note that interactive inspectors must use this
         /// object.
         /// </param>
-        public Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, InspectionOptions options);
+        public Task<D> Inspect(D deck, InspectionOptions options);
     }
 
     /// <summary>

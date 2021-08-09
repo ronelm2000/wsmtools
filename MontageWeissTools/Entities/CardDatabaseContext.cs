@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Entities.Impls;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;

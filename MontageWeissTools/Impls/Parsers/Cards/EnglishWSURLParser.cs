@@ -2,6 +2,7 @@
 using AngleSharp.Html.Dom;
 using Flurl.Http;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;

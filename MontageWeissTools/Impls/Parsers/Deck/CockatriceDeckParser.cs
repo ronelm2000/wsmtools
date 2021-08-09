@@ -2,6 +2,7 @@
 using Lamar;
 using Microsoft.EntityFrameworkCore.Update;
 using Montage.Card.API.Exceptions;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.Cockatrice;
@@ -21,7 +22,7 @@ using System.Xml.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Deck
 {
-    public class CockatriceDeckParser : IDeckParser
+    public class CockatriceDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
     {
         private readonly ILogger Log;
         private Func<CardDatabaseContext> _database;

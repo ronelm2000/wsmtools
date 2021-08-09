@@ -1,10 +1,8 @@
-﻿using AngleSharp.Common;
-using Montage.Weiss.Tools.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Montage.Weiss.Tools.Entities
+namespace Montage.Card.API.Entities.Impls
 {
     public class MultiLanguageString : IExactCloneable<MultiLanguageString>
     {
@@ -43,7 +41,7 @@ namespace Montage.Weiss.Tools.Entities
         /// Attempts to resolve this object into a string as much as it can.
         /// </summary>
         /// <returns></returns>
-        internal string AsNonEmptyString()
+        public string AsNonEmptyString()
         {
             StringBuilder sb = new StringBuilder();
             if (EN != null)

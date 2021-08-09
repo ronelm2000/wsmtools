@@ -29,7 +29,7 @@ namespace Montage.Weiss.Tools
 
             var container = Bootstrap();
             Log.Debug(container.WhatDoIHave(serviceType: typeof(IVerbCommand)));
-            Log.Debug(container.WhatDoIHave(serviceType: typeof(IDeckParser)));
+            Log.Debug(container.WhatDoIHave(serviceType: typeof(IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>)));
             Log.Debug(container.WhatDoIHave(serviceType: typeof(ICardSetParser<WeissSchwarzCard>)));
             FlurlHttp.Configure(settings => settings.HttpClientFactory = container.GetService<PollyHttpClientFactory>());
 

@@ -3,6 +3,7 @@ using Flurl.Http;
 using Lamar;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;

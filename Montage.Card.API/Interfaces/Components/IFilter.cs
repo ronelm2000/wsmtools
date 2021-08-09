@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Montage.Weiss.Tools.API
+namespace Montage.Card.API.Interfaces.Components
 {
     /// <summary>
     /// This interface signifies that a class that can filter out certain components from executing.

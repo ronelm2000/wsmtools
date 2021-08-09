@@ -4,6 +4,7 @@ using Lamar;
 using LamarCodeGeneration;
 using Microsoft.Extensions.DependencyInjection;
 using Montage.Card.API.Exceptions;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -25,7 +26,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
     /// Implements a Deck Parser that sources deck information from DeckLog.
     /// Note that parsing the deck this way means the deck has no name or description, but the source link will be appended.
     /// </summary>
-    public class DeckLogParser : IDeckParser
+    public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
     {
         private Regex urlMatcher = new Regex(@"(.*):\/\/decklog\.bushiroad\.com\/view\/([^\?]*)(.*)");
         private string deckLogApiUrlPrefix = "https://decklog.bushiroad.com/system/app/api/view/";

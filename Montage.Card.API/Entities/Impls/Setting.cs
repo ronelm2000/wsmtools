@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Entities
+namespace Montage.Card.API.Entities.Impls
 {
     public class Setting
     {

@@ -1,6 +1,8 @@
 ﻿using Fluent.IO;
 using Lamar;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Components;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.Cockatrice;
@@ -17,7 +19,7 @@ using System.Xml.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck
 {
-    public class CockatriceDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>, IFilter<IExportedDeckInspector>
+    public class CockatriceDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>, IFilter<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>
     {
         private readonly ILogger Log;
         private Func<CardDatabaseContext> _database;
@@ -73,7 +75,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck
             typeof(SanityImageInspector), 
             typeof(SanityTranslationsInspector)
         };
-        public bool IsIncluded(IExportedDeckInspector item)
+        public bool IsIncluded(IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard> item)
         {
             return item.GetType() switch
             {

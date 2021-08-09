@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 {
-    public class SanityTranslationsInspector : IExportedDeckInspector
+    public class SanityTranslationsInspector : IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>
     {
         public readonly ILogger Log; // = Serilog.Log.ForContext<SanityTranslationsInspector>();
 

@@ -1,4 +1,5 @@
-﻿using Montage.Weiss.Tools.API;
+﻿using Montage.Card.API.Interfaces.Services;
+using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Serilog;
 using System;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Deck
 {
-    public class DefaultDeckParser : IDeckParser
+    public class DefaultDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
     {
         public string[] Alias => new string[] { };
 

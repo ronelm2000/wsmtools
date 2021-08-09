@@ -2,6 +2,7 @@
 using Lamar;
 using Microsoft.EntityFrameworkCore;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;

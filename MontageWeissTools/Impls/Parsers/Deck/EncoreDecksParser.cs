@@ -3,6 +3,7 @@ using Flurl.Http;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic.FileIO;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
@@ -18,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Deck
 {
-    public class EncoreDecksParser : IDeckParser
+    public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
     {
         private ILogger Log { get; }
 

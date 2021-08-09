@@ -1,6 +1,7 @@
 ﻿using Fluent.IO;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.JSON;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Deck
 {
-    public class LocalDeckJSONParser : IDeckParser
+    public class LocalDeckJSONParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
     {
         private ILogger Log = Serilog.Log.ForContext<LocalDeckJSONParser>();
         public string[] Alias => new[] { "local", "json" };

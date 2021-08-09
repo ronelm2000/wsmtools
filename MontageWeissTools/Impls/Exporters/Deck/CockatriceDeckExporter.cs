@@ -17,7 +17,7 @@ using System.Xml.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck
 {
-    public class CockatriceDeckExporter : IDeckExporter, IFilter<IExportedDeckInspector>
+    public class CockatriceDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>, IFilter<IExportedDeckInspector>
     {
         private readonly ILogger Log;
         private Func<CardDatabaseContext> _database;

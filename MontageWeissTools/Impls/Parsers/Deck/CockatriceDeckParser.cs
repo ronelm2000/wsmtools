@@ -1,9 +1,9 @@
 ﻿using Fluent.IO;
 using Lamar;
 using Microsoft.EntityFrameworkCore.Update;
+using Montage.Card.API.Exceptions;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Entities.Exceptions;
 using Montage.Weiss.Tools.Entities.External.Cockatrice;
 using Montage.Weiss.Tools.Impls.Inspectors.Deck;
 using Montage.Weiss.Tools.Utilities;

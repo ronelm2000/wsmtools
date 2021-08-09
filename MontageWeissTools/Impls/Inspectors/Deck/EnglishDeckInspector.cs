@@ -13,7 +13,7 @@ using YamlDotNet.Core;
 
 namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 {
-    public class EnglishDeckInspector : IExportedDeckInspector, IFilter<IDeckExporter>
+    public class EnglishDeckInspector : IExportedDeckInspector, IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>>
     {
         private readonly ILogger Log = Serilog.Log.ForContext<SanityImageInspector>();
 
@@ -65,7 +65,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                 return true;
             }
         }
-        public bool IsIncluded(IDeckExporter item)
+        public bool IsIncluded(IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard> item)
         {
             return item is CockatriceDeckExporter;
         }

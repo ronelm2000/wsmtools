@@ -33,7 +33,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
 {
-    public class TTSDeckExporter : IDeckExporter
+    public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
     {
         private ILogger Log = Serilog.Log.ForContext<TTSDeckExporter>();
 

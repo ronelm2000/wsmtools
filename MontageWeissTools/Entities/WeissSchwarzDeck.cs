@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Montage.Card.API.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Montage.Weiss.Tools.Entities
 {
-    public class WeissSchwarzDeck
+    public class WeissSchwarzDeck : IDeck<WeissSchwarzCard>
     {
         public string Name { get; set; }
         public Dictionary<WeissSchwarzCard, int> Ratios { get; set; } = new Dictionary<WeissSchwarzCard, int>();

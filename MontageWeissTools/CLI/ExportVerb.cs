@@ -68,11 +68,11 @@ namespace Montage.Weiss.Tools.CLI
                 IsNonInteractive = this.NonInteractive,
                 NoWarning = this.NoWarning
             };
-            var exporter = ioc.GetAllInstances<IDeckExporter>()
+            var exporter = ioc.GetAllInstances<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>>()
                 .Where(exporter => exporter.Alias.Contains(Exporter))
                 .First();
 
-            var inspectors = ioc.GetAllInstances<IExportedDeckInspector>().Where(i => !(i is IFilter<IDeckExporter> filter) || filter.IsIncluded(exporter));
+            var inspectors = ioc.GetAllInstances<IExportedDeckInspector>().Where(i => !(i is IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>> filter) || filter.IsIncluded(exporter));
             if (exporter is IFilter<IExportedDeckInspector> filter)
                 inspectors = inspectors.Where(filter.IsIncluded);
 

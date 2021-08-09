@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Montage.Weiss.Tools.Entities.Exceptions
+namespace Montage.Card.API.Exceptions
 {
     [Serializable]
     public class DeckParsingException : Exception

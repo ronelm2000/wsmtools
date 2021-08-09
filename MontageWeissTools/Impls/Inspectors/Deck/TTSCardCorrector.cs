@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 {
-    public class TTSCardCorrector : IExportedDeckInspector, IFilter<IDeckExporter>
+    public class TTSCardCorrector : IExportedDeckInspector, IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>>
     {
         public int Priority => 0;
 
@@ -40,7 +40,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
                 );
         }
 
-        public bool IsIncluded(IDeckExporter item)
+        public bool IsIncluded(IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard> item)
         {
             return item is TTSDeckExporter;
         }

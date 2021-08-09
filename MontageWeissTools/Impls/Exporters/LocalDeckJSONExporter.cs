@@ -15,7 +15,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters
     /// <summary>
     /// A Deck Exporter whose output is purely a JSON file that coincides with the format of WeissSchwarzDeck, exactly.
     /// </summary>
-    public class LocalDeckJSONExporter : IDeckExporter
+    public class LocalDeckJSONExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
     {
         private ILogger Log = Serilog.Log.ForContext<LocalDeckJSONExporter>();
         private JsonSerializerOptions _defaultOptions = new JsonSerializerOptions()

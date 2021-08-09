@@ -315,7 +315,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         public class DeckLogSettings
         {
-            public string Version { get; set; } = "20210519.001";
+            public string Version { get; set; } = "20210719.001";
             public string VersionURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/version/";
             public string ImagePrefix { get; set; } = "https://ws-tcg.com/wordpress/wp-content/images/cardlist/";
 //            public string ImagePrefix { get; set; } = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";

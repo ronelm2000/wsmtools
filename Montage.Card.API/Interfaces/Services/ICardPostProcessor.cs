@@ -1,14 +1,14 @@
-﻿using Montage.Weiss.Tools.Entities;
+﻿using Montage.Card.API.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.API
+namespace Montage.Card.API.Interfaces.Services
 {
     /// <summary>
     /// A model for post-processing a card that has been successfully parsed.
     /// This includes adding an missing details (like images), or corrections.
     /// </summary>
-    public interface ICardPostProcessor
+    public interface ICardPostProcessor<C> where C : ICard
     {
         /// <summary>
         /// Indicates the priority of the post-processor.
@@ -20,13 +20,13 @@ namespace Montage.Weiss.Tools.API
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public Task<bool> IsCompatible(List<WeissSchwarzCard> cards);
+        public Task<bool> IsCompatible(List<C> cards);
 
         /// <summary>
         /// Applies post-processing on a card.
         /// </summary>
         /// <param name="original"></param>
         /// <returns>Returns the processed card. Should not return itself to respect atomicity.</returns>
-        public IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards);
+        public IAsyncEnumerable<C> Process(IAsyncEnumerable<C> originalCards);
     }
 }

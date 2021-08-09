@@ -1,5 +1,6 @@
 ﻿using Flurl.Http;
-using Montage.Weiss.Tools.API;
+using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json.Linq;
@@ -16,7 +17,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
     /// <summary>
     /// Parses card set results from the EncoreDecks API. Thanks to the dev who made this API for consumption.
     /// </summary>
-    public class EncoreDecksParser : ICardSetParser
+    public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
     {
         private readonly Regex encoreDecksAPIMatcher = new Regex(@"http(?:s)?:\/\/www\.encoredecks\.com\/api\/series\/(.+)\/cards");
         private readonly Regex encoreDecksSiteSetMatcher = new Regex(@"http(?:s)?:\/\/www.encoredecks\.com\/?.+&set=([a-f0-9]+).*");

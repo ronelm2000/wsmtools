@@ -1,5 +1,7 @@
 ﻿using CommandLine;
 using Lamar;
+using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Serilog;
@@ -59,7 +61,7 @@ namespace Montage.Weiss.Tools.CLI
 
             using (var database = new CardDatabaseContext(new AppConfig() { DbName = Source }))
             {
-                var exporter = ioc.GetAllInstances<IDatabaseExporter>()
+                var exporter = ioc.GetAllInstances<IDatabaseExporter<CardDatabaseContext, WeissSchwarzCard>>()
                     .Where(exporter => exporter.Alias.Contains(Exporter))
                     .First();
 

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Montage.Weiss.Tools.API
+namespace Montage.Card.API.Entities
 {
     public interface IParseInfo
     {

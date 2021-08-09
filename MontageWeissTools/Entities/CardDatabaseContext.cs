@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Montage.Card.API.Entities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Entities
 {
-    public class CardDatabaseContext : DbContext
+    public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
     {
         private readonly AppConfig _config;
         private readonly ILogger Log = Serilog.Log.ForContext<CardDatabaseContext>();

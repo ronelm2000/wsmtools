@@ -1,4 +1,6 @@
 ﻿using Flurl.Http;
+using Montage.Card.API.Entities;
+using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Utilities;
 using Serilog;
 using SixLabors.ImageSharp;
@@ -14,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Entities
 {
-    public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>
+    public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     {
         private static ILogger Log;
         private static string[] foilRarities = new[] { "SR", "SSR", "RRR", "SPM", "SPa", "SPb", "SP", "SSP", "SEC", "XR", "BDR" };

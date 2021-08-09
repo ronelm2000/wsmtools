@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Montage.Weiss.Tools.API
+namespace Montage.Card.API.Entities
 {
     public interface IDatabaseExportInfo : IExportInfo
     {

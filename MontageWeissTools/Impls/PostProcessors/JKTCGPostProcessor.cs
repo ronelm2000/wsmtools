@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Lamar;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors
 {
-    public class JKTCGPostProcessor : ICardPostProcessor
+    public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     {
         private readonly ILogger Log = Serilog.Log.ForContext<JKTCGPostProcessor>();
         private readonly Regex LinkMatcher = new Regex(@"(http:\/\/jktcg.com\/)(EN-.+-)(.+)");

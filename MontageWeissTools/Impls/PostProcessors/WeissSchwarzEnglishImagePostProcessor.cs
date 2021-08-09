@@ -1,4 +1,5 @@
 ﻿using Flurl.Http;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors
 {
-    public class WeissSchwarzEnglishImagePostProcessor : ICardPostProcessor
+    public class WeissSchwarzEnglishImagePostProcessor : ICardPostProcessor<WeissSchwarzCard>
     {
         public int Priority => -1;
         private static readonly string _imagePrefix = "https://en.ws-tcg.com/wp/wp-content/images/cardimages";

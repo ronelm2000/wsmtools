@@ -1,6 +1,8 @@
 ﻿using CommandLine;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
+using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using System;
@@ -24,19 +26,19 @@ namespace Montage.Weiss.Tools.CLI
         {
             var Log = Serilog.Log.ForContext<ParseVerb>();
 
-            var parser = container.GetAllInstances<ICardSetParser>()
+            var parser = container.GetAllInstances<ICardSetParser<WeissSchwarzCard>>()
                 .Where(parser => parser.IsCompatible(this))
                 .First();
 
             var cardList = await parser.Parse(URI).ToListAsync();
             var cards = cardList.Distinct(WeissSchwarzCard.SerialComparer).ToAsyncEnumerable();
 
-            var postProcessors = container.GetAllInstances<ICardPostProcessor>()
+            var postProcessors = container.GetAllInstances<ICardPostProcessor<WeissSchwarzCard>>()
                 .ToAsyncEnumerable()
                 .WhereAwait(async processor => await processor.IsCompatible(cardList))
-                .Where(processor => (parser is IFilter<ICardPostProcessor> filter) ? filter.IsIncluded(processor) : true)
+                .Where(processor => (parser is IFilter<ICardPostProcessor<WeissSchwarzCard>> filter) ? filter.IsIncluded(processor) : true)
                 .WhereAwait(async processor => (processor is ISkippable<IParseInfo> skippable) ? await skippable.IsIncluded(this) : true)
-                .WhereAwait(async processor => (processor is ISkippable<ICardSetParser> skippable) ? await skippable.IsIncluded(parser) : true)
+                .WhereAwait(async processor => (processor is ISkippable<ICardSetParser<WeissSchwarzCard>> skippable) ? await skippable.IsIncluded(parser) : true)
                 .OrderByDescending(processor => processor.Priority);
 
             cards = await postProcessors.AggregateAsync(cards, (pp, cs) => cs.Process(pp));

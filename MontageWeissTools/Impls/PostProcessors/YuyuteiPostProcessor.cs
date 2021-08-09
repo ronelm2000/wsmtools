@@ -3,6 +3,8 @@ using AngleSharp.Html.Dom;
 using Lamar;
 using Lamar.IoC.Instances;
 using Microsoft.EntityFrameworkCore;
+using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -18,7 +20,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
     /// <summary>
     /// Applies post-processing by searching in yuyutei for images of the cards and inserting them in.
     /// </summary>
-    public class YuyuteiPostProcessor : ICardPostProcessor, ISkippable<IParseInfo>
+    public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippable<IParseInfo>
     {
         private readonly ILogger Log = Serilog.Log.ForContext<YuyuteiPostProcessor>();
 

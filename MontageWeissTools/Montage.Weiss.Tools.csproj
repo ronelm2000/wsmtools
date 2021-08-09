@@ -67,6 +67,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Montage.Card.API\Montage.Card.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Resources\TTS\TTSResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

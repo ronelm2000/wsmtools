@@ -7,10 +7,12 @@ using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
 using Montage.Weiss.Tools.API;
 using Fluent.IO;
+using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Entities;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 {
-    public class HeartOfTheCardsURLParser : ICardSetParser
+    public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
     {
         private ILogger Log = Serilog.Log.ForContext<HeartOfTheCardsURLParser>();
 

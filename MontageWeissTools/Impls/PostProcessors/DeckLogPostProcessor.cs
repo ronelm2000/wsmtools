@@ -1,6 +1,8 @@
 ﻿using AngleSharp.Dom;
 using Flurl.Http;
 using Lamar;
+using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
@@ -21,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors
 {
-    public class DeckLogPostProcessor : ICardPostProcessor, ISkippable<IParseInfo>
+    public class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippable<IParseInfo>
     {
         private ILogger Log = Serilog.Log.ForContext<DeckLogPostProcessor>();
 

@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Lamar;
+using Montage.Card.API.Entities;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Serilog;

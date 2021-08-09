@@ -1,6 +1,8 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Flurl.Http;
+using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -18,7 +20,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
     /// Parses results from the English site. This is done using an exploit on cardsearch that allows more than 100 cards as a single query.
     /// This being an exploit means that at some time in the future this won't work.
     /// </summary>
-    public class EnglishWSURLParser : ICardSetParser
+    public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
     {
         ILogger Log = Serilog.Log.ForContext<EnglishWSURLParser>();
 

@@ -3,6 +3,7 @@ using Flurl.Http;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
@@ -29,7 +30,7 @@ namespace Montage.Weiss.Tools
             var container = Bootstrap();
             Log.Debug(container.WhatDoIHave(serviceType: typeof(IVerbCommand)));
             Log.Debug(container.WhatDoIHave(serviceType: typeof(IDeckParser)));
-            Log.Debug(container.WhatDoIHave(serviceType: typeof(ICardSetParser)));
+            Log.Debug(container.WhatDoIHave(serviceType: typeof(ICardSetParser<WeissSchwarzCard>)));
             FlurlHttp.Configure(settings => settings.HttpClientFactory = container.GetService<PollyHttpClientFactory>());
 
 

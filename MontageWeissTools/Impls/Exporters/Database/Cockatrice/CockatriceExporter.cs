@@ -1,5 +1,7 @@
 ﻿using Fluent.IO;
 using Lamar;
+using Montage.Card.API.Entities;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -14,7 +16,7 @@ using System.Xml.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Database.Cockatrice
 {
-    public class CockatriceExporter : IDatabaseExporter
+    public class CockatriceExporter : IDatabaseExporter<CardDatabaseContext, WeissSchwarzCard>
     {
         private ILogger Log = Serilog.Log.ForContext<CockatriceExporter>();
         public string[] Alias => new string[] { "cockatrice", "cc3s" };

@@ -1,4 +1,5 @@
-﻿using Montage.Weiss.Tools.CLI;
+﻿using Montage.Card.API.Entities;
+using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
 using System.Threading.Tasks;
 

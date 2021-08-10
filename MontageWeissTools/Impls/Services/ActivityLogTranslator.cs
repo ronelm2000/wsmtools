@@ -71,7 +71,7 @@ namespace Montage.Weiss.Tools.Impls.Services
 
     struct DeleteArgs
     {
-        public string Language;
-        public string VersionLessThan;
+        public string Language { get; set; }
+        public string VersionLessThan { get; set; }
     }
 }

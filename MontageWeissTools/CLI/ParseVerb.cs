@@ -44,10 +44,10 @@ namespace Montage.Weiss.Tools.CLI
 
             cards = await postProcessors.AggregateAsync(cards, (pp, cs) => cs.Process(pp));
 
+            await container.GetInstance<UpdateVerb>().Run(container);
+
             using (var db = container.GetInstance<CardDatabaseContext>())
             {
-                await db.Database.MigrateAsync();
-
                 await foreach (var card in cards)
                 {
                     card.VersionTimestamp = Program.AppVersion;

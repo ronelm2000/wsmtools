@@ -9,7 +9,7 @@
 
     <OutputType>Library</OutputType>
 
-    <StartupObject>Microsoft.VisualStudio.TestPlatform.TestHost.Program</StartupObject>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

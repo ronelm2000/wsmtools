@@ -163,6 +163,10 @@
     "wstools Parse Madoka Rebellion": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5c7b0e077cd9b718cdbd0798"
+    },
+    "Export MOB": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/Vd2zOev3k"
     }
   }
 }

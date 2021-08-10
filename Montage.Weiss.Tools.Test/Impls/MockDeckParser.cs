@@ -1,4 +1,5 @@
-﻿using Montage.Weiss.Tools.API;
+﻿using Montage.Card.API.Interfaces.Services;
+using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test.Impls
 {
-    class MockDeckParser : IDeckParser
+    class MockDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
     {
         public string[] Alias => new[] { "mock", "" };
 

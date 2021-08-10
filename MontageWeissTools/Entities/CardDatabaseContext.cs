@@ -22,6 +22,7 @@ namespace Montage.Weiss.Tools.Entities
         public DbSet<WeissSchwarzCard> WeissSchwarzCards { get; set; }
         //public DbSet<MultiLanguageString> MultiLanguageStrings { get; set; }
         public DbSet<Setting> Settings { get; set; }
+        public DbSet<ActivityLog> MigrationLog { get; set; }
 
         public CardDatabaseContext (AppConfig config) {
             Log.Debug("Instantiating with {@AppConfig}.", config);
@@ -42,7 +43,6 @@ namespace Montage.Weiss.Tools.Entities
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             options.UseSqlite($"Data Source={_config.DbName}");
-
         }
 
         internal async Task<WeissSchwarzCard> FindNonFoil(WeissSchwarzCard card)
@@ -79,6 +79,7 @@ namespace Montage.Weiss.Tools.Entities
                 {
                     bb.WithOwner();
                 });
+
             });
 
             modelBuilder.Entity<Setting>(b =>
@@ -86,9 +87,19 @@ namespace Montage.Weiss.Tools.Entities
                 b.HasKey(s => s.Key);
             });
 
-
-           // modelBuilder.Entity<MultiLanguageString>().HasKey(s => s.JP);
-
+            modelBuilder.Entity<ActivityLog>(b =>
+            {
+                b.HasKey(a => a.LogID);
+                b.HasData(
+                    new ActivityLog
+                    {
+                        LogID = 1,
+                        Activity = ActivityType.Delete,
+                        Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.8.0""}",
+                        DateAdded = new DateTime(2021, 8, 10, 10, 2, 57, 51, DateTimeKind.Local).AddTicks(8029)
+                    }
+                );
+            });
         }
     }
 }

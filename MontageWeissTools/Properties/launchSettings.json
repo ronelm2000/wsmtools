@@ -167,6 +167,10 @@
     "Export MOB": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/Vd2zOev3k"
+    },
+    "Update": {
+      "commandName": "Project",
+      "commandLineArgs": "update"
     }
   }
 }

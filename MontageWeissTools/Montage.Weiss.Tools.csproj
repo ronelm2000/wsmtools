@@ -6,10 +6,10 @@
     <AssemblyName>wstools</AssemblyName>
     <RootNamespace>Montage.Weiss.Tools</RootNamespace>
     <Product>Weiss Schwarz Montage Tools (wsmtools)</Product>
-    <AssemblyVersion>0.8.0.0</AssemblyVersion>
-    <FileVersion>0.8.1.0</FileVersion>
+    <AssemblyVersion>0.9.0.0</AssemblyVersion>
+    <FileVersion>0.9.0.0</FileVersion>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-    <Version>0.8.0</Version>
+    <Version>0.9.0</Version>
     <Version Condition=" '$(VersionSuffix)' != '' ">$(Version)-$(VersionSuffix)</Version>
 
     <PackageId>wsmtools</PackageId>
@@ -18,6 +18,8 @@
     <NoWin32Manifest>true</NoWin32Manifest>
     <Copyright>Copyright (c) 2020 ronelm2000 / Weiss Schwarz (c) Bushiroad All Rights Reserved.</Copyright>
     <Description>This a CLI (Command Line Interface) tool intended to parse through, process, and export data regarding to Weiss Schwarz cards; specifically, this tool's intention is to make querying, parsing, and exporting cards from various sources easier, as well as provide APIs to expand on that functionality.</Description>
+    <RepositoryUrl>https://github.com/ronelm2000/wsmtools</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

@@ -5,6 +5,7 @@
     <LangVersion>8</LangVersion>
     <AssemblyName>montage.card.api</AssemblyName>
     <UserSecretsId>094af219-82ef-49de-9dcb-15e70c8b9ef5</UserSecretsId>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

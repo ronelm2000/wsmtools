@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Newtonsoft.Json;
@@ -23,7 +24,7 @@ namespace Montage.Weiss.Tools.Entities
         //public DbSet<MultiLanguageString> MultiLanguageStrings { get; set; }
         public DbSet<Setting> Settings { get; set; }
         public DbSet<ActivityLog> MigrationLog { get; set; }
-
+        public DatabaseFacade GetDatabase() => Database;
         public CardDatabaseContext (AppConfig config) {
             Log.Debug("Instantiating with {@AppConfig}.", config);
 

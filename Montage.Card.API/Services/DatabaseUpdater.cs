@@ -29,8 +29,6 @@ namespace Montage.Card.API.Services
             {
                 await OnLogStarting(new UpdateEventArgs(act.ActLog, act.Index, activityLog.Length));
                 await translator.Perform(act.ActLog);
-                // await act.ActLog.ToCommand().Run(ioc);
-                act.ActLog.IsDone = true;
                 await OnLogEnding(new UpdateEventArgs(act.ActLog, act.Index + 1, activityLog.Length));
             }
             Log.Information("Done!");

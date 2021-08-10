@@ -29,27 +29,19 @@ namespace Montage.Weiss.Tools.Impls.Services
                     ActivityType.Delete => async () => await DeleteCards(db, activityLog),
                     _ => throw new NotImplementedException($"{activityLog.Activity} has not been implemented yet!")
                 };
-                try
-                {
-                    await action();
-                    activityLog.IsDone = true;
-                    return activityLog;
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                    // return false;
-                }
+                await action();
+                activityLog.IsDone = true;
+                return activityLog;
             }
         }
 
         private async Task DeleteCards(CardDatabaseContext db, ActivityLog activityLog)
         {
             var deleteArgs = JsonSerializer.Deserialize<DeleteArgs>(activityLog.Target);
-            var query = db.WeissSchwarzCards.AsQueryable();
+            var query = db.WeissSchwarzCards.AsAsyncEnumerable();
             if (!string.IsNullOrWhiteSpace(deleteArgs.Language))
             {
-                var lang = TranslateLanguage(deleteArgs.Language);
+                CardLanguage lang = TranslateLanguage(deleteArgs.Language);
                 query = query.Where(card => card.Language == lang);
             }
             if (!string.IsNullOrWhiteSpace(deleteArgs.Language))
@@ -57,7 +49,7 @@ namespace Montage.Weiss.Tools.Impls.Services
                 var version = new Version(deleteArgs.VersionLessThan);
                 query = query.Where(card => new Version(card.VersionTimestamp) < version);
             }
-            db.RemoveRange(query);
+            db.RemoveRange(query.ToEnumerable());
             await db.SaveChangesAsync();
         }
 

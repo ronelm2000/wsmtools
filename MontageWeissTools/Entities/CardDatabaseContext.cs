@@ -68,10 +68,7 @@ namespace Montage.Weiss.Tools.Entities
                     .HasConversion( arr => JsonConvert.SerializeObject(arr.Select(uri => uri.ToString()).ToArray())
                                 ,   str => JsonConvert.DeserializeObject<string[]>(str).Select(s => new Uri(s)).ToList()
                                     );
-                b   .Property(c => c.Name)
-                    .HasConversion( mls => JsonConvert.SerializeObject(mls)
-                                  , str => JsonConvert.DeserializeObject<MultiLanguageString>(str)
-                                    );
+
                 b.OwnsMany(s => s.Traits, bb =>
                      {
                          bb.Property<int>("Id").HasAnnotation("Sqlite:Autoincrement", true);
@@ -81,6 +78,15 @@ namespace Montage.Weiss.Tools.Entities
                          bb.Property<string>("EN").IsRequired(false);
                          bb.Property<string>("JP").IsRequired(false);
                      });
+                b.OwnsOne(s => s.Name, bb =>
+                {
+                    bb.ToTable("WeissSchwarzCards_Names");
+                    bb.Property<int>("Id").HasAnnotation("Sqlite:Autoincrement", true);
+                    bb.HasKey("Id");
+                    bb.WithOwner().HasPrincipalKey(s => s.Serial);
+                    bb.Property<string>("EN").IsRequired(false);
+                    bb.Property<string>("JP").IsRequired(false);
+                });
             });
 
             modelBuilder.Entity<Setting>(b =>

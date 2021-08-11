@@ -27,6 +27,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
         private static readonly string _CARD_NO_QUERY = "?cardno=";
         private static readonly string _WS_SEARCH_PAGE = "https://en.ws-tcg.com/cardlist/cardsearch/";
+        private static readonly string _WS_SEARCH_PAGE_EXEC = "https://en.ws-tcg.com/cardlist/cardsearch/exec";
         private static readonly string _WS_CARD_PAGE = "https://en.ws-tcg.com/cardlist/list/?cardno=";
         private static readonly string _CARD_UNIT_SELECTOR = "table#searchResult-table td";
         private static readonly string _CARD_NAME_SELECTOR = "#searchResult-table > tbody > tr > td > h4 > a > span:nth-child(1)";

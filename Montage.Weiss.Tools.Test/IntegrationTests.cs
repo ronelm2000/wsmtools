@@ -19,7 +19,6 @@ namespace Montage.Weiss.Tools.Test
         IContainer ioc; //= Bootstrap();
 
         [TestMethod("Full Integration Test (Typical Use Case)")]
-        [Ignore]
         public async Task FullTestRun()
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();

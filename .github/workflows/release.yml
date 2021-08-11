@@ -22,8 +22,8 @@ jobs:
       run: dotnet restore
     - name: Publish
       run: |
-        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -r win-x64 -c Release /p:PublishSingleFile=true
-        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -r linux-x64 -c Release /p:PublishSingleFile=true
+        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
+        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
         cd ./MontageWeissTools/bin/Release/netcoreapp3.1/win-x64/publish
         zip ../../../../../../wsmtools.zip ./wstools.exe
         cd ../../linux-x64/publish

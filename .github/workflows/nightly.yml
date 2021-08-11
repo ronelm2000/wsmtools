@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      run: dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
+      run: dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:

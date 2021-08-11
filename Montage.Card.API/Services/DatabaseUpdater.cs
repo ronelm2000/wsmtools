@@ -32,6 +32,7 @@ namespace Montage.Card.API.Services
 
             foreach (var act in activityLog.Select((act, i) => (ActLog: act, Index: i)))
             {
+                Log.Information("{verb}: {target}", act.ActLog.Activity.ToVerbString(), act.ActLog.Target);
                 await OnLogStarting(new UpdateEventArgs(act.ActLog, act.Index, activityLog.Length));
                 await translator.Perform(act.ActLog);
                 await OnLogEnding(new UpdateEventArgs(act.ActLog, act.Index + 1, activityLog.Length));

@@ -25,6 +25,7 @@ namespace Montage.Weiss.Tools.Impls.Inspectors.Deck
 
         public async Task<WeissSchwarzDeck> Inspect(WeissSchwarzDeck deck, InspectionOptions options)
         {
+            Log.Information("Starting.");
             var allEmptyTranslations = deck.Ratios.Keys.Where(card => String.IsNullOrWhiteSpace(card.Name.EN))
                                                         .Select(card => card.ReleaseID)
                                                         .Distinct();

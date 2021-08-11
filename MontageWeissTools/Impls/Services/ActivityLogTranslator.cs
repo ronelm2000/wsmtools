@@ -41,8 +41,8 @@ namespace Montage.Weiss.Tools.Impls.Services
             var query = db.WeissSchwarzCards.AsAsyncEnumerable();
             if (!string.IsNullOrWhiteSpace(deleteArgs.Language))
             {
-                CardLanguage lang = TranslateLanguage(deleteArgs.Language);
-                query = query.Where(card => card.Language == lang);
+                CardLanguage? lang = TranslateLanguage(deleteArgs.Language);
+                if (lang is not null) query = query.Where(card => card.Language == lang);
             }
             if (!string.IsNullOrWhiteSpace(deleteArgs.Language))
             {
@@ -53,10 +53,11 @@ namespace Montage.Weiss.Tools.Impls.Services
             await db.SaveChangesAsync();
         }
 
-        private CardLanguage TranslateLanguage(string language) => language.ToLower() switch
+        private CardLanguage? TranslateLanguage(string language) => language.ToLower() switch
          {
              "en" => CardLanguage.English,
              "jp" => CardLanguage.Japanese,
+             "all" => null,
              _ => throw new ActivityLogExecutionException($"Cannot translate {language} into CardLanguage")
          };
     }

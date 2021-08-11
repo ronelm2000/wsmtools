@@ -18,15 +18,19 @@ namespace Montage.Card.API.Entities.Impls
 
         // Defaults so that JSON can view it.
 
-        public string EN
+        public string? EN
         {
-            get { return resources.GetValueOrDefault("en", null); }
+            get { return resources.GetValueOrDefault("en"); }
+#pragma warning disable CS8601 // Possible null reference assignment.
             set { resources["en"] = value; }
+#pragma warning restore CS8601 // Possible null reference assignment.
         }
-        public string JP
+        public string? JP
         {
-            get { return resources.GetValueOrDefault("jp", null); }
+            get { return resources.GetValueOrDefault("jp"); }
+#pragma warning disable CS8601 // Possible null reference assignment.
             set { resources["jp"] = value; }
+#pragma warning restore CS8601 // Possible null reference assignment.
         }
 
         public MultiLanguageString Clone()

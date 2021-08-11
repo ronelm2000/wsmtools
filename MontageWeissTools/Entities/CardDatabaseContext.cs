@@ -68,19 +68,19 @@ namespace Montage.Weiss.Tools.Entities
                     .HasConversion( arr => JsonConvert.SerializeObject(arr.Select(uri => uri.ToString()).ToArray())
                                 ,   str => JsonConvert.DeserializeObject<string[]>(str).Select(s => new Uri(s)).ToList()
                                     );
-                
+                b   .Property(c => c.Name)
+                    .HasConversion( mls => JsonConvert.SerializeObject(mls)
+                                  , str => JsonConvert.DeserializeObject<MultiLanguageString>(str)
+                                    );
                 b.OwnsMany(s => s.Traits, bb =>
-                 {
-                     bb.Property<int>("Id").HasAnnotation("Sqlite:Autoincrement", true);
-                     bb.HasKey("Id");
-                     bb.WithOwner().HasPrincipalKey(s => s.Serial);
-                 });
-
-                b   .OwnsOne(c => c.Name, bb =>
-                {
-                    bb.WithOwner();
-                });
-
+                     {
+                         bb.Property<int>("Id").HasAnnotation("Sqlite:Autoincrement", true);
+                         bb.HasKey("Id");
+                         bb.ToTable("WeissSchwarzCards_Traits");
+                         bb.WithOwner().HasPrincipalKey(s => s.Serial);
+                         bb.Property<string>("EN").IsRequired(false);
+                         bb.Property<string>("JP").IsRequired(false);
+                     });
             });
 
             modelBuilder.Entity<Setting>(b =>
@@ -98,6 +98,13 @@ namespace Montage.Weiss.Tools.Entities
                         Activity = ActivityType.Delete,
                         Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.8.0""}",
                         DateAdded = new DateTime(2021, 8, 10, 10, 2, 57, 51, DateTimeKind.Local).AddTicks(8029)
+                    },
+                    new ActivityLog
+                    {
+                        LogID = 2,
+                        Activity = ActivityType.Delete,
+                        Target = @"{""Language"": ""ALL"", ""VersionLessThan"": ""0.9.0""}",
+                        DateAdded = new DateTime(2021, 8, 11, 10, 2, 57, 51, DateTimeKind.Local).AddTicks(8029)
                     }
                 );
             });

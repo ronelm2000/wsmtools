@@ -28,11 +28,13 @@ jobs:
         dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
         dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
     - name: Upload Artifact (win-x64)
+      if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v1
       with:
         name: wstools-win-x64
         path: publish/wstools.exe
     - name: Upload Artifact (linux-x64)
+      if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v1
       with:
         name: wstools-linux-x64

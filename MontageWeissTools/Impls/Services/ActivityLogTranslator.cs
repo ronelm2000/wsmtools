@@ -49,7 +49,7 @@ namespace Montage.Weiss.Tools.Impls.Services
             if (!string.IsNullOrWhiteSpace(deleteArgs.Language))
             {
                 var version = new Version(deleteArgs.VersionLessThan);
-                query = query.Where(card => Version.Parse(card.VersionTimestamp.Replace(new Regex(@"-[\\w\\d]+\\+[\\w\\d]+"), ""))  < version);
+                query = query.Where(card => Version.Parse(card.VersionTimestamp.Replace(new Regex(@"(-[\w\d]+)?(\+[\w\d]+)?"), ""))  < version);
             }
             db.RemoveRange(query.ToEnumerable());
             await db.SaveChangesAsync();

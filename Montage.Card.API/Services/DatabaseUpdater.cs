@@ -15,15 +15,20 @@ namespace Montage.Card.API.Services
     {
         public async Task Update(ICDB database, IActivityLogTranslator translator)
         {
-            Log.Information("Migrating Database...");
+            if ((await database.Database.GetPendingMigrationsAsync()).Count() > 0)
+                Log.Information("Migrating Database...");
             await database.Database.MigrateAsync();
-            Log.Information("Updating Database Using Activity Log Queue...");
+            
             var activityLog = await database.MigrationLog.AsQueryable()
                 .Where(log => !log.IsDone)
                 .OrderBy(log => log.DateAdded) 
                 .AsAsyncEnumerable()
                 .ToArrayAsync()
                 ;
+            if (activityLog.Length > 0)
+            {
+                Log.Information("Pending Database Updates [{length}]", activityLog.Length);
+            }
 
             foreach (var act in activityLog.Select((act, i) => (ActLog: act, Index: i)))
             {

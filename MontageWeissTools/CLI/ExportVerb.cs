@@ -3,6 +3,7 @@ using Lamar;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Serilog;
@@ -55,6 +56,8 @@ namespace Montage.Weiss.Tools.CLI
         public async Task Run(IContainer ioc)
         {
             if (NoWarning) NonInteractive = true;
+
+            await new UpdateVerb { }.Run(ioc);
 
             Log.Information("Running...");
 

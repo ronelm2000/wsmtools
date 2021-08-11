@@ -8,6 +8,12 @@ namespace Montage.Card.API.Interfaces.Services
 {
     public interface IDatabaseUpdater<ICDB, C> where ICDB : IDisposable, ICardDatabase<C> where C : ICard
     {
-        public Task Update(ICDB database, IActivityLogTranslator translator);
+        public Task Update(ICDB database, IActivityLogTranslator translator, DatabaseUpdateArgs? args = default);
+    }
+
+    public class DatabaseUpdateArgs
+    {
+        public bool DisplayLogOverride { get; set; } = false;
+
     }
 }

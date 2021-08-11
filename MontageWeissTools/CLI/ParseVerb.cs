@@ -6,6 +6,7 @@ using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace Montage.Weiss.Tools.CLI
 
             cards = await postProcessors.AggregateAsync(cards, (pp, cs) => cs.Process(pp));
 
-            await container.GetInstance<UpdateVerb>().Run(container);
+            await container.UpdateCardDatabase();
 
             using (var db = container.GetInstance<CardDatabaseContext>())
             {

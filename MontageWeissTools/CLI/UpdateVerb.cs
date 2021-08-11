@@ -23,7 +23,7 @@ namespace Montage.Weiss.Tools.CLI
         {
             var translator = ioc.GetInstance<IActivityLogTranslator>();
             using (var db = ioc.GetInstance<CardDatabaseContext>())
-                await ioc.GetInstance<IDatabaseUpdater<CardDatabaseContext, WeissSchwarzCard>>().Update(db, translator);
+                await ioc.GetInstance<IDatabaseUpdater<CardDatabaseContext, WeissSchwarzCard>>().Update(db, translator, new DatabaseUpdateArgs { DisplayLogOverride = true });
         }
     }
 }

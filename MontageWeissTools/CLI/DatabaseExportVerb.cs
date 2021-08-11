@@ -4,6 +4,7 @@ using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,8 @@ namespace Montage.Weiss.Tools.CLI
         public async Task Run(IContainer ioc)
         {
             if (NoWarning) NonInteractive = true;
+
+            await ioc.UpdateCardDatabase();
 
             Log.Information("Running...");
 

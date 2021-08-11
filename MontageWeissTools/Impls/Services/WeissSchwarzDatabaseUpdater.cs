@@ -1,4 +1,5 @@
-﻿using Montage.Card.API.Interfaces.Services;
+﻿using Lamar;
+using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
 using Montage.Weiss.Tools.Entities;
 using Serilog;
@@ -19,9 +20,15 @@ namespace Montage.Weiss.Tools.Impls.Services
 
         public override Task OnLogEnding(UpdateEventArgs args) => OnStarting?.Invoke(this, args) ?? Task.CompletedTask;
         public override Task OnLogStarting(UpdateEventArgs args) => OnEnding?.Invoke(this, args) ?? Task.CompletedTask;
+    }
 
- //       public override Task OnLogEnding(UpdateEventArgs args) => Task.CompletedTask;
-//        public override Task OnLogStarting(UpdateEventArgs args) => Task.CompletedTask;
-
+    internal static class DatabaseUpdaterExtensions
+    {
+        public static async Task UpdateCardDatabase(this IContainer ioc)
+        {
+            using (var db = ioc.GetInstance<CardDatabaseContext>())
+                await ioc.GetInstance<IDatabaseUpdater<CardDatabaseContext, WeissSchwarzCard>>() //
+                    .Update(db, ioc.GetInstance<IActivityLogTranslator>());
+        }
     }
 }

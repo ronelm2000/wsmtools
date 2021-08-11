@@ -13,9 +13,9 @@ namespace Montage.Card.API.Services
 {
     public abstract class DatabaseUpdater<ICDB, C> where ICDB : IDisposable, ICardDatabase<C> where C : ICard
     {
-        public async Task Update(ICDB database, IActivityLogTranslator translator)
+        public async Task Update(ICDB database, IActivityLogTranslator translator, DatabaseUpdateArgs? args = default)
         {
-            if ((await database.Database.GetPendingMigrationsAsync()).Count() > 0)
+            if (args?.DisplayLogOverride ?? false || (await database.Database.GetPendingMigrationsAsync()).Count() > 0)
                 Log.Information("Migrating Database...");
             await database.Database.MigrateAsync();
             
@@ -25,7 +25,7 @@ namespace Montage.Card.API.Services
                 .AsAsyncEnumerable()
                 .ToArrayAsync()
                 ;
-            if (activityLog.Length > 0)
+            if (args?.DisplayLogOverride ?? false || activityLog.Length > 0)
             {
                 Log.Information("Pending Database Updates [{length}]", activityLog.Length);
             }

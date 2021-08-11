@@ -22,12 +22,11 @@ jobs:
       run: dotnet restore
     - name: Publish
       run: |
-        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
-        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
-        cd ./MontageWeissTools/bin/Release/netcoreapp3.1/win-x64/publish
-        zip ../../../../../../wsmtools.zip ./wstools.exe
-        cd ../../linux-x64/publish
-        zip ../../../../../../wsmtools-linux-x64.zip ./wstools
+        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
+        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
+        cd ./publish
+        zip ../wsmtools-win-x64.zip ./wstools.exe
+        zip ../wsmtools-linux-x64.zip ./wstools
     - name: Create Release
       id: create_release
       uses: actions/create-release@latest

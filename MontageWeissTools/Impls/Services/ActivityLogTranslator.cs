@@ -2,11 +2,13 @@
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Services
@@ -47,7 +49,7 @@ namespace Montage.Weiss.Tools.Impls.Services
             if (!string.IsNullOrWhiteSpace(deleteArgs.Language))
             {
                 var version = new Version(deleteArgs.VersionLessThan);
-                query = query.Where(card => new Version(card.VersionTimestamp) < version);
+                query = query.Where(card => Version.Parse(card.VersionTimestamp.Replace(new Regex(@"-[\\w\\d]+\\+[\\w\\d]+"), ""))  < version);
             }
             db.RemoveRange(query.ToEnumerable());
             await db.SaveChangesAsync();

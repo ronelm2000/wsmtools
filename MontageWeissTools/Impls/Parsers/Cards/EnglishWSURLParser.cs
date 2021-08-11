@@ -132,7 +132,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 await _WS_SEARCH_PAGE.WithClient(fc).WithHTMLHeaders().WithCookies(cs).GetAsync(); // To get some initial cookies.
                 var serial = uri.Query.Substring(_CARD_NO_QUERY.Length);
                 var serialID = WeissSchwarzCard.ParseSerial(serial);
-                var wsSearchPage = await _WS_SEARCH_PAGE
+                var wsSearchPage = await _WS_SEARCH_PAGE_EXEC
                     .WithClient(fc)
                     .WithCookies(cs)
                     .WithHTMLHeaders()

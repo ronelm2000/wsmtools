@@ -11,7 +11,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Impls.Exporters
+namespace Montage.Weiss.Tools.Impls.Exporters.Deck
 {
     /// <summary>
     /// A Deck Exporter whose output is purely a JSON file that coincides with the format of WeissSchwarzDeck, exactly.

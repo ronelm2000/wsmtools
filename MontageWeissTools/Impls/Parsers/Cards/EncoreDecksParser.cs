@@ -98,8 +98,11 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
         private string TransformIntoAPIFormat(string urlOrFile)
         {
             Log.Information("Converting URL into API link...");
-            return $"https://www.encoredecks.com/api/series/{encoreDecksSiteSetMatcher.Match(urlOrFile).Groups[1]}/cards";
+            return TransformIntoAPIFormatFromSetGUID(encoreDecksSiteSetMatcher.Match(urlOrFile).Groups[1].Value);
         }
+
+        private string TransformIntoAPIFormatFromSetGUID(string setGUID)
+            => $"https://www.encoredecks.com/api/series/{setGUID}/cards";
 
         private CardColor TranslateColor(string color)
         {

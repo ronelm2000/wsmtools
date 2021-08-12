@@ -171,6 +171,10 @@
     "Update": {
       "commandName": "Project",
       "commandLineArgs": "update"
+    },
+    "Export Bandori (DeckLog)": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://decklog.bushiroad.com/view/K1HD"
     }
   }
 }

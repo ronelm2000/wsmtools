@@ -1,4 +1,5 @@
 ﻿using Flurl.Http;
+using Montage.Card.API.Utilities;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Weiss.Tools.API;
@@ -316,6 +317,24 @@ namespace Montage.Weiss.Tools.Entities
             CardType.Event => "EV",
             CardType.Climax => "CX",
             var str => throw new Exception($"Cannot parse {typeof(CardType).Name} from {str}")
+        };
+
+        public static int GetSortKey(this CardType cardType) => cardType switch
+        {
+            CardType.Character => 0,
+            CardType.Event => 1,
+            CardType.Climax => 2,
+            _ => 3
+        };
+
+        public static int GetSortKey(this CardColor cardColor) => cardColor switch
+        {
+            CardColor.Yellow => 0,
+            CardColor.Green => 1,
+            CardColor.Red => 2,
+            CardColor.Blue => 3,
+            CardColor.Purple => 4,
+            _ => 5
         };
     }
 

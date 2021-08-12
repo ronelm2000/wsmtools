@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Montage.Card.API.Utilities;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -50,7 +51,7 @@ namespace Montage.Weiss.Tools.Utilities
             return possibleShortcutExec.ToLower() switch
             {
                 "sharex" when (Environment.OSVersion.Platform == PlatformID.Win32NT) 
-                    => InstalledApplications.GetApplictionInstallPath("ShareX") + @"ShareX.exe",
+                    => InstalledApplications.GetApplicationInstallPath("ShareX") + @"ShareX.exe",
                 _ => possibleShortcutExec
             };
         }

@@ -4,6 +4,7 @@ using Lamar;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
@@ -128,7 +129,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
             {
                 var fullOutCommand = info.OutCommand;
                 if (Environment.OSVersion.Platform == PlatformID.Win32NT && fullOutCommand.ToLower() == "sharex")
-                    fullOutCommand = InstalledApplications.GetApplictionInstallPath("ShareX") + @"ShareX.exe";
+                    fullOutCommand = InstalledApplications.GetApplicationInstallPath("ShareX") + @"ShareX.exe";
 
                 var cmd = $"{fullOutCommand} {deckImagePath.FullPath}";
                 Log.Information("Executing {command}", cmd);
@@ -190,11 +191,9 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS
                 await SendTTSCommand(host, ttsPort, stopCommand);
                 await endSignal;
             }
-            catch (Exception e)
-            {
+            catch (Exception) when (!Log.IsEnabled(Serilog.Events.LogEventLevel.Debug))
+            {                       
                 Log.Warning("Unable to send the Deck Generator directly to TTS; please load the object manually.");
-                if (Log.IsEnabled(Serilog.Events.LogEventLevel.Debug))
-                    throw e;
             } finally
             {
                 if (tcpServer?.Pending() ?? false)

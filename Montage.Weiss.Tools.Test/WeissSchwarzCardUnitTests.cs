@@ -1,5 +1,6 @@
 ﻿using Flurl.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
 using Montage.Weiss.Tools.Test.Commons;
@@ -101,7 +102,7 @@ namespace Montage.Weiss.Tools.Test.ENWS
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             var Log = Serilog.Log.Logger.ForContext<WeissSchwarzCardUnitTests>();
-            Log.Information(InstalledApplications.GetApplictionInstallPath("ShareX"));
+            Log.Information(InstalledApplications.GetApplicationInstallPath("ShareX"));
         }
 
         [TestMethod]

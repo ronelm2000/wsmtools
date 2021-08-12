@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Utilities
+namespace Montage.Card.API.Utilities
 {
     public static class StringExtensions
     {

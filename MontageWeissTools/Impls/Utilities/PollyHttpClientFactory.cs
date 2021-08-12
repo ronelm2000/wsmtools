@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
@@ -60,7 +61,7 @@ namespace Montage.Weiss.Tools.Impls.Utilities
 
         public PolicyHandler(int maxTimeouts)
         {
-            this.PolicyStrategy = Policies.GenerateRetryPolicy(maxTimeouts);
+            this.PolicyStrategy = Policies.GenerateRetryPolicy(maxTimeouts).WrapAsync(Policies.GenerateFlurlTransientRetryPolicy(maxTimeouts));
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -135,10 +136,37 @@ namespace Montage.Weiss.Tools.Impls.Utilities
                 return $"[Socket Exception ({se.ErrorCode} - {se.SocketErrorCode})";
             else if (exception is TimeoutException)
                 return "[Timeout]";
+            else if (exception is FlurlHttpException flurlException)
+                return $"[{flurlException.StatusCode ?? -1} {flurlException.Message}]";
             else
                 return "";
         }
 
+        internal static AsyncRetryPolicy GenerateFlurlTransientRetryPolicy(int maxRetries)
+        {
+            var retryPolicy = Policy
+               .Handle<FlurlHttpException>(IsTransientError)
+               .WaitAndRetryAsync(
+                   Enumerable.Range(0, maxRetries).Select(i => TimeSpan.FromSeconds(Math.Pow(2, i))),
+                   (delegateResult, retryCount, context) =>
+                   {
+                       var log = Serilog.Log.ForContext<PolicyHandler>();
+                       log.Warning($"Retrying after {retryCount} {Policies.Translate(delegateResult)}");
+                   });
+    
+            return retryPolicy;
+        }
+        private static bool IsTransientError(FlurlHttpException exception)
+        {
+            int[] httpStatusCodesWorthRetrying =
+            {
+                (int)HttpStatusCode.RequestTimeout, // 408
+                (int)HttpStatusCode.BadGateway, // 502
+                (int)HttpStatusCode.ServiceUnavailable, // 503
+                (int)HttpStatusCode.GatewayTimeout // 504
+            };
+            return exception.StatusCode.HasValue && httpStatusCodesWorthRetrying.Contains(exception.StatusCode.Value);
+        }
         //public static IAsyncPolicy<HttpResponseMessage> PolicyStrategy => RetryPolicy; //Policy.WrapAsync(RetryPolicy, TimeoutPolicy);
     }
 }

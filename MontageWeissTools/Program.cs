@@ -53,6 +53,8 @@ namespace Montage.Weiss.Tools
                 var github = new GitHubClient(new ProductHeaderValue("wsmtools"));
                 //var user = await github.User.Get("ronelm2000");
                 var wsmtoolsLatestRelease = await github.Repository.Release.GetLatest("ronelm2000", "wsmtools");
+                var versionLatestRelease = Version.Parse(wsmtoolsLatestRelease.TagName.Substring(1));
+                var appVersion = AppVersion
                 if (wsmtoolsLatestRelease.CreatedAt.DateTime > AppReleaseDate)
                 //if (wsmtoolsLatestRelease.TagName != $"v{Program.AppVersion}")
                 {
@@ -69,7 +71,7 @@ namespace Montage.Weiss.Tools
             {
                 Log.Warning("Unable to check the latest version (likely due to internet connection issues).");
                 Log.Warning("If it is, some features of wsmtools may be unusable due to the need of an internet connection.");
-                Log.Debug("Technical Details: {@e}", e);
+                Log.Warning("Technical Details: {@e}", e);
             }
         }
 

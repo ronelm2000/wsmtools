@@ -6,6 +6,7 @@ using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json;
@@ -24,11 +25,11 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors
 {
-    public class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippable<IParseInfo>
+    public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippable<IParseInfo>
     {
         private ILogger Log = Serilog.Log.ForContext<DeckLogPostProcessor>();
 
-        private readonly DeckLogSettings settings = new DeckLogSettings();
+        private readonly DeckLogSettings settings = DeckLogSettings.Japanese;
 
 //        private string defaultAwsWeissSchwarzSitePrefix = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";
 //        private string defaultReferrer = "https://decklog.bushiroad.com/create?c=2";
@@ -314,18 +315,6 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             TitleOnly,
             [EnumMember(Value = "O")]
             Others
-        }
-
-        public class DeckLogSettings
-        {
-            public string Version { get; set; } = "20210719.001";
-            public string VersionURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/version/";
-            public string ImagePrefix { get; set; } = "https://ws-tcg.com/wordpress/wp-content/images/cardlist/";
-//            public string ImagePrefix { get; set; } = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";
-
-            public string Referrer { get; set; } = "https://decklog.bushiroad.com/create?c=2";
-            public string SearchURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/search/2";
-            public string CardParamURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/cardparam/2";
         }
     }
 }

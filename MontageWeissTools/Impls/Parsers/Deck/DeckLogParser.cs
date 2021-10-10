@@ -8,6 +8,7 @@ using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json;
 using Octokit;
@@ -29,8 +30,14 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
     /// </summary>
     public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
     {
-        private Regex urlMatcher = new Regex(@"(.*):\/\/decklog\.bushiroad\.com\/view\/([^\?]*)(.*)");
-        private string deckLogApiUrlPrefix = "https://decklog.bushiroad.com/system/app/api/view/";
+        //private Regex urlMatcher = new Regex(@"(.*):\/\/decklog\.bushiroad\.com\/view\/([^\?]*)(.*)");
+        //private string deckLogApiUrlPrefix = "https://decklog.bushiroad.com/system/app/api/view/";
+        private Dictionary<CardLanguage, DeckLogSettings> _settings = new()
+        {
+            [CardLanguage.English] = DeckLogSettings.English,
+            [CardLanguage.Japanese] = DeckLogSettings.Japanese
+        };
+
         private ILogger Log = Serilog.Log.ForContext<DeckLogParser>();
         private readonly Func<CardDatabaseContext> _database;
         private readonly Func<object, Task> _parse;
@@ -55,7 +62,8 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
             await Task.CompletedTask;
             if (Uri.TryCreate(urlOrFile, UriKind.Absolute, out _))
             {
-                return urlMatcher.IsMatch(urlOrFile);
+                return _settings.Any(s => s.Value.DeckURLMatcher.IsMatch(urlOrFile));
+//                return urlMatcher.IsMatch(urlOrFile);
             }else
             {
                 return false;
@@ -65,9 +73,10 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Deck
         public async Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile)
         {
             var document = await sourceUrlOrFile.WithHTMLHeaders().GetHTMLAsync();
-            var deckID = urlMatcher.Match(sourceUrlOrFile).Groups[2];
+            var (language, settings) = _settings.First(s => s.Value.DeckURLMatcher.IsMatch(sourceUrlOrFile));
+            var deckID = settings.DeckURLMatcher.Match(sourceUrlOrFile).Groups[2];
             Log.Information("Parsing ID: {deckID}", deckID);
-            var response = await $"{deckLogApiUrlPrefix}{deckID}" //
+            var response = await $"{settings.DeckViewURL}{deckID}" //
                 .WithReferrer(sourceUrlOrFile) //
                 .PostJsonAsync(null);
             var json = JsonConvert.DeserializeObject<dynamic>(await response.GetStringAsync());

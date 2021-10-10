@@ -54,7 +54,7 @@ namespace Montage.Weiss.Tools
                 //var user = await github.User.Get("ronelm2000");
                 var wsmtoolsLatestRelease = await github.Repository.Release.GetLatest("ronelm2000", "wsmtools");
                 var versionLatestRelease = Version.Parse(wsmtoolsLatestRelease.TagName.Substring(1));
-                var appVersion = AppVersion
+                var appVersion = AppVersion;
                 if (wsmtoolsLatestRelease.CreatedAt.DateTime > AppReleaseDate)
                 //if (wsmtoolsLatestRelease.TagName != $"v{Program.AppVersion}")
                 {

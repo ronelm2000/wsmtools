@@ -179,6 +179,10 @@
     "Export MOB (Image)": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/Vd2zOev3k --exporter image --out sharex"
+    },
+    "Export Bandori (DeckLog EN)": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://decklog-en.bushiroad.com/view/JYQJ"
     }
   }
 }

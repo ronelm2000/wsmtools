@@ -1,53 +1,5 @@
 {
   "profiles": {
-    "wstools help": {
-      "commandName": "Project",
-      "commandLineArgs": "help"
-    },
-    "wstools parse PRs": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
-    },
-    "wstools parse NGNL": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?lang=EN&neoset=5d7e742b21e8c57bffb3ecfe&page=1&set=5cbf21157cd9b718cdd40820"
-    },
-    "Parse GU": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/is_the_order_a_rabbit_dear_my_sister_booster_pack.html"
-    },
-    "wstools export Prillya": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/hzUnV5mRI"
-    },
-    "wstools export P4": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/tyjlBPJDK --exporter local"
-    },
-    "wstools parse W73": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/bang_dream!_vol._2_booster_pack.html"
-    },
-    "wstools NGNL": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/api/series/5cbf21157cd9b718cdd40820/cards"
-    },
-    "wstools parse BDML": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5cf701347cd9b718cdf21469"
-    },
-    "Parse GU EP": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/is_the_order_a_rabbit_extra_pack.html"
-    },
-    "export db": {
-      "commandName": "Project",
-      "commandLineArgs": "export-db"
-    },
-    "parse DAL": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/date_a_live_booster_pack.html --with skip:decklog"
-    },
     "export Batman Ninja via Cockatrice": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE --exporter cockatrice"
@@ -183,6 +135,10 @@
     "Export Bandori (DeckLog EN)": {
       "commandName": "Project",
       "commandLineArgs": "export https://decklog-en.bushiroad.com/view/JYQJ"
+    },
+    "Parse (HOTC Local)": {
+      "commandName": "Project",
+      "commandLineArgs": "parse \"R:\\Downloads\\illya_hotc.txt\" --with hotc"
     }
   }
 }

@@ -20,11 +20,21 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
 
         public bool IsCompatible(IParseInfo info)
         {
+            return IsCompatibleAsHOTCTextFile(info) || IsCompatibleAsURL(info);
+        }
+
+        private bool IsCompatibleAsURL(IParseInfo info)
+        {
             var urlOrFile = info.URI;
             if (!Uri.TryCreate(urlOrFile, UriKind.Absolute, out Uri url))
             {
                 Log.Debug("Not compatible because not a url: {urlOrFile}", urlOrFile);
-                return IsCompatibleAsHOTCTextFile(info);
+                return false;
+            }
+            if (!url.IsWellFormedOriginalString())
+            {
+                Log.Debug("Not a proper URL, will ignore: {urlOrFile}", urlOrFile);
+                return false;
             }
             if (url.Authority != "heartofthecards.com" && url.Authority != "www.heartofthecards.com")
             {
@@ -42,7 +52,7 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
                 Log.Debug("Not compatible because absolute path cannot be /translations/ itself; please provide a set html.");
                 return false;
             }
-            Log.Information("Selected.");
+            Log.Information("Compatible as a URL.");
             return true;
         }
 
@@ -50,16 +60,18 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
         {
             if (!info.ParserHints.Select(s => s.ToLower()).Contains("hotc"))
                 return false;
-            Log.Information("Checking if this is a local .txt file instead...");
             var possiblyPath = Path.Get(info.URI);
-            return possiblyPath.Exists && possiblyPath.Extension == ".txt";
+            var isCompatible = possiblyPath.Exists && possiblyPath.Extension == ".txt";
+            if (isCompatible)
+                Log.Information("Compatible as a Local .txt file.");
+            return isCompatible;
         }
 
         public async IAsyncEnumerable<WeissSchwarzCard> Parse(String url)
         {
             Log.Information("Starting. URI: {url}", url);
             string textToProcess = null;
-            if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            if (Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.IsWellFormedOriginalString())
             {
                 var html = await new Uri(url).DownloadHTML();
                 var preSelector = "td > pre";
@@ -67,8 +79,10 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards
             }
             else
             {
-                textToProcess = Path.Get(url).Read();
+                var path = Path.Get(url);
+                textToProcess = path.Read();
             }
+
             var majorSeparator = "================================================================================";
             
             var results = textToProcess.Split(majorSeparator)

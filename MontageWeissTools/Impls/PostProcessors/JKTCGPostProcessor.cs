@@ -55,7 +55,9 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 Log.Warning("JKTCG Image Post-Processor is disabled for sets with multiple Release IDs; please add those images manually when prompted.");
                 return false;
             }
-            else if (!(await GetSetListURI(firstCard)).HasValue)
+
+            var setList = await GetSetListURI(firstCard);
+            if (!setList.HasValue)
             {
                 Log.Information("Unable to find info from JKTCG; likely a new set, will skip.");
                 return false;
@@ -143,10 +145,17 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
 
         private async Task<(string setLinkWithUnderscores, string url)?> GetSetListURI(WeissSchwarzCard firstCard)
         {
-            var menu = await "http://jktcg.com/MenuLeftEN.html"
-                .WithHTMLHeaders()
-                .GetHTMLAsync();
-            return CardListURLFrom(menu, firstCard);
+            try
+            {
+                var menu = await "http://jktcg.com/MenuLeftEN.html"
+                    .WithHTMLHeaders()
+                    .GetHTMLAsync();
+                return CardListURLFrom(menu, firstCard);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private (string setLinkWithUnderscores, string url)? CardListURLFrom(IDocument menu, WeissSchwarzCard firstCard)

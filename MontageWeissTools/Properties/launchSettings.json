@@ -139,6 +139,10 @@
     "Parse (HOTC Local)": {
       "commandName": "Project",
       "commandLineArgs": "parse \"R:\\Downloads\\illya_hotc.txt\" --with hotc"
+    },
+    "Parse Slime vol. 2 (EncoreDecks)": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=615b69951e41dfffbdd37508"
     }
   }
 }

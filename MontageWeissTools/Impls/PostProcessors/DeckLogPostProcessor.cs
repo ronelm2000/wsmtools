@@ -29,33 +29,41 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
     {
         private ILogger Log = Serilog.Log.ForContext<DeckLogPostProcessor>();
 
-        private readonly DeckLogSettings settings = DeckLogSettings.Japanese;
+ //       private readonly DeckLogSettings settings = DeckLogSettings.Japanese;
 
-//        private string defaultAwsWeissSchwarzSitePrefix = "https://s3-ap-northeast-1.amazonaws.com/static.ws-tcg.com/wordpress/wp-content/cardimages/";
-//        private string defaultReferrer = "https://decklog.bushiroad.com/create?c=2";
-//        private string defaultRESTSearchURL = "https://decklog.bushiroad.com/system/app/api/search/2";
-//        private string defaultRESTCardParamURL = "";
         private readonly Func<CardDatabaseContext> _db;
-        private readonly Func<Task<string>> _getLatestVersion;
-        private readonly Func<CookieSession> _cookieSession;
+        //private readonly Func<Task<string>> _getLatestVersion;
+        private readonly Func<GlobalCookieJar> _cookieJar;
+ //       private readonly Func<CookieSession> _cookieSession;
         private string currentVersion;
 
+        private bool isOutdated = false;
+
         public int Priority => 1;
-        public DeckLogSettings Settings => settings;
+//        public DeckLogSettings Settings => settings;
 
         public DeckLogPostProcessor(IContainer ioc)
         {
             _db = () => ioc.GetInstance<CardDatabaseContext>();
-            _cookieSession = () => ioc.GetInstance<GlobalCookieJar>()["https://decklog.bushiroad.com/"];
-            _getLatestVersion = async () =>
-            {              
-                currentVersion = currentVersion ?? await settings.VersionURL.WithCookies(_cookieSession()).GetStringAsync();
-                return currentVersion;
-            };
+            _cookieJar = () => ioc.GetInstance<GlobalCookieJar>();
+            // _cookieSession = () => ioc.GetInstance<GlobalCookieJar>()["https://decklog.bushiroad.com/"];
         }
 
         public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
         {
+            List<CardLanguage> languages = cards.Select(c => c.Language).Distinct().ToList();
+            if (languages.Count > 1) {
+                return false;
+            }
+            var settings = (languages[0] == CardLanguage.English) ? DeckLogSettings.English : DeckLogSettings.Japanese;
+            var latestVersion = await GetLatestVersion(settings);
+            if (latestVersion != settings.Version)
+            {
+                Log.Warning("DeckLog's API has been updated from {version1} to {version2}.", settings.Version, latestVersion);
+                Log.Warning("Please check with the developer for a newer version that ensures compatibility with the newest version.");
+                isOutdated = true;
+            }
+            /*
             if (cards.Any(c => c.Language == CardLanguage.English))
                 return false;
             if ((await _getLatestVersion()) != settings.Version)
@@ -63,12 +71,13 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 Log.Warning("DeckLog's API has been updated from {version1} to {version2}.", settings.Version, await _getLatestVersion());
                 Log.Warning("Please check with the developer for a newer version that ensures compatibility with the newest version.");
             }
+            */
             return true;
         }
 
-        public async Task<string> GetLatestVersion()
+        public async Task<string> GetLatestVersion(DeckLogSettings settings)
         {
-            return currentVersion ?? (currentVersion = await settings.VersionURL.WithCookies(_cookieSession()).GetStringAsync());
+            return currentVersion ?? (currentVersion = await settings.VersionURL.WithCookies(_cookieJar()[settings.Referrer]).GetStringAsync());
         }
 
         public async Task<bool> IsIncluded(IParseInfo info)
@@ -78,7 +87,8 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             {
                 Log.Information("Skipping due to the parser hint [skip:decklog].");
                 return false;
-            }  if ((await _getLatestVersion()) != settings.Version)
+            }
+            if (isOutdated)
             {
                 if (info.ParserHints.Contains("nowarn", StringComparer.CurrentCultureIgnoreCase))
                     Log.Information("Please note that [nowarn] flag is now deprecated as DeckLog is now enabled by default due to several versions of ensured compatibility.");
@@ -102,9 +112,11 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
         public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
         {
             var cardData = await originalCards.ToListAsync();
+            List<CardLanguage> languages = cardData.Select(c => c.Language).Distinct().ToList();
+            var settings = (languages[0] == CardLanguage.English) ? DeckLogSettings.English : DeckLogSettings.Japanese;
             Log.Information("Starting...");
             var titleCodes = cardData.Select(c => c.TitleCode).Distinct().ToArray();
-            var deckLogSearchResults = await GetDeckLogSearchResults(cardData);
+            var deckLogSearchResults = await GetDeckLogSearchResults(cardData, settings);
             using (var db = _db())
             {
                 var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
@@ -118,7 +130,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                 await foreach (var card in prCards)
                 {
                     var entity = db.Attach(card);
-                    var newCard = TryMutate(entity.Entity, deckLogSearchResults);
+                    var newCard = TryMutate(entity.Entity, deckLogSearchResults, settings);
                     entity.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                     Log.Debug("New URL: {cards}", newCard.Images);
                 }
@@ -127,10 +139,10 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             }
 
             foreach (var card in cardData)
-                yield return TryMutate(card, deckLogSearchResults);
+                yield return TryMutate(card, deckLogSearchResults, settings);
         }
 
-        private WeissSchwarzCard TryMutate(WeissSchwarzCard originalCard, Dictionary<string, DLCardEntry> deckLogSearchData)
+        private WeissSchwarzCard TryMutate(WeissSchwarzCard originalCard, Dictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings)
         {
             if (deckLogSearchData.ContainsKey(originalCard.Serial + originalCard.Rarity))
             {
@@ -145,7 +157,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             }
             return originalCard;
         }
-        private async Task<Dictionary<string, DLCardEntry>> GetDeckLogSearchResults(List<WeissSchwarzCard> cardData)
+        private async Task<Dictionary<string, DLCardEntry>> GetDeckLogSearchResults(List<WeissSchwarzCard> cardData, DeckLogSettings settings)
         {
             var results = new Dictionary<string, DLCardEntry>();
             List<DLCardEntry> temporaryResults = null;
@@ -154,7 +166,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
             var cardParams = await settings.CardParamURL
                 .WithRESTHeaders()
                 .WithReferrer(settings.Referrer)
-                .WithCookies(_cookieSession())
+                .WithCookies(_cookieJar()[settings.Referrer])
                 .PostJsonAsync(new { })
                 .ReceiveJson<DLQueryParameters>();
             var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
@@ -168,7 +180,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors
                     Log.Information("Extracting Page {pagenumber}...", page);
                     temporaryResults = await settings.SearchURL.WithRESTHeaders()
                         .WithReferrer(settings.Referrer)
-                        .WithCookies(_cookieSession())
+                        .WithCookies(_cookieJar()[settings.Referrer])
                         .PostJsonAsync(new
                         {
                             param = queryData,

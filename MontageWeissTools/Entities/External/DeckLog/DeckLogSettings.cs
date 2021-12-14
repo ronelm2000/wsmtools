@@ -4,7 +4,7 @@ namespace Montage.Weiss.Tools.Entities.External.DeckLog
 {
     public class DeckLogSettings
     {
-        public string Version { get; set; } = "20210907.001";
+        public string Version { get; set; } = "20211022.001";
         public string Authority { get; set; } = "https://decklog.bushiroad.com/";
         public Regex DeckURLMatcher { get; set; } = new Regex(@"(.*):\/\/decklog\.bushiroad\.com\/view\/([^\?]*)(.*)");
         public string VersionURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/version/";

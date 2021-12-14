@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Impls.PostProcessors;
 using Montage.Weiss.Tools.Test.Commons;
 using System;
@@ -20,8 +21,9 @@ namespace Montage.Weiss.Tools.Test.PostProcessors
             Lamar.Container ioc = Program.Bootstrap();
 
             var deckLogPP = ioc.GetInstance<DeckLogPostProcessor>();
-            var latestVersion = await deckLogPP.GetLatestVersion();
-            Assert.IsTrue(latestVersion == deckLogPP.Settings.Version, $"DeckLog API version is outdated; latest version is {latestVersion} need to check for compatibility.");
+            var settings = DeckLogSettings.Japanese;
+            var latestVersion = await deckLogPP.GetLatestVersion(settings);
+            Assert.IsTrue(latestVersion == settings.Version, $"DeckLog API version is outdated; latest version is {latestVersion} need to check for compatibility.");
         }
     }
 }

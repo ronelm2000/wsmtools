@@ -1,10 +1,9 @@
 ﻿using CommandLine;
 
-namespace Montage.Weiss.Tools
+namespace Montage.Weiss.Tools;
+
+internal class Options
 {
-    internal class Options
-    {
-        [Value(0)]
-        public string URI { get; set; }
-    }
+    [Value(0)]
+    public string URI { get; set; }
 }

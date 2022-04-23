@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Montage.Weiss.Tools;
 
-namespace Montage.Weiss.Tools
+public class AppConfig
 {
-    public class AppConfig
-    {
-        public string DbName { get; set; } = "cards.db";
-    }
+    public string DbName { get; set; } = "cards.db";
 }

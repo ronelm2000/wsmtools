@@ -1,43 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
+﻿using System.Dynamic;
 
-namespace Montage.Weiss.Tools.Utilities
+namespace Montage.Weiss.Tools.Utilities;
+
+public static class DynamicExtensions
 {
-    public static class DynamicExtensions
+    public static dynamic AsOptional(dynamic obj) {
+        return new OptionalDynamicObject(obj);
+    }
+}
+
+internal class OptionalDynamicObject : DynamicObject
+{
+    private dynamic obj;
+
+    public OptionalDynamicObject(dynamic obj)
     {
-        public static dynamic AsOptional(dynamic obj) {
-            return new OptionalDynamicObject(obj);
-        }
+        this.obj = obj;
     }
 
-    internal class OptionalDynamicObject : DynamicObject
+    public override bool TryGetMember(GetMemberBinder binder, out object result)
     {
-        private dynamic obj;
-
-        public OptionalDynamicObject(dynamic obj)
+        try
         {
-            this.obj = obj;
-        }
-
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
-        {
-            try
-            {
-                var objAsDictionary = (IDictionary<string, object>)obj;
-                if (objAsDictionary != null && objAsDictionary.TryGetValue(binder.Name, out object innerResult))
-                    result = innerResult;
-                else
-                    result = null;
-                return true;
-            }
-            catch (Exception)
-            {
+            var objAsDictionary = (IDictionary<string, object>)obj;
+            if (objAsDictionary != null && objAsDictionary.TryGetValue(binder.Name, out object innerResult))
+                result = innerResult;
+            else
                 result = null;
-                return true;
-            }
+            return true;
+        }
+        catch (Exception)
+        {
+            result = null;
+            return true;
         }
     }
 }

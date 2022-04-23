@@ -4,329 +4,317 @@ using Lamar;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
-using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Octokit;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Impls.PostProcessors
+namespace Montage.Weiss.Tools.Impls.PostProcessors;
+
+public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippable<IParseInfo>
 {
-    public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippable<IParseInfo>
-    {
-        private ILogger Log = Serilog.Log.ForContext<DeckLogPostProcessor>();
+    private ILogger Log = Serilog.Log.ForContext<DeckLogPostProcessor>();
 
- //       private readonly DeckLogSettings settings = DeckLogSettings.Japanese;
+//       private readonly DeckLogSettings settings = DeckLogSettings.Japanese;
 
-        private readonly Func<CardDatabaseContext> _db;
-        //private readonly Func<Task<string>> _getLatestVersion;
-        private readonly Func<GlobalCookieJar> _cookieJar;
- //       private readonly Func<CookieSession> _cookieSession;
-        private string currentVersion;
+    private readonly Func<CardDatabaseContext> _db;
+    //private readonly Func<Task<string>> _getLatestVersion;
+    private readonly Func<GlobalCookieJar> _cookieJar;
+//       private readonly Func<CookieSession> _cookieSession;
+    private string currentVersion;
 
-        private bool isOutdated = false;
+    private bool isOutdated = false;
 
-        public int Priority => 1;
+    public int Priority => 1;
 //        public DeckLogSettings Settings => settings;
 
-        public DeckLogPostProcessor(IContainer ioc)
-        {
-            _db = () => ioc.GetInstance<CardDatabaseContext>();
-            _cookieJar = () => ioc.GetInstance<GlobalCookieJar>();
-            // _cookieSession = () => ioc.GetInstance<GlobalCookieJar>()["https://decklog.bushiroad.com/"];
-        }
+    public DeckLogPostProcessor(IContainer ioc)
+    {
+        _db = () => ioc.GetInstance<CardDatabaseContext>();
+        _cookieJar = () => ioc.GetInstance<GlobalCookieJar>();
+        // _cookieSession = () => ioc.GetInstance<GlobalCookieJar>()["https://decklog.bushiroad.com/"];
+    }
 
-        public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
-        {
-            List<CardLanguage> languages = cards.Select(c => c.Language).Distinct().ToList();
-            if (languages.Count > 1) {
-                return false;
-            }
-            var settings = (languages[0] == CardLanguage.English) ? DeckLogSettings.English : DeckLogSettings.Japanese;
-            var latestVersion = await GetLatestVersion(settings);
-            if (latestVersion != settings.Version)
-            {
-                Log.Warning("DeckLog's API has been updated from {version1} to {version2}.", settings.Version, latestVersion);
-                Log.Warning("Please check with the developer for a newer version that ensures compatibility with the newest version.");
-                isOutdated = true;
-            }
-            /*
-            if (cards.Any(c => c.Language == CardLanguage.English))
-                return false;
-            if ((await _getLatestVersion()) != settings.Version)
-            {
-                Log.Warning("DeckLog's API has been updated from {version1} to {version2}.", settings.Version, await _getLatestVersion());
-                Log.Warning("Please check with the developer for a newer version that ensures compatibility with the newest version.");
-            }
-            */
-            return true;
+    public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
+    {
+        List<CardLanguage> languages = cards.Select(c => c.Language).Distinct().ToList();
+        if (languages.Count > 1) {
+            return false;
         }
-
-        public async Task<string> GetLatestVersion(DeckLogSettings settings)
+        var settings = (languages[0] == CardLanguage.English) ? DeckLogSettings.English : DeckLogSettings.Japanese;
+        var latestVersion = await GetLatestVersion(settings);
+        if (latestVersion != settings.Version)
         {
-            return currentVersion ?? (currentVersion = await settings.VersionURL.WithCookies(_cookieJar()[settings.Referrer]).GetStringAsync());
+            Log.Warning("DeckLog's API has been updated from {version1} to {version2}.", settings.Version, latestVersion);
+            Log.Warning("Please check with the developer for a newer version that ensures compatibility with the newest version.");
+            isOutdated = true;
         }
-
-        public async Task<bool> IsIncluded(IParseInfo info)
+        /*
+        if (cards.Any(c => c.Language == CardLanguage.English))
+            return false;
+        if ((await _getLatestVersion()) != settings.Version)
         {
-            await Task.CompletedTask;
-            if (info.ParserHints.Select(s => s.ToLower()).Contains("skip:decklog"))
+            Log.Warning("DeckLog's API has been updated from {version1} to {version2}.", settings.Version, await _getLatestVersion());
+            Log.Warning("Please check with the developer for a newer version that ensures compatibility with the newest version.");
+        }
+        */
+        return true;
+    }
+
+    public async Task<string> GetLatestVersion(DeckLogSettings settings)
+    {
+        return currentVersion ?? (currentVersion = await settings.VersionURL.WithCookies(_cookieJar()[settings.Referrer]).GetStringAsync());
+    }
+
+    public async Task<bool> IsIncluded(IParseInfo info)
+    {
+        await Task.CompletedTask;
+        if (info.ParserHints.Select(s => s.ToLower()).Contains("skip:decklog"))
+        {
+            Log.Information("Skipping due to the parser hint [skip:decklog].");
+            return false;
+        }
+        if (isOutdated)
+        {
+            if (info.ParserHints.Contains("nowarn", StringComparer.CurrentCultureIgnoreCase))
+                Log.Information("Please note that [nowarn] flag is now deprecated as DeckLog is now enabled by default due to several versions of ensured compatibility.");
+            if (info.ParserHints.Contains("strict", StringComparer.CurrentCultureIgnoreCase))
             {
-                Log.Information("Skipping due to the parser hint [skip:decklog].");
+                Log.Information("Not executing due to [strict] flag.");
                 return false;
-            }
-            if (isOutdated)
-            {
-                if (info.ParserHints.Contains("nowarn", StringComparer.CurrentCultureIgnoreCase))
-                    Log.Information("Please note that [nowarn] flag is now deprecated as DeckLog is now enabled by default due to several versions of ensured compatibility.");
-                if (info.ParserHints.Contains("strict", StringComparer.CurrentCultureIgnoreCase))
-                {
-                    Log.Information("Not executing due to [strict] flag.");
-                    return false;
-                }
-                else
-                {
-                    Log.Warning("DeckLog is now enabled by default, but expect bugs due to version incompability.");
-                    return true;
-                }
             }
             else
             {
+                Log.Warning("DeckLog is now enabled by default, but expect bugs due to version incompability.");
                 return true;
             }
         }
-
-        public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
+        else
         {
-            var cardData = await originalCards.ToListAsync();
-            List<CardLanguage> languages = cardData.Select(c => c.Language).Distinct().ToList();
-            var settings = (languages[0] == CardLanguage.English) ? DeckLogSettings.English : DeckLogSettings.Japanese;
-            Log.Information("Starting...");
-            var titleCodes = cardData.Select(c => c.TitleCode).Distinct().ToArray();
-            var deckLogSearchResults = await GetDeckLogSearchResults(cardData, settings);
-            using (var db = _db())
+            return true;
+        }
+    }
+
+    public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
+    {
+        var cardData = await originalCards.ToListAsync();
+        List<CardLanguage> languages = cardData.Select(c => c.Language).Distinct().ToList();
+        var settings = (languages[0] == CardLanguage.English) ? DeckLogSettings.English : DeckLogSettings.Japanese;
+        Log.Information("Starting...");
+        var titleCodes = cardData.Select(c => c.TitleCode).Distinct().ToArray();
+        var deckLogSearchResults = await GetDeckLogSearchResults(cardData, settings);
+        using (var db = _db())
+        {
+            var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
+                .Where(c => titleCodes.Contains(c.TitleCode)
+                            && c.Language == CardLanguage.Japanese
+                            && c.Rarity == "PR"
+                            && !c.Images.Any(u => u.AbsoluteUri.StartsWith(settings.ImagePrefix))
+                      );
+
+            Log.Information("Post-Processing PRs...");
+            await foreach (var card in prCards)
             {
-                var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
-                    .Where(c => titleCodes.Contains(c.TitleCode)
-                                && c.Language == CardLanguage.Japanese
-                                && c.Rarity == "PR"
-                                && !c.Images.Any(u => u.AbsoluteUri.StartsWith(settings.ImagePrefix))
-                          );
-
-                Log.Information("Post-Processing PRs...");
-                await foreach (var card in prCards)
-                {
-                    var entity = db.Attach(card);
-                    var newCard = TryMutate(entity.Entity, deckLogSearchResults, settings);
-                    entity.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                    Log.Debug("New URL: {cards}", newCard.Images);
-                }
-                var results = await db.SaveChangesAsync();
-                Log.Information("Changed: {results} rows.", results);
+                var entity = db.Attach(card);
+                var newCard = TryMutate(entity.Entity, deckLogSearchResults, settings);
+                entity.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                Log.Debug("New URL: {cards}", newCard.Images);
             }
-
-            foreach (var card in cardData)
-                yield return TryMutate(card, deckLogSearchResults, settings);
+            var results = await db.SaveChangesAsync();
+            Log.Information("Changed: {results} rows.", results);
         }
 
-        private WeissSchwarzCard TryMutate(WeissSchwarzCard originalCard, Dictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings)
-        {
-            if (deckLogSearchData.ContainsKey(originalCard.Serial + originalCard.Rarity))
-            {
-                Log.Information("Found and adding data: [{card}]", originalCard.Serial);
-                var deckLogData = deckLogSearchData[originalCard.Serial + originalCard.Rarity];
-                originalCard.Name.JP = deckLogData.Name;
-                originalCard.Images.Add(new Uri($"{settings.ImagePrefix}{deckLogData.ImagePath}"));
-            }
-            else
-            {
-                Log.Warning("Unable to find data for [{serial}], no image data was extracted...", originalCard.Serial);
-            }
-            return originalCard;
-        }
-        private async Task<Dictionary<string, DLCardEntry>> GetDeckLogSearchResults(List<WeissSchwarzCard> cardData, DeckLogSettings settings)
-        {
-            var results = new Dictionary<string, DLCardEntry>();
-            List<DLCardEntry> temporaryResults = null;
-            // var queryData = GenerateSearchJSON(titleCodes);
-            //Log.Information($"Accessing DeckLog API with the following query data: {JsonConvert.SerializeObject(queryData, Formatting.Indented)}");
-            var cardParams = await settings.CardParamURL
-                .WithRESTHeaders()
-                .WithReferrer(settings.Referrer)
-                .WithCookies(_cookieJar()[settings.Referrer])
-                .PostJsonAsync(new { })
-                .ReceiveJson<DLQueryParameters>();
-            var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
-            IEnumerable<DLCardQuery> queries = GetCardQueries(cardData, cardParams, titleCodes);
-            foreach (var queryData in queries)
-            {
-                int page = 1;
-                Log.Information($"Accessing DeckLog API with the following query data: {JsonConvert.SerializeObject(queryData, Formatting.Indented)}");
-                do
-                {
-                    Log.Information("Extracting Page {pagenumber}...", page);
-                    temporaryResults = await settings.SearchURL.WithRESTHeaders()
-                        .WithReferrer(settings.Referrer)
-                        .WithCookies(_cookieJar()[settings.Referrer])
-                        .PostJsonAsync(new
-                        {
-                            param = queryData,
-                            page = page
-                        })
-                        .ReceiveJson<List<DLCardEntry>>();
-                    foreach (var entry in temporaryResults)
-                        results[entry.Serial + entry.Rarity] = entry;
-                    Log.Information("Got {count} results...", temporaryResults?.Count ?? 0);
-                    page++;
-                } while (temporaryResults.Count > 29);
-            }
-            return results;
-        }
+        foreach (var card in cardData)
+            yield return TryMutate(card, deckLogSearchResults, settings);
+    }
 
-        private IEnumerable<DLCardQuery> GetCardQueries(List<WeissSchwarzCard> cardData, DLQueryParameters cardParams, HashSet<string> titleCodes)
+    private WeissSchwarzCard TryMutate(WeissSchwarzCard originalCard, Dictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings)
+    {
+        if (deckLogSearchData.ContainsKey(originalCard.Serial + originalCard.Rarity))
         {
-            //var matchesOneNSTitle = cardParams.GetTitleSelectionKeys().Any(a => titleCodes.Except(a).SequenceEqual(Array.Empty<string>()));
-            var titles = cardParams.GetTitleSelectionKeys().Where(a => titleCodes.Intersect(a).Count() > 0).Select(a => titleCodes.Intersect(a).ToArray()).ToArray();
-            Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
-            Log.Information("All Titles: {@titles}", titles);
-            Log.Information("Removing Sub-Lists...");
-            titles = titles.Where(t1 => titles.All(t2 => t1 == t2 || !t1.Union(t2).ToHashSet().SetEquals(t2))).ToArray();
-            Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
-            Log.Information("All Titles: {@titles}", titles);
-            if (titles.Length < 5)
-                return GenerateSearchJSON(titles.SelectMany(t => t).Distinct());
-            else
-                return GenerateSearchJSON(cardData);
+            Log.Information("Found and adding data: [{card}]", originalCard.Serial);
+            var deckLogData = deckLogSearchData[originalCard.Serial + originalCard.Rarity];
+            originalCard.Name.JP = deckLogData.Name;
+            originalCard.Images.Add(new Uri($"{settings.ImagePrefix}{deckLogData.ImagePath}"));
         }
-
-        private IEnumerable<DLCardQuery> GenerateSearchJSON(IEnumerable<string> titleCodes)
+        else
         {
+            Log.Warning("Unable to find data for [{serial}], no image data was extracted...", originalCard.Serial);
+        }
+        return originalCard;
+    }
+    private async Task<Dictionary<string, DLCardEntry>> GetDeckLogSearchResults(List<WeissSchwarzCard> cardData, DeckLogSettings settings)
+    {
+        var results = new Dictionary<string, DLCardEntry>();
+        List<DLCardEntry> temporaryResults = null;
+        // var queryData = GenerateSearchJSON(titleCodes);
+        //Log.Information($"Accessing DeckLog API with the following query data: {JsonConvert.SerializeObject(queryData, Formatting.Indented)}");
+        var cardParams = await settings.CardParamURL
+            .WithRESTHeaders()
+            .WithReferrer(settings.Referrer)
+            .WithCookies(_cookieJar()[settings.Referrer])
+            .PostJsonAsync(new { })
+            .ReceiveJson<DLQueryParameters>();
+        var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
+        IEnumerable<DLCardQuery> queries = GetCardQueries(cardData, cardParams, titleCodes);
+        foreach (var queryData in queries)
+        {
+            int page = 1;
+            Log.Information($"Accessing DeckLog API with the following query data: {JsonConvert.SerializeObject(queryData, Formatting.Indented)}");
+            do
+            {
+                Log.Information("Extracting Page {pagenumber}...", page);
+                temporaryResults = await settings.SearchURL.WithRESTHeaders()
+                    .WithReferrer(settings.Referrer)
+                    .WithCookies(_cookieJar()[settings.Referrer])
+                    .PostJsonAsync(new
+                    {
+                        param = queryData,
+                        page = page
+                    })
+                    .ReceiveJson<List<DLCardEntry>>();
+                foreach (var entry in temporaryResults)
+                    results[entry.Serial + entry.Rarity] = entry;
+                Log.Information("Got {count} results...", temporaryResults?.Count ?? 0);
+                page++;
+            } while (temporaryResults.Count > 29);
+        }
+        return results;
+    }
+
+    private IEnumerable<DLCardQuery> GetCardQueries(List<WeissSchwarzCard> cardData, DLQueryParameters cardParams, HashSet<string> titleCodes)
+    {
+        //var matchesOneNSTitle = cardParams.GetTitleSelectionKeys().Any(a => titleCodes.Except(a).SequenceEqual(Array.Empty<string>()));
+        var titles = cardParams.GetTitleSelectionKeys().Where(a => titleCodes.Intersect(a).Count() > 0).Select(a => titleCodes.Intersect(a).ToArray()).ToArray();
+        Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
+        Log.Information("All Titles: {@titles}", titles);
+        Log.Information("Removing Sub-Lists...");
+        titles = titles.Where(t1 => titles.All(t2 => t1 == t2 || !t1.Union(t2).ToHashSet().SetEquals(t2))).ToArray();
+        Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
+        Log.Information("All Titles: {@titles}", titles);
+        if (titles.Length < 5)
+            return GenerateSearchJSON(titles.SelectMany(t => t).Distinct());
+        else
+            return GenerateSearchJSON(cardData);
+    }
+
+    private IEnumerable<DLCardQuery> GenerateSearchJSON(IEnumerable<string> titleCodes)
+    {
+        yield return new DLCardQuery
+        {
+            Titles = $"##{titleCodes.ConcatAsString("##")}##"
+        };
+    }
+
+    private IEnumerable<DLCardQuery> GenerateSearchJSON(List<WeissSchwarzCard> cardData)
+    {
+        foreach (var card in cardData) {
             yield return new DLCardQuery
             {
-                Titles = $"##{titleCodes.ConcatAsString("##")}##"
+                Keyword = card.Serial
             };
         }
+    }
 
-        private IEnumerable<DLCardQuery> GenerateSearchJSON(List<WeissSchwarzCard> cardData)
+    private class DLQueryParameters
+    {
+        [JsonProperty("title_number_select_for_search")]
+        public Dictionary<string, TitleSelection> TitleSelectionsForSearch { get; set; }
+
+        public IEnumerable<string[]> GetTitleSelectionKeys()
         {
-            foreach (var card in cardData) {
-                yield return new DLCardQuery
-                {
-                    Keyword = card.Serial
-                };
-            }
+            return TitleSelectionsForSearch.Keys.Select(s => s.Split("##", StringSplitOptions.RemoveEmptyEntries));
         }
+    }
 
-        private class DLQueryParameters
-        {
-            [JsonProperty("title_number_select_for_search")]
-            public Dictionary<string, TitleSelection> TitleSelectionsForSearch { get; set; }
+    private class TitleSelection
+    {
+        public int Side { get; set; } // -1 = Weiss ; -2 = Schwarz ; -3 = Both
+        public string Label { get; set; }
+        public int ID { get; set; }
+    }
 
-            public IEnumerable<string[]> GetTitleSelectionKeys()
-            {
-                return TitleSelectionsForSearch.Keys.Select(s => s.Split("##", StringSplitOptions.RemoveEmptyEntries));
-            }
-        }
+    private class DLCardEntry
+    {
+        [JsonProperty("card_number")]
+        public string Serial { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("rare")]
+        public string Rarity { get; set; }  
+        [JsonProperty("img")]
+        public string ImagePath { get; set; }
+    }
 
-        private class TitleSelection
-        {
-            public int Side { get; set; } // -1 = Weiss ; -2 = Schwarz ; -3 = Both
-            public string Label { get; set; }
-            public int ID { get; set; }
-        }
+    private class DLCardQuery
+    {
+        [JsonProperty("title_number")]
+        public string Titles { get; set; } = "";
+        [JsonProperty("keyword")]
+        public string Keyword { get; set; } = "";
+        [JsonProperty("keyword_type")]
+        public string[] KeywordQueryType { get; set; } = new string[] { "no" };
+        [JsonProperty("side")]
+        public string Side { get; set; } = "";
+        [JsonProperty("card_kind")]
+        public CardType TypeQuery { get; set; } = CardType.All;
+        [JsonProperty("color")]
+        public CardColor ColorQuery { get; set; } = CardColor.All;
+        [JsonProperty("option_clock")]
+        public bool CounterCardsOnly { get; set; } = false;
+        [JsonProperty("option_counter")]
+        public bool ClockCardsOnly { get; set; } = false;
+        [JsonProperty("deck_param1")]
+        public DeckConstructionType DeckConstruction { get; set; } = DeckConstructionType.Standard;
+        [JsonProperty("deck_param2")]
+        public string DeckConstructionParameter { get; set; } = "";
 
-        private class DLCardEntry
-        {
-            [JsonProperty("card_number")]
-            public string Serial { get; set; }
-            [JsonProperty("name")]
-            public string Name { get; set; }
-            [JsonProperty("rare")]
-            public string Rarity { get; set; }  
-            [JsonProperty("img")]
-            public string ImagePath { get; set; }
-        }
+        //TODO: There's actually alot of missing variables that can be placed here, but these are ignored for now.
+    }
 
-        private class DLCardQuery
-        {
-            [JsonProperty("title_number")]
-            public string Titles { get; set; } = "";
-            [JsonProperty("keyword")]
-            public string Keyword { get; set; } = "";
-            [JsonProperty("keyword_type")]
-            public string[] KeywordQueryType { get; set; } = new string[] { "no" };
-            [JsonProperty("side")]
-            public string Side { get; set; } = "";
-            [JsonProperty("card_kind")]
-            public CardType TypeQuery { get; set; } = CardType.All;
-            [JsonProperty("color")]
-            public CardColor ColorQuery { get; set; } = CardColor.All;
-            [JsonProperty("option_clock")]
-            public bool CounterCardsOnly { get; set; } = false;
-            [JsonProperty("option_counter")]
-            public bool ClockCardsOnly { get; set; } = false;
-            [JsonProperty("deck_param1")]
-            public DeckConstructionType DeckConstruction { get; set; } = DeckConstructionType.Standard;
-            [JsonProperty("deck_param2")]
-            public string DeckConstructionParameter { get; set; } = "";
+    [JsonConverter(typeof(StringEnumConverter))]
+    [DataContract]
+    private enum CardType {
+        [EnumMember(Value = "0")]
+        All,
+        [EnumMember(Value = "2")]
+        Character,
+        [EnumMember(Value = "3")]
+        Event,
+        [EnumMember(Value = "4")]
+        Climax
+    }
 
-            //TODO: There's actually alot of missing variables that can be placed here, but these are ignored for now.
-        }
+    [JsonConverter(typeof(StringEnumConverter))]
+    [DataContract]
+    private enum CardColor
+    {
+        [EnumMember(Value = "0")]
+        All,
+        [EnumMember(Value = "yellow")]
+        Yellow,
+        [EnumMember(Value = "green")]
+        Green,
+        [EnumMember(Value = "red")]
+        Red,
+        [EnumMember(Value = "blue")]
+        Blue
+    }
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        [DataContract]
-        private enum CardType {
-            [EnumMember(Value = "0")]
-            All,
-            [EnumMember(Value = "2")]
-            Character,
-            [EnumMember(Value = "3")]
-            Event,
-            [EnumMember(Value = "4")]
-            Climax
-        }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        [DataContract]
-        private enum CardColor
-        {
-            [EnumMember(Value = "0")]
-            All,
-            [EnumMember(Value = "yellow")]
-            Yellow,
-            [EnumMember(Value = "green")]
-            Green,
-            [EnumMember(Value = "red")]
-            Red,
-            [EnumMember(Value = "blue")]
-            Blue
-        }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        [DataContract]
-        private enum DeckConstructionType
-        {
-            [EnumMember(Value = "S")]
-            Standard,
-            [EnumMember(Value = "N")]
-            NeoStandard,
-            [EnumMember(Value = "T")]
-            TitleOnly,
-            [EnumMember(Value = "O")]
-            Others
-        }
+    [JsonConverter(typeof(StringEnumConverter))]
+    [DataContract]
+    private enum DeckConstructionType
+    {
+        [EnumMember(Value = "S")]
+        Standard,
+        [EnumMember(Value = "N")]
+        NeoStandard,
+        [EnumMember(Value = "T")]
+        TitleOnly,
+        [EnumMember(Value = "O")]
+        Others
     }
 }

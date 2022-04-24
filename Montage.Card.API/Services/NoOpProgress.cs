@@ -17,11 +17,14 @@ namespace Montage.Card.API.Services
         /// </summary>
         public static NoOpProgress<T> Instance { get; } = new NoOpProgress<T>();
 
-        private NoOpProgress() { }
+        private NoOpProgress()
+        {
+
+        }
 
         public void Report(T value)
         {
-            throw new NotImplementedException();
+            // Do nothing
         }
     }
 }

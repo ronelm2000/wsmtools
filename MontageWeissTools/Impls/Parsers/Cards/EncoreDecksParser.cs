@@ -4,6 +4,8 @@ using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Cards;
 
@@ -16,42 +18,61 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
     private readonly Regex encoreDecksSiteSetMatcher = new Regex(@"http(?:s)?:\/\/www.encoredecks\.com\/?.+&set=([a-f0-9]+).*");
     private readonly ILogger Log = Serilog.Log.ForContext<EncoreDecksParser>();
 
-    public bool IsCompatible(IParseInfo info)
+    public async Task<bool> IsCompatible(IParseInfo info)
     {
         var urlOrFile = info.URI;
         if (encoreDecksAPIMatcher.IsMatch(urlOrFile))
         {
             Log.Information("Compatibility Passed for: {urlOrFile}", urlOrFile);
-            return true;
+            
+            return await ValueTask.FromResult(true);
         }
         else if (encoreDecksSiteSetMatcher.IsMatch(urlOrFile))
         {
             Log.Information("Compatibility Passed for: {urlOrFile}", urlOrFile);
-            return true;
+            return await ValueTask.FromResult(true);
         }
         else
         {
             Log.Debug("Compatibility Failed for: {urlOrFile}", urlOrFile);
-            return false;
+            return await ValueTask.FromResult(false);
         }
     }
 
-    public async IAsyncEnumerable<WeissSchwarzCard> Parse(string urlOrFile, )
+    public async IAsyncEnumerable<WeissSchwarzCard> Parse(string urlOrLocalFile, IProgress<SetParserProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        if (encoreDecksSiteSetMatcher.IsMatch(urlOrFile))
-            urlOrFile = TransformIntoAPIFormat(urlOrFile);
+        if (encoreDecksSiteSetMatcher.IsMatch(urlOrLocalFile))
+            urlOrLocalFile = TransformIntoAPIFormat(urlOrLocalFile);
 
         IList<dynamic> setCards = null;
+        var progressReport = new SetParserProgressReport();
         do try
             {
-                setCards = await urlOrFile.WithRESTHeaders().GetJsonListAsync();
+                progressReport = progressReport with
+                {
+                    ReportMessage = new MultiLanguageString
+                    {
+                        EN = "Obtaining list of cards..."
+                    },
+                    Percentage = 1
+                };
+                progress.Report(progressReport);
+                setCards = await urlOrLocalFile.WithRESTHeaders().GetJsonListAsync(cancellationToken);
             }
             catch (FlurlHttpException)
             {
                 // Do nothing
             } while (setCards == null);
+
+        progressReport = progressReport with {
+            ReportMessage = new MultiLanguageString { EN = $"Obtained [{setCards.Count}] cards." }, 
+            Percentage = 10
+        };
+        progress.Report(progressReport);
+
         foreach (var setCard in setCards)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             WeissSchwarzCard result = new WeissSchwarzCard();
             result.Name = new MultiLanguageString();
             var enOptional = DynamicExtensions.AsOptional(setCard.locale.EN);
@@ -80,10 +101,18 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
 
             result.Type = TranslateType(setCard.cardtype);
             result.Color = TranslateColor(setCard.colour);
-            result.Remarks = $"Parsed: {this.GetType().Name}";  
+            result.Remarks = $"Parsed: {this.GetType().Name}";
+
+            progressReport = progressReport with
+            {
+                ReportMessage = new MultiLanguageString { EN = $"Parsed [{result.Serial}]." },
+                Percentage = 10 + (int)((progressReport.CardsParsed + 1f) * 90 / setCards.Count),
+                CardsParsed = progressReport.CardsParsed + 1
+            };
+            progress.Report(progressReport);
+
             yield return result;
         }
-        // Get 
         yield break;
     }
 

@@ -2,6 +2,7 @@
 using Lamar;
 using Microsoft.EntityFrameworkCore;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
@@ -24,28 +25,32 @@ namespace Montage.Weiss.Tools.CLI
         [Option("with", HelpText = "Provides a hint as to what parser should be used or if post-processors are skipped (if any).", Default = new string[] { })]
         public IEnumerable<string> ParserHints { get; set; } = new string[] { };
 
-        public async Task Run(IContainer container)
+        public async Task Run(IContainer container, IProgress<CommandProgressReport> progress, CancellationToken ct)
         {
             var Log = Serilog.Log.ForContext<ParseVerb>();
+            var parser = await container.GetAllInstances<ICardSetParser<WeissSchwarzCard>>()
+                .ToAsyncEnumerable()
+                .WhereAwait(async parser => await parser.IsCompatible(this))
+                .FirstAsync();
 
-            var parser = container.GetAllInstances<ICardSetParser<WeissSchwarzCard>>()
-                .Where(parser => parser.IsCompatible(this))
-                .First();
-
-            var cardList = await parser.Parse(URI).ToListAsync();
+            var redirector = new CommandProgressAggregator(progress);
+            var cardList = await parser.Parse(URI, redirector, ct).ToListAsync(ct);
             var cards = cardList.Distinct(WeissSchwarzCard.SerialComparer).ToAsyncEnumerable();
 
-            var postProcessors = container.GetAllInstances<ICardPostProcessor<WeissSchwarzCard>>()
+            var postProcessors = await container.GetAllInstances<ICardPostProcessor<WeissSchwarzCard>>()
                 .ToAsyncEnumerable()
                 .WhereAwait(async processor => await processor.IsCompatible(cardList))
                 .Where(processor => (parser is IFilter<ICardPostProcessor<WeissSchwarzCard>> filter) ? filter.IsIncluded(processor) : true)
                 .WhereAwait(async processor => (processor is ISkippable<IParseInfo> skippable) ? await skippable.IsIncluded(this) : true)
                 .WhereAwait(async processor => (processor is ISkippable<ICardSetParser<WeissSchwarzCard>> skippable) ? await skippable.IsIncluded(parser) : true)
-                .OrderByDescending(processor => processor.Priority);
+                .OrderByDescending(processor => processor.Priority)
+                .ToArrayAsync(ct)
+                ;
 
-            cards = await postProcessors.AggregateAsync(cards, (pp, cs) => cs.Process(pp));
+            redirector.PostProcessorCount = postProcessors.Length;
+            cards = postProcessors.Aggregate(cards, (pp, cs) => cs.Process(pp, redirector, ct));
 
-            await container.UpdateCardDatabase();
+            await container.UpdateCardDatabase(redirector, ct);
 
             using (var db = container.GetInstance<CardDatabaseContext>())
             {
@@ -59,13 +64,72 @@ namespace Montage.Weiss.Tools.CLI
                     Log.Information("Added to DB: {serial}", card.Serial);
                 }
 
+                progress.Report(new CommandProgressReport
+                {
+                    ReportMessage = new MultiLanguageString
+                    {
+                        EN = "Saving all changes..."
+                    },
+                    Percentage = 75
+                });
                 await db.SaveChangesAsync();
             }
 
-//            foreach (var pp in postProcessors)
-//                cards = pp.Process(cards);
-
             Log.Information("Successfully parsed: {uri}", URI);
+            progress.Report(new CommandProgressReport
+            {
+                ReportMessage = new MultiLanguageString
+                {
+                    EN = $"Successfully parsed: {URI}"
+                },
+                Percentage = 100
+            });
         }
+    }
+
+    internal class CommandProgressAggregator : IProgress<SetParserProgressReport>, IProgress<PostProcessorProgressReport>, IProgress<DatabaseUpdateReport>
+    {
+        private CommandProgressReport _totalReport = new CommandProgressReport();
+        private IProgress<CommandProgressReport> _progress;
+        public int PostProcessorCount { get; internal set; }
+
+        public CommandProgressAggregator(IProgress<CommandProgressReport> progress)
+        {
+            _progress = progress;
+        }
+
+        public void Report(DatabaseUpdateReport value)
+        {
+            _totalReport = _totalReport with
+            {
+                Percentage = 0 + (int)(value.Percentage * 0.15f),
+                ReportMessage = value.ReportMessage
+            };
+            _progress.Report(_totalReport);
+        }
+
+        public void Report(SetParserProgressReport value)
+        {
+            _totalReport = _totalReport with
+            {
+                Percentage = 15 + (int)(value.Percentage * 0.80f),
+                ReportMessage = value.ReportMessage
+            };
+            _progress.Report(_totalReport);
+        }
+
+        public void Report(PostProcessorProgressReport value)
+        {
+            // TODO: Maybe need to change how total percentage computation works?
+            /*
+            _totalReport = _totalReport with
+            {
+                Percentage = 25 + (int)(value.Percentage * 100 * 0.25f),
+                ReportMessage = value.ReportMessage
+            };
+            _progress.Report(_totalReport);
+            */
+        }
+
     }
 }

@@ -24,7 +24,7 @@ public static class UriExtensions
         if (errors != SslPolicyErrors.None)
             if (cert.Thumbprint == "cf0b1d5c188a542271330ad489d9c7bde9a8abd0")
             {
-                Log.Warning("There is an known error certifcate error with www.encoredecks.com. This is ignored tempoaririly as I contact the developer.");
+                Log.Warning("There is an known error certifcate error with www.encoredecks.com. This is ignored temporarily as I contact the developer.");
                 return true;
             } else
             {
@@ -34,65 +34,56 @@ public static class UriExtensions
             return true;
     }
 
-    public static async Task<IDocument> DownloadHTML(this Uri uri)
+    public static Task<IDocument> DownloadHTML(this Uri uri, params (string Key, string Value)[] keyValuePairs)
+        => DownloadHTML(uri, CancellationToken.None, keyValuePairs);
+
+    public static async Task<IDocument> DownloadHTML(this Uri uri, CancellationToken cancellationToken = default)
     {
-        //HttpWebRequest myReq = (HttpWebRequest)WebRequest.Create(uri);
-        //var response = myReq.GetResponse();
-        //Log.Information("Response Content Length: {ContentLength}", response.ContentLength);
-        using (WebClient wc = new WebClient())
+        var content = await uri.WithClient(customizedClient)
+            .WithHeaders(new
+            {
+                User_Agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36",
+                X_Requested_With = "XMLHttpRequest",
+                Accept = "*/*",
+                Accept_Language = "en-US,en;q=0.8"
+            })
+            .GetStringAsync(cancellationToken: cancellationToken)
+            ;
+        var config = Configuration.Default.WithDefaultLoader()
+                .WithCss()
+                ;
+        var context = BrowsingContext.New(config);
+        return await context.OpenAsync(req =>
         {
-            wc.Encoding = Encoding.UTF8;
-            var values = new NameValueCollection();
-            //values.Add("Referer", "http://www.nseindia.com/products/content/equities/equities/bulk.htm");
-            values.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36");
-            values.Add("X-Requested-With", "XMLHttpRequest");
-            values.Add("Accept", "*/*");
-            values.Add("Accept-Language", "en-US,en;q=0.8");
-            wc.Headers.Add(values);
-
-            var content = wc.DownloadString(uri);
-
-            var config = Configuration.Default.WithDefaultLoader()
-                    .WithCss()
-                    ;
-            var context = BrowsingContext.New(config);
-            return await context.OpenAsync(req => req.Content(content));
-        }
+            req.Content(content);
+            req.Address(uri);
+        }, cancellationToken);        
     }
 
-    public static async Task<IDocument> DownloadHTML(this Uri uri, params (string Key, string Value)[] keyValuePairs)
+    public static async Task<IDocument> DownloadHTML(this Uri uri, CancellationToken cancel, params (string Key, string Value)[] keyValuePairs)
     {
-        //HttpWebRequest myReq = (HttpWebRequest)WebRequest.Create(uri);
-        //var response = myReq.GetResponse();
-        //Log.Information("Response Content Length: {ContentLength}", response.ContentLength);
-        using (WebClient wc = new WebClient())
-        {
-            wc.Encoding = Encoding.UTF8;
-
-            var values = new NameValueCollection();
-            //values.Add("Referer", "http://www.nseindia.com/products/content/equities/equities/bulk.htm");
-            values.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36");
-            values.Add("X-Requested-With", "XMLHttpRequest");
-            values.Add("Accept", "*/*");
-            values.Add("Accept-Language", "en-US,en;q=0.8");
-            foreach (var kvp in keyValuePairs)
+        var req = uri.WithClient(customizedClient)
+            .WithHeaders(new
             {
-                values.Remove(kvp.Key);
-                values.Add(kvp.Key, kvp.Value);
-            }
-            wc.Headers.Add(values);
+                User_Agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36",
+                X_Requested_With = "XMLHttpRequest",
+                Accept = "*/*",
+                Accept_Language = "en-US,en;q=0.8"
+            });
 
-            var content = wc.DownloadString(uri);
-            var config = Configuration.Default.WithDefaultLoader()
-                    .WithCss()
-                    ;
-            var context = BrowsingContext.New(config);
-            return await context.OpenAsync(req =>
+        foreach (var kvp in keyValuePairs)
+            req = req.WithHeader(kvp.Key, kvp.Value);
+
+        var content = await req.GetStringAsync(cancellationToken: cancel);
+        var config = Configuration.Default.WithDefaultLoader()
+                .WithCss()
+                ;
+        var context = BrowsingContext.New(config);
+        return await context.OpenAsync(req =>
             {
                 req.Content(content);
                 req.Address(uri);
-            });
-        }
+            }, cancel: cancel);   
     }
 
     public static IFlurlRequest WithReferrer(this IFlurlRequest request, string referrerUrl) => request.WithHeader("Referer", referrerUrl);
@@ -139,26 +130,25 @@ public static class UriExtensions
         //.WithHeader("Host", url.Authority) //
     }
 
-    public static async Task<IDocument> GetHTMLAsync(this IFlurlRequest flurlReq)
+    public static async Task<IDocument> GetHTMLAsync(this IFlurlRequest flurlReq, CancellationToken cancel = default)
     {
         //var content = wc.DownloadString(uri);
         var config = Configuration.Default.WithDefaultLoader()
                 .WithCss()
                 ;
         var context = BrowsingContext.New(config);
-        var stream = await flurlReq.GetStreamAsync();
+        var stream = await flurlReq.GetStreamAsync(cancel);
         return await context.OpenAsync(req =>
         {
             req.Address(flurlReq.Url.ToString());
             req.Content(stream, true);
-        });
+        }, cancel: cancel);
     }
 
-    public static async Task<IDocument> RecieveHTML(this Task<IFlurlResponse> flurlResponse)
+    public static async Task<IDocument> RecieveHTML(this Task<IFlurlResponse> flurlResponse, CancellationToken cancel = default)
     {
         var config = Configuration.Default.WithDefaultLoader()
                 .WithCss()
-                //.With(I)
                 ;
         var context = BrowsingContext.New(config);
         var response = await flurlResponse;
@@ -168,6 +158,6 @@ public static class UriExtensions
         {
             req.Address(url);
             req.Content(stream, true);
-        });
+        }, cancel: cancel);
     }
 }

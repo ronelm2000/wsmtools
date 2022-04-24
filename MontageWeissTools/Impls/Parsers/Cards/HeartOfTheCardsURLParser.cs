@@ -5,6 +5,8 @@ using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Utilities;
+using System.Threading;
+using System.Runtime.CompilerServices;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Cards;
 
@@ -12,9 +14,9 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
 {
     private ILogger Log = Serilog.Log.ForContext<HeartOfTheCardsURLParser>();
 
-    public bool IsCompatible(IParseInfo info)
+    public async Task<bool> IsCompatible(IParseInfo parseInfo)
     {
-        return IsCompatibleAsHOTCTextFile(info) || IsCompatibleAsURL(info);
+        return await ValueTask.FromResult(IsCompatibleAsHOTCTextFile(parseInfo) || IsCompatibleAsURL(parseInfo));
     }
 
     private bool IsCompatibleAsURL(IParseInfo info)
@@ -61,33 +63,62 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         return isCompatible;
     }
 
-    public async IAsyncEnumerable<WeissSchwarzCard> Parse(String url)
+    public async IAsyncEnumerable<WeissSchwarzCard> Parse(string url, IProgress<SetParserProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         Log.Information("Starting. URI: {url}", url);
         string textToProcess = null;
+
+        var progressReport = new SetParserProgressReport
+        {
+            ReportMessage = new MultiLanguageString { EN = $"Starting with URI: [{url}]" },
+            Percentage = 0
+        };
+        progress.Report(progressReport);
+
         if (Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.IsWellFormedOriginalString())
         {
-            var html = await new Uri(url).DownloadHTML();
+            var html = await new Uri(url).DownloadHTML(cancellationToken);
             var preSelector = "td > pre";
             textToProcess = html.QuerySelector(preSelector).TextContent;
         }
         else
         {
             var path = Path.Get(url);
-            textToProcess = path.Read();
+            textToProcess = await path.ReadStringAsync(cancellationToken);
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
+        progressReport = progressReport with
+        {
+            ReportMessage = new MultiLanguageString { EN = $"Finished obtaining text: [{url}]" },
+            Percentage = 10
+        };
+        progress.Report(progressReport);
+
         var majorSeparator = "================================================================================";
-        
-        var results = textToProcess.Split(majorSeparator)
-            .AsEnumerable()
+        var textSplits = textToProcess.Split(majorSeparator);
+        var rows = textSplits.Length - 2;
+        var results = textSplits.AsEnumerable()
             .Skip(1)
             .SkipLast(1)
-            .Select(section => ParseHOTCText(section))
+            .Select( (section, index) => (index, card: ParseHOTCText(section)))
             ;
-        foreach (var card in results)
-            yield return card;
-        
+
+        foreach (var cardPair in results)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            progressReport = progressReport.WithParsedSerial(cardPair.card, rows);
+            progress.Report(progressReport);
+            yield return cardPair.card;
+        }
+
+        progressReport = progressReport with
+        {
+            ReportMessage = new MultiLanguageString { EN = $"Parsed all cards." },
+            Percentage = 100
+        };
+        progress.Report(progressReport);
+        yield break;
     }
 
     private WeissSchwarzCard ParseHOTCText(string hotcText)

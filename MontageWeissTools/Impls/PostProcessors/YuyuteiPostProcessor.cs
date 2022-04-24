@@ -3,10 +3,12 @@ using AngleSharp.Html.Dom;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
+using System.Runtime.CompilerServices;
 using System.Web;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors;
@@ -38,7 +40,7 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
 
     public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
     {
-        await Task.CompletedTask;
+        await ValueTask.CompletedTask;
         if (cards.First().Language != CardLanguage.Japanese)
             return false;
         var list = cards.Select(c => c.ReleaseID).Distinct().ToList();
@@ -83,11 +85,11 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
         }
     }
 
-    public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
+    public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards, IProgress<PostProcessorProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var yuyuteiSellPage = "https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=";
 
-        var cards = await originalCards.ToArrayAsync();
+        var cards = await originalCards.ToArrayAsync(cancellationToken);
 
         var firstCard = cards.Skip(Math.Min(cards.Length - 1, 10)).First(); // wtf GFB. Why you do this to me.
         var setCode = firstCard.ReleaseID;
@@ -104,7 +106,7 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
         yuyuteiSellPage += HttpUtility.UrlEncode(setCode);
         Log.Information("Loading: {yuyuteiSellPage}", yuyuteiSellPage);
 
-        IDocument yuyuteiSearchPage = await new Uri(yuyuteiSellPage).DownloadHTML(("Referer", "https://yuyu-tei.jp/")).WithRetries(10);
+        IDocument yuyuteiSearchPage = await new Uri(yuyuteiSellPage).DownloadHTML(cancellationToken, ("Referer", "https://yuyu-tei.jp/")).WithRetries(10);
 
         var cardUnitListItems = yuyuteiSearchPage.QuerySelectorAll(cardUnitListItemSelector);
 

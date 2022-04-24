@@ -32,9 +32,12 @@ namespace Montage.Weiss.Tools.CLI
         [Value(1, HelpText = "Indicates the Language. This is only applicable if you indicated the Release ID.", Default = "")]
         public string Language { get; set; } = "";
 
-        public async Task Run(IContainer ioc)
+        public async Task Run(IContainer ioc, IProgress<CommandProgressReport> progress, CancellationToken cancellationToken = default)
         {
             Log.Information("Starting.");
+            var report = CommandProgressReport.Starting(CommandProgressReportVerbType.Caching);
+            progress.Report(report);
+
             var language = InterpretLanguage(Language);
             IAsyncEnumerable<WeissSchwarzCard> list = null;
 
@@ -43,7 +46,7 @@ namespace Montage.Weiss.Tools.CLI
 
             using (var db = ioc.GetInstance<CardDatabaseContext>())
             {
-                await db.Database.MigrateAsync();
+                await db.Database.MigrateAsync(cancellationToken);
                 if (language == null)
                 {
                     try
@@ -70,18 +73,34 @@ namespace Montage.Weiss.Tools.CLI
                     list = query.ToAsyncEnumerable().Where(c => c.Language == language.Value);
                 }
 
-                await foreach (var card in list)
-                    await AddCachedImageAsync(card, _cookieSession);
+
+
+                await foreach (var card in list.WithCancellation(cancellationToken))
+                {
+                    report = report with
+                    {
+                        MessageType = MessageType.InProgress,
+                        ReportMessage = new Card.API.Entities.Impls.MultiLanguageString
+                        {
+                            EN = $"Caching [${card.Serial}]..."
+                        },
+                        Percentage = 50
+                    };
+                    progress.Report(report);
+                    await AddCachedImageAsync(card, _cookieSession, cancellationToken);
+                }
 
                 Log.Information("Done.");
                 Log.Information("PS: Please refrain from executing this command continuously as this may cause your IP address to get tagged as a DDoS bot.");
                 Log.Information("    Only cache the images you may need.");
                 Log.Information("    -ronelm2000");
-
             }
+
+            report = report.AsDone();
+            progress.Report(report);
         }
 
-        private async Task AddCachedImageAsync(WeissSchwarzCard card, Func<Flurl.Url, CookieSession> _cookieSession)
+        private async Task AddCachedImageAsync(WeissSchwarzCard card, Func<Flurl.Url, CookieSession> _cookieSession, CancellationToken ct = default)
         {
             try
             {
@@ -101,7 +120,7 @@ namespace Montage.Weiss.Tools.CLI
                     img.Metadata.ExifProfile ??= new ExifProfile();
                     img.Metadata.ExifProfile.SetValue(SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifTag.Copyright, card.Images.Last().Authority);
                     var savePath = Path.Get(_IMAGE_CACHE_PATH).Combine($"{card.Serial.Replace('-', '_').AsFileNameFriendly()}.jpg");
-                    savePath.Open(img.SaveAsJpeg);
+                    await img.SaveAsPngAsync(savePath.FullPath, ct);
                 }
             } catch (InvalidOperationException e) when (e.Message == "Sequence contains no elements")
             {

@@ -19,10 +19,11 @@ public class WeissSchwarzDatabaseUpdater : DatabaseUpdater<CardDatabaseContext, 
 
 internal static class DatabaseUpdaterExtensions
 {
-    public static async Task UpdateCardDatabase(this IContainer ioc)
+
+    public static async Task UpdateCardDatabase(this IContainer ioc, IProgress<DatabaseUpdateReport> progress, CancellationToken token = default)
     {
         using (var db = ioc.GetInstance<CardDatabaseContext>())
             await ioc.GetInstance<IDatabaseUpdater<CardDatabaseContext, WeissSchwarzCard>>() //
-                .Update(db, ioc.GetInstance<IActivityLogTranslator>());
+                .Update(db, ioc.GetInstance<IActivityLogTranslator>(), new DatabaseUpdateArgs { CancellationToken = token, Progress = progress });
     }
 }

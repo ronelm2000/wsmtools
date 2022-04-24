@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using Lamar;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
@@ -54,11 +55,13 @@ namespace Montage.Weiss.Tools.CLI
         { 
         }
 
-        public async Task Run(IContainer ioc)
+        public async Task Run(IContainer ioc, IProgress<CommandProgressReport> progress, CancellationToken cancellationToken = default)
         {
             if (NoWarning) NonInteractive = true;
 
-            await ioc.UpdateCardDatabase();
+            var aggregator = new CommandProgressAggregator(progress);
+
+            await ioc.UpdateCardDatabase(aggregator, cancellationToken);
 
             Log.Information("Running...");
 
@@ -66,9 +69,8 @@ namespace Montage.Weiss.Tools.CLI
                 .ToAsyncEnumerable()
                 .WhereAwait(async parser => await parser.IsCompatible(Source))
                 .OrderByDescending(parser => parser.Priority)
-                .FirstAsync();
-
-            var deck = await parser.Parse(Source);
+                .FirstAsync(cancellationToken);
+            var deck = await parser.Parse(Source, aggregator, cancellationToken);
             var inspectionOptions = new InspectionOptions()
             {
                 IsNonInteractive = this.NonInteractive,
@@ -89,6 +91,60 @@ namespace Montage.Weiss.Tools.CLI
 
             if (deck != WeissSchwarzDeck.Empty)
                 await exporter.Export(deck, this);
+        }
+
+        internal class CommandProgressAggregator : IProgress<SetParserProgressReport>, IProgress<PostProcessorProgressReport>, IProgress<DatabaseUpdateReport>, IProgress<DeckParserProgressReport>
+        {
+            private CommandProgressReport _totalReport = new CommandProgressReport();
+            private IProgress<CommandProgressReport> _progress;
+            public int PostProcessorCount { get; internal set; }
+
+            internal CommandProgressAggregator(IProgress<CommandProgressReport> progress)
+            {
+                _progress = progress;
+            }
+
+            private (int PercentageBase, float PercentageRatio) GetAggregatePercentageRatios(UpdateProgressReport report)
+            {
+                return report switch
+                {
+                    var x when x is DatabaseUpdateReport => (0, 0.05f),
+                    var x when x is SetParserProgressReport => (0, 0.05f),
+                    var x when x is DeckParserProgressReport => (10, 0.30f),
+                    _ => (0, 0f)
+                };
+            }
+
+            private int GetAggregatePercentage(UpdateProgressReport report)
+            {
+                var percentages = GetAggregatePercentageRatios(report);
+                return percentages.PercentageBase + (int)(report.Percentage * percentages.PercentageRatio);
+            }
+
+            public void Report(DatabaseUpdateReport value) => ReportUpdate(value);
+            public void Report(SetParserProgressReport value) => ReportUpdate(value);
+            public void Report(DeckParserProgressReport value) => ReportUpdate(value);
+            public void Report(PostProcessorProgressReport value)
+            {
+                // TODO: Maybe need to change how total percentage computation works?
+                _totalReport = _totalReport with
+                {
+                    Percentage = 25 + (int)(value.Percentage * 100 * 0.25f),
+                    ReportMessage = value.ReportMessage
+                };
+                _progress.Report(_totalReport);
+            }
+
+            public void ReportUpdate(UpdateProgressReport value)
+            {
+                _totalReport = _totalReport with
+                {
+                    Percentage = GetAggregatePercentage(value),
+                    ReportMessage = value.ReportMessage
+                };
+                _progress.Report(_totalReport);
+            }
+
         }
     }
 }

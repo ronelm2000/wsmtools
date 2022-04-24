@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.JSON;
+using Montage.Weiss.Tools.Utilities;
 using System.Text.Json;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Deck;
@@ -33,20 +34,24 @@ public class LocalDeckJSONParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCar
             return true;
     }
 
-    public async Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile)
+    public async Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile, IProgress<DeckParserProgressReport> progress, CancellationToken cancellationToken = default)
     {
+        // TODO: Add DeckLog code here for getting missing sets.
+        DeckParserProgressReport report = DeckParserProgressReport.AsStarting("Local Deck File");
+        progress.Report(report);
+
         var filePath = Path.Get(sourceUrlOrFile);
         SimpleDeck deckJSON = null;
-        deckJSON = JsonSerializer.Deserialize<SimpleDeck>(filePath.ReadBytes());
+        deckJSON = JsonSerializer.Deserialize<SimpleDeck>(await filePath.ReadBytesAsync(cancellationToken));
         WeissSchwarzDeck deck = new WeissSchwarzDeck();
         deck.Name = deckJSON.Name;
         deck.Remarks = deckJSON.Remarks;
         using (var db = _database())
         {
-            await db.Database.MigrateAsync();
+            await db.Database.MigrateAsync(cancellationToken);
             foreach (var serial in deckJSON.Ratios.Keys)
             {
-                var card = await db.WeissSchwarzCards.FindAsync(serial);
+                var card = await db.WeissSchwarzCards.FindAsync(new[] { serial }, cancellationToken);
                 if (card == null)
                 {
                     Log.Error("This card is missing in your local card db: {serial}", serial);
@@ -59,6 +64,10 @@ public class LocalDeckJSONParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCar
                 }
             }
         }
+
+        report = report.SuccessfullyParsedDeck(deck);
+        progress.Report(report);
+
         return deck;
     }
 }

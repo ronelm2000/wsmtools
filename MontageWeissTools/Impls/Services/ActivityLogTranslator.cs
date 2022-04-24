@@ -16,13 +16,13 @@ public class ActivityLogTranslator : IActivityLogTranslator
         _db = () => ioc.GetInstance<CardDatabaseContext>();
     }
 
-    public async Task<ActivityLog> Perform(ActivityLog activityLog)
+    public async Task<ActivityLog> Perform(ActivityLog activityLog, IProgress<ActivityLogProgressReport> progress, CancellationToken ct)
     {
         using (var db = _db())
         {
             Func<Task> action = activityLog.Activity switch
             {
-                ActivityType.Delete => async () => await DeleteCards(db, activityLog),
+                ActivityType.Delete => async () => await DeleteCards(db, activityLog, ct),
                 _ => throw new NotImplementedException($"{activityLog.Activity} has not been implemented yet!")
             };
             await action();
@@ -31,7 +31,7 @@ public class ActivityLogTranslator : IActivityLogTranslator
         }
     }
 
-    private async Task DeleteCards(CardDatabaseContext db, ActivityLog activityLog)
+    private async Task DeleteCards(CardDatabaseContext db, ActivityLog activityLog, CancellationToken ct)
     {
         var deleteArgs = JsonSerializer.Deserialize<DeleteArgs>(activityLog.Target);
         var query = db.WeissSchwarzCards.AsAsyncEnumerable();
@@ -46,7 +46,7 @@ public class ActivityLogTranslator : IActivityLogTranslator
             query = query.Where(card => Version.Parse(card.VersionTimestamp.Replace(new Regex(@"(-[\w\d]+)?(\+[\w\d]+)?"), ""))  < version);
         }
         db.RemoveRange(query.ToEnumerable());
-        await db.SaveChangesAsync();
+        await db.SaveChangesAsync(ct);
     }
 
     private CardLanguage? TranslateLanguage(string language) => language.ToLower() switch

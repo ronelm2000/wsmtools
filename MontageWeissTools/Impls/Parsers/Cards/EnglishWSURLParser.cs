@@ -7,6 +7,8 @@ using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Cards;
 
@@ -75,11 +77,13 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
         ("<img src=\"../partimages/bounce.gif\">", "【BOUNCE】") 
     };
 
-    public bool IsCompatible(IParseInfo info)
+    public async Task<bool> IsCompatible(IParseInfo parseInfo)
     {
-        var urlOrFile = info.URI;
+        var urlOrFile = parseInfo.URI;
         try
         {
+            await ValueTask.CompletedTask;
+
             if (!Uri.TryCreate(urlOrFile, UriKind.Absolute, out var uri))
             {
                 Log.Debug("Not a URI. Failed compatibility check.", urlOrFile);
@@ -113,16 +117,24 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
         }
     }
 
-    public async IAsyncEnumerable<WeissSchwarzCard> Parse(string urlOrFile)
+    public async IAsyncEnumerable<WeissSchwarzCard> Parse(string urlOrLocalFile, IProgress<SetParserProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         Log.Information("Starting...");
 
-        var uri = new Uri(urlOrFile);
+        var progressReport = new SetParserProgressReport
+        {
+            CardsParsed = 0,
+            Percentage = 0,
+            ReportMessage = new MultiLanguageString { EN = $"Getting cards from [{urlOrLocalFile}]... " }
+        };
+        progress.Report(progressReport);
+
+        var uri = new Uri(urlOrLocalFile);
         using (var fc = new FlurlClient())
         using (var cs = new CookieSession("https://en.ws-tcg.com/"))
         {
             fc.Settings.BeforeCall = this.Debug;
-            await _WS_SEARCH_PAGE.WithClient(fc).WithHTMLHeaders().WithCookies(cs).GetAsync(); // To get some initial cookies.
+            await _WS_SEARCH_PAGE.WithClient(fc).WithHTMLHeaders().WithCookies(cs).GetAsync(cancellationToken); // To get some initial cookies.
             var serial = uri.Query.Substring(_CARD_NO_QUERY.Length);
             var serialID = WeissSchwarzCard.ParseSerial(serial);
             var wsSearchPage = await _WS_SEARCH_PAGE_EXEC
@@ -157,13 +169,39 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
                 })
                 .RecieveHTML();
 
-            foreach (var cardUnitTD in wsSearchPage.QuerySelectorAll(_CARD_UNIT_SELECTOR))
-                yield return await ParseCardAsync(cardUnitTD);
+            var divsToProcess = wsSearchPage.QuerySelectorAll(_CARD_UNIT_SELECTOR);
+
+            progressReport = progressReport with
+            {
+                ReportMessage = new MultiLanguageString { EN = $"(Possibly) Obtained [{divsToProcess.Length}] cards." },
+                Percentage = 10
+            };
+            progress.Report(progressReport);
+
+            foreach (var cardUnitTD in divsToProcess)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var result = await ParseCardAsync(cardUnitTD);
+                progressReport = progressReport with
+                {
+                    ReportMessage = new MultiLanguageString { EN = $"Parsed [{result.Serial}]." },
+                    Percentage = 10 + (int)((progressReport.CardsParsed + 1f) * 90 / divsToProcess.Length),
+                    CardsParsed = progressReport.CardsParsed + 1
+                };
+                progress.Report(progressReport);
+                yield return result;
+            }
 
             //Log.Information("Debug: {content}", wsSearchPage.DocumentElement.OuterHtml);
         }
 
         Log.Information("Ending...");
+        progressReport = progressReport with
+        {
+            ReportMessage = new MultiLanguageString { EN = $"Parsed all cards." },
+            Percentage = 100
+        };
+        progress.Report(progressReport);
         yield break;
     }
 

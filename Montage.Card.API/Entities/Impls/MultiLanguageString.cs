@@ -6,9 +6,9 @@ namespace Montage.Card.API.Entities.Impls
 {
     public class MultiLanguageString : IExactCloneable<MultiLanguageString>
     {
-        private Dictionary<string, string> resources = new Dictionary<String,String>();
+        private Dictionary<string, string?> resources = new Dictionary<string, string?>();
 
-        public string this[string languageIndex]
+        public string? this[string languageIndex]
         {
             get { return resources[languageIndex]; }
             set { resources[languageIndex] = value; }
@@ -21,17 +21,15 @@ namespace Montage.Card.API.Entities.Impls
         public string? EN
         {
             get { return resources.GetValueOrDefault("en"); }
-#pragma warning disable CS8601 // Possible null reference assignment.
             set { resources["en"] = value; }
-#pragma warning restore CS8601 // Possible null reference assignment.
         }
         public string? JP
         {
             get { return resources.GetValueOrDefault("jp"); }
-#pragma warning disable CS8601 // Possible null reference assignment.
             set { resources["jp"] = value; }
-#pragma warning restore CS8601 // Possible null reference assignment.
         }
+
+        public static MultiLanguageString Empty { get; internal set; } = new MultiLanguageString() { EN = "", JP = "" };
 
         public MultiLanguageString Clone()
         {

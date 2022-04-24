@@ -11,7 +11,7 @@ namespace Montage.Card.API.Entities
         string Parser { get; }
         string Exporter { get; }
         string OutCommand { get; }
-        public IEnumerable<string> Flags { get; }
-        public bool NonInteractive { get; }
+        IEnumerable<string> Flags { get; }
+        bool NonInteractive { get; }
     }
 }

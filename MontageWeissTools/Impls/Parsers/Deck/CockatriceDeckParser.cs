@@ -40,13 +40,24 @@ public class CockatriceDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCa
         return file.Exists && file.Extension == ".cod";
     }
 
-    public async Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile)
+    public async Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile, IProgress<DeckParserProgressReport> progress, CancellationToken cancellationToken = default)
     {
         Log.Information("Parsing: {source}", sourceUrlOrFile);
+        var report = new DeckParserProgressReport
+        {
+            Percentage = 0,
+            ReportMessage = new Card.API.Entities.Impls.MultiLanguageString
+            {
+                EN = $"Parsing Cockatrice Deck: {sourceUrlOrFile}"
+            }
+        };
+        progress.Report(report);
+
         var file = Fluent.IO.Path.Get(sourceUrlOrFile);
         var serializer = new XmlSerializer(typeof(CockatriceDeck));
         using (var stream = file.GetStream())
         {
+            // TODO: Copy code from DeckParser/DeckLogParser to get sets from EncoreDecks if they are missing.
             var cockatriceDeck = serializer.Deserialize(stream) as CockatriceDeck;
             var result = new WeissSchwarzDeck();
             var missingSerials = new List<String>();
@@ -69,7 +80,16 @@ public class CockatriceDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCa
             }
             else
             {
-                return await Task.FromResult(result);
+                report = new DeckParserProgressReport
+                {
+                    Percentage = 100,
+                    ReportMessage = new Card.API.Entities.Impls.MultiLanguageString
+                    {
+                        EN = "Done parsing."
+                    }
+                };
+                progress.Report(report);
+                return await ValueTask.FromResult(result);
             }
         }
     }

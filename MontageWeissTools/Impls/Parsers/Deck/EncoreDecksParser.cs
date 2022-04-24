@@ -18,7 +18,7 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 
     // Dependencies
     private readonly Func<CardDatabaseContext> _database;
-    private readonly Func<string,Task> _parse;
+    private readonly Func<string, IProgress<CommandProgressReport>, CancellationToken, Task> _parse;
 
     public string[] Alias => new[] { "encoredecks", "ed" };
     public int Priority => 1;
@@ -27,14 +27,14 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
     {
         Log = Serilog.Log.ForContext<EncoreDecksParser>();
         _database = () => container.GetInstance<CardDatabaseContext>();
-        _parse = async (url) =>
+        _parse = async (url, p, ct) =>
         {
             var parser = container.GetInstance<ParseVerb>();
             parser.URI = url;
-            await parser.Run(container);
+            await parser.Run(container, p, ct);
         };
     }
-    
+
 
     public async Task<bool> IsCompatible(string urlOrFile)
     {
@@ -46,15 +46,15 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
             urlOrFile.StartsWith("http://www.encoredecks.com/deck/");
     }
 
-    public async Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile)
+    public async Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile, IProgress<DeckParserProgressReport> progress, CancellationToken cancellationToken = default)
     {
         if (File.Exists(sourceUrlOrFile))
-                return await ParseFromCSV(sourceUrlOrFile);
+            return await ParseFromCSV(sourceUrlOrFile, progress, cancellationToken);
         else
-            return await Parse(new Uri(sourceUrlOrFile));
+            return await Parse(new Uri(sourceUrlOrFile), progress, cancellationToken);
     }
 
-    private async Task<WeissSchwarzDeck> ParseFromCSV(string sourceCSV)
+    private async Task<WeissSchwarzDeck> ParseFromCSV(string sourceCSV, IProgress<DeckParserProgressReport> progress, CancellationToken cancellationToken)
     {
         WeissSchwarzDeck res = new WeissSchwarzDeck();
         using (var db = _database())
@@ -71,22 +71,29 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         return res;
     }
 
-    private async Task<WeissSchwarzDeck> Parse(Uri uri)
+    private async Task<WeissSchwarzDeck> Parse(Uri uri, IProgress<DeckParserProgressReport> progress, CancellationToken cancellationToken)
     {
-        var encoreDecksDeckAPIURL = "https://www.encoredecks.com/api/deck";
+        var report = DeckParserProgressReport.AsStarting("EncoreDecks");
+        progress.Report(report);
 
+        var encoreDecksDeckAPIURL = "https://www.encoredecks.com/api/deck";
         var localPath = uri.LocalPath;
         var deckID = localPath.Substring(localPath.LastIndexOf('/') + 1);
         Log.Information("Deck ID: {deckID}", deckID);
 
-        dynamic deckJSON = await GetDeckJSON(encoreDecksDeckAPIURL, deckID);
+        dynamic deckJSON = await GetDeckJSON(encoreDecksDeckAPIURL, deckID, cancellationToken);
 
         WeissSchwarzDeck res = new WeissSchwarzDeck();
         res.Name = deckJSON.name;
 
+        report = report.ObtainedParseDeckData(res);
+        progress.Report(report);
+
+        var parseTranslator = progress.From().Translate<CommandProgressReport>(TranslateProgress);
+
         using (var db = _database())
         {
-            await db.Database.MigrateAsync();
+            await db.Database.MigrateAsync(cancellationToken);
 
             foreach (dynamic card in deckJSON.cards)
             {
@@ -95,33 +102,34 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
                 if (wscard == null)
                 {
                     string setID = card.series;
-                    await _parse($"https://www.encoredecks.com/api/series/{setID}/cards");
-                    wscard = await db.WeissSchwarzCards.FindAsync(serial);
+                    await _parse($"https://www.encoredecks.com/api/series/{setID}/cards", parseTranslator, cancellationToken);
+                    wscard = await db.WeissSchwarzCards.FindAsync(new[] { serial }, cancellationToken);
                 }
 
                 if (res.Ratios.TryGetValue(wscard, out int quantity))
                     res.Ratios[wscard]++;
                 else
                     res.Ratios[wscard] = 1;
-
-                //Log.Information("Parsed: {@wscard}", wscard);
-
             }
         }
         var simpleRatios = res.AsSimpleDictionary();
         Log.Information("Deck Parsed: {@simpleRatios}", simpleRatios);
         Log.Information("Cards in Deck: {@count}", simpleRatios.Values.Sum());
+
+        report = report.SuccessfullyParsedDeck(res);
+        progress.Report(report);
+
         return res;
     }
 
-    async Task<dynamic> GetDeckJSON(string encoreDecksDeckAPIURL, string deckID)
+    async Task<dynamic> GetDeckJSON(string encoreDecksDeckAPIURL, string deckID, CancellationToken ct = default)
     {
         return await encoreDecksDeckAPIURL
                         .AppendPathSegment(deckID)
                         .WithRESTHeaders()
                         .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
                         .WithHeader("Accept", "text/plain")
-                        .GetJsonAsync<dynamic>();
+                        .GetJsonAsync<dynamic>(ct);
     }
 
     private IEnumerable<string[]> ParseCSV(string csvFile, Action<TextFieldParser> builder)
@@ -136,4 +144,6 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         }
     }
 
+    private DeckParserProgressReport TranslateProgress(CommandProgressReport arg)
+        => arg.AsRatio<CommandProgressReport, DeckParserProgressReport>(10, 0.20f);
 }

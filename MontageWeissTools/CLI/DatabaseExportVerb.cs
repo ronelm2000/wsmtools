@@ -5,6 +5,7 @@ using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Services;
+using Montage.Weiss.Tools.Utilities;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -54,13 +55,18 @@ namespace Montage.Weiss.Tools.CLI
         { 
         }
 
-        public async Task Run(IContainer ioc)
+        public async Task Run(IContainer ioc, IProgress<CommandProgressReport> progress, CancellationToken cancellationToken = default)
         {
             if (NoWarning) NonInteractive = true;
 
-            await ioc.UpdateCardDatabase();
-
             Log.Information("Running...");
+
+            var report = CommandProgressReport.Starting(CommandProgressReportVerbType.DatabaseExport);
+            var dbReportTranslator = progress.From().Translate<DatabaseUpdateReport>(TranslateDatabaseUpdate);
+            // TODO: Add a translator for DB Exporter.
+            progress.Report(report);
+
+            await ioc.UpdateCardDatabase(dbReportTranslator, cancellationToken);
 
             using (var database = new CardDatabaseContext(new AppConfig() { DbName = Source }))
             {
@@ -71,6 +77,8 @@ namespace Montage.Weiss.Tools.CLI
                 await exporter.Export(database, this);
             }
 
+            report = report.AsDone();
+            progress.Report(report);
 
             /*
 
@@ -95,5 +103,8 @@ namespace Montage.Weiss.Tools.CLI
             }
             */
         }
+
+        private CommandProgressReport TranslateDatabaseUpdate(DatabaseUpdateReport arg)
+            => arg.AsRatio<DatabaseUpdateReport, CommandProgressReport>(0, 0.10f);
     }
 }

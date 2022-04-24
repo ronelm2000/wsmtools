@@ -1,7 +1,10 @@
 ﻿using Montage.Card.API.Entities;
+using Montage.Card.API.Entities.Impls;
+using Montage.Card.API.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Montage.Card.API.Interfaces.Services
@@ -14,6 +17,11 @@ namespace Montage.Card.API.Interfaces.Services
     public class DatabaseUpdateArgs
     {
         public bool DisplayLogOverride { get; set; } = false;
+        public IProgress<DatabaseUpdateReport> Progress { get; set; } = NoOpProgress<DatabaseUpdateReport>.Instance;
+        public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
+    }
 
+    public record DatabaseUpdateReport : UpdateProgressReport
+    {
     }
 }

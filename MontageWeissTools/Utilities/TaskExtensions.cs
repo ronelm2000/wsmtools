@@ -9,7 +9,13 @@ public static class TaskExtensions
             try
             {
                 return await task;
-            } catch (Exception e)
+            }
+            catch (TaskCanceledException)
+            {
+                // Rethrow TaskCancelledException as it needs to be cancelled as soon as possible.
+                throw;
+            }
+            catch (Exception e)
             {
                 if (i == retries) temp = e;
             }

@@ -2,6 +2,7 @@
 using Flurl.Http;
 using Lamar;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
@@ -10,6 +11,7 @@ using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors;
@@ -98,9 +100,9 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         }
     }
 
-    public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards)
+    public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards, IProgress<PostProcessorProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var cardData = await originalCards.ToListAsync();
+        var cardData = await originalCards.ToListAsync(cancellationToken);
         List<CardLanguage> languages = cardData.Select(c => c.Language).Distinct().ToList();
         var settings = (languages[0] == CardLanguage.English) ? DeckLogSettings.English : DeckLogSettings.Japanese;
         Log.Information("Starting...");

@@ -23,6 +23,28 @@ public static class FluentPathExtensions
         return System.IO.File.OpenRead(path.FullPath);
     }
 
+    /// <summary>
+    /// Reads a file as string from a file asynchronously using the TAP model.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static async Task<string> ReadStringAsync(this Path path, CancellationToken cancellationToken = default)
+    {
+        return await System.IO.File.ReadAllTextAsync(path.FullPath, cancellationToken);
+    }
+
+    /// <summary>
+    /// Reads a file as byte array asynchronously using the TAP model.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static async Task<byte[]> ReadBytesAsync(this Path path, CancellationToken cancellationToken = default)
+    {
+        return await System.IO.File.ReadAllBytesAsync(path.FullPath, cancellationToken);
+    }
+
     /// 
     /// <summary>
     /// Creates a file under the first path in the set.

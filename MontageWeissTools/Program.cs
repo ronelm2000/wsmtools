@@ -26,17 +26,26 @@ public class Program
         Log.Debug(container.WhatDoIHave(serviceType: typeof(ICardSetParser<WeissSchwarzCard>)));
         FlurlHttp.Configure(settings => settings.HttpClientFactory = container.GetService<PollyHttpClientFactory>());
 
+        var progressReporter = new Progress<CommandProgressReport>();
+        var cts = new CancellationTokenSource();
+        progressReporter.ProgressChanged += ProgressReporter_ProgressChanged;
+        Console.CancelKeyPress += (s, e) => cts.Cancel();
 
         var verbs = container.GetAllInstances<IVerbCommand>().Select(a => a.GetType()).ToArray();
         var result = CommandLine.Parser.Default.ParseArguments(args, verbs); //
         await result.MapResult<IVerbCommand, Task>(
             async (verb) => {
                 await CheckLatestVersion();
-                await verb.Run(container);
+                await verb.Run(container, progressReporter);
             },
             (errors) => Display(errors)
         );
         await Task.CompletedTask;
+    }
+
+    private static void ProgressReporter_ProgressChanged(object sender, CommandProgressReport e)
+    {
+        // Log.Information($"{e.ReportMessage.EN} [{e.Percentage}%]");
     }
 
     private static async Task CheckLatestVersion()

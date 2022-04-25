@@ -10,7 +10,7 @@ namespace Montage.Card.API.Services
     /// Represents a Progress class that does nothing.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class NoOpProgress<T> : IProgress<T>
+    public class NoOpProgress<T> : IProgress<T>
     {
         /// <summary>
         /// Represents a static instance of the class.

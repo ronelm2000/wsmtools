@@ -20,8 +20,4 @@ namespace Montage.Card.API.Interfaces.Services
         public IProgress<DatabaseUpdateReport> Progress { get; set; } = NoOpProgress<DatabaseUpdateReport>.Instance;
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
     }
-
-    public record DatabaseUpdateReport : UpdateProgressReport
-    {
-    }
 }

@@ -4,6 +4,7 @@ using Montage.Weiss.Tools.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test.Impls
@@ -16,9 +17,9 @@ namespace Montage.Weiss.Tools.Test.Impls
 
         public Task<bool> IsCompatible(string urlOrFile) => Task.FromResult(true);
 
-        public Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile)
+        public Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile, IProgress<DeckParserProgressReport> progress, CancellationToken cancellationToken = default)
         {
-            return null;
+            return Task.FromResult<WeissSchwarzDeck>(null);
         }
     }
 }

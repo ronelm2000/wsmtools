@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
@@ -21,6 +22,7 @@ namespace Montage.Weiss.Tools.Test.Cockatrice
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             Lamar.Container ioc = Program.Bootstrap();
+            var progressReporter = NoOpProgress<object>.Instance;
             using var db = ioc.GetInstance<CardDatabaseContext>();
 
             /*
@@ -33,12 +35,12 @@ namespace Montage.Weiss.Tools.Test.Cockatrice
             await new ParseVerb()
             {
                 URI = "https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards"
-            }.Run(ioc);
+            }.Run(ioc, progressReporter);
 
             await new ParseVerb()
             {
                 URI = "https://www.heartofthecards.com/translations/little_busters!_anime_booster_pack.html"
-            }.Run(ioc);
+            }.Run(ioc, progressReporter);
 
             IDatabaseExportInfo info = new MockDatabaseExportInfo();
             await new CockatriceExporter().Export(db, info);

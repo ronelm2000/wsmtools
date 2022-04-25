@@ -1,4 +1,5 @@
 ﻿using Lamar;
+using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
 using Montage.Weiss.Tools.Entities;

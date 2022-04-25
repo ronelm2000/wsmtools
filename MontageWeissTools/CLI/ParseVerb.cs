@@ -25,7 +25,7 @@ namespace Montage.Weiss.Tools.CLI
         [Option("with", HelpText = "Provides a hint as to what parser should be used or if post-processors are skipped (if any).", Default = new string[] { })]
         public IEnumerable<string> ParserHints { get; set; } = new string[] { };
 
-        public async Task Run(IContainer container, IProgress<CommandProgressReport> progress, CancellationToken ct)
+        public async Task Run(IContainer container, IProgress<CommandProgressReport> progress, CancellationToken ct = default)
         {
             var Log = Serilog.Log.ForContext<ParseVerb>();
             var parser = await container.GetAllInstances<ICardSetParser<WeissSchwarzCard>>()

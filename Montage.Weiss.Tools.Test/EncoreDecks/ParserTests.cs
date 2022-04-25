@@ -1,5 +1,7 @@
 ﻿using Fluent.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Montage.Card.API.Entities.Impls;
+using Montage.Card.API.Services;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Test.Commons;
@@ -8,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test.EncoreDecks
@@ -20,14 +23,16 @@ namespace Montage.Weiss.Tools.Test.EncoreDecks
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             Lamar.Container ioc = Program.Bootstrap();
+            var progress = NoOpProgress<SetParserProgressReport>.Instance;
+            var ct = CancellationToken.None;
 
-            var batmanNinja = new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards");
+            var batmanNinja = new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards", progress, ct);
             Assert.IsTrue(await batmanNinja.AnyAsync(c => c.Serial == "BNJ/BCS2019-02"));
 
-            var bdml = new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/?page=1&set=5cf701347cd9b718cdf21469");
+            var bdml = new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/?page=1&set=5cf701347cd9b718cdf21469", progress, ct);
             Assert.IsTrue(await bdml.AnyAsync(c => c.Serial == "BD/EN-W03-007" || c.Effect.Length < 1), "BD/EN-W03 might have not been parsed correctly; do check.");
 
-            var lbAnime = new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/?page=1&set=5d6d4e147cd9b718cd3a0d40");
+            var lbAnime = new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/?page=1&set=5d6d4e147cd9b718cd3a0d40", progress, ct);
             Log.Information("LB Anime Set has been parsed successfully. This was a set that is not translated when this Unit Test was created.");
             var serialChecklist = new[] { "LB/W21-078", "LB/W21-065" };
             Assert.IsTrue(await bdml.AnyAsync(c => !serialChecklist.Contains(c.Serial)), "LB/W21 might have not been parsed correctly; do check.");
@@ -38,7 +43,10 @@ namespace Montage.Weiss.Tools.Test.EncoreDecks
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             Lamar.Container ioc = Program.Bootstrap();
-            var batmanNinja = await new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards") //
+            var progress = NoOpProgress<SetParserProgressReport>.Instance;
+            var ct = CancellationToken.None;
+
+            var batmanNinja = await new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards", progress, ct) //
                 .ToDictionaryAsync(c => c.Serial);
             Assert.IsTrue(batmanNinja["BNJ/SX01-T07"].Traits.Count == 0);
             Assert.IsTrue(batmanNinja["BNJ/SX01-A13"].Traits.Count == 0);
@@ -50,7 +58,10 @@ namespace Montage.Weiss.Tools.Test.EncoreDecks
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             Lamar.Container ioc = Program.Bootstrap();
-            var bdml = await new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/?page=1&set=5cf701347cd9b718cdf21469")
+            var progress = NoOpProgress<SetParserProgressReport>.Instance;
+            var ct = CancellationToken.None;
+
+            var bdml = await new Tools.Impls.Parsers.Cards.EncoreDecksParser().Parse("https://www.encoredecks.com/?page=1&set=5cf701347cd9b718cdf21469", progress, ct)
                 .ToDictionaryAsync(c => c.Serial);
             Assert.IsTrue(bdml["BD/EN-W03-125"].Triggers.Length == 2);
             Assert.IsTrue(bdml["BD/EN-W03-125"].Triggers.Contains(Trigger.Gate));
@@ -62,8 +73,11 @@ namespace Montage.Weiss.Tools.Test.EncoreDecks
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             Lamar.Container ioc = Program.Bootstrap();
+            var progress = NoOpProgress<SetParserProgressReport>.Instance;
+            var ct = CancellationToken.None;
+
             var prismaIllyaEN = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
-                .Parse("https://www.encoredecks.com/?page=1&set=5c7b101d7cd9b718cdbd085e")
+                .Parse("https://www.encoredecks.com/?page=1&set=5c7b101d7cd9b718cdbd085e", progress, ct)
                 .ToDictionaryAsync(c => c.Serial);
             Assert.IsTrue(prismaIllyaEN["PI/EN-S04-E038"] != null);
         }
@@ -73,8 +87,11 @@ namespace Montage.Weiss.Tools.Test.EncoreDecks
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
             Lamar.Container ioc = Program.Bootstrap();
+            var progress = NoOpProgress<SetParserProgressReport>.Instance;
+            var ct = CancellationToken.None;
+
             var prismaIllyaHertz = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
-                .Parse("https://www.encoredecks.com/api/series/5d9a1ccc7cd9b718cd5b2200/cards")
+                .Parse("https://www.encoredecks.com/api/series/5d9a1ccc7cd9b718cd5b2200/cards", progress, ct)
                 .ToDictionaryAsync(c => c.Serial);
 
             Assert.IsTrue(prismaIllyaHertz["PI/S40-038"].Name.EN == null);

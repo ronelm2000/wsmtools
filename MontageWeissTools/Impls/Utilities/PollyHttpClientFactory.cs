@@ -9,7 +9,6 @@ using Polly.Timeout;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
-using System.Threading;
 
 namespace Montage.Weiss.Tools.Impls.Utilities;
 

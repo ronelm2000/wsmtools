@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
+﻿namespace Montage.Card.API.Entities;
 
-namespace Montage.Card.API.Entities
+public interface IParseInfo
 {
-    public interface IParseInfo
-    {
-        string URI { get; }
-        IEnumerable<string> ParserHints { get; }
-    }
+    string URI { get; }
+    IEnumerable<string> ParserHints { get; }
 }

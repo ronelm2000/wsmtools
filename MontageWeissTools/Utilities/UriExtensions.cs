@@ -1,8 +1,6 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
 using Flurl.Http;
-using System.Collections.Specialized;
-using System.Net;
 using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;

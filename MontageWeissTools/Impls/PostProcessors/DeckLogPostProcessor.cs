@@ -23,7 +23,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
 
     private readonly Func<CardDatabaseContext> _db;
     private readonly Func<GlobalCookieJar> _cookieJar;
-    private readonly Func<ICachedMapService<string, Dictionary<string, DLCardEntry>>> _cacheSrvc;
+    private readonly Func<ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>> _cacheSrvc;
 
     private string currentVersion;
 
@@ -35,7 +35,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     {
         _db = () => ioc.GetInstance<CardDatabaseContext>();
         _cookieJar = () => ioc.GetInstance<GlobalCookieJar>();
-        _cacheSrvc = () => ioc.GetInstance<ICachedMapService<string, Dictionary<string, DLCardEntry>>>();
+        _cacheSrvc = () => ioc.GetInstance<ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>>();
         // _cookieSession = () => ioc.GetInstance<GlobalCookieJar>()["https://decklog.bushiroad.com/"];
     }
 
@@ -152,7 +152,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         var cacheSrvc = _cacheSrvc();
         var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
         var results = new Dictionary<string, DLCardEntry>();
-        var cacheResults = cacheSrvc.GetValues(titleCodes)
+        var cacheResults = cacheSrvc.GetValues(titleCodes.Select(t => (settings.Language, t)))
             .Where(c => c.Value.Count > 0)
             .ToDictionary(c => c.Key, c => c.Value);
         var cacheValues = cacheResults.SelectMany(c => c.Value).ToList();
@@ -162,7 +162,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             results.Add(kvp.Key, kvp.Value);
 
         if (titleCodes.Count < 10) //TODO: How do we indicate that this is a WPR extraction? 
-            titleCodes.RemoveWhere(t => cacheResults.ContainsKey(t));
+            titleCodes.RemoveWhere(t => cacheResults.ContainsKey((settings.Language,t)));
 
         if (titleCodes.Count < 1)
             return results;
@@ -197,7 +197,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                 {
                     results[entry.Serial + entry.Rarity] = entry;
                     var serialEncoded = WeissSchwarzCard.ParseSerial(entry.Serial);
-                    cacheSrvc[serialEncoded.NeoStandardCode][entry.Serial + entry.Rarity] = entry;
+                    cacheSrvc[(settings.Language, serialEncoded.NeoStandardCode)][entry.Serial + entry.Rarity] = entry;
                 }
                 Log.Information("Got {count} results...", temporaryResults?.Count ?? 0);
                 page++;

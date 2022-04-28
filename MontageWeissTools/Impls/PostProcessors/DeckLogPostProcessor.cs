@@ -20,23 +20,22 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
 {
     private ILogger Log = Serilog.Log.ForContext<DeckLogPostProcessor>();
 
-//       private readonly DeckLogSettings settings = DeckLogSettings.Japanese;
 
     private readonly Func<CardDatabaseContext> _db;
-    //private readonly Func<Task<string>> _getLatestVersion;
     private readonly Func<GlobalCookieJar> _cookieJar;
-//       private readonly Func<CookieSession> _cookieSession;
+    private readonly Func<ICachedMapService<string, Dictionary<string, DLCardEntry>>> _cacheSrvc;
+
     private string currentVersion;
 
     private bool isOutdated = false;
 
     public int Priority => 1;
-//        public DeckLogSettings Settings => settings;
 
     public DeckLogPostProcessor(IContainer ioc)
     {
         _db = () => ioc.GetInstance<CardDatabaseContext>();
         _cookieJar = () => ioc.GetInstance<GlobalCookieJar>();
+        _cacheSrvc = () => ioc.GetInstance<ICachedMapService<string, Dictionary<string, DLCardEntry>>>();
         // _cookieSession = () => ioc.GetInstance<GlobalCookieJar>()["https://decklog.bushiroad.com/"];
     }
 
@@ -133,7 +132,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             yield return TryMutate(card, deckLogSearchResults, settings);
     }
 
-    private WeissSchwarzCard TryMutate(WeissSchwarzCard originalCard, Dictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings)
+    private WeissSchwarzCard TryMutate(WeissSchwarzCard originalCard, IDictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings)
     {
         if (deckLogSearchData.ContainsKey(originalCard.Serial + originalCard.Rarity))
         {
@@ -148,9 +147,23 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         }
         return originalCard;
     }
-    private async Task<Dictionary<string, DLCardEntry>> GetDeckLogSearchResults(List<WeissSchwarzCard> cardData, DeckLogSettings settings)
+    private async Task<IDictionary<string, DLCardEntry>> GetDeckLogSearchResults(List<WeissSchwarzCard> cardData, DeckLogSettings settings)
     {
+        var cacheSrvc = _cacheSrvc();
+        var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
         var results = new Dictionary<string, DLCardEntry>();
+        var cacheResults = cacheSrvc.GetValues(titleCodes).Where(c => c.Value.Count > 0).ToDictionary(c => c.Key, c => c.Value);
+        var cacheValues = cacheResults.SelectMany(c => c.Value).ToList();
+        var serialMapper = cardData.ToDictionary(c => c.Serial, c => c.TitleCode);
+
+        foreach (var kvp in cacheValues)
+            results.Add(kvp.Key, kvp.Value);
+
+        titleCodes.RemoveWhere(t => cacheResults.ContainsKey(t));
+
+        if (titleCodes.Count < 1)
+            return results;
+
         List<DLCardEntry> temporaryResults = null;
         // var queryData = GenerateSearchJSON(titleCodes);
         //Log.Information($"Accessing DeckLog API with the following query data: {JsonConvert.SerializeObject(queryData, Formatting.Indented)}");
@@ -160,7 +173,6 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             .WithCookies(_cookieJar()[settings.Referrer])
             .PostJsonAsync(new { })
             .ReceiveJson<DLQueryParameters>();
-        var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
         IEnumerable<DLCardQuery> queries = GetCardQueries(cardData, cardParams, titleCodes);
         foreach (var queryData in queries)
         {
@@ -179,7 +191,11 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                     })
                     .ReceiveJson<List<DLCardEntry>>();
                 foreach (var entry in temporaryResults)
+                {
                     results[entry.Serial + entry.Rarity] = entry;
+                    var serialEncoded = WeissSchwarzCard.ParseSerial(entry.Serial);
+                    cacheSrvc[serialEncoded.NeoStandardCode][entry.Serial + entry.Rarity] = entry;
+                }
                 Log.Information("Got {count} results...", temporaryResults?.Count ?? 0);
                 page++;
             } while (temporaryResults.Count > 29);
@@ -239,7 +255,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         public int ID { get; set; }
     }
 
-    private class DLCardEntry
+    internal class DLCardEntry
     {
         [JsonProperty("card_number")]
         public string Serial { get; set; }

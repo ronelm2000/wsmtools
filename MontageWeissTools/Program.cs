@@ -3,8 +3,10 @@ using Flurl.Http;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.Services;
 using Montage.Weiss.Tools.Impls.Utilities;
 using Octokit;
 using Serilog.Events;
@@ -45,7 +47,7 @@ public class Program
 
     private static void ProgressReporter_ProgressChanged(object sender, CommandProgressReport e)
     {
-        // Log.Information($"{e.ReportMessage.EN} [{e.Percentage}%]");
+        Console.Write($"{e.ReportMessage.EN} [{e.Percentage}%]\r");
     }
 
     private static async Task CheckLatestVersion()
@@ -111,6 +113,7 @@ public class Program
             //x.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));
             x.AddSingleton<GlobalCookieJar>();
             x.AddSingleton<ILogger>(Serilog.Log.Logger);
+            x.AddSingleton<DeckLogCacheService>();
             x.Scan(s =>
             {
                 s.AssemblyContainingType<Program>();

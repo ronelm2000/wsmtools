@@ -1,20 +1,21 @@
 ﻿using Montage.Card.API.Interfaces.Services;
+using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.PostProcessors;
 using static Montage.Weiss.Tools.Impls.PostProcessors.DeckLogPostProcessor;
 
 namespace Montage.Weiss.Tools.Impls.Services;
 
-internal class DeckLogCacheService : ICachedMapService<string, Dictionary<string, DLCardEntry>>
+internal class DeckLogCacheService : ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>
 {
-    private Dictionary<string, Dictionary<string, DLCardEntry>> _cache = new();
+    private Dictionary<(CardLanguage, string), Dictionary<string, DLCardEntry>> _cache = new();
 
-    public Dictionary<string, DLCardEntry> this[string key]
+    public Dictionary<string, DLCardEntry> this[(CardLanguage, string) key]
     {
         get => _cache.GetValueOrDefault(key) ?? (_cache[key] = new Dictionary<string, DLCardEntry>());
         set => _cache[key] = value;
     }
 
-    public IDictionary<string, Dictionary<string, DLCardEntry>> GetValues(IEnumerable<string> keys)
+    public IDictionary<(CardLanguage, string), Dictionary<string, DLCardEntry>> GetValues(IEnumerable<(CardLanguage, string)> keys)
     {
         return keys.Select(key => (Key: key, Value: this[key]) )
                    .Where(p => p.Value is not null)

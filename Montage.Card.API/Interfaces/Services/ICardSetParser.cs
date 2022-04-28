@@ -1,7 +1,6 @@
 ﻿using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Services;
-using System.Runtime.CompilerServices;
 
 namespace Montage.Card.API.Interfaces.Services;
 

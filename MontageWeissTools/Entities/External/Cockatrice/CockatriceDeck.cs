@@ -1,39 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
-namespace Montage.Weiss.Tools.Entities.External.Cockatrice
+namespace Montage.Weiss.Tools.Entities.External.Cockatrice;
+
+[XmlRoot(   "cockatrice_deck",
+            IsNullable = false
+            )]
+public class CockatriceDeck
 {
-    [XmlRoot(   "cockatrice_deck",
-                IsNullable = false
-                )]
-    public class CockatriceDeck
-    {
-        [XmlAttribute("version")]
-        public string Version = "1";
-        [XmlElement("deckname")]
-        public string DeckName;
-        [XmlElement("comments")]
-        public string Comments;
-        [XmlElement("zone")]
-        public CockatriceDeckRatio Ratios;
-    }
+    [XmlAttribute("version")]
+    public string Version = "1";
+    [XmlElement("deckname")]
+    public string DeckName;
+    [XmlElement("comments")]
+    public string Comments;
+    [XmlElement("zone")]
+    public CockatriceDeckRatio Ratios;
+}
 
-    [XmlType("zone")]
-    public class CockatriceDeckRatio
-    {
-        [XmlAttribute("name")]
-        public string Name = "main";
-        [XmlElement("card")]
-        public List<CockatriceSerialAmountPair> Ratios = new List<CockatriceSerialAmountPair>();
-    }
+[XmlType("zone")]
+public class CockatriceDeckRatio
+{
+    [XmlAttribute("name")]
+    public string Name = "main";
+    [XmlElement("card")]
+    public List<CockatriceSerialAmountPair> Ratios = new List<CockatriceSerialAmountPair>();
+}
 
-    public class CockatriceSerialAmountPair
-    {
-        [XmlAttribute("number")]
-        public int Amount;
-        [XmlAttribute("name")]
-        public string Serial;
-    }
+public class CockatriceSerialAmountPair
+{
+    [XmlAttribute("number")]
+    public int Amount;
+    [XmlAttribute("name")]
+    public string Serial;
 }

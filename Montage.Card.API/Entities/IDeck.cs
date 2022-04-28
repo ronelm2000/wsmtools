@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Montage.Card.API.Entities;
 
-namespace Montage.Card.API.Entities
+public interface IDeck<C> where C : ICard
 {
-    public interface IDeck<C> where C : ICard
-    {
-    }
 }

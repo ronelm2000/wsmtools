@@ -142,8 +142,8 @@ public class Program
     }
 
     public static string AppVersion =>
-        Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
     public static DateTime AppReleaseDate =>
-        System.IO.File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location);
+        System.IO.File.GetLastWriteTime(typeof(Program).Assembly.Location);
 }

@@ -1,6 +1,4 @@
-﻿using Montage.Card.API.Entities;
-
-namespace Montage.Card.API.Entities.Impls;
+﻿namespace Montage.Card.API.Entities.Impls;
 
 public record SetParserProgressReport : UpdateProgressReport
 {
@@ -8,9 +6,9 @@ public record SetParserProgressReport : UpdateProgressReport
 
     public SetParserProgressReport WithParsedSerial(ICard card, int totalCardsToParse)
         => this with
-            {
+        {
             ReportMessage = new MultiLanguageString { EN = $"Parsed [{card.Serial}]." },
-                Percentage = 10 + (int)((CardsParsed + 1f) * 90 / totalCardsToParse),
-                CardsParsed = CardsParsed + 1
-            };
+            Percentage = 10 + (int)((CardsParsed + 1f) * 90 / totalCardsToParse),
+            CardsParsed = CardsParsed + 1
+        };
 }

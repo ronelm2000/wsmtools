@@ -152,14 +152,17 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         var cacheSrvc = _cacheSrvc();
         var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
         var results = new Dictionary<string, DLCardEntry>();
-        var cacheResults = cacheSrvc.GetValues(titleCodes).Where(c => c.Value.Count > 0).ToDictionary(c => c.Key, c => c.Value);
+        var cacheResults = cacheSrvc.GetValues(titleCodes)
+            .Where(c => c.Value.Count > 0)
+            .ToDictionary(c => c.Key, c => c.Value);
         var cacheValues = cacheResults.SelectMany(c => c.Value).ToList();
         var serialMapper = cardData.ToDictionary(c => c.Serial, c => c.TitleCode);
 
         foreach (var kvp in cacheValues)
             results.Add(kvp.Key, kvp.Value);
 
-        titleCodes.RemoveWhere(t => cacheResults.ContainsKey(t));
+        if (titleCodes.Count < 10) //TODO: How do we indicate that this is a WPR extraction? 
+            titleCodes.RemoveWhere(t => cacheResults.ContainsKey(t));
 
         if (titleCodes.Count < 1)
             return results;

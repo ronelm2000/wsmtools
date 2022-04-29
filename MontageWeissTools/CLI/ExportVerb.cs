@@ -7,6 +7,7 @@ using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Services;
+using Montage.Weiss.Tools.Utilities;
 
 namespace Montage.Weiss.Tools.CLI;
 
@@ -37,6 +38,8 @@ public class ExportVerb : IVerbCommand, IExportInfo
     [Option("nowarn", HelpText = "When set to true, all warning prompts will default to yes without user input. This flag when set ignores noninteractive flag during warnings (and is automatically true).", Default = false)]
     public bool NoWarning { get; set; } = false;
 
+    public IProgress<DeckExportProgressReport> Progress { get; set; }
+
     private readonly ILogger Log = Serilog.Log.ForContext<ExportVerb>();
 
     private static readonly IEnumerable<string> Empty = new string[] { };
@@ -53,8 +56,11 @@ public class ExportVerb : IVerbCommand, IExportInfo
         if (NoWarning) NonInteractive = true;
 
         var aggregator = new CommandProgressAggregator(progress);
+        var cardDBProgress = aggregator.GetProgress<DatabaseUpdateReport>();
+        var deckParserProgress = aggregator.GetProgress<DeckParserProgressReport>();
+        Progress = aggregator.GetProgress<DeckExportProgressReport>();
 
-        await ioc.UpdateCardDatabase(aggregator, cancellationToken);
+        await ioc.UpdateCardDatabase(cardDBProgress, cancellationToken);
 
         Log.Information("Running...");
 
@@ -63,7 +69,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
             .WhereAwait(async parser => await parser.IsCompatible(Source))
             .OrderByDescending(parser => parser.Priority)
             .FirstAsync(cancellationToken);
-        var deck = await parser.Parse(Source, aggregator, cancellationToken);
+        var deck = await parser.Parse(Source, deckParserProgress, cancellationToken);
         var inspectionOptions = new InspectionOptions()
         {
             IsNonInteractive = this.NonInteractive,
@@ -86,7 +92,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
             await exporter.Export(deck, this);
     }
 
-    internal class CommandProgressAggregator : IProgress<SetParserProgressReport>, IProgress<PostProcessorProgressReport>, IProgress<DatabaseUpdateReport>, IProgress<DeckParserProgressReport>
+    internal class CommandProgressAggregator
     {
         private CommandProgressReport _totalReport = new CommandProgressReport();
         private IProgress<CommandProgressReport> _progress;
@@ -97,46 +103,18 @@ public class ExportVerb : IVerbCommand, IExportInfo
             _progress = progress;
         }
 
-        private (int PercentageBase, float PercentageRatio) GetAggregatePercentageRatios(UpdateProgressReport report)
+        private Dictionary<Type, (int PercentageBase, float PercentageRatio)> aggregatePercentages = new()
         {
-            return report switch
+            [typeof(DatabaseUpdateReport)]      = (00, 0.05f),
+            [typeof(DeckParserProgressReport)]  = (05, 0.45f),
+            [typeof(DeckExportProgressReport)]  = (50, 0.50f)
+        };
+
+        public IProgress<T> GetProgress<T>() where T : UpdateProgressReport
+            => _progress.From().Translate<T>(r =>
             {
-                var x when x is DatabaseUpdateReport => (0, 0.05f),
-                var x when x is SetParserProgressReport => (0, 0.05f),
-                var x when x is DeckParserProgressReport => (10, 0.30f),
-                _ => (0, 0f)
-            };
-        }
-
-        private int GetAggregatePercentage(UpdateProgressReport report)
-        {
-            var percentages = GetAggregatePercentageRatios(report);
-            return percentages.PercentageBase + (int)(report.Percentage * percentages.PercentageRatio);
-        }
-
-        public void Report(DatabaseUpdateReport value) => ReportUpdate(value);
-        public void Report(SetParserProgressReport value) => ReportUpdate(value);
-        public void Report(DeckParserProgressReport value) => ReportUpdate(value);
-        public void Report(PostProcessorProgressReport value)
-        {
-            // TODO: Maybe need to change how total percentage computation works?
-            _totalReport = _totalReport with
-            {
-                Percentage = 25 + (int)(value.Percentage * 100 * 0.25f),
-                ReportMessage = value.ReportMessage
-            };
-            _progress.Report(_totalReport);
-        }
-
-        public void ReportUpdate(UpdateProgressReport value)
-        {
-            _totalReport = _totalReport with
-            {
-                Percentage = GetAggregatePercentage(value),
-                ReportMessage = value.ReportMessage
-            };
-            _progress.Report(_totalReport);
-        }
-
+                var ratio = aggregatePercentages[typeof(T)];
+                return r.AsRatio<T, CommandProgressReport>(ratio.PercentageBase, ratio.PercentageRatio);
+            });
     }
 }

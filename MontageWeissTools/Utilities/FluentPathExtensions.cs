@@ -45,6 +45,20 @@ public static class FluentPathExtensions
         return await System.IO.File.ReadAllBytesAsync(path.FullPath, cancellationToken);
     }
 
+    /// <summary>
+    /// Writes to file using a specified stream action.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="streamAction"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static async Task WriteAsync(this Path path, Action<System.IO.FileStream> streamAction, CancellationToken cancellationToken = default)
+    {
+        await using var stream = System.IO.File.OpenWrite(path.FullPath);
+        streamAction?.Invoke(stream);
+        await stream.FlushAsync(cancellationToken);
+    }
+
     /// 
     /// <summary>
     /// Creates a file under the first path in the set.

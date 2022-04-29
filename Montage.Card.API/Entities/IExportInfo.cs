@@ -9,4 +9,5 @@ public interface IExportInfo
     string OutCommand { get; }
     IEnumerable<string> Flags { get; }
     bool NonInteractive { get; }
+    IProgress<DeckExportProgressReport> Progress { get; }
 }

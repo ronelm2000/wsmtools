@@ -1,12 +1,14 @@
 ﻿using Fluent.IO;
 using Lamar;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.Cockatrice;
 using Montage.Weiss.Tools.Impls.Inspectors.Deck;
+using Montage.Weiss.Tools.Utilities;
 using System.Xml.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
@@ -32,16 +34,33 @@ public class CockatriceDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
         };
         */
     }
-    public async Task Export(WeissSchwarzDeck deck, IExportInfo info)
+    public async Task Export(WeissSchwarzDeck deck, IExportInfo info, CancellationToken cancellationToken = default)
     {
         Log.Information("Serializing: {name}", deck.Name);
+        var progress = info.Progress;
+        var report = DeckExportProgressReport.Starting(deck.Name, "Cockatrice");
+        progress.Report(report);
 
         using (var db = _database())
         {
             Log.Information("Replacing all foils with non-foils...");
+            report = report with
+            {
+                Percentage = 1,
+                ReportMessage = new MultiLanguageString { EN = "Replacing foils with non-foils..." }
+            };
+            progress.Report(report);
+
             foreach (var card in deck.Ratios.Keys)
-                if (card.IsFoil) deck.ReplaceCard(card, await db.FindNonFoil(card));
+                if (card.IsFoil) deck.ReplaceCard(card, await db.FindNonFoil(card, cancellationToken));
         }
+
+        report = report with
+        {
+            Percentage = 30,
+            ReportMessage = new MultiLanguageString { EN = "Creating Deck for COD format." }
+        };
+        progress.Report(report);
 
         Log.Information("Creating deck.cod...");
         var cckDeck = new CockatriceDeck();
@@ -50,15 +69,21 @@ public class CockatriceDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
         cckDeck.Ratios = new CockatriceDeckRatio();
         cckDeck.Ratios.Ratios = deck.Ratios.Select(Translate).ToList();
 
+        report = report with
+        {
+            Percentage = 30,
+            ReportMessage = new MultiLanguageString { EN = "Saving COD file..." }
+        };
+        progress.Report(report);
+
         var deckFilename = deck.Name?.AsFileNameFriendly();
         if (String.IsNullOrEmpty(deckFilename)) deckFilename = "deck";
         var resultDeck = Path.CreateDirectory(info.Destination).Combine($"{deckFilename}.cod");
-        resultDeck.Open(s => _serializer.Serialize(s, cckDeck),
-                                System.IO.FileMode.Create,
-                                System.IO.FileAccess.Write,
-                                System.IO.FileShare.ReadWrite
-                                );
+        await resultDeck.WriteAsync(s => _serializer.Serialize(s, cckDeck), cancellationToken);
         Log.Information($"Saved: {resultDeck.FullPath}");
+
+        report = report.Done(resultDeck.FullPath);
+        progress.Report(report);
     }
 
     private Type[] _exclusionFilters = new[]

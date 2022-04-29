@@ -39,6 +39,8 @@ public class DatabaseExportVerb : IVerbCommand, IDatabaseExportInfo
     [Option("nowarn", HelpText = "When set to true, all warning prompts will default to yes without user input. This flag when set ignores noninteractive flag during warnings (and is automatically true).", Default = false)]
     public bool NoWarning { get; set; } = false;
 
+    public IProgress<DeckExportProgressReport> Progress { get; } = null;
+
     private readonly ILogger Log = Serilog.Log.ForContext<DatabaseExportVerb>();
 
     private static readonly IEnumerable<string> Empty = new string[] { };

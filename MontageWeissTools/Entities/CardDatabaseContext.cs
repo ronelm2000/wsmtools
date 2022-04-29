@@ -38,9 +38,9 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
         options.UseSqlite($"Data Source={_config.DbName}");
     }
 
-    internal async Task<WeissSchwarzCard> FindNonFoil(WeissSchwarzCard card)
+    internal async Task<WeissSchwarzCard> FindNonFoil(WeissSchwarzCard card, CancellationToken ct = default)
     {
-        return await WeissSchwarzCards.FindAsync(WeissSchwarzCard.RemoveFoil(card.Serial));
+        return await WeissSchwarzCards.FindAsync(new[] { WeissSchwarzCard.RemoveFoil(card.Serial) }, ct);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

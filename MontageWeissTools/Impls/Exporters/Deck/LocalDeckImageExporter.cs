@@ -27,7 +27,7 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
     private (IImageEncoder, IImageFormat) _pngEncoder = (new PngEncoder(), PngFormat.Instance);
     private (IImageEncoder, IImageFormat) _jpegEncoder = (new JpegEncoder(), JpegFormat.Instance);
     private readonly Func<Flurl.Url, CookieSession> _cookieSession;
-    private readonly Func<string, string, Task> _processOutCommand;
+    private readonly Func<string, string, CancellationToken, Task> _processOutCommand;
 
     public LocalDeckImageExporter(IContainer ioc)
     {
@@ -35,9 +35,13 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
         _processOutCommand = ioc.GetInstance<IFileOutCommandProcessor>().Process;
     }
 
-    public async Task Export(WeissSchwarzDeck deck, IExportInfo info)
+    public async Task Export(WeissSchwarzDeck deck, IExportInfo info, CancellationToken cancellationToken = default)
     {
         Log.Information("Exporting as Deck Image.");
+        var progress = info.Progress;
+        var report = DeckExportProgressReport.Starting(deck.Name, "Deck Image Exporter");
+        progress.Report(report);
+
         //var jsonFilename = Path.CreateDirectory(info.Destination).Combine($"deck_{deck.Name.AsFileNameFriendly()}.jpg");
         var count = deck.Ratios.Keys.Count;
         int rows = (int)Math.Ceiling(deck.Count / 10d);
@@ -51,18 +55,28 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
             .Select((p, i) =>
             {
                 Log.Information("Loading Images: ({i}/{count}) [{serial}]", i + 1, count, p.Serial);
+                report = report.LoadingImages(p.Serial, i + 1, count);
+                progress.Report(report);
                 return p;
             })
-            .SelectAwait(async (wsc) => (card: wsc, stream: await wsc.GetImageStreamAsync(_cookieSession(wsc.Images.Last()))))
-            .ToDictionaryAsync(p => p.card, p => PreProcess(Image.Load(p.stream)));
+            .SelectAwaitWithCancellation(async (wsc, ct) => 
+            (   card: wsc, 
+                stream: await wsc.GetImageStreamAsync(_cookieSession(wsc.Images.Last()), ct))
+            )
+            .ToDictionaryAwaitWithCancellationAsync(
+                async (p, ct) => await ValueTask.FromResult(p.card),
+                async (p, ct) => PreProcess(await Image.LoadAsync(Configuration.Default, p.stream, ct)),
+                cancellationToken
+                );
+            //.ToDictionaryAsync(p => p.card, p => PreProcess(Image.LoadAsync(p.stream)));
 
         var (encoder, format) = info.Flags.Any(s => s.ToLower() == "png") == true ? _pngEncoder : _jpegEncoder;
         var newImageFilename = $"deck_{fileNameFriendlyDeckName.ToLower()}.{format.FileExtensions.First()}";
         var deckImagePath = resultFolder.Combine(newImageFilename);
-        GenerateDeckImage(info, rows, serialList, imageDictionary, encoder, deckImagePath);
+        await GenerateDeckImage(info, new(rows, serialList, imageDictionary, encoder, deckImagePath, progress, report, cancellationToken));
 
         if (info.OutCommand != "")
-            await _processOutCommand(info.OutCommand, deckImagePath.FullPath);
+            await _processOutCommand(info.OutCommand, deckImagePath.FullPath, cancellationToken);
     }
 
     private IEnumerable<WeissSchwarzCard> AsOrdered(IEnumerable<WeissSchwarzCard> cards)
@@ -73,7 +87,6 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
             .ThenBy(card => card.Color.GetSortKey())
             .ThenBy(card => card.Serial)
         ;
-
 
     private Image PreProcess(Image image)
     {
@@ -96,52 +109,75 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
         return image;
     }
 
-    private void GenerateDeckImage(IExportInfo info, int rows, List<WeissSchwarzCard> serialList, Dictionary<WeissSchwarzCard, Image> imageDictionary, IImageEncoder encoder, Path deckImagePath)
+    internal async Task GenerateDeckImage(IExportInfo info, DeckImageExporterArgs args)
     {
-        using (var _ = imageDictionary.GetDisposer())
+        var (rows, serialList, imageDictionary, encoder, deckImagePath, progress, _, tc) = args;
+
+        var report = args.Report.GeneratingDeckImage();
+        progress.Report(report);
+
+        using var _ = imageDictionary.GetDisposer();
+
+        var selection = imageDictionary.Select(p => (p.Value.Width, p.Value.Height));
+        (int Width, int Height) bounds = (0, 0);
+        if (info.Flags.Contains("upscaling"))
         {
-            var selection = imageDictionary.Select(p => (p.Value.Width, p.Value.Height));
-            (int Width, int Height) bounds = (0, 0);
-            if (info.Flags.Contains("upscaling"))
-            {
-                bounds = selection.Aggregate((a, b) => (Math.Max(a.Width, b.Width), Math.Max(a.Height, b.Height)));
-                Log.Information("Adjusting image sizing to the maximum bounds: {@minimumBounds}", bounds);
-            }
-            else
-            {
-                bounds = selection.Aggregate((a, b) => (Math.Min(a.Width, b.Width), Math.Min(a.Height, b.Height)));
-                Log.Information("Adjusting image sizing to the minimum bounds: {@minimumBounds}", bounds);
-            }
-            foreach (var image in imageDictionary.Values)
-                image.Mutate(x => x.Resize(bounds.Width, bounds.Height));
-
-            var grid = (Width: bounds.Width * 10, Height: bounds.Height * rows);
-            Log.Information("Creating Full Grid of {x}x{y}...", grid.Width, grid.Height);
-
-            using (var fullGrid = new Image<Rgba32>(bounds.Width * 10, bounds.Height * rows))
-            {
-                for (int i = 0; i < serialList.Count; i++)
-                {
-                    var x = i % 10;
-                    var y = i / 10;
-                    var point = new Point(x * bounds.Width, y * bounds.Height);
-
-                    fullGrid.Mutate(ctx =>
-                    {
-                        ctx.DrawImage(imageDictionary[serialList[i]], point, 1);
-                    });
-                }
-
-                Log.Information("Finished drawing all cards in logical order; saving image...");
-                deckImagePath.Open(s => fullGrid.Save(s, encoder));
-
-                if (Program.IsOutputRedirected) // Enable Non-Interactive Path stdin Passthrough of the deck png
-                    using (var stdout = Console.OpenStandardOutput())
-                        fullGrid.Save(stdout, encoder);
-
-                Log.Information($"Done! Result PNG: {deckImagePath.FullPath}");
-            }
+            bounds = selection.Aggregate((a, b) => (Math.Max(a.Width, b.Width), Math.Max(a.Height, b.Height)));
+            Log.Information("Adjusting image sizing to the maximum bounds: {@minimumBounds}", bounds);
+            report = report.SizingImages("Upscaling", bounds);
+            progress.Report(report);
         }
+        else
+        {
+            bounds = selection.Aggregate((a, b) => (Math.Min(a.Width, b.Width), Math.Min(a.Height, b.Height)));
+            Log.Information("Adjusting image sizing to the minimum bounds: {@minimumBounds}", bounds);
+            report = report.SizingImages("Downscaling", bounds);
+            progress.Report(report);
+        }
+        foreach (var image in imageDictionary.Values)
+            image.Mutate(x => x.Resize(bounds.Width, bounds.Height));
+
+        var grid = (Width: bounds.Width * 10, Height: bounds.Height * rows);
+
+        Log.Information("Creating Full Grid of {x}x{y}...", grid.Width, grid.Height);
+        report = report.SizingImages("Downscaling", bounds);
+        progress.Report(report);
+
+        using var fullGrid = new Image<Rgba32>(bounds.Width * 10, bounds.Height * rows);
+
+        for (int i = 0; i < serialList.Count; i++)
+        {
+            var x = i % 10;
+            var y = i / 10;
+            var point = new Point(x * bounds.Width, y * bounds.Height);
+
+            fullGrid.Mutate(ctx =>
+            {
+                ctx.DrawImage(imageDictionary[serialList[i]], point, 1);
+            });
+        }
+
+        Log.Information("Finished drawing all cards in logical order; saving image...");
+        await deckImagePath.WriteAsync(s => fullGrid.SaveAsync(s, encoder, tc), tc);
+
+        if (Program.IsOutputRedirected) // Enable Non-Interactive Path stdin Passthrough of the deck png
+            using (var stdout = Console.OpenStandardOutput())
+                await fullGrid.SaveAsync(stdout, encoder, tc);
+
+        Log.Information($"Done! Result PNG: {deckImagePath.FullPath}");
+        report = report.Done(deckImagePath.FullPath);
+        progress.Report(report);
     }
+
+    internal record DeckImageExporterArgs (
+        int Rows, 
+        List<WeissSchwarzCard> SerialList, 
+        Dictionary<WeissSchwarzCard, Image> ImageDictionary, 
+        IImageEncoder Encoder, 
+        Path DeckImagePath,
+        IProgress<DeckExportProgressReport> Progress,
+        DeckExportProgressReport Report,
+        CancellationToken CancellationToken
+        );
 
 }

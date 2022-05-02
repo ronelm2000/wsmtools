@@ -1,6 +1,8 @@
 ﻿using Fluent.IO;
+using Lamar;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -18,12 +20,22 @@ public class LocalDeckJSONExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwar
     {
         WriteIndented = true
     };
+    private readonly Func<IFileOutCommandProcessor> _focProcessor;
 
     public string[] Alias => new[]{ "local", "json" };
 
-    public async Task Export(WeissSchwarzDeck deck, IExportInfo info)
+    public LocalDeckJSONExporter(IContainer ioc)
+    {
+        _focProcessor = () => ioc.GetInstance<IFileOutCommandProcessor>();
+    }
+
+    public async Task Export(WeissSchwarzDeck deck, IExportInfo info, CancellationToken cancellationToken = default)
     {
         Log.Information("Exporting as Deck JSON.");
+        var report = DeckExportProgressReport.Starting(deck.Name, ".dek Exporter");
+        var progress = info.Progress;
+        progress.Report(report);
+
         var jsonFilename = Path.CreateDirectory(info.Destination).Combine($"deck_{deck.Name.AsFileNameFriendly()}.json");
         var simplifiedDeck = new
         {
@@ -31,22 +43,19 @@ public class LocalDeckJSONExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwar
             Remarks = deck.Remarks,
             Ratios = deck.AsSimpleDictionary()
         };
-            
+
         jsonFilename.Open(
-            async s => await JsonSerializer.SerializeAsync(s, simplifiedDeck, options: _defaultOptions),
-            System.IO.FileMode.Create, 
-            System.IO.FileAccess.Write, 
+            async s => await JsonSerializer.SerializeAsync(s, simplifiedDeck, options: _defaultOptions, cancellationToken),
+            System.IO.FileMode.Create,
+            System.IO.FileAccess.Write,
             System.IO.FileShare.ReadWrite
         );
+
         Log.Information($"Done: {jsonFilename.FullPath}");
+        report = report.Done(jsonFilename.FullPath);
+        progress.Report(report);
 
         if (!String.IsNullOrWhiteSpace(info.OutCommand))
-            await ExecuteCommandAsync(info.OutCommand, jsonFilename);
-    }
-
-    private async Task ExecuteCommandAsync(string outCommand, Path jsonFilename)
-    {
-        ConsoleUtils.RunExecutable(outCommand, $"\"{jsonFilename.FullPath}\"");
-        await Task.CompletedTask;
+            await _focProcessor().Process(info.OutCommand, jsonFilename.FullPath, cancellationToken);
     }
 }

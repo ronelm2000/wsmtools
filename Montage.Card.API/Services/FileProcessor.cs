@@ -7,7 +7,7 @@ public abstract class FileOutCommandProcessor : IFileOutCommandProcessor
 {
     public abstract ILogger Log { get; }
 
-    public async Task Process(string fullOutCommand, string fullFilePath)
+    public async Task Process(string fullOutCommand, string fullFilePath, CancellationToken cancellationToken = default)
     {
         if (Environment.OSVersion.Platform == PlatformID.Win32NT && fullOutCommand.ToLower() == "sharex")
             fullOutCommand = InstalledApplications.GetApplicationInstallPath("ShareX") + @"ShareX.exe";
@@ -27,7 +27,7 @@ public abstract class FileOutCommandProcessor : IFileOutCommandProcessor
             if (process.Start())
             {
                 Log.Information("Command executed successfully.");
-                await process.WaitForExitAsync();
+                await process.WaitForExitAsync(cancellationToken);
                 Log.Information("Command exited successfully.");
             }
             //                        while (!process.HasExited)

@@ -26,16 +26,22 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
     private (IImageEncoder, IImageFormat) _pngEncoder = (new PngEncoder(), PngFormat.Instance);
     private (IImageEncoder, IImageFormat) _jpegEncoder = (new JpegEncoder(), JpegFormat.Instance);
     private readonly Func<Flurl.Url, CookieSession> _cookieSession;
+    private readonly Func<LocalDeckImageExporter> _localDeckImageExporter;
 
     public string[] Alias => new [] { "tts", "tabletopsim" };
 
     public TTSDeckExporter(IContainer ioc)
     {
         _cookieSession = (url) => ioc.GetInstance<GlobalCookieJar>()[url.Root];
+        _localDeckImageExporter = () => ioc.GetInstance<LocalDeckImageExporter>();
     }
 
-    public async Task Export(WeissSchwarzDeck deck, IExportInfo info)
+    public async Task Export(WeissSchwarzDeck deck, IExportInfo info, CancellationToken cancellationToken = default)
     {
+        var progress = info.Progress;
+        var report = DeckExportProgressReport.Starting(deck.Name, "TTS");
+        progress.Report(report);
+
         var count = deck.Ratios.Keys.Count;
         int rows = (int)Math.Ceiling(deck.Count / 10d);
 
@@ -49,23 +55,34 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         var fileNameFriendlyDeckName = deck.Name.AsFileNameFriendly();
 
         var imageDictionary = await deck.Ratios.Keys
-            .OrderBy(c => c.Serial)
             .ToAsyncEnumerable()
             .Select((p, i) =>
             {
-                Log.Information("Loading Images: ({i}/{count}) [{serial}]", i+1, count, p.Serial);
+                Log.Information("Loading Images: ({i}/{count}) [{serial}]", i + 1, count, p.Serial);
+                report = report.LoadingImages(p.Serial, i + 1, count);
+                progress.Report(report);
                 return p;
             })
-            .SelectAwait(async (wsc) => (card: wsc, stream: await wsc.GetImageStreamAsync(_cookieSession(wsc.Images.Last()))))
-            .ToDictionaryAsync(p => p.card, p => PreProcess(Image.Load(p.stream)));
+            .SelectAwaitWithCancellation(async (wsc, ct) =>
+            (card: wsc,
+                stream: await wsc.GetImageStreamAsync(_cookieSession(wsc.Images.Last()), ct))
+            )
+            .ToDictionaryAwaitWithCancellationAsync(
+                async (p, ct) => await ValueTask.FromResult(p.card),
+                async (p, ct) => PreProcess(await Image.LoadAsync(Configuration.Default, p.stream, ct)),
+                cancellationToken
+                );
 
         var (encoder, format) = info.Flags.Any(s => s.ToLower() == "png") == true ? _pngEncoder : _jpegEncoder;
         var newImageFilename = $"deck_{fileNameFriendlyDeckName.ToLower()}.{format.FileExtensions.First()}";
         var deckImagePath = resultFolder.Combine(newImageFilename);
 
-        GenerateDeckImage(info, rows, serialList, imageDictionary, encoder, deckImagePath);
+        //GenerateDeckImage(info, rows, serialList, imageDictionary, encoder, deckImagePath);
+        await _localDeckImageExporter().GenerateDeckImage(info, new(rows, serialList, imageDictionary, encoder, deckImagePath, progress.From().Translate<DeckExportProgressReport>(r => r.AsRatio<DeckExportProgressReport, DeckExportProgressReport>(10, 0.40f)), report, cancellationToken));
 
         Log.Information("Generating the Custom Object for TTS...");
+        report = report with { Exporter = "TTS", Percentage = 55, ReportMessage = new() { EN = "Generating Tabletop Simulator Custom Object..."}};
+        progress.Report(report);
 
         var serialDictionary = deck.Ratios.Keys
             .ToDictionary(card => card.Serial,
@@ -90,6 +107,8 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 
         var nameOfObject = $"Deck Generator ({fileNameFriendlyDeckName})";
         var deckGeneratorPath = resultFolder.Combine($"{nameOfObject}.json");
+
+        //TODO: Add more progress logs here.
 
         deckGeneratorPath.Open(s =>
         {

@@ -73,12 +73,18 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         return newCard;
     }
 
-    public async Task<System.IO.Stream> GetImageStreamAsync(CookieSession cookieSession)
+    public async Task<System.IO.Stream> GetImageStreamAsync(CookieSession cookieSession, CancellationToken ct)
     {
         if (!String.IsNullOrWhiteSpace(CachedImagePath) && !CachedImagePath.Contains(".."))
             try
             {
-                return System.IO.File.OpenRead(CachedImagePath);
+                if (System.IO.File.Exists(CachedImagePath))
+                    return System.IO.File.OpenRead(CachedImagePath);
+                else
+                {
+                    Log.Warning("Cannot find cache file: {cacheImagePath}.", CachedImagePath);
+                    Log.Warning("Falling back on remote URL.");
+                }
             }
             catch (System.IO.FileNotFoundException)
             {
@@ -88,19 +94,9 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
             catch (Exception) { }
         var url = Images.Last();
         Log.Debug("Loading URL: {url}", url.AbsoluteUri);
-
-        /*
-        var response = await url.WithImageHeaders()
-                            .WithReferrer(url.AbsoluteUri)
-                            .GetAsync();
-        Log.Debug("Done, reading content: {url}", url.AbsoluteUri);
-        var bytes = await response.Content.ReadAsByteArrayAsync();
-        return new MemoryStream(bytes);
-        */
-        
         return await url.WithImageHeaders()
                         .WithCookies(cookieSession)
-                        .GetAsync()
+                        .GetAsync(ct)
                         .ReceiveStream();
     }
     

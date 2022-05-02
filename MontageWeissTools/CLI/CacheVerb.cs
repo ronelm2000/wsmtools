@@ -100,7 +100,7 @@ public class CacheVerb : IVerbCommand
             var imgURL = card.Images.Last();
             Log.Information("Caching: {imgURL}", imgURL);
             var session = _cookieSession(imgURL);
-            using (System.IO.Stream netStream = await card.GetImageStreamAsync(session))
+            using (System.IO.Stream netStream = await card.GetImageStreamAsync(session, ct))
             using (Image img = Image.Load(netStream))
             {
                 var imageDirectoryPath = Path.Get(_IMAGE_CACHE_PATH);

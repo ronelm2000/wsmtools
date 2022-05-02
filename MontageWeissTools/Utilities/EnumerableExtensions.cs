@@ -9,6 +9,12 @@ public static class EnumerableExtensions
         return new DictionaryDisposer<K,V>(originalDictionary);
     }
 
+    public static IAsyncDisposable GetAsyncDisposer<K, V>(this IDictionary<K, V> originalDictionary) where V : IAsyncDisposable
+    {
+        return new AsyncDictionaryDisposer<K, V>(originalDictionary);
+    }
+
+
     public static V Add<K,V>(this IDictionary<K,V> dictionary, K key, V valueToAdd)
     {
         if (dictionary.TryAdd(key, valueToAdd))
@@ -63,7 +69,7 @@ public static class EnumerableExtensions
     }
 
     public class DictionaryDisposer<K,V> : IDisposable where V : IDisposable
-{
+    {
         IDictionary<K, V> _original;
 
         public DictionaryDisposer(IDictionary<K, V> original)
@@ -92,6 +98,50 @@ public static class EnumerableExtensions
         public void Dispose()
         {
             Dispose(true);
+        }
+        #endregion
+    }
+
+    public class AsyncDictionaryDisposer<K, V> : IAsyncDisposable, IDisposable where V : IAsyncDisposable
+    {
+        IDictionary<K, V> _original;
+
+        public AsyncDictionaryDisposer(IDictionary<K, V> original)
+        {
+            this._original = original;
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await DisposeAsyncCore().ConfigureAwait(false);
+            Dispose(disposing: false);
+            GC.SuppressFinalize(this);
+        }
+
+        #region IDisposable Support
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                foreach (var v in _original?.Values)
+                    (v as IDisposable)?.Dispose();
+                _original = null;
+            }
+        }
+
+        protected virtual async ValueTask DisposeAsyncCore()
+        {
+            if (_original is not null)
+            {
+                await Task  .WhenAll(_original?.Values.Select(async v => await v.DisposeAsync().ConfigureAwait(false)))
+                            .ConfigureAwait(false);
+            }
         }
         #endregion
     }

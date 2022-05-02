@@ -2,5 +2,5 @@
 
 public interface IFileOutCommandProcessor
 {
-    public Task Process(string fullOutCommand, string fullFilePath);
+    public Task Process(string fullOutCommand, string fullFilePath, CancellationToken cancellationToken = default);
 }

@@ -35,10 +35,11 @@ public class SanityTranslationsInspector : IExportedDeckInspector<WeissSchwarzDe
             if (setsWithTranslations.Any(rid => allEmptyTranslations.Contains(rid)))
             {
                 Log.Warning("The following cards have missing translations: {allNonTranslatedCards}", allNonTranslatedCards.Select(card => card.Serial).ToList());
-                Log.Warning("These are very likely untranslated PRs, please go back and manually export PRs using any of the ff. where applicable and retry:\n" +
-                    "\t./wstools export https://www.heartofthecards.com/translations/schwarz_promos.html\n" +
-                    "\t./wstools export https://www.heartofthecards.com/translations/weiss_promos.html");
+                Log.Warning("If you suspect that these are (untranslated) PRs, please go back and manually export PRs using any of the ff. where applicable and retry:\n" +
+                    "\t./wstools parse https://www.heartofthecards.com/translations/schwarz_promos.html\n" +
+                    "\t./wstools parse https://www.heartofthecards.com/translations/weiss_promos.html");
                 Log.Warning("Note that to avoid too much bandwidth, images are not exported this way. You will need to put an image manually on the Images sub-folder. The process to improve this process is still in progress.");
+                Log.Warning("It is also possible for extremely new sets that there simply aren't full translations yet; check your source before continuing.");
                 return WeissSchwarzDeck.Empty;
             }
             else

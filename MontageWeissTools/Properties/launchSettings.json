@@ -28,14 +28,6 @@
       "commandName": "Project",
       "commandLineArgs": "parse https://www.heartofthecards.com/translations/schwarz_promos.html"
     },
-    "Parse Aobuta S1": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/rascal_does_not_dream_of_bunny_girl_senpai_booster_pack.html"
-    },
-    "Parse Aobuta Movie": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/rascal_does_not_dream_of_a_dreaming_girl_booster_pack.html"
-    },
     "Export Aobuta DeckLog": {
       "commandName": "Project",
       "commandLineArgs": "export https://decklog.bushiroad.com/view/FHL4 --with upscaling"
@@ -44,25 +36,13 @@
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
     },
-    "Export GFB COD": {
-      "commandName": "Project",
-      "commandLineArgs": "export \"R:\\\\Downloads\\\\GFB.cod\" --with sendtcp"
-    },
     "Parse GFB vol. 2": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html --with skip:yyt"
+      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html --with noskip:yyt"
     },
     "Cache W38 JP": {
       "commandName": "Project",
       "commandLineArgs": "cache w38 jp"
-    },
-    "Parse GFB vol. 1": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html --with skip:yyt"
-    },
-    "Export DC3/W18": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/da_capo_iii_booster_pack.html --with skip:yyt"
     },
     "Parse LB vs DC": {
       "commandName": "Project",
@@ -124,18 +104,6 @@
       "commandName": "Project",
       "commandLineArgs": "update"
     },
-    "Export Bandori (DeckLog)": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://decklog.bushiroad.com/view/K1HD"
-    },
-    "Export MOB (Image)": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/Vd2zOev3k --exporter image --out sharex"
-    },
-    "Export Bandori (DeckLog EN)": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://decklog-en.bushiroad.com/view/JYQJ"
-    },
     "Parse (HOTC Local)": {
       "commandName": "Project",
       "commandLineArgs": "parse \"R:\\Downloads\\illya_hotc.txt\" --with hotc"
@@ -143,6 +111,10 @@
     "Parse Slime vol. 2 (EncoreDecks)": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=615b69951e41dfffbdd37508"
+    },
+    "Parse Bandori 5th Anniv (HOTC)": {
+      "commandName": "Project",
+      "commandLineArgs": "parse \"https://heartofthecards.com/translations/bang_dream_girls_band_party!_5th_anniversary_booster_pack.html\" --with noskip:yyt"
     }
   }
 }

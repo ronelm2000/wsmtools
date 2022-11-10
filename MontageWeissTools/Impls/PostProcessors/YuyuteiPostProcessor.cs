@@ -8,7 +8,9 @@ using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Web;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors;
@@ -26,6 +28,8 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
     private static readonly string cardUnitListItemSelector = "#main .card_unit";
     private static readonly string cardUnitImageSelector = ".image_box > a > .image > img";
     private static readonly string cardUnitSerialSelector = ".headline > p.id";
+    private static readonly string cardUnitPriceSelector = ".price";
+    private static readonly string cardUnitSaleSelector = ".sale";
 
     // Exceptional Sets
     private static string[] gfbException = new[] { "W33", "W38" };
@@ -89,14 +93,14 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
     {
         var yuyuteiSellPage = "https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=";
 
-        var cards = await originalCards.ToArrayAsync(cancellationToken);
-
-        var firstCard = cards.Skip(Math.Min(cards.Length - 1, 10)).First(); // wtf GFB. Why you do this to me.
+        //var cards = await originalCards.ToArrayAsync(cancellationToken);
+        //.Skip(Math.Min(cards.Length - 1, 10)).First(); 
+        var firstCard = await originalCards.Take(10).LastAsync(cancellationToken); // wtf GFB. Why you do this to me.
         var setCode = firstCard.ReleaseID;
         var lang = firstCard.Language;
 
         if (lang == CardLanguage.English) // Yuyutei Inquiry will just crash
-        { 
+        {
             await foreach (var card in originalCards) yield return card;
             yield break;
         }
@@ -109,15 +113,40 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
         IDocument yuyuteiSearchPage = await new Uri(yuyuteiSellPage).DownloadHTML(cancellationToken, ("Referer", "https://yuyu-tei.jp/")).WithRetries(10);
 
         var cardUnitListItems = yuyuteiSearchPage.QuerySelectorAll(cardUnitListItemSelector);
+        // Caution on https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=BD%2fW54
+        var yytInfoDict = cardUnitListItems.Select(Serialize)
+            .Distinct(yyti => yyti.Serial + yyti.Rarity)
+            .ToDictionary(yyti => new WSKey(yyti.Serial, yyti.Rarity), yyti => yyti);
 
-        var serialImageTriplets = cardUnitListItems
-            .Select(div => this.CreateTrio(div))
-            .Select(trio => this.Serialize(trio))
-            .Distinct(trio => trio.Serial + " " + trio.Rarity)             // Dev Notes: https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=BD%2fW54 gave me cancer.
-            .ToDictionary(trio => (trio.Serial, trio.Rarity), pair => pair.ImageUri)
-            ;
+        Log.Information("Processing all new cards...");
+        Log.Debug("YYT Info Dict Count: {count}", yytInfoDict.Count);
 
-        Log.Information("Getting all PRs on card database without a YYT image link...");
+        await foreach (var originalCard in originalCards)
+            if (yytInfoDict.TryGetValue(new WSKey(originalCard.Serial, originalCard.Rarity), out var info))
+            {
+                yield return Process(originalCard, info);
+            }
+            else
+            {
+                Log.Information("Cannot find info for: {serial} {rarity}", originalCard.Serial, originalCard.Rarity);
+                yield return originalCard;
+            }
+
+        Log.Information("Processing all PRs on card database (if any)...");
+        using (var db = _database())
+        {
+            var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
+                .Where(c => c.ReleaseID == setCode
+                            && c.Language == lang
+                            && c.Rarity == "PR"
+                );
+            await foreach (var prCard in prCards)
+                if (yytInfoDict.TryGetValue(new WSKey(prCard.Serial, prCard.Rarity), out var info))
+                    yield return Process(prCard, info);
+                else
+                    yield return prCard;
+        }
+        /*
         using (var db = _database())
         {
             await db.Database.MigrateAsync();
@@ -153,10 +182,72 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
             }
             yield return res;
         }
+        */
         Log.Information("Ended.");
         yield break;
     }
 
+    private static WSYYTInfo Serialize(IElement cardUnitDiv)
+    {
+        WSYYTInfo info = new();
+        info.Rarity = cardUnitDiv.ClassList
+            .Where(s => s.StartsWith(rarityClassPrefix))
+            .Select(s => s.Substring(rarityClassPrefix.Length)).First();
+        info.Serial = cardUnitDiv.QuerySelector(cardUnitSerialSelector).GetInnerText().Trim();
+        info.ImageUri = cardUnitDiv.QuerySelector<IHtmlImageElement>(cardUnitImageSelector)
+            .Source
+            .Replace("ws/90_126", "ws/front");
+        var priceStringSelector = cardUnitDiv.QuerySelector(cardUnitPriceSelector);
+        var priceString = priceStringSelector
+            .QuerySelector(cardUnitSaleSelector)
+            ?.GetInnerText()
+            .Trim()
+            .Replace("円", "") ?? null;
+        if (string.IsNullOrWhiteSpace(priceString))
+            priceString = priceStringSelector?.GetInnerText()
+                .Trim()
+                .Replace("円", "") ?? "0";
+        info.Price = int.Parse(priceString);
+
+        return HandleExceptions(info);
+    }
+
+    private static WSYYTInfo HandleExceptions(WSYYTInfo rawInfo)
+    {
+        return rawInfo switch
+        {
+            // Fix Exceptional Serial on GU/57 caused by the serial being the same serial in SEC and in normal rarity.
+            var tup when tup.Rarity == "SEC" && tup.Serial.StartsWith("GU/W57") => rawInfo with { Rarity = tup.Serial + tup.Rarity },
+            // Fix Exceptional CC rarity when it's supposed to be a regular C for all Extra Boosters
+            var tup when (tup.Serial.Contains("/WE") || tup.Serial.Contains("/SE"))
+                       && (tup.Rarity.EndsWith("CC") || tup.Rarity.EndsWith("CU"))
+              => rawInfo with { Serial = tup.Rarity.Substring(0, tup.Rarity.Length - 2) + tup.Rarity.Last() },
+            _ => rawInfo
+        };
+    }
+
+    private WeissSchwarzCard Process(WeissSchwarzCard original, WSYYTInfo info)
+    {
+        Log.Information("Processing {serial}", original.Serial);
+
+        if (original.Images.Any(u => u.Authority == "yuyu-tei.jp"))
+            original.Images.Add(new Uri(info.ImageUri));
+        Dictionary<DateTime, int> priceTable = null;
+        if (original.AdditionalInfo.Any(i => i.Key == "yyt.price.info"))
+            priceTable = original.AdditionalInfo
+                .First(i => i.Key == "yyt.price.info")
+                .DeserializeValue<Dictionary<DateTime, int>>();
+        else
+            priceTable = new();
+
+        priceTable.Add(DateTime.Now, info.Price);
+
+        original.AddOptionalInfo("yyt.price.info", priceTable);
+
+        return original;
+    }
+
+    /*
     private (IElement serialDiv, IHtmlImageElement imageDiv, string rarityClass) CreateTrio(IElement div)
     {
         return (serialDiv: div.QuerySelector(cardUnitSerialSelector),
@@ -182,4 +273,15 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
             _ => res
         };
     }
+    */
+
+    private record WSYYTInfo
+    {
+        internal string Serial { get; set; }
+        internal string Rarity { get; set; }
+        internal string ImageUri { get; set; }
+        internal int Price { get; set; }
+    }
+
+    private readonly record struct WSKey (string Serial, string Rarity);
 }

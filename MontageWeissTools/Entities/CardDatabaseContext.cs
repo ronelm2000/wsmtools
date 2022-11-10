@@ -47,18 +47,18 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
     {
         modelBuilder.Entity<WeissSchwarzCard>(b =>
         {
-            b   .HasKey(c => c.Serial);
-            b   .Property(c => c.Triggers)
-                .HasConversion( arr => String.Join(',', arr.Select(t => t.ToString()))
-                            ,   str => str.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.ToEnum<Trigger>().Value).ToArray()
+            b.HasKey(c => c.Serial);
+            b.Property(c => c.Triggers)
+                .HasConversion(arr => String.Join(',', arr.Select(t => t.ToString()))
+                            , str => str.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.ToEnum<Trigger>().Value).ToArray()
                         );
-            b   .Property(c => c.Effect)
-                .HasConversion( arr => JsonConvert.SerializeObject(arr)
-                            ,   str => JsonConvert.DeserializeObject<string[]>(str)
+            b.Property(c => c.Effect)
+                .HasConversion(arr => JsonConvert.SerializeObject(arr)
+                            , str => JsonConvert.DeserializeObject<string[]>(str)
                                 );
-            b   .Property(c => c.Images)
-                .HasConversion( arr => JsonConvert.SerializeObject(arr.Select(uri => uri.ToString()).ToArray())
-                            ,   str => JsonConvert.DeserializeObject<string[]>(str).Select(s => new Uri(s)).ToList()
+            b.Property(c => c.Images)
+                .HasConversion(arr => JsonConvert.SerializeObject(arr.Select(uri => uri.ToString()).ToArray())
+                            , str => JsonConvert.DeserializeObject<string[]>(str).Select(s => new Uri(s)).ToList()
                                 );
 
             b.OwnsMany(s => s.Traits, bb =>
@@ -79,6 +79,15 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                 bb.Property<string>("EN").IsRequired(false);
                 bb.Property<string>("JP").IsRequired(false);
             });
+        });
+
+        modelBuilder.Entity<WeissSchwarzCardOptionalInfo>(b =>
+        {
+            b   .HasOne(i => i.Card)
+                .WithMany(c => c.AdditionalInfo)
+                .HasForeignKey(i => i.Serial)
+                .HasPrincipalKey(c => c.Serial);
+            b   .HasKey(i => new { i.Serial, i.Key });
         });
 
         modelBuilder.Entity<Setting>(b =>

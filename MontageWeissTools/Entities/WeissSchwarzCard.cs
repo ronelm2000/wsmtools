@@ -6,6 +6,7 @@ using Montage.Weiss.Tools.Utilities;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace Montage.Weiss.Tools.Entities;
 
@@ -36,6 +37,8 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     public List<Uri> Images { get; set; } = new List<Uri>();
     public string VersionTimestamp { get; set; }
     public string Remarks { get; set; }
+
+    public List<WeissSchwarzCardOptionalInfo> AdditionalInfo { get; set; } = new List<WeissSchwarzCardOptionalInfo>();
     
     /// <summary>
     /// File Path Relative Link into a cached image. This property is usually assigned exactly once by
@@ -240,6 +243,18 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
                 break; 
         }
         return res;
+    }
+
+    internal void AddOptionalInfo<T>(string key, T value)
+    {
+        if (string.IsNullOrEmpty(key)) return;
+        if (value is null) return;
+        var json = JsonSerializer.Serialize<T>(value);
+        if (string.IsNullOrEmpty(json)) return;
+        var info = AdditionalInfo.FirstOrDefault(i => i.Key == key, new WeissSchwarzCardOptionalInfo(this, key));
+        info.SerializeValue<T>(value);
+        AdditionalInfo.Remove(info);
+        AdditionalInfo.Add(info);
     }
 }
 

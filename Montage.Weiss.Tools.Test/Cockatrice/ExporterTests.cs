@@ -57,5 +57,7 @@ namespace Montage.Weiss.Tools.Test.Cockatrice
         public string OutCommand => "";
         public IEnumerable<string> Flags => new string[] { };
         public bool NonInteractive => true;
+
+        public IProgress<DeckExportProgressReport> Progress => NoOpProgress<DeckExportProgressReport>.Instance;
     }
 }

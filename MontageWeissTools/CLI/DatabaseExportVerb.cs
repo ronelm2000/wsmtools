@@ -71,34 +71,11 @@ public class DatabaseExportVerb : IVerbCommand, IDatabaseExportInfo
                 .Where(exporter => exporter.Alias.Contains(Exporter))
                 .First();
 
-            await exporter.Export(database, this);
+            await exporter.Export(database, this, cancellationToken);
         }
 
-        report = report.AsDone();
+        report = report.AsDone(CommandProgressReportVerbType.DatabaseExport);
         progress.Report(report);
-
-        /*
-
-        var deck = await parser.Parse(Source);
-        var inspectionOptions = new InspectionOptions()
-        {
-            IsNonInteractive = this.NonInteractive,
-            NoWarning = this.NoWarning
-        };
-        deck = await ioc.GetAllInstances<IExportedDeckInspector>()
-            .OrderByDescending(inspector => inspector.Priority)
-            .ToAsyncEnumerable()
-            .AggregateAwaitAsync(deck, async (d, inspector) => await inspector.Inspect(d, inspectionOptions));
-
-        if (deck != WeissSchwarzDeck.Empty)
-        {
-            var exporter = ioc.GetAllInstances<IDeckExporter>()
-                .Where(exporter => exporter.Alias.Contains(Exporter))
-                .First();
-
-            await exporter.Export(deck, this);
-        }
-        */
     }
 
     private CommandProgressReport TranslateDatabaseUpdate(DatabaseUpdateReport arg)

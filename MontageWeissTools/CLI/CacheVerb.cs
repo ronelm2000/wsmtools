@@ -89,7 +89,7 @@ public class CacheVerb : IVerbCommand
             Log.Information("    -ronelm2000");
         }
 
-        report = report.AsDone();
+        report = report.AsDone(CommandProgressReportVerbType.Caching);
         progress.Report(report);
     }
 

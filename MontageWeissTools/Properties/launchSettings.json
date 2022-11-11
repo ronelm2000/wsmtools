@@ -115,6 +115,10 @@
     "Parse Bandori 5th Anniv (HOTC)": {
       "commandName": "Project",
       "commandLineArgs": "parse \"https://heartofthecards.com/translations/bang_dream_girls_band_party!_5th_anniversary_booster_pack.html\" --with noskip:yyt"
+    },
+    "Export DB as JSON": {
+      "commandName": "Project",
+      "commandLineArgs": "export-db --rids W95 --exporter json"
     }
   }
 }

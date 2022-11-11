@@ -10,7 +10,7 @@ public static class FluentPathExtensions
     /// <param name="path"></param>
     /// <param name="filename"></param>
     /// <returns></returns>
-    public static Path CreateFile(this Path path, string filename, Action<System.IO.FileStream> streamAction)
+    public static Fluent.IO.Path CreateFile(this Path path, string filename, Action<System.IO.FileStream> streamAction)
     {
         // if Path is null TODO: make an exception
         using (var stream = System.IO.File.Create(path.FullPath))
@@ -52,11 +52,16 @@ public static class FluentPathExtensions
     /// <param name="streamAction"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static async Task WriteAsync(this Path path, Action<System.IO.FileStream> streamAction, CancellationToken cancellationToken = default)
+    public static async Task WriteAsync(this Fluent.IO.Path path, Action<System.IO.FileStream> streamAction, CancellationToken cancellationToken = default)
     {
         await using var stream = System.IO.File.OpenWrite(path.FullPath);
         streamAction?.Invoke(stream);
         await stream.FlushAsync(cancellationToken);
+    }
+
+    public static System.IO.FileStream GetOpenWriteStream(this Fluent.IO.Path path)
+    {
+        return System.IO.File.OpenWrite(path.FullPath);
     }
 
     /// 

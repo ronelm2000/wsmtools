@@ -13,13 +13,13 @@ public class CockatriceExporter : IDatabaseExporter<CardDatabaseContext, WeissSc
     private ILogger Log = Serilog.Log.ForContext<CockatriceExporter>();
     public string[] Alias => new string[] { "cockatrice", "cc3s" };
 
-    public async Task Export(CardDatabaseContext database, IDatabaseExportInfo info)
+    public async Task Export(CardDatabaseContext database, IDatabaseExportInfo info, CancellationToken cancellationToken)
     {
         Log.Information("Starting...");
         var query = CreateQuery(database.WeissSchwarzCards, info);
         var resultFile = Path.CreateDirectory(info.Destination).Combine("cockatrice_card_db.xml");
         var serializer = new XmlSerializer(typeof(CockatriceCardDatabase));
-        var cardSet = await CockatriceCardDatabase.CreateFromDatabase(query);
+        var cardSet = await CockatriceCardDatabase.CreateFromDatabase(query, cancellationToken);
         resultFile.Open(s => serializer.Serialize(s, cardSet),
                                 System.IO.FileMode.Create,
                                 System.IO.FileAccess.Write,
@@ -54,12 +54,13 @@ public class CockatriceCardDatabase
     [XmlArrayItem("card")]
     public CockatriceCard[] Cards;
 
-    internal static async Task<CockatriceCardDatabase> CreateFromDatabase(IAsyncEnumerable<WeissSchwarzCard> query)
+    internal static async Task<CockatriceCardDatabase> CreateFromDatabase(IAsyncEnumerable<WeissSchwarzCard> query, CancellationToken cancellationToken)
     {
         var result = new CockatriceCardDatabase();
         var tempSetList = new Dictionary<string,CockatriceSet>();
         var tempCardList = new List<CockatriceCard>();
-        await foreach (var card in query)
+
+        await foreach (var card in query.WithCancellation(cancellationToken))
         {
             try
             {

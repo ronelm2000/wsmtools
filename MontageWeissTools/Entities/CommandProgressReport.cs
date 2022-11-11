@@ -22,9 +22,18 @@ public record CommandProgressReport : UpdateProgressReport
         };
     }
 
-    internal CommandProgressReport AsDone()
+    internal CommandProgressReport AsDone(CommandProgressReportVerbType vtype)
     {
-        throw new NotImplementedException();
+        return new CommandProgressReport
+        {
+            MessageType = MessageType.IsDone,
+            VerbType = vtype,
+            Percentage = 100,
+            ReportMessage = new MultiLanguageString
+            {
+                EN = "Done."
+            }
+        };
     }
 }
 

@@ -43,7 +43,7 @@ namespace Montage.Weiss.Tools.Test.Cockatrice
             }.Run(ioc, progressReporter);
 
             IDatabaseExportInfo info = new MockDatabaseExportInfo();
-            await new CockatriceExporter().Export(db, info);
+            await new CockatriceExporter().Export(db, info, default);
         }
     }
 

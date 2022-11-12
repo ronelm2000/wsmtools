@@ -79,6 +79,10 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                 bb.Property<string>("EN").IsRequired(false);
                 bb.Property<string>("JP").IsRequired(false);
             });
+
+            b   .HasMany(c => c.AdditionalInfo)
+                .WithOne(i => i.Card)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<WeissSchwarzCardOptionalInfo>(b =>
@@ -87,7 +91,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                 .WithMany(c => c.AdditionalInfo)
                 .HasForeignKey(i => i.Serial)
                 .HasPrincipalKey(c => c.Serial);
-            b   .HasKey(i => new { i.Serial, i.Key });
+            b.HasKey(i => new { i.Serial, i.Key });
         });
 
         modelBuilder.Entity<Setting>(b =>

@@ -38,7 +38,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     public string VersionTimestamp { get; set; }
     public string Remarks { get; set; }
 
-    public List<WeissSchwarzCardOptionalInfo> AdditionalInfo { get; set; } = new List<WeissSchwarzCardOptionalInfo>();
+    public virtual List<WeissSchwarzCardOptionalInfo> AdditionalInfo { get; set; } = new List<WeissSchwarzCardOptionalInfo>();
     
     /// <summary>
     /// File Path Relative Link into a cached image. This property is usually assigned exactly once by
@@ -73,6 +73,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         WeissSchwarzCard newCard = (WeissSchwarzCard) this.MemberwiseClone();
         newCard.Name = this.Name.Clone();
         newCard.Traits = this.Traits.Select(s => s.Clone()).ToList();
+        newCard.AdditionalInfo = this.AdditionalInfo.Select(s => s.Clone()).ToList();
         return newCard;
     }
 
@@ -255,6 +256,8 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         info.SerializeValue<T>(value);
         AdditionalInfo.Remove(info);
         AdditionalInfo.Add(info);
+
+        Log.Debug("All Optional Info: {@info}", AdditionalInfo);
     }
 }
 

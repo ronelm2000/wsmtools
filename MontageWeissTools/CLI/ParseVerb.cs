@@ -26,7 +26,7 @@ public class ParseVerb : IVerbCommand, IParseInfo
         var parser = await container.GetAllInstances<ICardSetParser<WeissSchwarzCard>>()
             .ToAsyncEnumerable()
             .WhereAwait(async parser => await parser.IsCompatible(this))
-            .FirstAsync();
+            .FirstAsync(ct);
 
         var redirector = new CommandProgressAggregator(progress);
         var cardList = await parser.Parse(URI, redirector, ct).ToListAsync(ct);
@@ -47,15 +47,12 @@ public class ParseVerb : IVerbCommand, IParseInfo
 
         await container.UpdateCardDatabase(redirector, ct);
 
-        using (var db = container.GetInstance<CardDatabaseContext>())
+        await using (var db = container.GetInstance<CardDatabaseContext>())
         {
-            await foreach (var card in cards)
+            await foreach (var card in cards.WithCancellation(ct))
             {
                 card.VersionTimestamp = Program.AppVersion;
-                var dups = db.WeissSchwarzCards.AsQueryable<WeissSchwarzCard>().Where(c => c.Serial == card.Serial).ToArray();
-                if (dups.Length > 0)
-                    db.WeissSchwarzCards.RemoveRange(dups); // delete all the dups, based on serial.
-                db.Add(card);                    
+                await db.AddAsync(card);                    
                 Log.Information("Added to DB: {serial}", card.Serial);
             }
 

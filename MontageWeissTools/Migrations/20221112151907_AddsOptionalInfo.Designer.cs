@@ -9,7 +9,7 @@ using Montage.Weiss.Tools.Entities;
 namespace Montage.Weiss.Tools.Migrations
 {
     [DbContext(typeof(CardDatabaseContext))]
-    [Migration("20221110105814_AddsOptionalInfo")]
+    [Migration("20221112151907_AddsOptionalInfo")]
     partial class AddsOptionalInfo
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

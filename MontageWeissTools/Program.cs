@@ -145,6 +145,9 @@ public class Program
     public static string AppVersion =>
         typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
+
+    public static string AppFilePath =>
+        System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
     public static DateTime AppReleaseDate =>
-        System.IO.File.GetLastWriteTime(typeof(Program).Assembly.Location);
+        System.IO.File.GetLastWriteTime(AppFilePath);
 }

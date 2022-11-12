@@ -198,6 +198,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                     results[entry.Serial + entry.Rarity] = entry;
                     var serialEncoded = WeissSchwarzCard.ParseSerial(entry.Serial);
                     cacheSrvc[(settings.Language, serialEncoded.NeoStandardCode)][entry.Serial + entry.Rarity] = entry;
+                    Log.Debug("Encoded DeckLog Result: {serial}", entry.Serial + entry.Rarity);
                 }
                 Log.Information("Got {count} results...", temporaryResults?.Count ?? 0);
                 page++;
@@ -277,7 +278,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         [JsonProperty("keyword")]
         public string Keyword { get; set; } = "";
         [JsonProperty("keyword_type")]
-        public string[] KeywordQueryType { get; set; } = new string[] { "no" };
+        public string[] KeywordQueryType { get; set; } = new string[] { "name", "text", "no", "feature" };
         [JsonProperty("side")]
         public string Side { get; set; } = "";
         [JsonProperty("card_kind")]
@@ -289,9 +290,37 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         [JsonProperty("option_counter")]
         public bool ClockCardsOnly { get; set; } = false;
         [JsonProperty("deck_param1")]
-        public DeckConstructionType DeckConstruction { get; set; } = DeckConstructionType.Standard;
+        public DeckConstructionType DeckConstruction { get; set; } = DeckConstructionType.Others;
+
         [JsonProperty("deck_param2")]
         public string DeckConstructionParameter { get; set; } = "";
+
+        [JsonProperty("cost_e")]
+        public string CostEnd = "";
+        
+        [JsonProperty("cost_s")]
+        public string CostStart = "";
+
+        [JsonProperty("level_e")]
+        public string LevelStart = "";
+        
+        [JsonProperty("level_s")]
+        public string LevelEnd = "";
+
+        [JsonProperty("power_e")]
+        public string PowerEnd = "";
+
+        [JsonProperty("power_s")]
+        public string PowerStart = "";
+
+        [JsonProperty("soul_e")]
+        public string SoulEnd = "";
+
+        [JsonProperty("soul_s")]
+        public string SoulStart = "";
+
+        [JsonProperty("trigger")]
+        public string Trigger = ""; //TODO: Replace this with string--based enum.
 
         //TODO: There's actually alot of missing variables that can be placed here, but these are ignored for now.
     }

@@ -19,6 +19,9 @@ public class DatabaseExportVerb : IVerbCommand, IDatabaseExportInfo
     [Option("rids", HelpText = "Limits the range of the database export to a few RIDs (Release IDs).", Separator = ',', Default = new string[] { })]
     public IEnumerable<string> ReleaseIDs { get; set; } = new string[] { };
 
+    [Option("serials", HelpText = "Limits the range of the database export to a few card serials.", Separator = ',', Default = new string[] { })]
+    public IEnumerable<string> Serials { get; set; } = new string[] { };
+
     [Value(0, HelpText = "Indicates the source file/url. Default value: ./cards.db", Default = "./cards.db")]
     public string Source { get; set; } = "./cards.db";
 

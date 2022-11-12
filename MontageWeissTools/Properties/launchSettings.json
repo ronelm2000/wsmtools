@@ -118,7 +118,7 @@
     },
     "Export DB as JSON": {
       "commandName": "Project",
-      "commandLineArgs": "export-db --rids W95 --exporter json"
+      "commandLineArgs": "export-db --rids W95,S82 --exporter json"
     }
   }
 }

@@ -1,4 +1,5 @@
 ﻿using Fluent.IO;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
@@ -13,13 +14,13 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Database
 {
-    public class JSONExporter : IDatabaseExporter<CardDatabaseContext, WeissSchwarzCard>
+    public class JSONExporter : CommonDatabaseExporter
     {
         private ILogger Log = Serilog.Log.ForContext<JSONExporter>();
 
-        public string[] Alias => new[] { "json", "json-db" }; 
+        public override string[] Alias => new[] { "json", "json-db" }; 
 
-        public async Task Export(CardDatabaseContext database, IDatabaseExportInfo info, CancellationToken cancellationToken)
+        public override async Task Export(CardDatabaseContext database, IDatabaseExportInfo info, CancellationToken cancellationToken)
         {
             Log.Information("Starting...");
             var query = CreateQuery(database.WeissSchwarzCards, info);
@@ -36,18 +37,6 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Database
 
             Log.Information("Done.");
             Log.Information($"Saved: {destPath.ToString()}");
-        }
-
-        private IQueryable<WeissSchwarzCard> CreateQuery(IQueryable<WeissSchwarzCard> query, IDatabaseExportInfo info)
-        {
-            var releaseIDLimitations = info.ReleaseIDs.ToList();
-            var result = query;
-            foreach (var rid in releaseIDLimitations)
-            {
-                result = result.Where(c => c.Serial.Contains(rid + "-"));
-            }
-
-            return result;
         }
 
         async Task<List<WeissSchwarzCard>> GenerateJSONAsync(IQueryable<WeissSchwarzCard> query, CancellationToken cancellationToken)

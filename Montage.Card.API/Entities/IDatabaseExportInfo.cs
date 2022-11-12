@@ -7,4 +7,10 @@ public interface IDatabaseExportInfo : IExportInfo
     /// Release IDs.
     /// </summary>
     public IEnumerable<string> ReleaseIDs { get; }
+
+    /// <summary>
+    /// If this is not empty, signals the exporter that the export range is just limited to the following
+    /// Serials.
+    /// </summary>
+    public IEnumerable<string> Serials { get; }
 }

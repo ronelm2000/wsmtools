@@ -8,33 +8,24 @@ using System.Xml.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Database.Cockatrice;
 
-public class CockatriceExporter : IDatabaseExporter<CardDatabaseContext, WeissSchwarzCard>
+public class CockatriceExporter : CommonDatabaseExporter
 {
     private ILogger Log = Serilog.Log.ForContext<CockatriceExporter>();
-    public string[] Alias => new string[] { "cockatrice", "cc3s" };
+    public override string[] Alias => new string[] { "cockatrice", "cc3s" };
 
-    public async Task Export(CardDatabaseContext database, IDatabaseExportInfo info, CancellationToken cancellationToken)
+    public override async Task Export(CardDatabaseContext database, IDatabaseExportInfo info, CancellationToken cancellationToken)
     {
         Log.Information("Starting...");
         var query = CreateQuery(database.WeissSchwarzCards, info);
         var resultFile = Path.CreateDirectory(info.Destination).Combine("cockatrice_card_db.xml");
         var serializer = new XmlSerializer(typeof(CockatriceCardDatabase));
-        var cardSet = await CockatriceCardDatabase.CreateFromDatabase(query, cancellationToken);
+        var cardSet = await CockatriceCardDatabase.CreateFromDatabase(query.ToAsyncEnumerable(), cancellationToken);
         resultFile.Open(s => serializer.Serialize(s, cardSet),
                                 System.IO.FileMode.Create,
                                 System.IO.FileAccess.Write,
                                 System.IO.FileShare.ReadWrite
                                 );
         Log.Information($"Done: {resultFile.FullPath}");
-    }
-
-    private IAsyncEnumerable<WeissSchwarzCard> CreateQuery(IAsyncEnumerable<WeissSchwarzCard> query, IDatabaseExportInfo info)
-    {
-        var releaseIDLimitations = info.ReleaseIDs.ToArray();
-        var result = query;
-        if (releaseIDLimitations.Length > 0)
-            result = result.Where(card => releaseIDLimitations.Contains(card.ReleaseID));
-        return result.Where(card => card.Images.Count > 0);
     }
 }
 

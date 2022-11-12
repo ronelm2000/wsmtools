@@ -50,6 +50,7 @@ namespace Montage.Weiss.Tools.Test.Cockatrice
     internal class MockDatabaseExportInfo : IDatabaseExportInfo
     {
         public IEnumerable<string> ReleaseIDs => new string[] { };
+        public IEnumerable<string> Serials => new string[] { };
         public string Source => "";
         public string Destination => "./Export/";
         public string Parser => "";

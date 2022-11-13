@@ -1,12 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29728.190
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Montage.Weiss.Tools", "MontageWeissTools\Montage.Weiss.Tools.csproj", "{1A0D3FF8-59D2-4548-988E-E66CC1BAC914}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BB5C3BE8-6A5C-4C2F-9DAD-9C12D150F90F}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.github\workflows\nightly.yml = .github\workflows\nightly.yml
 		readme.md = readme.md
 		.github\workflows\release.yml = .github\workflows\release.yml
@@ -14,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Montage.Weiss.Tools.Test", "Montage.Weiss.Tools.Test\Montage.Weiss.Tools.Test.csproj", "{B1170FA3-8208-4AEE-9E45-DD62FBC38BA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Montage.Card.API", "Montage.Card.API\Montage.Card.API.csproj", "{D4B69600-AC71-4A82-B0BF-8ED9185BC972}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Montage.Card.API", "Montage.Card.API\Montage.Card.API.csproj", "{D4B69600-AC71-4A82-B0BF-8ED9185BC972}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

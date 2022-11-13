@@ -79,6 +79,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\HelpText.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>HelpText.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\TTS\TTSResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -87,6 +92,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\HelpText.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>HelpText.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\TTS\TTSResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>TTSResources.Designer.cs</LastGenOutput>

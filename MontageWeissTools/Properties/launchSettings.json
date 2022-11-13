@@ -119,6 +119,18 @@
     "Export DB as JSON": {
       "commandName": "Project",
       "commandLineArgs": "export-db --rids W95,S82 --exporter json"
+    },
+    "Fetch W95": {
+      "commandName": "Project",
+      "commandLineArgs": "fetch W95"
+    },
+    "Fetch Da Capo": {
+      "commandName": "Project",
+      "commandLineArgs": "fetch DC,LB"
+    },
+    "Help": {
+      "commandName": "Project",
+      "commandLineArgs": "help"
     }
   }
 }

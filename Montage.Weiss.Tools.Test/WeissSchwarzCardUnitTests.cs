@@ -24,13 +24,15 @@ namespace Montage.Weiss.Tools.Test.ENWS
             var serials = new[] { 
                "LSS/W69-054",
                "BD/EN-W03-026BDR",
-               "CCS/BSF2019-02"
+               "CCS/BSF2019-02",
+               "RANDOM"
             };
-            var expectedOutput = new (string NeoStandardCode, string ReleaseID, string SetID)[]
+            var expectedOutput = new (string NeoStandardCode, string ReleaseID, string SetID)?[]
             {
                 ("LSS", "W69", "054"),
                 ("BD", "EN-W03", "026BDR"),
-                ("CCS", "BSF2019", "02")
+                ("CCS", "BSF2019", "02"),
+                (null,null,null)
             };
 
             for (int i = 0; i < serials.Length; i++)

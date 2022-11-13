@@ -172,14 +172,20 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
 
     public static SerialTuple ParseSerial(string serial)
     {
-        SerialTuple res = new SerialTuple();
-        res.NeoStandardCode = serial.Substring(0, serial.IndexOf('/'));
-        var slice = serial.AsSpan().Slice(serial.IndexOf('/'));
-        res.ReleaseID = ParseRID(serial);
-        slice = slice.Slice(res.ReleaseID.Length + 2);
-        res.SetID = slice.ToString();
-        //res.
-        return res;
+        try
+        {
+            SerialTuple res = new SerialTuple();
+            res.NeoStandardCode = serial.Substring(0, serial.IndexOf('/'));
+            var slice = serial.AsSpan().Slice(serial.IndexOf('/'));
+            res.ReleaseID = ParseRID(serial);
+            slice = slice.Slice(res.ReleaseID.Length + 2);
+            res.SetID = slice.ToString();
+            //res.
+            return res;
+        } catch (ArgumentOutOfRangeException)
+        {
+            return default;
+        }
     }
 
     private static string ParseRID(string serial)

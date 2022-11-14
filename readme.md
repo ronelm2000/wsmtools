@@ -19,21 +19,21 @@ For now this tool is barebones (in its alpha stage, so expect some bugs), but I'
 Somewhat stable releases are on the [appropriate link](https://github.com/ronelm2000/wsmtools/releases), but if you're having some issues with them, you can also try the [latest build](https://github.com/ronelm2000/wsmtools/actions) by
 registering on GitHub. 
 
-#### Supported Deck Exporters ####
+#### Supported Deck Exporters
 * [Tabletop Simulator](https://steamcommunity.com/sharedfiles/filedetails/?id=1321170886)
 * Local Deck JSON
 * [Weiss Schwarz Card Game Simulator by Blake Thoennes](https://blakethoennes.itch.io/weiss-schwarz)
 
-#### Supported Database Exporters ####
+#### Supported Database Exporters
 * [Cockatrice](https://github.com/longagofaraway/Cockatrice)
 * Local Set List JSON
 
-#### Supported Deck Parsers ####
+#### Supported Deck Parsers
 * [Encore Decks](https://www.encoredecks.com/)
 * [Deck Log](https://decklog.bushiroad.com/)
 * Local Deck JSON
 
-#### Supported Card Set Parsers ####
+#### Supported Card Set Parsers
 * HOTC
 * Encore Decks (through their API)
 * [English Weiss Schwarz Official Website](https://en.ws-tcg.com/)
@@ -41,10 +41,10 @@ registering on GitHub.
 ---------
 
 *I know you're probably just here just so that you can quickly netdeck; so how do you do it?*
-* [For Tabletop Simulator (TTS)](####Tabletop Simulator)
-* [For Weiss Schwarz Card Game Simulator by Blake Thoennes (BlakeWS)](####Weiss Schwarz Card Game Simulator by Blake Thoennes)
+* [For Tabletop Simulator (TTS)](#tabletop-simulator)
+* [For Weiss Schwarz Card Game Simulator by Blake Thoennes (BlakeWS)](#weiss-schwarz-card-game-simulator-by-blake-thoennes)
 
-####Tabletop Simulator####
+#### Tabletop Simulator
 01. Install [ShareX](https://getsharex.com/) (Do not use the portable edition).
 02. Extract [the binaries](https://github.com/ronelm2000/wsmtools/releases) into the folder of your choice.
 03. Open PowerShell on that folder. This can be done by holding [Shift] then Right-Click while on the folder.
@@ -69,7 +69,7 @@ registering on GitHub.
 09. You should be able to create decks like this:
     ![Tho why do you need effects for decks with English art?](https://i.imgur.com/WuRpf9I.png)
 
-####Weiss Schwarz Card Game Simulator by Blake Thoennes####
+#### Weiss Schwarz Card Game Simulator by Blake Thoennes
 01. Run the application.
 02. Create a deck named `[wstools import]` and put any legal deck in it.
 03. Extract [the binaries](https://github.com/ronelm2000/wsmtools/releases) into the folder of your choice.
@@ -83,7 +83,7 @@ registering on GitHub.
     ![Nothing like an anti-memory memory deck](https://i.imgur.com/9svzkYz.png)
 ---------
 
-### Known Issues ### 
+### Known Issues
 * Some decks from Encore Decks will be untranslated. This is true for all sets without a community translation.
   In order to resolve this, you must (begrudgingly) use HOTC translations by running the following command first.
   Personally, I discourage anyone with a 10-foot pole to use it because they don't like people using their translations
@@ -103,5 +103,7 @@ registering on GitHub.
 
   ![Why!?!](https://i.imgur.com/NdpGGp0.png)
 
-### Build ###
-The only requirement for now is having Visual Studio 2019. For any prior version of VS, ensure you have a compatible .NET Core 3.1 SDK.
+* There are alot of missing serials for BlakeWS, including cards that may already have an English card serial but not Japanese.
+
+### Build
+The only requirement for now is having Visual Studio 2022. For any prior version of VS (or VS Code), ensure you have a compatible .NET 6 SDK.

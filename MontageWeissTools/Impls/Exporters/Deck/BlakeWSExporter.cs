@@ -45,6 +45,7 @@ public class BlakeWSExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         Log.Information("Encoding information to deck...");
         var deckCodeString = deck.Ratios
             .SelectMany(p => Enumerable.Repeat(p.Key.Serial, p.Value))
+            .Select(HandleExceptionalSerial)
             .ConcatAsString("|") + "|\0";
         var deckTime = DateTime.Now;
 
@@ -58,6 +59,15 @@ public class BlakeWSExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         info.Progress.Report(report.Done());
 
         await Task.CompletedTask;
+    }
+
+    private string HandleExceptionalSerial(string serial)
+    {
+        return serial switch
+        {
+            var s when s.Contains("EN-W03") => s.Replace("EN-W03", "ENW03"),
+            _ => serial
+        };
     }
 
     public bool IsIncluded(IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard> item)

@@ -131,6 +131,10 @@
     "Help": {
       "commandName": "Project",
       "commandLineArgs": "help"
+    },
+    "Fetch Everything": {
+      "commandName": "Project",
+      "commandLineArgs": "fetch"
     }
   }
 }

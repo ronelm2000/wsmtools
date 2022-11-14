@@ -78,10 +78,14 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             Log.Information("Skipping due to the parser hint [skip:decklog].");
             return false;
         }
+        else if (info.ParserHints.Contains("skip:external", StringComparer.CurrentCultureIgnoreCase))
+        {
+            Log.Information("Skipping due to parser hint [skip:external].");
+            return false;
+        }
+
         if (isOutdated)
         {
-            if (info.ParserHints.Contains("nowarn", StringComparer.CurrentCultureIgnoreCase))
-                Log.Information("Please note that [nowarn] flag is now deprecated as DeckLog is now enabled by default due to several versions of ensured compatibility.");
             if (info.ParserHints.Contains("strict", StringComparer.CurrentCultureIgnoreCase))
             {
                 Log.Information("Not executing due to [strict] flag.");

@@ -1,7 +1,9 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Lamar;
+using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
+using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
@@ -10,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors;
 
-public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>
+public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippable<IParseInfo>
 {
     private readonly ILogger Log = Serilog.Log.ForContext<JKTCGPostProcessor>();
     private readonly Regex LinkMatcher = new Regex(@"(http:\/\/jktcg.com\/)(EN-.+-)(.+)");
@@ -24,6 +26,20 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     public JKTCGPostProcessor(IContainer container)
     {
         _database = () => container.GetInstance<CardDatabaseContext>();
+    }
+
+    public async Task<bool> IsIncluded(IParseInfo info)
+    {
+        await Task.CompletedTask;
+
+        if (info.ParserHints.Contains("skip:external", StringComparer.CurrentCultureIgnoreCase))
+        {
+            Log.Information("Skipping due to parser hint [skip:external].");
+            return false;
+        } else
+        {
+            return true;
+        }
     }
 
     public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
@@ -97,30 +113,6 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                 Source: ele.GetAncestor<IHtmlAnchorElement>().Href.Replace("\t", "")
                 ))
             .ToDictionary(p => p.Serial, p => p.Source);//(setID + "-" + str.AsSpan().Slice(c => c.LastIndexOf('_') + 1, c => c.LastIndexOf(".")).ToString()).ToLower());
-
-        /* Commented for future use
-        Log.Information("Getting all PRs on card database without a YYT image link...");
-        using (var db = _database())
-        {
-            var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
-                .Where(c => c.ReleaseID == releaseID
-                            && c.Language == CardLanguage.English
-                            && c.Rarity == "PR"
-                            && !c.Images.Any(u => u.Authority == "jktcg.com")
-                );
-            await foreach (var prCard in prCards)
-            {
-                if (cardImages.TryGetValue(prCard.Serial, out var urlLink))
-                {
-                    var imgUrl = new Uri(urlLink);
-                    prCard.Images.Add(imgUrl);
-                    db.Update(prCard);
-                    Log.Information("Attached to {serial}: {imgUrl}", prCard.Serial, urlLink);
-                }
-            }
-            await db.SaveChangesAsync();
-        }
-        */
 
         await foreach (var card in originalCards)
         {

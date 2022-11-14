@@ -80,10 +80,16 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
             Log.Information("Skipping due to the parser hint [skip:yyt].");
             return false;
         }
+        else if (info.ParserHints.Select(s => s.ToLower()).Contains("skip:external"))
+        {
+            Log.Information("Skipping due to the parser hint [skip:external].");
+            return false;
+        }
         else if (info.ParserHints.Select(s => s.ToLower()).Contains("noskip:yyt"))
         {
             return true;
-        } else
+        }
+        else
         {
             return false;
         }

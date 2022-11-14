@@ -34,8 +34,29 @@ public class FetchVerb : IVerbCommand, IFetchInfo
             .ToList();
         var encoreDeckSrvc = ioc.GetInstance<EncoreDecksService>();
         var setList = await encoreDeckSrvc.GetSetListEntries(cancellationToken);
-        var setListResults = setList.Where(sle => searchTerms.Any(st => sle.HasMatch(st))).ToList();
-        Log.Information("Found {res} result/s.", setListResults.Count);
+        List<EncoreDeckSetListEntry> setListResults;
+        if (RIDsOrSerials.Count() > 0)
+        {
+            setListResults = setList.Where(sle => searchTerms.Any(st => sle.HasMatch(st))).ToList();
+            Log.Information("Found {res} result/s.", setListResults.Count);
+        }
+        else
+        {
+            setListResults = setList;
+            if (!Flags.Contains("nowarn"))
+            {
+                Flags = Flags?.Append("skip:external");
+                Log.Warning("Exporting all sets; adding [skip:external] as a flag.");
+                Log.Warning("This is enabled to protect users using this function from any possible issues due to extensive use of external resources.");
+                Log.Warning("If you wish to enable those post-processors regardless of risk, please add --with nowarn to this command.");
+            }
+            else
+            {
+                Log.Information("Exporting all sets; as [nowarn] has been enabled, no default post-processors will be skipped.");
+                Log.Warning("Please note that you are responsible for your own actions, including possibly getting your access to DeckLog or other external sites revoked for an extended period of time.");
+            }
+        }
+
         foreach (var result in setListResults)
             await new ParseVerb()
             {

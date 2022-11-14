@@ -8,26 +8,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Impls.Exporters.Database
+namespace Montage.Weiss.Tools.Impls.Exporters.Database;
+
+public abstract class CommonDatabaseExporter : IDatabaseExporter<CardDatabaseContext, WeissSchwarzCard>
 {
-    public abstract class CommonDatabaseExporter : IDatabaseExporter<CardDatabaseContext, WeissSchwarzCard>
+    public abstract string[] Alias { get; }
+    public abstract Task Export(CardDatabaseContext database, IDatabaseExportInfo info, CancellationToken cancellationToken);
+
+    protected IQueryable<WeissSchwarzCard> CreateQuery(IQueryable<WeissSchwarzCard> query, IDatabaseExportInfo info)
     {
-        public abstract string[] Alias { get; }
-        public abstract Task Export(CardDatabaseContext database, IDatabaseExportInfo info, CancellationToken cancellationToken);
+        var releaseIDLimitations = info.ReleaseIDs.ToList();
+        var serialLimitations = info.Serials.ToList();
+        var predicate = PredicateBuilder.New<WeissSchwarzCard>();
 
-        protected IQueryable<WeissSchwarzCard> CreateQuery(IQueryable<WeissSchwarzCard> query, IDatabaseExportInfo info)
-        {
-            var releaseIDLimitations = info.ReleaseIDs.ToList();
-            var serialLimitations = info.Serials.ToList();
-            var predicate = PredicateBuilder.New<WeissSchwarzCard>();
+        foreach (var rid in releaseIDLimitations)
+            predicate = predicate.Or(c => c.Serial.Contains(rid + "-"));
 
-            foreach (var rid in releaseIDLimitations)
-                predicate = predicate.Or(c => c.Serial.Contains(rid + "-"));
+        foreach (var serial in serialLimitations)
+            predicate = predicate.Or(c => c.Serial == serial);
 
-            foreach (var serial in serialLimitations)
-                predicate = predicate.Or(c => c.Serial == serial);
-
-            return query.Where(predicate);
-        }
+        return query.Where(predicate);
     }
 }

@@ -5,6 +5,4 @@ global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
 
-namespace Montage.Card.API
-{
-}
+namespace Montage.Card.API;

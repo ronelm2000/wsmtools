@@ -135,6 +135,10 @@
     "Fetch Everything": {
       "commandName": "Project",
       "commandLineArgs": "fetch"
+    },
+    "Fetch LLS vol. 2": {
+      "commandName": "Project",
+      "commandLineArgs": "fetch W53"
     }
   }
 }

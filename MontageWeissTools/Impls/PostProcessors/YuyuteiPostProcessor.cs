@@ -45,6 +45,8 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
     public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
     {
         await ValueTask.CompletedTask;
+        if (cards.Count == 0)
+            return false;
         if (cards.First().Language != CardLanguage.Japanese)
             return false;
         var list = cards.Select(c => c.ReleaseID).Distinct().ToList();

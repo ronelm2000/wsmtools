@@ -42,7 +42,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
     {
         List<CardLanguage> languages = cards.Select(c => c.Language).Distinct().ToList();
-        if (languages.Count > 1) {
+        if (languages.Count != 1) {
             return false;
         }
         var settings = (languages[0] == CardLanguage.English) ? DeckLogSettings.English : DeckLogSettings.Japanese;

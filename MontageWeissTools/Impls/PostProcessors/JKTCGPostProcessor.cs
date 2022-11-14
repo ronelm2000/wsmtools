@@ -45,6 +45,9 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
     public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
     {
         await ValueTask.CompletedTask;
+        if (cards.Count == 0)
+            return false;
+
         var firstCard = cards.First();
         if (firstCard.Language != CardLanguage.English)
             return false;

@@ -10,50 +10,49 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Impls.PostProcessors
+namespace Montage.Weiss.Tools.Impls.PostProcessors;
+
+public class DuplicateCardPostProcessor : ICardPostProcessor<WeissSchwarzCard>
 {
-    public class DuplicateCardPostProcessor : ICardPostProcessor<WeissSchwarzCard>
+    private readonly Func<CardDatabaseContext> _db;
+
+    public int Priority => 2;
+
+    public DuplicateCardPostProcessor(IContainer ioc)
     {
-        private readonly Func<CardDatabaseContext> _db;
+        _db = () => ioc.GetInstance<CardDatabaseContext>();
+    }
 
-        public int Priority => 2;
+    public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
+    {
+        return await ValueTask.FromResult(true);
+    }
 
-        public DuplicateCardPostProcessor(IContainer ioc)
+    public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards, IProgress<PostProcessorProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await using var db = _db();
+        await foreach (var card in originalCards.WithCancellation(cancellationToken))
         {
-            _db = () => ioc.GetInstance<CardDatabaseContext>();
-        }
-
-        public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
-        {
-            return await ValueTask.FromResult(true);
-        }
-
-        public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards, IProgress<PostProcessorProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken = default)
-        {
-            await using var db = _db();
-            await foreach (var card in originalCards.WithCancellation(cancellationToken))
+            var dupCards = await db.WeissSchwarzCards.AsQueryable()
+                .Include(c => c.AdditionalInfo)
+                .Where(c => c.Serial == card.Serial)
+                .OrderByDescending(c => c.VersionTimestamp)
+                .ToAsyncEnumerable()
+                .ToListAsync(cancellationToken);
+            if (dupCards.Count == 0)
             {
-                var dupCards = await db.WeissSchwarzCards.AsQueryable()
-                    .Include(c => c.AdditionalInfo)
-                    .Where(c => c.Serial == card.Serial)
-                    .OrderByDescending(c => c.VersionTimestamp)
-                    .ToAsyncEnumerable()
-                    .ToListAsync(cancellationToken);
-                if (dupCards.Count == 0)
-                {
-                    yield return card;
-                    continue;
-                }
-
-                card.AdditionalInfo = dupCards[0].AdditionalInfo
-                    .Select(i => new WeissSchwarzCardOptionalInfo(card, i.Key) { ValueJSON = i.ValueJSON })
-                    .ToList();
-
-                db.RemoveRange(dupCards);
-
                 yield return card;
+                continue;
             }
-            await db.SaveChangesAsync(cancellationToken);
+
+            card.AdditionalInfo = dupCards[0].AdditionalInfo
+                .Select(i => new WeissSchwarzCardOptionalInfo(card, i.Key) { ValueJSON = i.ValueJSON })
+                .ToList();
+
+            db.RemoveRange(dupCards);
+
+            yield return card;
         }
+        await db.SaveChangesAsync(cancellationToken);
     }
 }

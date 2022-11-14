@@ -139,6 +139,10 @@
     "Fetch LLS vol. 2": {
       "commandName": "Project",
       "commandLineArgs": "fetch W53"
+    },
+    "Export HHW via Blake": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter blake"
     }
   }
 }

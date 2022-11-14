@@ -26,6 +26,16 @@
             }
         };
 
+        public DeckExportProgressReport Done() => this with
+        {
+            Percentage = 100,
+            ReportMessage = new Impls.MultiLanguageString
+            {
+                EN = $"Exported via [{Exporter}]"
+            }
+        };
+
+
         public DeckExportProgressReport LoadingImages(string serial, int index, int count)
         => this with
         {

@@ -4,7 +4,7 @@ public class ActivityLog
 {
     public int LogID { get; set; }
     public ActivityType Activity { get; set; }
-    public string Target { get; set; }
+    public string? Target { get; set; }
     public bool IsDone { get; set; } = false;
     public DateTime DateAdded { get; set; } = DateTime.Now;
 }

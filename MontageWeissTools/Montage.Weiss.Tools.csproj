@@ -7,12 +7,13 @@
     <RootNamespace>Montage.Weiss.Tools</RootNamespace>
     <Product>Weiss Schwarz Montage Tools (wsmtools)</Product>
 	<VersionPrefix>0.11.0</VersionPrefix>
-	<AssemblyVersion>$(VersionPrefix}</AssemblyVersion>
-    <FileVersion>$(VersionPrefix}</FileVersion>
+	<AssemblyVersion>$(Version}</AssemblyVersion>
+    <FileVersion>$(Version}</FileVersion>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-	<VersionPrefix>0.11.0</VersionPrefix>
+	<Version>0.11.0</Version>
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(Version)-$(VersionSuffix)</Version>
 
-    <PackageId>wsmtools</PackageId>
+	<PackageId>wsmtools</PackageId>
     <Authors>ronelm2000</Authors>
     <Company>ronelm2000</Company>
     <NoWin32Manifest>true</NoWin32Manifest>

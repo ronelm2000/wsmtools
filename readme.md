@@ -22,9 +22,11 @@ registering on GitHub.
 #### Supported Deck Exporters ####
 * [Tabletop Simulator](https://steamcommunity.com/sharedfiles/filedetails/?id=1321170886)
 * Local Deck JSON
+* [Weiss Schwarz Card Game Simulator by Blake Thoennes](https://blakethoennes.itch.io/weiss-schwarz)
 
 #### Supported Database Exporters ####
 * [Cockatrice](https://github.com/longagofaraway/Cockatrice)
+* Local Set List JSON
 
 #### Supported Deck Parsers ####
 * [Encore Decks](https://www.encoredecks.com/)
@@ -38,7 +40,11 @@ registering on GitHub.
 
 ---------
 
-*I know you're probably just here just so that you can quickly netdeck into TTS; so how do you do it?*
+*I know you're probably just here just so that you can quickly netdeck; so how do you do it?*
+* [For Tabletop Simulator (TTS)](####Tabletop Simulator)
+* [For Weiss Schwarz Card Game Simulator by Blake Thoennes (BlakeWS)](####Weiss Schwarz Card Game Simulator by Blake Thoennes)
+
+####Tabletop Simulator####
 01. Install [ShareX](https://getsharex.com/) (Do not use the portable edition).
 02. Extract [the binaries](https://github.com/ronelm2000/wsmtools/releases) into the folder of your choice.
 03. Open PowerShell on that folder. This can be done by holding [Shift] then Right-Click while on the folder.
@@ -63,6 +69,18 @@ registering on GitHub.
 09. You should be able to create decks like this:
     ![Tho why do you need effects for decks with English art?](https://i.imgur.com/WuRpf9I.png)
 
+####Weiss Schwarz Card Game Simulator by Blake Thoennes####
+01. Run the application.
+02. Create a deck named `[wstools import]` and put any legal deck in it.
+03. Extract [the binaries](https://github.com/ronelm2000/wsmtools/releases) into the folder of your choice.
+04. Open PowerShell on that folder. This can be done by holding [Shift] then Right-Click while on the folder.
+05. Execute this command.
+   ```ps
+   ./wstools export your_encore_decks_deck_link_here --exporter blake
+   ```
+06. The deck which was named `[wstools import]` should now have been replaced with the exported deck; open it to check for any missing sets.
+07. Once you've verified all the cards are complete without any missing sets/cards, save it as a new deck of your choice.
+    ![Nothing like an anti-memory memory deck](https://i.imgur.com/9svzkYz.png)
 ---------
 
 ### Known Issues ### 

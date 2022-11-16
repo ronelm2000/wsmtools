@@ -16,7 +16,6 @@ namespace Montage.Weiss.Tools.Test.ENWS
     public class ParserTests
     {
         [TestMethod("EN WS Parser Test")]
-        [Ignore("Currently not working due to a change in site. WIP")]
         public async Task TestParser()
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
@@ -29,11 +28,14 @@ namespace Montage.Weiss.Tools.Test.ENWS
                 Log.Information("Card: {@card}", card.Serial);
 
             url = "https://en.ws-tcg.com/cardlist/list/?cardno=FS/S36-E018";
-            list = await new EnglishWSURLParser().Parse(url, progressReporter, CancellationToken.None).ToListAsync();
-            Log.Information("Cards Obtained: {length}", list.Count);
+            var dict = await new EnglishWSURLParser().Parse(url, progressReporter, CancellationToken.None)
+                .ToDictionaryAsync(c => c.Serial, c => c);
+            Log.Information("Cards Obtained: {length}", dict.Keys.Count);
 
-            foreach (var card in list)
-                Log.Information("Card: {@card}", card.Serial);
+            Action<string> serialAssertions = serial => Assert.IsTrue(dict.ContainsKey(serial), $"Could not find {serial} in output.");
+            serialAssertions("FS/S36-PE02");
+            serialAssertions("FS/S36-E012");
+            serialAssertions("FS/S36-PE01");
         }
     }
 }

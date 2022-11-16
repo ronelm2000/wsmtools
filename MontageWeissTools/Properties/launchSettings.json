@@ -143,6 +143,10 @@
     "Export HHW via Blake": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter blake"
+    },
+    "Fetch BNJ": {
+      "commandName": "Project",
+      "commandLineArgs": "fetch BNJ"
     }
   }
 }

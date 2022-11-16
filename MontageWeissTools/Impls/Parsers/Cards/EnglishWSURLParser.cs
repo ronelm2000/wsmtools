@@ -137,51 +137,81 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
             await _WS_SEARCH_PAGE.WithClient(fc).WithHTMLHeaders().WithCookies(cs).GetAsync(cancellationToken); // To get some initial cookies.
             var serial = uri.Query.Substring(_CARD_NO_QUERY.Length);
             var serialID = WeissSchwarzCard.ParseSerial(serial);
-            var wsSearchPage = await _WS_SEARCH_PAGE_EXEC
+
+            Log.Debug("Cookie: {@c}", cs.Cookies.ToDictionary(k => k.GetKey(), k=> k.Value));
+
+            var wsSearchPage = await cs
+                .Request(_WS_SEARCH_PAGE_EXEC)
                 .WithClient(fc)
-                .WithCookies(cs)
                 .WithHTMLHeaders()
                 .WithHeader("Referer", _WS_SEARCH_PAGE)
                 .PostUrlEncodedAsync(new Dictionary<string,object>{
                     ["cmd"] = "search",
-                    ["data[CardSearch][keyword]"] = serialID.ReleaseID,
-                    ["data[CardSearch][keyword_or]"] = "",
-                    ["data[CardSearch][keyword_not]"] = "",
-                    ["data[CardSearch][keyword_cardname]"] = "0",
-                    ["data[CardSearch][keyword_feature]"] = "0",
-                    ["data[CardSearch][keyword_text]"] = "0",
-                    ["data[CardSearch][keyword_cardnumber]"] = new[] { 0, 1 },
-                    ["data[CardSearch][expansion]"] = "",
-                    ["data[CardSearch][card_kind]"] = "",
-                    ["data[CardSearch][level_s]"] = "",
-                    ["data[CardSearch][level_e]"] = "",
-                    ["data[CardSearch][color]"] = "",
-                    ["data[CardSearch][soul_s]"] = "",
-                    ["data[CardSearch][soul_e]"] = "",
-                    ["data[CardSearch][cost_s]"] = "",
-                    ["data[CardSearch][cost_e]"] = "",
-                    ["data[CardSearch][trigger]"] = "",
-                    ["data[CardSearch][option_counter]"] = "0",
-                    ["data[CardSearch][option_clock]"] = "0",
-                    ["data[CardSearch][show_page_count]"] = "500",
-                    ["data[CardSearch][show_small]"] = "0",
+                    ["keyword"] = serialID.ReleaseID,
+                    ["keyword_or"] = "",
+                    ["keyword_not"] = "",
+                    ["keyword_cardname"] = new[] { "0", "1" },
+                    ["keyword_feature"] = new[] { "0", "1" },
+                    ["keyword_text"] = new[] { "0", "1" },
+                    ["keyword_cardnumber"] = new[] { "0", "1" },
+                    ["expansion"] = "",
+                    ["card_kind"] = "",
+                    ["level_s"] = "",
+                    ["level_e"] = "",
+                    ["color"] = "",
+                    ["soul_s"] = "",
+                    ["soul_e"] = "",
+                    ["cost_s"] = "",
+                    ["cost_e"] = "",
+                    ["trigger"] = "",
+                    ["option_counter"] = "0",
+                    ["option_clock"] = "0",
+                    ["show_page_count"] = "500",
+                    ["show_small"] = "0",
                     ["button"] = "search"
                 })
                 .RecieveHTML();
 
-            var divsToProcess = wsSearchPage.QuerySelectorAll(_CARD_UNIT_SELECTOR);
+            var divsToProcess = wsSearchPage.QuerySelectorAll(_CARD_UNIT_SELECTOR).ToAsyncEnumerable();
+            var pageResultDiv = wsSearchPage.QuerySelector<IHtmlAnchorElement>(".pageLink :nth-last-child(2)")?.InnerHtml ?? null;
+            var resultCountString = wsSearchPage.QuerySelector("#exFilterForm ~ p").GetInnerText();
+
+            Func<int,ValueTask<IDocument>> followupDivs = async p => await cs
+                .Request(_WS_SEARCH_PAGE_EXEC)
+                .SetQueryParams(new
+                {
+                    page = p
+                })
+                .WithClient(fc)
+                .WithHTMLHeaders()
+                .WithHeader("Referer", _WS_SEARCH_PAGE_EXEC)
+                .WithHeader("Cache-Control", "no-cache")
+                .WithHeader("Sec-Fetch-Site", "same-origin")
+                .WithHeader("Sec-Fetch-User", "?1")
+                .GetHTMLAsync(cancellationToken);
+
+            if (pageResultDiv is not null && int.TryParse(pageResultDiv, out int lastPage))
+                divsToProcess = Enumerable.Range(2, lastPage - 1)
+                    .ToAsyncEnumerable()
+                    .SelectAwait(followupDivs)
+                    .Do(idoc => {
+                        Log.Debug("Cookie: {@c}", cs.Cookies.ToDictionary(k => k.GetKey(), k => k.Value));
+                    })
+                    .SelectMany(html => html.QuerySelectorAll(_CARD_UNIT_SELECTOR).ToAsyncEnumerable())
+                    .Concat(divsToProcess);
+                    
 
             progressReport = progressReport with
             {
-                ReportMessage = new MultiLanguageString { EN = $"(Possibly) Obtained [{divsToProcess.Length}] cards." },
+                ReportMessage = new MultiLanguageString { EN = $"Got {resultCountString}" },
                 Percentage = 10
             };
             progress.Report(progressReport);
 
-            foreach (var cardUnitTD in divsToProcess)
+            await foreach (var cardUnitTD in divsToProcess.WithCancellation(cancellationToken))
             {
-                cancellationToken.ThrowIfCancellationRequested();
                 var result = await ParseCardAsync(cardUnitTD);
+                /*
                 progressReport = progressReport with
                 {
                     ReportMessage = new MultiLanguageString { EN = $"Parsed [{result.Serial}]." },
@@ -189,6 +219,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
                     CardsParsed = progressReport.CardsParsed + 1
                 };
                 progress.Report(progressReport);
+                */
                 yield return result;
             }
 

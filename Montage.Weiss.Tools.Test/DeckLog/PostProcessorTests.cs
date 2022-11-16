@@ -16,15 +16,28 @@ namespace Montage.Weiss.Tools.Test.DeckLog;
 [TestClass]
 public class PostProcessorTests
 {
-    [TestMethod("DeckLog API Version Test")]
+    [TestMethod("DeckLog API Version Test (JP)")]
     [DeploymentItem("Resources/deck_date_a_live.json")]
-    public async Task EnsureLatestVersion()
+    public async Task EnsureLatestVersionJP()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
         Lamar.Container ioc = Program.Bootstrap();
 
         var deckLogPP = ioc.GetInstance<DeckLogPostProcessor>();
         var settings = DeckLogSettings.Japanese;
+        var latestVersion = await deckLogPP.GetLatestVersion(settings);
+        Assert.IsTrue(latestVersion == settings.Version, $"DeckLog API version is outdated; latest version is {latestVersion} need to check for compatibility.");
+    }
+
+    [TestMethod("DeckLog API Version Test (JP)")]
+    [DeploymentItem("Resources/deck_date_a_live.json")]
+    public async Task EnsureLatestVersionEN()
+    {
+        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+        Lamar.Container ioc = Program.Bootstrap();
+
+        var deckLogPP = ioc.GetInstance<DeckLogPostProcessor>();
+        var settings = DeckLogSettings.English;
         var latestVersion = await deckLogPP.GetLatestVersion(settings);
         Assert.IsTrue(latestVersion == settings.Version, $"DeckLog API version is outdated; latest version is {latestVersion} need to check for compatibility.");
     }

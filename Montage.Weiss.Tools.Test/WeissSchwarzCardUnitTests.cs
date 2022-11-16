@@ -99,7 +99,7 @@ namespace Montage.Weiss.Tools.Test.ENWS
         }
 
         [TestMethod]
-        [Ignore]
+        [TestCategory("Manual")]
         public void TestShareX()
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
@@ -108,7 +108,7 @@ namespace Montage.Weiss.Tools.Test.ENWS
         }
 
         [TestMethod]
-        [Ignore]
+        [TestCategory("Manual")]
         public async Task TestEncoreDecksGifsAsync()
         {
             Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();

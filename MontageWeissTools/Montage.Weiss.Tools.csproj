@@ -10,7 +10,7 @@
 	<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
     <FileVersion>$(VersionPrefix)</FileVersion>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-	<VersionPrefix>0.11.0</VersionPrefix>
+	<VersionPrefix>0.11.1</VersionPrefix>
 	<Version>$(VersionPrefix)</Version>
     <Version Condition=" '$(VersionSuffix)' != '' ">$(Version)-$(VersionSuffix)</Version>
 

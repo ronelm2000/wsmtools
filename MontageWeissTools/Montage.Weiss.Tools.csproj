@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>wstools</AssemblyName>
+	<TargetFramework>net7.0</TargetFramework>
+	<LangVersion>11.0</LangVersion>
+	<AssemblyName>wstools</AssemblyName>
     <RootNamespace>Montage.Weiss.Tools</RootNamespace>
     <Product>Weiss Schwarz Montage Tools (wsmtools)</Product>
 	<VersionPrefix>0.11.0</VersionPrefix>

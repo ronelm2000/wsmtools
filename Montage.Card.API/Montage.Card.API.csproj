@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>10.0</LangVersion>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangVersion>11.0</LangVersion>
     <AssemblyName>montage.card.api</AssemblyName>
     <UserSecretsId>094af219-82ef-49de-9dcb-15e70c8b9ef5</UserSecretsId>
     <Nullable>enable</Nullable>

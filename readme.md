@@ -105,5 +105,10 @@ registering on GitHub.
 
 * There are alot of missing serials for BlakeWS, including cards that may already have an English card serial but not Japanese.
 
-### Build
-The only requirement for now is having Visual Studio 2022. For any prior version of VS (or VS Code), ensure you have a compatible .NET 6 SDK.
+### Building from Source
+1. Install Visual Studio 2022 17.4.1.
+2. Install .NET 7.0 SDK
+3. Go to `Tools` > `Options`, then go to `Environment` > `Preview Features".
+4. Check `Use Previews ot the .NET SDK`, then restart VS 2022. 
+5. Open the `.sln` file.
+6. Build all projects as necessary. (The startup project is `Monatage.Weiss.Tools`.)

@@ -164,7 +164,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         {
             return $"Type: {card.TypeToString()}\n"
                 + ((card.Type == CardType.Character) ? (
-                    $"Traits: {card.Traits.Select(t => t.AsNonEmptyString()).ConcatAsString(" - ")}\n"
+                    $"Traits: {card.Traits.Select(t => t.TraitString).ConcatAsString(" - ")}\n"
                   + $"P/S: {card.Power}P/{card.Soul}S || "
                     ) : "")
                 + ((card.Type != CardType.Climax) ? $"Lv/Co: {card.Level}/{card.Cost}\n" : $"Triggers: {card.Triggers.Select(c => c.ToString()).ConcatAsString(" - ")}\n")

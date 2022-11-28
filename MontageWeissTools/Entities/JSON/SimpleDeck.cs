@@ -2,7 +2,7 @@
 
 public class SimpleDeck
 {
-    public string Name { get; set; }
-    public string Remarks { get; set; }
-    public Dictionary<string, int> Ratios { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Remarks { get; set; } = string.Empty;
+    public Dictionary<string, int> Ratios { get; set; } = new();
 }

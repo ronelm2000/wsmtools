@@ -2,7 +2,7 @@
 
 public class MultiLanguageString : IExactCloneable<MultiLanguageString>
 {
-    private Dictionary<string, string?> resources = new Dictionary<string, string?>();
+    protected internal Dictionary<string, string?> resources = new Dictionary<string, string?>();
 
     public string? this[string languageIndex]
     {
@@ -47,16 +47,4 @@ public class MultiLanguageString : IExactCloneable<MultiLanguageString>
         //     sb.Append($" ({JP})");
         return sb.ToString();
     }
-
-    /*
-    internal MultiLanguageString ResolveConflicts(MultiLanguageString oldString)
-    {
-        if (oldString.Version >= Version)
-        {
-            resources = oldString.resources;
-            Version = oldString.Version;
-        }
-        return this;
-    }
-    */
 }

@@ -21,7 +21,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
 
     public string Serial { get; set; }
     public MultiLanguageString Name { get; set; }
-    public List<MultiLanguageString> Traits { get; set; }
+    public List<WeissSchwarzTrait> Traits { get; set; } = new List<WeissSchwarzTrait>();
     public CardType Type { get; set; }
     public CardColor Color { get; set; }
     public CardSide Side { get; set; }
@@ -32,7 +32,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     public int? Soul { get; set; }
     public int? Power { get; set; }
     public Trigger[] Triggers { get; set; }
-    public string Flavor { get; set; }
+    public string? Flavor { get; set; }
     public string[] Effect { get; set; }
     public List<Uri> Images { get; set; } = new List<Uri>();
     public string VersionTimestamp { get; set; }

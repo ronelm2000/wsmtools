@@ -16,6 +16,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
     //public DbSet<MultiLanguageString> MultiLanguageStrings { get; set; }
     public DbSet<Setting> Settings { get; set; }
     public DbSet<ActivityLog> MigrationLog { get; set; }
+    public DbSet<WeissSchwarzTrait> Traits { get; set; }
     public DatabaseFacade GetDatabase() => Database;
     public CardDatabaseContext (AppConfig config) {
         Log.Debug("Instantiating with {@AppConfig}.", config);
@@ -29,7 +30,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
         using (StreamReader file = File.OpenText(@"app.json"))
         using (JsonTextReader reader = new JsonTextReader(file))
         {
-            _config = JToken.ReadFrom(reader).ToObject<AppConfig>();
+            _config = JToken.ReadFrom(reader).ToObject<AppConfig>() ?? new AppConfig();
         }
     }
 
@@ -62,14 +63,11 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                                 );
 
             b.OwnsMany(s => s.Traits, bb =>
-                 {
-                     bb.Property<int>("Id").HasAnnotation("Sqlite:Autoincrement", true);
-                     bb.HasKey("Id");
-                     bb.ToTable("WeissSchwarzCards_Traits");
-                     bb.WithOwner().HasPrincipalKey(s => s.Serial);
-                     bb.Property<string>("EN").IsRequired(false);
-                     bb.Property<string>("JP").IsRequired(false);
-                 });
+            {
+                bb.WithOwner().HasForeignKey("Serial");
+                bb.HasKey("TraitID", "Serial");
+            });
+
             b.OwnsOne(s => s.Name, bb =>
             {
                 bb.ToTable("WeissSchwarzCards_Names");
@@ -84,6 +82,14 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                 .WithOne(i => i.Card)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+        /*
+        modelBuilder.Entity<WeissSchwarzTrait>(b =>
+        {
+            b.HasKey(t => t.TraitID);
+            b.Property(t => t.TraitID).ValueGeneratedNever();
+        });
+        */
 
         modelBuilder.Entity<WeissSchwarzCardOptionalInfo>(b =>
         {
@@ -123,6 +129,13 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                     Activity = ActivityType.Delete,
                     Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.10.0""}",
                     DateAdded = new DateTime(2021, 12, 14, 10, 2, 57, 51, DateTimeKind.Local).AddTicks(8029)
+                },
+                new ActivityLog
+                {
+                    LogID = 4,
+                    Activity = ActivityType.Delete,
+                    Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.12.0""}",
+                    DateAdded = DateTime.Now
                 }
             );
         });

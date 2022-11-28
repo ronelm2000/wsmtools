@@ -362,9 +362,9 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         return result;
     }
 
-    private MultiLanguageString ParseTrait(Match match)
+    private WeissSchwarzTrait ParseTrait(Match match)
     {
-        MultiLanguageString result = new MultiLanguageString();
+        WeissSchwarzTrait result = new WeissSchwarzTrait();
         result["jp"] = match.Groups[1].Value.Trim();
         result["en"] = match.Groups[2].Value.Trim();
         Log.Debug("All Groups: {@groups}", match.Groups.OfType<Group>().Select(g => g.Value).ToArray());

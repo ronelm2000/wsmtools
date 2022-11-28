@@ -83,12 +83,13 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
 
     public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards, IProgress<PostProcessorProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var firstCard = await originalCards.FirstAsync();
+        var cardData = await originalCards.ToListAsync(cancellationToken);
+        var firstCard = cardData.First();
         var lang = firstCard.Language;
         var stream = (lang == CardLanguage.Japanese) ? originalCards : Process(firstCard, new PostProcessorInfo {
             CancellationToken = cancellationToken,
             Progress = progress,
-            OriginalCards = originalCards,
+            OriginalCards = cardData.ToAsyncEnumerable(),
             ProgressReport = new PostProcessorProgressReport() { Percentage = 0, ReportMessage = new MultiLanguageString { EN = $"Starting JKTCG Post-Processor..." } }
         });
 
@@ -117,9 +118,8 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
                 ))
             .ToDictionary(p => p.Serial, p => p.Source);//(setID + "-" + str.AsSpan().Slice(c => c.LastIndexOf('_') + 1, c => c.LastIndexOf(".")).ToString()).ToLower());
 
-        await foreach (var card in originalCards)
+        await foreach (var card in originalCards.WithCancellation(ct))
         {
-            ct.ThrowIfCancellationRequested();
             var res = card.Clone();
             try
             {

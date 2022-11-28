@@ -5,6 +5,7 @@ using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Services;
@@ -64,6 +65,7 @@ public class ParseVerb : IVerbCommand, IParseInfo
                 },
                 Percentage = 75
             });
+            var debugView = db.ChangeTracker.DebugView;
             await db.SaveChangesAsync();
         }
 

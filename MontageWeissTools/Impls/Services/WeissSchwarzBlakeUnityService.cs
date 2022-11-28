@@ -95,6 +95,7 @@ public class WeissSchwarzBlakeUnityService
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Only privately accessible.")]
 
+#nullable enable
     private string? GetVariableValue(RegistryKey key, string prefix, string variableName)
         => key?.GetValueNames()
            .Where(sk => sk.StartsWith(prefix))

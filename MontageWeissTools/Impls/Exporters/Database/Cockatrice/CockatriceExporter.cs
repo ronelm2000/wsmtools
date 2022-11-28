@@ -94,9 +94,9 @@ public class CockatriceCardDatabase
         return color.ToString().Substring(0, 1);
     }
 
-    private static string TranslateTrait(MultiLanguageString mlString)
+    private static string TranslateTrait(WeissSchwarzTrait mlString)
     {
-        return mlString?.EN?.Replace(" ", "");
+        return mlString?.EN?.Replace(" ", "") ?? null;
     }
 
     private static CockatriceSet GetOrCreateSet(Dictionary<string, CockatriceSet> tempSetList, WeissSchwarzCard card)

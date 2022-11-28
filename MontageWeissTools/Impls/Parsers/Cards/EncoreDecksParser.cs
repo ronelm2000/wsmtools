@@ -159,7 +159,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         };
     }
 
-    private IEnumerable<MultiLanguageString> TranslateTraits((List<object> EN, List<object> JP) attributes)
+    private IEnumerable<WeissSchwarzTrait> TranslateTraits((List<object> EN, List<object> JP) attributes)
     {
         var nullCheckedAttributes = (EN: attributes.EN ?? Enumerable.Empty<object>().ToList(), JP: attributes.JP ?? Enumerable.Empty<object>().ToList());
         var maxlength = Math.Max(nullCheckedAttributes.EN.Count, nullCheckedAttributes.JP.Count);
@@ -178,9 +178,9 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         "－"
     };
 
-    private MultiLanguageString Construct(object traitEN, object traitJP)
+    private WeissSchwarzTrait Construct(object traitEN, object traitJP)
     {
-        MultiLanguageString str = new MultiLanguageString();
+        WeissSchwarzTrait str = new WeissSchwarzTrait();
         str.EN = traitEN?.ToString();
         str.JP = traitJP?.ToString();
         str.EN = (String.IsNullOrWhiteSpace(str.EN) || NULL_TRAITS.Contains(str.EN)) ? null : str.EN;

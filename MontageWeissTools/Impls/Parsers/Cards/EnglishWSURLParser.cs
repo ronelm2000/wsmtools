@@ -322,10 +322,10 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
         return doc.Body.Children[0].GetInnerText();//.InnerHtml;
     }
 
-    private async Task<List<MultiLanguageString>> TranslateToTraitsAsync(string value)
+    private async Task<List<WeissSchwarzTrait>> TranslateToTraitsAsync(string value)
     {
         var traitInnerHTML = (await value.ParseHTML()).Body.Children[0].InnerHtml;
-        return traitInnerHTML.Split("・").Select(s => new MultiLanguageString() { EN = s, JP = "" }).ToList();
+        return traitInnerHTML.Split("・").Select(s => new WeissSchwarzTrait() { EN = s, JP = "" }).ToList();
     }
 
     private async Task<Trigger[]> TranslateToTriggers(string value)

@@ -26,9 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="cards.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\deck_date_a_live.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

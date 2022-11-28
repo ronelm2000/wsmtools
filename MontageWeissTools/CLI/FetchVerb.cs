@@ -19,10 +19,10 @@ public class FetchVerb : IVerbCommand, IFetchInfo
     private static ILogger Log = Serilog.Log.ForContext<FetchVerb>();
 
     [Value(0, HelpText = "Fetch_RIDorSerialHelpText", ResourceType = typeof(Resources.HelpText), Default = new string[] { })]
-    public IEnumerable<string> RIDsOrSerials { get; set; } = new string[] { };
+    public IEnumerable<string> RIDsOrSerials { get; set; } = Array.Empty<string>();
 
     [Option("with", HelpText = "Fetch_WithHelpText", ResourceType = typeof(Resources.HelpText), Separator = ',', Default = new string[] { })]
-    public IEnumerable<string> Flags { get; set; }
+    public IEnumerable<string> Flags { get; set; } = Array.Empty<string>();
 
     public async Task Run(IContainer ioc, IProgress<CommandProgressReport> progress, CancellationToken cancellationToken = default)
     {

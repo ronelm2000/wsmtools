@@ -73,7 +73,7 @@ public class BlakeWSExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         await using (var stream = resultDeckPath.GetOpenWriteStream())
             await stream.WriteAsync(deckCodeEncoded, cancellationToken);
 
-        Log.Information("Done!");
+        Log.Information($"Done: {resultDeckPath.FullPath}");
         info.Progress.Report(report.Done(resultDeckPath.FullPath));
     }
 

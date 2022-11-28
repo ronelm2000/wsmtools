@@ -7,11 +7,11 @@
 	<AssemblyName>wstools</AssemblyName>
     <RootNamespace>Montage.Weiss.Tools</RootNamespace>
     <Product>Weiss Schwarz Montage Tools (wsmtools)</Product>
-	<VersionPrefix>0.11.0</VersionPrefix>
+	<VersionPrefix>0.12.0</VersionPrefix>
 	<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
     <FileVersion>$(VersionPrefix)</FileVersion>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-	<VersionPrefix>0.11.1</VersionPrefix>
+	<VersionPrefix>0.12.0</VersionPrefix>
 	<Version>$(VersionPrefix)</Version>
     <Version Condition=" '$(VersionSuffix)' != '' ">$(Version)-$(VersionSuffix)</Version>
 

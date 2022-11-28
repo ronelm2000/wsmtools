@@ -6,7 +6,7 @@
     <AssemblyName>montage.card.api</AssemblyName>
     <UserSecretsId>094af219-82ef-49de-9dcb-15e70c8b9ef5</UserSecretsId>
     <Nullable>enable</Nullable>
-	<VersionPrefix>0.2.0</VersionPrefix>
+	<VersionPrefix>0.3.0</VersionPrefix>
 	<Version>$(VersionPrefix)</Version>
   </PropertyGroup>
 

@@ -49,6 +49,7 @@ public class WeissSchwarzBlakeUnityService
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) throw new NotImplementedException();
         var blakeKey = Registry.CurrentUser.OpenSubKey(BlakeRegistryKey, RegistryKeyPermissionCheck.ReadWriteSubTree);
         var deckImportKey = GetVariableValue(blakeKey, ImportDeckPrefix, ImportVariableName);
+        if (deckImportKey is null) return;
         if (!dataToExport.EndsWith("\0")) dataToExport += "\0";
         var dataBytes = System.Text.Encoding.ASCII.GetBytes(dataToExport);
         blakeKey.SetValue(deckImportKey, dataBytes);
@@ -59,6 +60,7 @@ public class WeissSchwarzBlakeUnityService
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) throw new NotImplementedException();
         var blakeKey = Registry.CurrentUser.OpenSubKey(BlakeRegistryKey, RegistryKeyPermissionCheck.ReadWriteSubTree);
         var dateImportKey = GetVariableValue(blakeKey, ImportDatePrefix, ImportVariableName);
+        if (dateImportKey is null) return;
         var dateTimeString = dateTime.ToString("HH:mm  MM/dd/yyyy") + "\0";
         var dataBytes = System.Text.Encoding.ASCII.GetBytes(dateTimeString);
         blakeKey.SetValue(dateImportKey, dataBytes);

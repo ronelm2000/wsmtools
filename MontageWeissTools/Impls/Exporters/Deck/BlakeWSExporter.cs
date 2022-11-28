@@ -1,7 +1,10 @@
-﻿using Lamar;
+﻿using Fluent.IO;
+using Lamar;
+using LamarCodeGeneration.Util;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Inspectors.Deck;
 using Montage.Weiss.Tools.Impls.Services;
@@ -43,10 +46,15 @@ public class BlakeWSExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         info.Progress.Report(report);
 
         Log.Information("Encoding information to deck...");
-        var deckCodeString = deck.Ratios
+        var deckCodes = deck.Ratios
+            .OrderBy(p => p.Key.Type.GetSortKey())
+            .ThenBy(p => p.Key.Level)
+            .ThenBy(p => p.Value)
             .SelectMany(p => Enumerable.Repeat(p.Key.Serial, p.Value))
             .Select(HandleExceptionalSerial)
-            .ConcatAsString("|") + "|\0";
+            .ToList();
+
+        var deckCodeString = deckCodes.ConcatAsString("|") + "|\0";
         var deckTime = DateTime.Now;
 
         Log.Information("Inserting data to [wstools import]...");
@@ -55,10 +63,18 @@ public class BlakeWSExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         _blakeWSSrvc.ExportDeckData(deckCodeString);
         _blakeWSSrvc.ExportDeckDate(deckTime);
 
-        Log.Information("Done!");
-        info.Progress.Report(report.Done());
+        Log.Information("For non-Windows, an export file will be created...");
 
-        await Task.CompletedTask;
+        var deckCodeFileString = deckCodes.ConcatAsString("\n");
+        var deckCodeEncoded = Encoding.ASCII.GetBytes(deckCodeFileString);
+        var deckFilename = deck.Name?.AsFileNameFriendly();
+        if (String.IsNullOrEmpty(deckFilename)) deckFilename = "deck";
+        var resultDeckPath = Path.CreateDirectory(info.Destination).Combine($"{deckFilename}.bws.txt");
+        await using (var stream = resultDeckPath.GetOpenWriteStream())
+            await stream.WriteAsync(deckCodeEncoded, cancellationToken);
+
+        Log.Information("Done!");
+        info.Progress.Report(report.Done(resultDeckPath.FullPath));
     }
 
     private string HandleExceptionalSerial(string serial)

@@ -1,10 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Fluent.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Montage.Card.API.Services;
+using Montage.Weiss.Tools.CLI;
+using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Services;
 using Montage.Weiss.Tools.Test.Commons;
+using Montage.Weiss.Tools.Utilities;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,9 +35,11 @@ public class ServiceTests
         Assert.IsNotNull(data);
     }
 
-    [TestMethod("Insert Import Deck Test")]
+    [TestMethod("Insert Import Deck Test (Regedit)")]
     [TestCategory("Manual")]
-    public void InsertImportDeck()
+    [DeploymentItem("Resources/deck_date_a_live.json")]
+
+    public void TestInsertImportDeckToBlakeWSS()
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             Assert.Inconclusive("Test was not run on Windows and is unsupported in other platforms.");
@@ -51,4 +61,39 @@ public class ServiceTests
         Assert.IsTrue(importedData == dataToImport, "Data was not imported correctly.");
         Assert.IsTrue(importedDateTime?.Equals(timeToImport) ?? false, "Timestamp was not imported correctly.");
     }
+
+    [TestMethod("Export Deck to Blake WS Format Test")]
+    [DeploymentItem("Resources/deck_Lucky_Happy_Smile_Yay_v3.json")]
+    [DeploymentItem("Resources/test_deck_results.bws.txt")]
+    [TestCategory("Manual")]
+    public async Task TestExportToBlakeWSFormat()
+    {
+        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+        Lamar.Container ioc = Program.Bootstrap();
+        await new FetchVerb
+        {
+            RIDsOrSerials = new[] { "W73", "W63", "W54" }
+        }.Run(ioc, NoOpProgress<CommandProgressReport>.Instance);
+
+        await new ExportVerb
+        {
+            Source = "./Resources/deck_Lucky_Happy_Smile_Yay_v3.json",
+            Exporter = "bws"
+        }.Run(ioc, NoOpProgress<CommandProgressReport>.Instance);
+
+        var resourceStream = await Path.Get("./Resources/test_deck_results.bws.txt").ReadBytesAsync();
+        var resultStream = await Path.Get("./Export/Lucky_Happy_Smile_Yay_v3.bws.txt").ReadBytesAsync();
+        var hasher = SHA512.Create();
+        var resourceHash = hasher.ComputeHash(resourceStream);
+        var resultHash = hasher.ComputeHash(resultStream);
+
+        var resourceString = ASCIIEncoding.ASCII.GetString(resourceStream);
+        var resultString = ASCIIEncoding.ASCII.GetString(resultStream);
+
+        Log.Information("Expected: {s}", resourceString);
+        Log.Information("Obtained: {s}", resultString);
+
+        Assert.IsTrue(resourceHash?.SequenceEqual(resultHash) ?? false);
+    }
+
 }

@@ -52,7 +52,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 
         var resultFolder = Path.CreateDirectory(info.Destination);
 
-        var fileNameFriendlyDeckName = deck.Name.AsFileNameFriendly();
+        var fileNameFriendlyDeckName = deck.Name.AsFriendlyToTabletopSimulator();
 
         var imageDictionary = await deck.Ratios.Keys
             .ToAsyncEnumerable()
@@ -101,11 +101,11 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             ;
 
         var finalTemplateUIXML = TTSResources.XMLUITemplate;
-        var saveState = JsonConvert.DeserializeObject<SaveState>(Encoding.UTF8.GetString(TTSResources.CustomObject));
+        var saveState = JsonConvert.DeserializeObject<SaveState>(Encoding.UTF8.GetString(TTSResources.CustomObject)) ?? throw new InvalidOperationException();
         saveState.ObjectStates[0].LuaScript = finalTemplateLUA;
         saveState.ObjectStates[0].XmlUI = finalTemplateUIXML;
 
-        var nameOfObject = $"Deck Generator ({fileNameFriendlyDeckName})";
+        var nameOfObject = $"Deck Generator ({deck.Name})";
         var deckGeneratorPath = resultFolder.Combine($"{nameOfObject}.json");
 
         //TODO: Add more progress logs here.

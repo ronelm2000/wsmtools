@@ -49,7 +49,7 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
             .SelectMany(c => Enumerable.Range(0, deck.Ratios[c]).Select(i => c))
             .ToList();
         var resultFolder = Path.CreateDirectory(info.Destination);
-        var fileNameFriendlyDeckName = deck.Name.AsFileNameFriendly();
+        var fileNameFriendlyDeckName = deck.Name.AsFriendlyToTabletopSimulator();
         var imageDictionary = await AsOrdered(deck.Ratios.Keys)
             .ToAsyncEnumerable()
             .Select((p, i) =>

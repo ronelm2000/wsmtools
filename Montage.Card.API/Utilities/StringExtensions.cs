@@ -60,13 +60,25 @@ public static class StringExtensions
     {
         var res = str;
         foreach (var c in System.IO.Path.GetInvalidFileNameChars())
-            res = res.Replace(c, '_');
-        res = res.Replace('\\', '_');
-        res = res.Replace('/', '_');
-        res = res.Replace(' ', '_');
+            res = res.Replace(c, replacement);
+        res = res.Replace('\\', replacement);
+        res = res.Replace('/', replacement);
+        res = res.Replace(' ', replacement);
         return res;
     }
 
+    public static string AsFriendlyToTabletopSimulator(this string str, char replacement = '_')
+    {
+        var res = str;
+        foreach (var c in System.IO.Path.GetInvalidFileNameChars())
+            res = res.Replace(c, replacement);
+        res = res   .Replace('\\', replacement)
+                    .Replace('/', replacement)
+                    .Replace(' ', replacement)
+                    .Replace(')', replacement)
+                    .Replace('(', replacement);
+        return res;
+    }
     public static async Task<IDocument> ParseHTML(this string content)
     {
         var config = AngleSharp.Configuration.Default.WithCss();

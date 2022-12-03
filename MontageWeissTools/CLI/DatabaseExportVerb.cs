@@ -3,6 +3,7 @@ using Lamar;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Services;
@@ -25,7 +26,7 @@ public class DatabaseExportVerb : IVerbCommand, IDatabaseExportInfo
     [Value(0, HelpText = "Indicates the source file/url. Default value: ./cards.db", Default = "./cards.db")]
     public string Source { get; set; } = "./cards.db";
 
-    public string Parser => null;
+    public string Parser => string.Empty;
 
     [Option("exporter", HelpText = "Manually sets the database exporter to use. Possible values: cockatrice", Default = "cockatrice")]
     public string Exporter { get; set; } = "cockatrice";
@@ -42,7 +43,7 @@ public class DatabaseExportVerb : IVerbCommand, IDatabaseExportInfo
     [Option("nowarn", HelpText = "When set to true, all warning prompts will default to yes without user input. This flag when set ignores noninteractive flag during warnings (and is automatically true).", Default = false)]
     public bool NoWarning { get; set; } = false;
 
-    public IProgress<DeckExportProgressReport> Progress { get; } = null;
+    public IProgress<DeckExportProgressReport> Progress { get; init; } = NoOpProgress<DeckExportProgressReport>.Instance;
 
     private readonly ILogger Log = Serilog.Log.ForContext<DatabaseExportVerb>();
 

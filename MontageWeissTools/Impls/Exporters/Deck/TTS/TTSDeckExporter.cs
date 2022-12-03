@@ -244,8 +244,8 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
                         Log.Debug($"Recieved Data: {data}");
                         try
                         {
-                            dynamic json = JsonConvert.DeserializeObject(data);
-                            if (json?.messageID == 4 && json.customMessage?.StopID?.ToString() == stopSignalGUID.ToString())
+                            dynamic? json = JsonConvert.DeserializeObject(data);
+                            if (json?.messageID == 4 && json?.customMessage?.StopID?.ToString() == stopSignalGUID.ToString())
                                 return;
                         }
                         catch (Exception) { }

@@ -37,7 +37,7 @@ namespace Montage.Weiss.Tools.Migrations
 
                     b.HasKey("LogID");
 
-                    b.ToTable("MigrationLog");
+                    b.ToTable("MigrationLog", (string)null);
 
                     b.HasData(
                         new
@@ -84,7 +84,7 @@ namespace Montage.Weiss.Tools.Migrations
 
                     b.HasKey("Key");
 
-                    b.ToTable("Settings");
+                    b.ToTable("Settings", (string)null);
                 });
 
             modelBuilder.Entity("Montage.Weiss.Tools.Entities.WeissSchwarzCard", b =>
@@ -142,7 +142,7 @@ namespace Montage.Weiss.Tools.Migrations
 
                     b.HasKey("Serial");
 
-                    b.ToTable("WeissSchwarzCards");
+                    b.ToTable("WeissSchwarzCards", (string)null);
                 });
 
             modelBuilder.Entity("Montage.Weiss.Tools.Entities.WeissSchwarzCardOptionalInfo", b =>
@@ -159,12 +159,12 @@ namespace Montage.Weiss.Tools.Migrations
 
                     b.HasKey("Serial", "Key");
 
-                    b.ToTable("WeissSchwarzCardOptionalInfo");
+                    b.ToTable("WeissSchwarzCardOptionalInfo", (string)null);
                 });
 
             modelBuilder.Entity("Montage.Weiss.Tools.Entities.WeissSchwarzCard", b =>
                 {
-                    b.OwnsMany("Montage.Weiss.Tools.Entities.WeissSchwarzTrait", "Traits", b1 =>
+                    b.OwnsMany("Montage.Weiss.Tools.Entities.WeissSchwarzCard.Traits#Montage.Weiss.Tools.Entities.WeissSchwarzTrait", "Traits", b1 =>
                         {
                             b1.Property<Guid>("TraitID")
                                 .ValueGeneratedOnAdd()
@@ -183,13 +183,13 @@ namespace Montage.Weiss.Tools.Migrations
 
                             b1.HasIndex("Serial");
 
-                            b1.ToTable("Traits");
+                            b1.ToTable("Traits", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("Serial");
                         });
 
-                    b.OwnsOne("Montage.Card.API.Entities.Impls.MultiLanguageString", "Name", b1 =>
+                    b.OwnsOne("Montage.Weiss.Tools.Entities.WeissSchwarzCard.Name#Montage.Card.API.Entities.Impls.MultiLanguageString", "Name", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()

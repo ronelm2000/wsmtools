@@ -12,7 +12,8 @@ namespace Montage.Weiss.Tools.Entities;
 
 public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
 {
-    private static ILogger Log;
+    private static ILogger Log = Serilog.Log.ForContext<WeissSchwarzCard>();
+
     private static string[] foilRarities = new[] { "SR", "SSR", "RRR", "SPM", "SPa", "SPb", "SP", "SSP", "SEC", "XR", "BDR" };
     private static string[] englishEditedPrefixes = new[] { "EN-", "S25", "W30" };
     private static string[] englishOriginalPrefixes = new[] { "Wx", "SX", "BSF", "BCS" };
@@ -46,13 +47,17 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     /// </summary>
     [JsonIgnore]
     [NotMapped]
-    public string CachedImagePath { get; set; }
+    public string? CachedImagePath { get; set; }
 
     //public readonly WeissSchwarzCard Empty = new WeissSchwarzCard();
 
     public WeissSchwarzCard()
     {
         Log ??= Serilog.Log.ForContext<WeissSchwarzCard>();
+        Effect = Array.Empty<string>();
+        Name = MultiLanguageString.Empty;
+        Rarity = string.Empty;
+        Triggers = Array.Empty<Trigger>();
     }
 
     /// <summary>
@@ -71,7 +76,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     public WeissSchwarzCard Clone()
     {
         WeissSchwarzCard newCard = (WeissSchwarzCard) this.MemberwiseClone();
-        newCard.Name = this.Name.Clone();
+        newCard.Name = this.Name;
         newCard.Traits = this.Traits.Select(s => s.Clone()).ToList();
         newCard.AdditionalInfo = this.AdditionalInfo.Select(s => s.Clone()).ToList();
         return newCard;
@@ -270,10 +275,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
 internal class WeissSchwarzCardSerialComparerImpl : IEqualityComparer<WeissSchwarzCard>
 {
     public bool Equals([AllowNull] WeissSchwarzCard x, [AllowNull] WeissSchwarzCard y)
-    {
-        if (x == null) return y == null;
-        else return x.Serial == y.Serial;
-    }
+        => x?.Serial == y?.Serial;
 
     public int GetHashCode([DisallowNull] WeissSchwarzCard obj)
     {

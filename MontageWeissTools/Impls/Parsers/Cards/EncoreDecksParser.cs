@@ -44,25 +44,17 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         if (encoreDecksSiteSetMatcher.IsMatch(urlOrLocalFile))
             urlOrLocalFile = TransformIntoAPIFormat(urlOrLocalFile);
 
-        IList<dynamic> setCards = null;
-        var progressReport = new SetParserProgressReport();
-        do try
+        var progressReport = new SetParserProgressReport
+        {
+
+            ReportMessage = new MultiLanguageString
             {
-                progressReport = progressReport with
-                {
-                    ReportMessage = new MultiLanguageString
-                    {
-                        EN = "Obtaining list of cards..."
-                    },
-                    Percentage = 1
-                };
-                progress.Report(progressReport);
-                setCards = await urlOrLocalFile.WithRESTHeaders().GetJsonListAsync(cancellationToken);
-            }
-            catch (FlurlHttpException)
-            {
-                // Do nothing
-            } while (setCards == null);
+                EN = "Obtaining list of cards..."
+            },
+            Percentage = 1
+        };
+        progress.Report(progressReport);
+        var setCards = await urlOrLocalFile.WithRESTHeaders().GetJsonListAsync(cancellationToken);
 
         progressReport = progressReport with {
             ReportMessage = new MultiLanguageString { EN = $"Obtained [{setCards.Count}] cards." }, 

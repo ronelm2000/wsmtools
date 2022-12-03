@@ -37,7 +37,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
         return inspectedDeck;
     }
 
-    private async Task<WeissSchwarzCard> AddImageFromConsole(WeissSchwarzCard card, InspectionOptions options)
+    private async Task<WeissSchwarzCard?> AddImageFromConsole(WeissSchwarzCard card, InspectionOptions options)
     {
         var modifiedCard = card.Clone();
         Log.Information("Please enter a new image URL: ");

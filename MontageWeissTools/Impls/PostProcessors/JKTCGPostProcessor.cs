@@ -5,6 +5,7 @@ using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
@@ -102,21 +103,27 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
     private async IAsyncEnumerable<WeissSchwarzCard> Process(WeissSchwarzCard firstCard, PostProcessorInfo info)
     {
         Log.Information("Starting...");
-        (string setLinkWithUnderscores, string url)? pair = await GetSetListURI(firstCard);
+        (string setLinkWithUnderscores, string url)? nullPair = await GetSetListURI(firstCard);
+        if (!(nullPair is not null and (string setLinkWithUnderscores, string url) pair))
+        {
+            Log.Warning("Cannot obtain set from JKTCG; Skipping...");
+            await foreach (var c in info.OriginalCards) yield return c;
+            yield break;
+        }
+
         var originalCards = info.OriginalCards;
         var ct = info.CancellationToken;
         var progressReport = info.ProgressReport;
         var progress = info.Progress;
-        var cardList = await pair?.url
-            .WithHTMLHeaders()
-            .GetHTMLAsync(ct);
+        var cardList = await pair.url.WithHTMLHeaders().GetHTMLAsync(ct);
         var releaseID = firstCard.ReleaseID;
         var cardImages = cardList.QuerySelectorAll<IHtmlImageElement>("a > img")
             .Select(ele => (
                 Serial: GetSerial(ele),
-                Source: ele.GetAncestor<IHtmlAnchorElement>().Href.Replace("\t", "")
+                Source: ele.GetAncestor<IHtmlAnchorElement>()?.Href.Replace("\t", "")
                 ))
-            .ToDictionary(p => p.Serial, p => p.Source);//(setID + "-" + str.AsSpan().Slice(c => c.LastIndexOf('_') + 1, c => c.LastIndexOf(".")).ToString()).ToLower());
+            .Where(p => p.Serial is not null)
+            .ToDictionary(p => p.Serial ?? "", p => p.Source);//(setID + "-" + str.AsSpan().Slice(c => c.LastIndexOf('_') + 1, c => c.LastIndexOf(".")).ToString()).ToLower());
 
         await foreach (var card in originalCards.WithCancellation(ct))
         {
@@ -124,7 +131,7 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
             try
             {
                 var imgURL = cardImages[res.Serial.ToLower()];
-                res.Images.Add(new Uri(imgURL));
+                res.Images.Add(new Uri(imgURL ?? throw new KeyNotFoundException()));
                 Log.Information("Attached image to {serial}: {imgURL}", res.Serial, imgURL);
             }
             catch (KeyNotFoundException)
@@ -140,12 +147,12 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
         yield break;
     }
 
-    private object GetSerial(IHtmlImageElement ele)
+    private string? GetSerial(IHtmlImageElement ele)
     {
-        Log.Debug("Parent Content: {content}", ele.Parent.TextContent);
+        Log.Debug("Parent Content: {content}", ele.Parent?.TextContent ?? string.Empty);
         Log.Debug("Last Ancestor Content: {content}", ele.Ancestors().Last().Text());
-        var innerHTML = ele.ParentElement.ParentElement.InnerHtml;
-        return innerHTML.AsSpan().Slice(c => 1, c => c.Slice(1).IndexOf('\t') + 1).ToString().ToLower();
+        var innerHTML = ele.ParentElement?.ParentElement?.InnerHtml;
+        return innerHTML?.AsSpan().Slice(c => 1, c => c.Slice(1).IndexOf('\t') + 1).ToString().ToLower();
     }
 
     private async Task<(string setLinkWithUnderscores, string url)?> GetSetListURI(WeissSchwarzCard firstCard, CancellationToken token = default)
@@ -190,9 +197,9 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
 
     private record PostProcessorInfo
     {
-        public IAsyncEnumerable<WeissSchwarzCard> OriginalCards { get; init; } = default;
-        public IProgress<PostProcessorProgressReport> Progress { get; init; } = default;
-        public PostProcessorProgressReport ProgressReport { get; init; } = default;
+        public IAsyncEnumerable<WeissSchwarzCard> OriginalCards { get; init; } = AsyncEnumerable.Empty<WeissSchwarzCard>();
+        public IProgress<PostProcessorProgressReport> Progress { get; init; } = NoOpProgress<PostProcessorProgressReport>.Instance;
+        public PostProcessorProgressReport ProgressReport { get; init; } = new PostProcessorProgressReport();
         public CancellationToken CancellationToken { get; init; } = default;
 
     }

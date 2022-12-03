@@ -7,9 +7,11 @@ using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
+using Octokit;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
+using System.Collections.Generic;
 
 namespace Montage.Weiss.Tools.CLI;
 
@@ -32,41 +34,12 @@ public class CacheVerb : IVerbCommand
         progress.Report(report);
 
         var language = InterpretLanguage(Language);
-        IAsyncEnumerable<WeissSchwarzCard> list = null;
-
         Func<Flurl.Url, CookieSession> _cookieSession = (url) => ioc.GetInstance<GlobalCookieJar>()[url.Root];
-
 
         using (var db = ioc.GetInstance<CardDatabaseContext>())
         {
             await db.Database.MigrateAsync(cancellationToken);
-            if (language == null)
-            {
-                try
-                {
-                    var tuple = WeissSchwarzCard.ParseSerial(ReleaseIDorFullSerialID);
-                }
-                catch (Exception)
-                {
-                    Log.Error("Serial cannot be parsed properly. Did you mean to cache a release set? If so, please indicate the language (EN/JP) as well.");
-                    return;
-                }
-
-                var query = from card in db.WeissSchwarzCards.AsQueryable()
-                            where card.Serial.ToLower() == ReleaseIDorFullSerialID.ToLower()
-                            select card;
-                list = query.ToAsyncEnumerable().Take(1);
-            } 
-            else
-            {
-                var releaseID = ReleaseIDorFullSerialID.ToLower().Replace("%","");
-                var query = from card in db.WeissSchwarzCards.AsQueryable()
-                            where EF.Functions.Like(card.Serial.ToLower(), $"%/{releaseID}%")
-                            select card;
-                list = query.ToAsyncEnumerable().Where(c => c.Language == language.Value);
-            }
-
-
+            var list = GenerateQuery(db, language);
 
             await foreach (var card in list.WithCancellation(cancellationToken))
             {
@@ -91,6 +64,35 @@ public class CacheVerb : IVerbCommand
 
         report = report.AsDone(CommandProgressReportVerbType.Caching);
         progress.Report(report);
+    }
+
+    private IAsyncEnumerable<WeissSchwarzCard> GenerateQuery(CardDatabaseContext db, CardLanguage? language)
+    {
+        if (language == null)
+        {
+            try
+            {
+                var tuple = WeissSchwarzCard.ParseSerial(ReleaseIDorFullSerialID);
+            }
+            catch (Exception)
+            {
+                Log.Error("Serial cannot be parsed properly. Did you mean to cache a release set? If so, please indicate the language (EN/JP) as well.");
+                return AsyncEnumerable.Empty<WeissSchwarzCard>();
+            }
+
+            var query = from card in db.WeissSchwarzCards.AsQueryable()
+                        where card.Serial.ToLower() == ReleaseIDorFullSerialID.ToLower()
+                        select card;
+            return query.ToAsyncEnumerable().Take(1);
+        }
+        else
+        {
+            var releaseID = ReleaseIDorFullSerialID.ToLower().Replace("%", "");
+            var query = from card in db.WeissSchwarzCards.AsQueryable()
+                        where EF.Functions.Like(card.Serial.ToLower(), $"%/{releaseID}%")
+                        select card;
+            return query.ToAsyncEnumerable().Where(c => c.Language == language.Value);
+        }
     }
 
     private async Task AddCachedImageAsync(WeissSchwarzCard card, Func<Flurl.Url, CookieSession> _cookieSession, CancellationToken ct = default)

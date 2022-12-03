@@ -12,36 +12,35 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Impls.Exporters.Database
+namespace Montage.Weiss.Tools.Impls.Exporters.Database;
+
+public class JSONExporter : CommonDatabaseExporter
 {
-    public class JSONExporter : CommonDatabaseExporter
+    private ILogger Log = Serilog.Log.ForContext<JSONExporter>();
+
+    public override string[] Alias => new[] { "json", "json-db" }; 
+
+    public override async Task Export(CardDatabaseContext database, IDatabaseExportInfo info, CancellationToken cancellationToken)
     {
-        private ILogger Log = Serilog.Log.ForContext<JSONExporter>();
+        Log.Information("Starting...");
+        var query = CreateQuery(database.WeissSchwarzCards, info);
+        var destPath = Path.Get(info.Destination);
+        if (!destPath.HasExtension)
+            destPath = destPath.CreateDirectory().Combine("result.json");
 
-        public override string[] Alias => new[] { "json", "json-db" }; 
-
-        public override async Task Export(CardDatabaseContext database, IDatabaseExportInfo info, CancellationToken cancellationToken)
+        var jsonObject = await GenerateJSONAsync(query, cancellationToken);
+        await using (var stream = destPath.GetOpenWriteStream())
         {
-            Log.Information("Starting...");
-            var query = CreateQuery(database.WeissSchwarzCards, info);
-            var destPath = Path.Get(info.Destination);
-            if (!destPath.HasExtension)
-                destPath = destPath.CreateDirectory().Combine("result.json");
-
-            var jsonObject = await GenerateJSONAsync(query, cancellationToken);
-            await using (var stream = destPath.GetOpenWriteStream())
-            {
-                await JsonSerializer.SerializeAsync(stream, jsonObject, cancellationToken: cancellationToken);
-                await stream.FlushAsync(cancellationToken);
-            }
-
-            Log.Information("Done.");
-            Log.Information($"Saved: {destPath.ToString()}");
+            await JsonSerializer.SerializeAsync(stream, jsonObject, cancellationToken: cancellationToken);
+            await stream.FlushAsync(cancellationToken);
         }
 
-        async Task<List<WeissSchwarzCard>> GenerateJSONAsync(IQueryable<WeissSchwarzCard> query, CancellationToken cancellationToken)
-        {
-            return await query.ToListAsync(cancellationToken);
-        }
+        Log.Information("Done.");
+        Log.Information($"Saved: {destPath.ToString()}");
+    }
+
+    async Task<List<WeissSchwarzCard>> GenerateJSONAsync(IQueryable<WeissSchwarzCard> query, CancellationToken cancellationToken)
+    {
+        return await query.ToListAsync(cancellationToken);
     }
 }

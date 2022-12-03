@@ -10,32 +10,31 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Test.ENWS
+namespace Montage.Weiss.Tools.Test.ENWS;
+
+[TestClass]
+public class ParserTests
 {
-    [TestClass]
-    public class ParserTests
+    [TestMethod("EN WS Parser Test")]
+    public async Task TestParser()
     {
-        [TestMethod("EN WS Parser Test")]
-        public async Task TestParser()
-        {
-            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-            var progressReporter = NoOpProgress<object>.Instance;
+        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+        var progressReporter = NoOpProgress<object>.Instance;
 
-            var url = "https://en.ws-tcg.com/cardlist/list/?cardno=CCS/BSF2019-02";
-            var list = await new EnglishWSURLParser().Parse(url, progressReporter, CancellationToken.None).ToListAsync();
-            Log.Information("Cards Obtained: {length}", list.Count);
-            foreach (var card in list)
-                Log.Information("Card: {@card}", card.Serial);
+        var url = "https://en.ws-tcg.com/cardlist/list/?cardno=CCS/BSF2019-02";
+        var list = await new EnglishWSURLParser().Parse(url, progressReporter, CancellationToken.None).ToListAsync();
+        Log.Information("Cards Obtained: {length}", list.Count);
+        foreach (var card in list)
+            Log.Information("Card: {@card}", card.Serial);
 
-            url = "https://en.ws-tcg.com/cardlist/list/?cardno=FS/S36-E018";
-            var dict = await new EnglishWSURLParser().Parse(url, progressReporter, CancellationToken.None)
-                .ToDictionaryAsync(c => c.Serial, c => c);
-            Log.Information("Cards Obtained: {length}", dict.Keys.Count);
+        url = "https://en.ws-tcg.com/cardlist/list/?cardno=FS/S36-E018";
+        var dict = await new EnglishWSURLParser().Parse(url, progressReporter, CancellationToken.None)
+            .ToDictionaryAsync(c => c.Serial, c => c);
+        Log.Information("Cards Obtained: {length}", dict.Keys.Count);
 
-            Action<string> serialAssertions = serial => Assert.IsTrue(dict.ContainsKey(serial), $"Could not find {serial} in output.");
-            serialAssertions("FS/S36-PE02");
-            serialAssertions("FS/S36-E012");
-            serialAssertions("FS/S36-PE01");
-        }
+        Action<string> serialAssertions = serial => Assert.IsTrue(dict.ContainsKey(serial), $"Could not find {serial} in output.");
+        serialAssertions("FS/S36-PE02");
+        serialAssertions("FS/S36-E012");
+        serialAssertions("FS/S36-PE01");
     }
 }

@@ -150,8 +150,8 @@ public static class UriExtensions
                 ;
         var context = BrowsingContext.New(config);
         var response = await flurlResponse;
-        var url = response.ResponseMessage.RequestMessage.RequestUri.AbsoluteUri;
-        var stream = await response.GetStreamAsync(); //.ReceiveStream();
+        var url = response.ResponseMessage?.RequestMessage?.RequestUri?.AbsoluteUri;
+        var stream = await response.GetStreamAsync();
         return await context.OpenAsync(req =>
         {
             req.Address(url);

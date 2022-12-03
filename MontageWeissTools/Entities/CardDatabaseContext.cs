@@ -39,7 +39,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
         options.UseSqlite($"Data Source={_config.DbName}");
     }
 
-    internal async Task<WeissSchwarzCard> FindNonFoil(WeissSchwarzCard card, CancellationToken ct = default)
+    internal async Task<WeissSchwarzCard?> FindNonFoil(WeissSchwarzCard card, CancellationToken ct = default)
     {
         return await WeissSchwarzCards.FindAsync(new[] { WeissSchwarzCard.RemoveFoil(card.Serial) }, ct);
     }
@@ -51,15 +51,16 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
             b.HasKey(c => c.Serial);
             b.Property(c => c.Triggers)
                 .HasConversion(arr => String.Join(',', arr.Select(t => t.ToString()))
-                            , str => str.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.ToEnum<Trigger>().Value).ToArray()
+                            , str => str.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.ToEnum<Trigger>() ?? Trigger.Soul).ToArray()
                         );
             b.Property(c => c.Effect)
                 .HasConversion(arr => JsonConvert.SerializeObject(arr)
-                            , str => JsonConvert.DeserializeObject<string[]>(str)
+                            , str => JsonConvert.DeserializeObject<string[]>(str) ?? Array.Empty<string>()
                                 );
+            
             b.Property(c => c.Images)
                 .HasConversion(arr => JsonConvert.SerializeObject(arr.Select(uri => uri.ToString()).ToArray())
-                            , str => JsonConvert.DeserializeObject<string[]>(str).Select(s => new Uri(s)).ToList()
+                            , str => (JsonConvert.DeserializeObject<string[]>(str) ?? Array.Empty<string>()).Select(s => new Uri(s)).ToList()
                                 );
 
             b.OwnsMany(s => s.Traits, bb =>

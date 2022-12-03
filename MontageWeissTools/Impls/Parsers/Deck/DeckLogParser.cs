@@ -72,8 +72,8 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         var json = JsonConvert.DeserializeObject<dynamic>(await response.GetStringAsync());
         var newDeck = new WeissSchwarzDeck();
         var missingSerials = new List<string>();
-        newDeck.Name = json.title.ToString();
-        newDeck.Remarks = json.memo.ToString();
+        newDeck.Name = json?.title?.ToString() ?? throw new DeckParsingException("Cannot parse the deck name.");
+        newDeck.Remarks = json?.memo?.ToString() ?? throw new DeckParsingException("Cannot parse the deck remarks.");
 
         aggregator.ReportParsedDeckData(newDeck);
 

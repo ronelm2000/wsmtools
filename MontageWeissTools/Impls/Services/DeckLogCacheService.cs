@@ -9,10 +9,10 @@ internal class DeckLogCacheService : ICachedMapService<(CardLanguage,string), Di
 {
     private Dictionary<(CardLanguage, string), Dictionary<string, DLCardEntry>> _cache = new();
 
-    public Dictionary<string, DLCardEntry> this[(CardLanguage, string) key]
+    public Dictionary<string, DLCardEntry>? this[(CardLanguage, string) key]
     {
         get => _cache.GetValueOrDefault(key) ?? (_cache[key] = new Dictionary<string, DLCardEntry>());
-        set => _cache[key] = value;
+        set => _cache[key] = value ?? new Dictionary<string, DLCardEntry>();
     }
 
     public IDictionary<(CardLanguage, string), Dictionary<string, DLCardEntry>> GetValues(IEnumerable<(CardLanguage, string)> keys)

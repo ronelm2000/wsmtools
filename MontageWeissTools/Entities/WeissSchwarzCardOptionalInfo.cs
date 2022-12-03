@@ -7,11 +7,15 @@ public class WeissSchwarzCardOptionalInfo : IExactCloneable<WeissSchwarzCardOpti
 {
     public string Serial { get; set; }
     public string Key { get; set; }
-    public string ValueJSON { get; set; }
+    public string? ValueJSON { get; set; }
 
-    public virtual WeissSchwarzCard Card { get; set; }
+    public virtual WeissSchwarzCard? Card { get; set; }
 
-    public WeissSchwarzCardOptionalInfo() { }
+    public WeissSchwarzCardOptionalInfo()
+    {
+        Serial = string.Empty;
+        Key = string.Empty;
+    }
 
     public WeissSchwarzCardOptionalInfo(WeissSchwarzCard card, string key)
     {
@@ -20,9 +24,9 @@ public class WeissSchwarzCardOptionalInfo : IExactCloneable<WeissSchwarzCardOpti
         this.Key = key;
     }
 
-    public T DeserializeValue<T>()
+    public T? DeserializeValue<T>()
     {
-        return JsonSerializer.Deserialize<T>(ValueJSON);
+        return JsonSerializer.Deserialize<T>(ValueJSON ?? string.Empty);
     }
 
     public void SerializeValue<T>(T rawValue)

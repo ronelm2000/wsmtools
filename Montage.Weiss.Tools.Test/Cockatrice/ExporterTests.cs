@@ -12,53 +12,52 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Test.Cockatrice
+namespace Montage.Weiss.Tools.Test.Cockatrice;
+
+[TestClass]
+public class ExporterTests
 {
-    [TestClass]
-    public class ExporterTests
+    [TestMethod("Cockatrice Database Exporter Test (Full)")]
+    public async Task TestExporterForDatabase()
     {
-        [TestMethod("Cockatrice Database Exporter Test (Full)")]
-        public async Task TestExporterForDatabase()
+        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+        Lamar.Container ioc = Program.Bootstrap();
+        var progressReporter = NoOpProgress<object>.Instance;
+        using var db = ioc.GetInstance<CardDatabaseContext>();
+
+        /*
+        await new ParseVerb()
         {
-            Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-            Lamar.Container ioc = Program.Bootstrap();
-            var progressReporter = NoOpProgress<object>.Instance;
-            using var db = ioc.GetInstance<CardDatabaseContext>();
+            URI = "https://heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
+        }.Run(ioc);
+        */
 
-            /*
-            await new ParseVerb()
-            {
-                URI = "https://heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
-            }.Run(ioc);
-            */
+        await new ParseVerb()
+        {
+            URI = "https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards"
+        }.Run(ioc, progressReporter);
 
-            await new ParseVerb()
-            {
-                URI = "https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards"
-            }.Run(ioc, progressReporter);
+        await new ParseVerb()
+        {
+            URI = "https://www.heartofthecards.com/translations/little_busters!_anime_booster_pack.html"
+        }.Run(ioc, progressReporter);
 
-            await new ParseVerb()
-            {
-                URI = "https://www.heartofthecards.com/translations/little_busters!_anime_booster_pack.html"
-            }.Run(ioc, progressReporter);
-
-            IDatabaseExportInfo info = new MockDatabaseExportInfo();
-            await new CockatriceExporter().Export(db, info, default);
-        }
+        IDatabaseExportInfo info = new MockDatabaseExportInfo();
+        await new CockatriceExporter().Export(db, info, default);
     }
+}
 
-    internal class MockDatabaseExportInfo : IDatabaseExportInfo
-    {
-        public IEnumerable<string> ReleaseIDs => new string[] { };
-        public IEnumerable<string> Serials => new string[] { };
-        public string Source => "";
-        public string Destination => "./Export/";
-        public string Parser => "";
-        public string Exporter => "";
-        public string OutCommand => "";
-        public IEnumerable<string> Flags => new string[] { };
-        public bool NonInteractive => true;
+internal class MockDatabaseExportInfo : IDatabaseExportInfo
+{
+    public IEnumerable<string> ReleaseIDs => new string[] { };
+    public IEnumerable<string> Serials => new string[] { };
+    public string Source => "";
+    public string Destination => "./Export/";
+    public string Parser => "";
+    public string Exporter => "";
+    public string OutCommand => "";
+    public IEnumerable<string> Flags => new string[] { };
+    public bool NonInteractive => true;
 
-        public IProgress<DeckExportProgressReport> Progress => NoOpProgress<DeckExportProgressReport>.Instance;
-    }
+    public IProgress<DeckExportProgressReport> Progress => NoOpProgress<DeckExportProgressReport>.Instance;
 }

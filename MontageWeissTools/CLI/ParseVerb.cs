@@ -16,7 +16,7 @@ namespace Montage.Weiss.Tools.CLI;
 public class ParseVerb : IVerbCommand, IParseInfo
 {
     [Value(0, HelpText = "URL to parse. Compatible Formats are found at https://github.com/ronelm2000/wsmtools/")]
-    public string URI { get; set; }
+    public string URI { get; set; } = string.Empty;
 
     [Option("with", HelpText = "Provides a hint as to what parser should be used or if post-processors are skipped (if any).", Default = new string[] { })]
     public IEnumerable<string> ParserHints { get; set; } = new string[] { };

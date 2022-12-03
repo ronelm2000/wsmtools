@@ -129,9 +129,9 @@ public static class EnumerableExtensions
         {
             if (disposing)
             {
-                foreach (var v in _original?.Values)
+                foreach (var v in _original.Values)
                     (v as IDisposable)?.Dispose();
-                _original = null;
+                //_original = null;
             }
         }
 
@@ -139,7 +139,7 @@ public static class EnumerableExtensions
         {
             if (_original is not null)
             {
-                await Task  .WhenAll(_original?.Values.Select(async v => await v.DisposeAsync().ConfigureAwait(false)))
+                await Task  .WhenAll(_original.Values.Select(async v => await v.DisposeAsync().ConfigureAwait(false)))
                             .ConfigureAwait(false);
             }
         }

@@ -35,15 +35,15 @@ public class CockatriceExporter : CommonDatabaseExporter
 public class CockatriceCardDatabase
 {
     [XmlAttribute("version")]
-    public string Version;
+    public string Version = string.Empty;
 
     [XmlArray("sets")]
     [XmlArrayItem("set")]
-    public CockatriceSet[] Sets;
+    public CockatriceSet[] Sets = Array.Empty<CockatriceSet>();
 
     [XmlArray("cards")]
     [XmlArrayItem("card")]
-    public CockatriceCard[] Cards;
+    public CockatriceCard[] Cards = Array.Empty<CockatriceCard>();
 
     internal static async Task<CockatriceCardDatabase> CreateFromDatabase(IAsyncEnumerable<WeissSchwarzCard> query, CancellationToken cancellationToken)
     {
@@ -64,7 +64,11 @@ public class CockatriceCardDatabase
                 newCckCard.Props.Colors = TranslateToColorPropString(card.Color);
                 newCckCard.Props.LevelCost = $"{card.Level}/{card.Cost}";
                 newCckCard.Props.PowerSoul = $"{card.Power ?? 0}/{card.Soul ?? 0}";
-                newCckCard.Props.Type = $"{card.Traits.Select(TranslateTrait).Prepend(card.Type.ToString()).ConcatAsString(" - ")}";
+                newCckCard.Props.Type = $"{card.Traits.Select(TranslateTrait)
+                    .Where(s => s is not null)
+                    .Select(s => s ?? string.Empty)
+                    .Prepend(card.Type.ToString())
+                    .ConcatAsString(" - ")}";
                 newCckCard.Props.MainType = card.Type.ToString();
                 newCckCard.Props.Triggers = card.Triggers?.Select(t => t.ToString()).ConcatAsString(" - ") ?? "";
                 newCckCard.Text = FormatText(card);
@@ -94,9 +98,9 @@ public class CockatriceCardDatabase
         return color.ToString().Substring(0, 1);
     }
 
-    private static string TranslateTrait(WeissSchwarzTrait mlString)
+    private static string? TranslateTrait(WeissSchwarzTrait mlString)
     {
-        return mlString?.EN?.Replace(" ", "") ?? null;
+        return mlString?.EN?.Replace(" ", "");
     }
 
     private static CockatriceSet GetOrCreateSet(Dictionary<string, CockatriceSet> tempSetList, WeissSchwarzCard card)
@@ -116,9 +120,9 @@ public class CockatriceCardDatabase
 public class CockatriceSet
 {
     [XmlElement("name")]
-    public string Name;
+    public string Name = string.Empty;
     [XmlElement("longname")]
-    public string LongName;
+    public string LongName = string.Empty;
 
     public CockatriceSet()
     {
@@ -139,43 +143,43 @@ public class CockatriceSet
 public class CockatriceCard
 {
     [XmlElement("name")]
-    public string Name;
+    public string Name = string.Empty;
     [XmlElement("set")]
-    public CockatriceCardSetRelationship Set;
+    public CockatriceCardSetRelationship? Set;
     [XmlElement("prop")]
-    public CockatriceCardCardProperties Props;
+    public CockatriceCardCardProperties? Props;
     [XmlElement("text")]
-    public string Text;
+    public string Text = string.Empty;
 }
 
 public class CockatriceCardCardProperties
 {
     [XmlElement("code")]
-    public string Code;
+    public string? Code;
     [XmlElement("colors")]
-    public string Colors;
+    public string? Colors;
     [XmlElement("manacost")]
-    public string LevelCost;
+    public string? LevelCost;
     [XmlElement("type")]
-    public string Type;
+    public string? Type;
     [XmlElement("maintype")]
-    public string MainType;
+    public string? MainType;
     [XmlElement("pt")]
-    public string PowerSoul;
+    public string? PowerSoul;
     [XmlElement("triggers")]
-    public string Triggers;
+    public string? Triggers;
 }
 
 public class CockatriceCardSetRelationship
 {
     [XmlAttribute("picURL")]
-    public string PicURL;
+    public string? PicURL;
     [XmlAttribute("picURLHq")]
-    public string PicURLHQ;
+    public string? PicURLHQ;
     [XmlAttribute("picURLSt")]
-    public string PicURLST;
+    public string? PicURLST;
     [XmlText]
-    public string SetName;
+    public string? SetName;
 
     public CockatriceCardSetRelationship()
     {

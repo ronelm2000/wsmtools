@@ -18,12 +18,12 @@ internal class OptionalDynamicObject : DynamicObject
         this.obj = obj;
     }
 
-    public override bool TryGetMember(GetMemberBinder binder, out object result)
+    public override bool TryGetMember(GetMemberBinder binder, out object? result)
     {
         try
         {
             var objAsDictionary = (IDictionary<string, object>)obj;
-            if (objAsDictionary != null && objAsDictionary.TryGetValue(binder.Name, out object innerResult))
+            if (objAsDictionary != null && (objAsDictionary?.TryGetValue(binder.Name, out var innerResult) ?? false))
                 result = innerResult;
             else
                 result = null;
@@ -32,7 +32,7 @@ internal class OptionalDynamicObject : DynamicObject
         catch (Exception)
         {
             result = null;
-            return true;
+            return false;
         }
     }
 }

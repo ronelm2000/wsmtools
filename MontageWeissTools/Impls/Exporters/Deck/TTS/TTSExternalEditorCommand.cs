@@ -8,12 +8,12 @@ public class TTSExternalEditorCommand
     public CommandType CommandType { get; set; } = CommandType.GetLuaScripts;
 
     [JsonProperty("guid", NullValueHandling = NullValueHandling.Ignore)]
-    public string GUID { get; set; } = null;
+    public string? GUID { get; set; } = null;
     [JsonProperty("script", NullValueHandling = NullValueHandling.Ignore)]
-    public string Script { get; set; } = null;
+    public string? Script { get; set; } = null;
    
     [JsonProperty("scriptStates", NullValueHandling = NullValueHandling.Ignore)]
-    public List<ObjectState> ObjectStates { get; set; } = null;
+    public List<ObjectState>? ObjectStates { get; set; } = null;
 
     public TTSExternalEditorCommand() { }
     public TTSExternalEditorCommand(List<ObjectState> objectStates)

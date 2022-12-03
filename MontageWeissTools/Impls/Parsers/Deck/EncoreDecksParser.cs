@@ -98,8 +98,8 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
             foreach (dynamic card in deckJSON.cards)
             {
                 string serial = WeissSchwarzCard.GetSerial(card.set.ToString(), card.side.ToString(), card.lang.ToString(), card.release.ToString(), card.sid.ToString());
-                WeissSchwarzCard wscard = await db.WeissSchwarzCards.FindAsync(serial);
-                if (wscard == null)
+                WeissSchwarzCard? wscard = await db.WeissSchwarzCards.FindAsync(serial);
+                if (wscard is null)
                 {
                     string setID = card.series;
                     await _parse($"https://www.encoredecks.com/api/series/{setID}/cards", parseTranslator, cancellationToken);

@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>", Scope = "member", Target = "~M:Montage.Weiss.Tools.Utilities.InstalledApplications.ExistsInSubKey(Microsoft.Win32.RegistryKey,System.String,System.String,System.String)~System.String")]
+[assembly: SuppressMessage("Style", "IDE0161:Convert to file-scoped namespace", Justification = "<Pending>", Scope = "namespace", Target = "~N:Montage.Weiss.Tools.Migrations")]

@@ -7,19 +7,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Montage.Weiss.Tools.Test.Impls
+namespace Montage.Weiss.Tools.Test.Impls;
+
+class MockDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 {
-    class MockDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
+    public string[] Alias => new[] { "mock", "" };
+
+    public int Priority => int.MaxValue;
+
+    public Task<bool> IsCompatible(string urlOrFile) => Task.FromResult(true);
+
+    public Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile, IProgress<DeckParserProgressReport> progress, CancellationToken cancellationToken = default)
     {
-        public string[] Alias => new[] { "mock", "" };
-
-        public int Priority => int.MaxValue;
-
-        public Task<bool> IsCompatible(string urlOrFile) => Task.FromResult(true);
-
-        public Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile, IProgress<DeckParserProgressReport> progress, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<WeissSchwarzDeck>(null);
-        }
+        return Task.FromResult<WeissSchwarzDeck>(null);
     }
 }

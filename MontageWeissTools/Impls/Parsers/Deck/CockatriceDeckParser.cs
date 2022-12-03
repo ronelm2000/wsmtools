@@ -58,7 +58,7 @@ public class CockatriceDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCa
         using (var stream = file.GetStream())
         {
             // TODO: Copy code from DeckParser/DeckLogParser to get sets from EncoreDecks if they are missing.
-            var cockatriceDeck = serializer.Deserialize(stream) as CockatriceDeck;
+            var cockatriceDeck = serializer.Deserialize(stream) as CockatriceDeck ?? new DeckParsingException("Cannot parse into CockatriceDeck"); 
             var result = new WeissSchwarzDeck();
             var missingSerials = new List<String>();
             result.Name = cockatriceDeck.DeckName;

@@ -147,7 +147,7 @@ public class Program
 
 
     public static string AppFilePath =>
-        System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+        System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? Environment.ProcessPath ?? "";
     public static DateTime AppReleaseDate =>
         System.IO.File.GetLastWriteTime(AppFilePath);
 }

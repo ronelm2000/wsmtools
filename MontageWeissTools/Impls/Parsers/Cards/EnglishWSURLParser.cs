@@ -3,6 +3,7 @@ using AngleSharp.Html.Dom;
 using Flurl.Http;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
+using Montage.Card.API.Exceptions;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
@@ -239,9 +240,8 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
     private async Task<WeissSchwarzCard> ParseCardAsync(IElement cardUnitTD)
     {
         WeissSchwarzCard res = new WeissSchwarzCard();
-
-        var href = cardUnitTD.QuerySelector<IHtmlAnchorElement>("h4 a").Href;
-        var name = cardUnitTD.QuerySelector(_CARD_NAME_SELECTOR).InnerHtml;
+        var href = cardUnitTD.QuerySelector<IHtmlAnchorElement>("h4 a")?.Href ?? throw new DeckParsingException("Cannot find anchor element in unit ID");
+        var name = cardUnitTD.QuerySelector(_CARD_NAME_SELECTOR)?.InnerHtml ?? throw new DeckParsingException("cannot find name element in unit ID.");
         Log.Debug("HREF: {href}", href);
         res.Serial = href.Substring(_WS_CARD_PAGE.Length);
         res.Name = new MultiLanguageString() { EN = name, JP = "" };
@@ -316,10 +316,10 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
         return res;
     }
 
-    private async Task<string> CleanupFlavorText(string value)
+    private async Task<string?> CleanupFlavorText(string value)
     {
         var doc = await value.ParseHTML();
-        return doc.Body.Children[0].GetInnerText();//.InnerHtml;
+        return doc.Body?.Children[0]?.GetInnerText();//.InnerHtml;
     }
 
     private async Task<List<WeissSchwarzTrait>> TranslateToTraitsAsync(string value)
@@ -332,7 +332,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
     {
         var doc = await value.ParseHTML();
         return doc.QuerySelectorAll<IHtmlImageElement>("img")
-            .SelectMany(e => _TRIGGER_MAP.Where(t => e.Source.Contains(t.LookupString)))
+            .SelectMany(e => _TRIGGER_MAP.Where(t => e?.Source.Contains(t.LookupString)))
             .Select(t => t.CardTrigger)
             .ToArray();
     }

@@ -42,7 +42,7 @@ public class PostProcessorTests
         Assert.IsTrue(latestVersion == settings.Version, $"DeckLog API (EN) version is outdated; latest version is {latestVersion} need to check for compatibility.");
     }
 
-    [TestMethod("DeckLog API Set List Test")]
+    [TestMethod("DeckLog API Set List Test (EN)")]
     [TestCategory("Manual")]
     public async Task TestPostProcessor()
     {
@@ -63,6 +63,38 @@ public class PostProcessorTests
         var resultCards = await deckLogPP.Process(cards, progress2, ct)
             .ToDictionaryAsync(c => c.Serial);
 
-        Assert.IsTrue(resultCards["BD/EN-W03-001"].Images.Contains(new Uri("https://en.ws-tcg.com/wp/wp-content/images/cardimages/b/bd_en_w03/BD_EN_W03_001.png")), "The expected URI is incorrect.");
+        Assert.IsTrue(resultCards["BD/EN-W03-001"]
+            .Images
+            .Contains(new Uri("https://en.ws-tcg.com/wp/wp-content/images/cardimages/b/bd_en_w03/BD_EN_W03_001.png")),
+            "The expected URI is missing."
+            );
+    }
+
+    [TestMethod("DeckLog API Set List Test - Reported Bug for HHW")]
+    [TestCategory("Manual")]
+    public async Task TestPostProcessor2()
+    {
+        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+        Lamar.Container ioc = Program.Bootstrap();
+
+        var progress1 = NoOpProgress<SetParserProgressReport>.Instance;
+        var progress2 = NoOpProgress<PostProcessorProgressReport>.Instance;
+        var progress3 = NoOpProgress<CommandProgressReport>.Instance;
+        var ct = CancellationToken.None;
+
+        await new UpdateVerb().Run(ioc, progress3, ct);
+        var deckLogPP = ioc.GetInstance<DeckLogPostProcessor>();
+
+        var cards = new Tools.Impls.Parsers.Cards.EncoreDecksParser()
+            .Parse("https://www.encoredecks.com/?page=1&set=5c6763677cd9b718cdb87eca", progress1, ct);
+
+        var resultCards = await deckLogPP.Process(cards, progress2, ct)
+            .ToDictionaryAsync(c => c.Serial);
+
+        Assert.IsTrue(resultCards["BD/W54-008"]
+            .Images
+            .Contains(new Uri("https://ws-tcg.com/wordpress/wp-content/images/cardlist/b/bd_w54/bd_w54_008.png")),
+            "The expected URI is missing."
+            );
     }
 }

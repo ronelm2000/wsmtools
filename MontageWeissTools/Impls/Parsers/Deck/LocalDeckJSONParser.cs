@@ -1,6 +1,7 @@
 ﻿using Fluent.IO;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
+using Montage.Card.API.Exceptions;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.JSON;
@@ -41,8 +42,7 @@ public class LocalDeckJSONParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCar
         progress.Report(report);
 
         var filePath = Path.Get(sourceUrlOrFile);
-        SimpleDeck deckJSON = null;
-        deckJSON = JsonSerializer.Deserialize<SimpleDeck>(await filePath.ReadBytesAsync(cancellationToken));
+        SimpleDeck deckJSON = JsonSerializer.Deserialize<SimpleDeck>(await filePath.ReadBytesAsync(cancellationToken)) ?? throw new DeckParsingException();
         WeissSchwarzDeck deck = new WeissSchwarzDeck();
         deck.Name = deckJSON.Name;
         deck.Remarks = deckJSON.Remarks;

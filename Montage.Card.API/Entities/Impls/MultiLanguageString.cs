@@ -1,8 +1,8 @@
 ﻿namespace Montage.Card.API.Entities.Impls;
 
-public class MultiLanguageString : IExactCloneable<MultiLanguageString>
+public record MultiLanguageString
 {
-    protected internal Dictionary<string, string?> resources = new Dictionary<string, string?>();
+    private Dictionary<string, string?> resources = new Dictionary<string, string?>();
 
     public string? this[string languageIndex]
     {
@@ -23,6 +23,13 @@ public class MultiLanguageString : IExactCloneable<MultiLanguageString>
 
     public static MultiLanguageString Empty { get; internal set; } = new MultiLanguageString() { EN = "", JP = "" };
 
+    public MultiLanguageString()
+    {
+        EN = null;
+        JP = null;
+    }
+
+    /*
     public MultiLanguageString Clone()
     {
         var newMLS = new MultiLanguageString();
@@ -30,6 +37,7 @@ public class MultiLanguageString : IExactCloneable<MultiLanguageString>
             newMLS.resources.Add(val.Key, val.Value);
         return newMLS;
     }
+    */
 
     /// <summary>
     /// Attempts to resolve this object into a string as much as it can.

@@ -22,7 +22,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
     private bool IsCompatibleAsURL(IParseInfo info)
     {
         var urlOrFile = info.URI;
-        if (!Uri.TryCreate(urlOrFile, UriKind.Absolute, out Uri url))
+        if (!Uri.TryCreate(urlOrFile, UriKind.Absolute, out Uri? url))
         {
             Log.Debug("Not compatible because not a url: {urlOrFile}", urlOrFile);
             return false;
@@ -66,7 +66,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
     public async IAsyncEnumerable<WeissSchwarzCard> Parse(string url, IProgress<SetParserProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         Log.Information("Starting. URI: {url}", url);
-        string textToProcess = null;
+        string? textToProcess = null;
 
         var progressReport = new SetParserProgressReport
         {
@@ -79,7 +79,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         {
             var html = await new Uri(url).DownloadHTML(cancellationToken);
             var preSelector = "td > pre";
-            textToProcess = html.QuerySelector(preSelector).TextContent;
+            textToProcess = html.QuerySelector(preSelector)?.TextContent;
         }
         else
         {
@@ -96,7 +96,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         progress.Report(progressReport);
 
         var majorSeparator = "================================================================================";
-        var textSplits = textToProcess.Split(majorSeparator);
+        var textSplits = textToProcess?.Split(majorSeparator) ?? Array.Empty<string>();
         var rows = textSplits.Length - 2;
         var results = textSplits.AsEnumerable()
             .Skip(1)
@@ -318,7 +318,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         };
     }
 
-    private string HandleRarityCorrections(string serial, Exception innerException)
+    private string HandleRarityCorrections(string serial, Exception? innerException)
     {
         return serial switch
         {

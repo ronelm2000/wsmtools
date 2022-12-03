@@ -11,8 +11,8 @@ public class WeissSchwarzDatabaseUpdater : DatabaseUpdater<CardDatabaseContext, 
     public override ILogger Log => Serilog.Log.ForContext<WeissSchwarzDatabaseUpdater>();
 
     public delegate Task UpdateEventHandler(WeissSchwarzDatabaseUpdater sender, UpdateEventArgs args);
-    public event UpdateEventHandler OnStarting;
-    public event UpdateEventHandler OnEnding;
+    public event UpdateEventHandler? OnStarting;
+    public event UpdateEventHandler? OnEnding;
 
     public override Task OnLogEnding(UpdateEventArgs args) => OnStarting?.Invoke(this, args) ?? Task.CompletedTask;
     public override Task OnLogStarting(UpdateEventArgs args) => OnEnding?.Invoke(this, args) ?? Task.CompletedTask;

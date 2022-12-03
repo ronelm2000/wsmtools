@@ -14,7 +14,7 @@ public class SaveState //Holds a state of the game
     public string Note = "";
     public string Rules = "";
     public string XmlUI = ""; //Custom Xml UI
-    public List<CustomAssetState> CustomUIAssets;
+    public List<CustomAssetState> CustomUIAssets = new();
     public string LuaScript = "";
     public string LuaScriptState = ""; // Serialized running Lua code; will run nothing as it's just a save state.    
     public List<ObjectState> ObjectStates; //Objects on the table
@@ -26,10 +26,10 @@ public class SaveState //Holds a state of the game
 public class ObjectState //Moveable objects
 {
     public string Name = ""; //Internal object name
-    public TransformState Transform; //Position, Rotation, Scale
+    public TransformState? Transform; //Position, Rotation, Scale
     public string Nickname = ""; //Name supplied in game
     public string Description = "";
-    public ColourState ColorDiffuse; //Material color tint
+    public ColourState? ColorDiffuse; //Material color tint
     /*Toggles*/
     public bool Locked = false; //Freeze object in place
     public bool Grid = true; //Object will snap to grid
@@ -50,39 +50,39 @@ public class ObjectState //Moveable objects
     public bool? SidewaysCard;
     public bool? RPGmode;
     public bool? RPGdead;
-    public string FogColor = null;
+    public string? FogColor = null;
     public bool? FogHidePointers;
     public bool? FogReverseHiding;
     public bool? FogSeethrough;
     public List<int> DeckIDs;
-    public Dictionary<int, CustomDeckState> CustomDeck; //Key matches the hundreth place of the id (ex. id = 354, index = 3)
+    public Dictionary<int, CustomDeckState> CustomDeck = new(); //Key matches the hundreth place of the id (ex. id = 354, index = 3)
     public CustomMeshState CustomMesh;
-    public CustomImageState CustomImage;
-    public CustomAssetbundleState CustomAssetbundle;
-    public FogOfWarSaveState FogOfWar;
-    public FogOfWarRevealerSaveState FogOfWarRevealer;
-    public Object Clock = null; //public ClockSaveState Clock;
-    public CounterState Counter;
-    public TabletState Tablet;
-    public Mp3PlayerState Mp3Player;
-    public CalculatorState Calculator;
-    public TextState Text;
+    public CustomImageState CustomImage = new();
+    public CustomAssetbundleState CustomAssetbundle = new();
+    public FogOfWarSaveState FogOfWar = new();
+    public FogOfWarRevealerSaveState FogOfWarRevealer = new();
+    public object? Clock = null; //public ClockSaveState Clock;
+    public CounterState Counter = new();
+    public TabletState Tablet = new();
+    public Mp3PlayerState Mp3Player = new();
+    public CalculatorState Calculator = new();
+    public TextState Text = new();
     public string XmlUI = ""; //Custom Xml UI
-    public List<CustomAssetState> CustomUIAssets;
+    public List<CustomAssetState> CustomUIAssets = new();
     public string LuaScript = "";
     public string LuaScriptState = ""; // Serialized running Lua code
-    public List<ObjectState> ContainedObjects; //Objects inside this one
-    public PhysicsMaterialState PhysicsMaterial; //Use to modify the physics material (friction, bounce, etc.) http://docs.unity3d.com/Manual/class-PhysicMaterial.html
-    public RigidbodyState Rigidbody; //Use to modify the physical properties (mass, drag, etc) http://docs.unity3d.com/Manual/class-Rigidbody.html
-    public object JointFixed = null;                    //public JointFixedState JointFixed; //Joints can be used to attached/link objects together check the classes below
-    public object JointHingeState = null;               //public JointHingeState JointHinge;
-    public object JointSpring = null;                   //public JointSpringState JointSpring;
-    public string GUID = ""; //Used so objects can reference other objects, ex. joints or scripting
-    public List<SnapPointState> AttachedSnapPoints; //Snap points that are stuck to this object, happens when placing a snap point on a locked object
-    public List<VectorLineState> AttachedVectorLines; // Vector lines that are stuck to this object, happens when drawing a vector line on a locked object
-    public List<DecalState> AttachedDecals; //Decals that are attached to this objects
-    public Dictionary<int, ObjectState> States; //Objects can have multiple states which can be swapped between    
-    public List<RotationValueState> RotationValues; //Rotation values are tooltip values tied to rotations
+    public List<ObjectState> ContainedObjects = new(); //Objects inside this one
+    public PhysicsMaterialState PhysicsMaterial = new(); //Use to modify the physics material (friction, bounce, etc.) http://docs.unity3d.com/Manual/class-PhysicMaterial.html
+    public RigidbodyState Rigidbody = new(); //Use to modify the physical properties (mass, drag, etc) http://docs.unity3d.com/Manual/class-Rigidbody.html
+    public object? JointFixed = null;                    //public JointFixedState JointFixed; //Joints can be used to attached/link objects together check the classes below
+    public object? JointHingeState = null;               //public JointHingeState JointHinge;
+    public object? JointSpring = null;                   //public JointSpringState JointSpring;
+    public string? GUID = null; //Used so objects can reference other objects, ex. joints or scripting
+    public List<SnapPointState> AttachedSnapPoints = new(); //Snap points that are stuck to this object, happens when placing a snap point on a locked object
+    public List<VectorLineState> AttachedVectorLines = new(); // Vector lines that are stuck to this object, happens when drawing a vector line on a locked object
+    public List<DecalState> AttachedDecals = new(); //Decals that are attached to this objects
+    public Dictionary<int, ObjectState> States = new(); //Objects can have multiple states which can be swapped between    
+    public List<RotationValueState> RotationValues = new(); //Rotation values are tooltip values tied to rotations
 
     public bool EqualsObject(object obj)
     {
@@ -194,7 +194,7 @@ public class ObjectState //Moveable objects
 
     public ObjectState Clone()
     {
-        return JsonConvert.DeserializeObject<ObjectState>(this.ToJson());// Json.Clone(this);
+        return JsonConvert.DeserializeObject<ObjectState>(this.ToJson()) ?? new ObjectState();// Json.Clone(this);
     }
 
     public string ToJson()
@@ -320,10 +320,10 @@ public class TextState
 
 public class TabState
 {
-    public string title;
-    public string body;
-    public string color;
-    public ColourState visibleColor;
+    public string? title;
+    public string? body;
+    public string? color;
+    public ColourState? visibleColor;
     public int id = -1;
 
     [JsonConstructor]
@@ -355,23 +355,23 @@ public class DecalState
 
 public class CustomDecalState
 {
-    public string Name;
+    public string? Name;
     //[Tag(TagType.URL)]
-    public string ImageURL;
-    public float Size; //Size in inches
+    public string? ImageURL;
+    public float? Size; //Size in inches
 }
 
 public class RotationValueState
 {
-    public object Value;
-    public VectorState Rotation;
+    public object? Value;
+    public VectorState? Rotation;
 }
 
 public class CustomAssetState
 {
-    public string Name;
+    public string? Name;
     //[Tag(TagType.URL)]
-    public string URL;
+    public string? URL;
 }
 
 /*
@@ -699,7 +699,7 @@ public class CalculatorState
 public class VectorLineState
 {
     public List<VectorState> points3;
-    public ColourState color;
+    public ColourState? color;
     public float thickness = 0.1f;
     public VectorState rotation;
     public bool? loop;

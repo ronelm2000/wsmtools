@@ -182,7 +182,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
                             .Trim()
                             .ToEnum<CardColor>() ?? throw new SetParsingException(new CannotBeParsedCode("CardColor"));
         }
-        catch (Exception)
+        catch (Exception e)
         {
             res.Color = HandleColorCorrections(res.Serial, e);
         }

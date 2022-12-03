@@ -332,7 +332,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
     {
         var doc = await value.ParseHTML();
         return doc.QuerySelectorAll<IHtmlImageElement>("img")
-            .SelectMany(e => _TRIGGER_MAP.Where(t => e?.Source.Contains(t.LookupString)))
+            .SelectMany(e => _TRIGGER_MAP.Where(t => e.Source?.Contains(t.LookupString) ?? false))
             .Select(t => t.CardTrigger)
             .ToArray();
     }

@@ -198,6 +198,11 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                     .ReceiveJson<List<DLCardEntry>>();
                 foreach (DLCardEntry entry in temporaryResults)
                 {
+                    if (entry.Serial is null || entry.Rarity is null)
+                    {
+                        Log.Warning("Detected unusual output: {@entry}", entry);
+                        continue;
+                    }
                     results[entry.Serial + entry.Rarity] = entry;
                     var serialEncoded = WeissSchwarzCard.ParseSerial(entry.Serial);
                     cacheSrvc[(settings.Language, serialEncoded.NeoStandardCode)][entry.Serial + entry.Rarity] = entry;

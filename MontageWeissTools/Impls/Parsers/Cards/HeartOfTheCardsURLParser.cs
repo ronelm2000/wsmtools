@@ -253,7 +253,8 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
                 .ToString()
                 .SplitWithRegex(traitMatcher)
                 .Select(this.ParseTrait)
-                .Where(o => o != null)
+                .Where(o => o is not null)
+                .Select(o => o!)
                 .ToList();
         }
         else if (cursor.CurrentLine.ToString().Contains(trait1Text))
@@ -265,7 +266,8 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
                 .Split("Trait 2: ")
                 .SelectMany(s => s.Trim().SplitWithRegex(traitMatcher))
                 .Select(this.ParseTrait)
-                .Where(o => o != null)
+                .Where(o => o is not null)
+                .Select(o => o!)
                 .ToList();
         }
 
@@ -349,7 +351,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
 
     private static readonly Regex traitMatcher = new Regex(@"([^\(]+)\(((?:[^()]|(?<Open>[(])|(?<-Open>[)]))*(?(Open)(?!)))\),{0,1}");
 
-    private MultiLanguageString ParseTrait(String traitString)
+    private MultiLanguageString? ParseTrait(String traitString)
     {
         if (!IsValidTrait(traitString)) return null;
         var group = traitMatcher.Matches(traitString).First().Groups;
@@ -361,7 +363,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         return result;
     }
 
-    private WeissSchwarzTrait ParseTrait(Match match)
+    private WeissSchwarzTrait? ParseTrait(Match match)
     {
         WeissSchwarzTrait result = new WeissSchwarzTrait();
         result["jp"] = match.Groups[1].Value.Trim();

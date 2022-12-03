@@ -74,7 +74,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             result.Name.JP = jpOptional.name;
             (List<object>, List<object>) attributes = (enOptional.attributes, jpOptional.attributes);
             result.Traits = TranslateTraits(attributes).ToList();
-            result.Effect = ((List<object>)enOptional.ability)?.Cast<string>().ToArray();
+            result.Effect = ((List<object>)enOptional.ability)?.Cast<string>().ToArray() ?? Array.Empty<string>();
             result.Rarity = setCard.rarity;
             result.Side = TranslateSide(setCard.side);
             result.Level = (int?) setCard.level;
@@ -160,7 +160,9 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         var maxLength = Math.Max(enSpan.Length, jpSpan.Length);
         Array.Resize(ref enSpan, maxLength);
         Array.Resize(ref jpSpan, maxLength);
-        return enSpan.Zip(jpSpan, Construct).Where(mls => mls != null);
+        return enSpan.Zip(jpSpan, Construct)
+            .Where(mls => mls is not null)
+            .Select(mls => mls!);
     }
 
     private static readonly string[] NULL_TRAITS = new[]
@@ -170,14 +172,14 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         "－"
     };
 
-    private WeissSchwarzTrait Construct(object traitEN, object traitJP)
+    private WeissSchwarzTrait? Construct(object traitEN, object traitJP)
     {
         WeissSchwarzTrait str = new WeissSchwarzTrait();
         str.EN = traitEN?.ToString();
         str.JP = traitJP?.ToString();
         str.EN = (String.IsNullOrWhiteSpace(str.EN) || NULL_TRAITS.Contains(str.EN)) ? null : str.EN;
         str.JP = (String.IsNullOrWhiteSpace(str.JP)) ? null : str.JP;
-        if (str.EN == null && str.JP == null)
+        if (str.EN is null && str.JP is null)
             return null;
         else
             return str;

@@ -17,7 +17,7 @@ public class GlobalCookieJar : IDisposable
         dictionaryDisposer = sessions.GetDisposer();
     }
 
-    public CookieSession this[string url] => (sessions.TryGetValue(url, out var res)) ?  res : sessions.Add<string,CookieSession>(url, new CookieSession(url));
+    public CookieSession this[string url] => (sessions.TryGetValue(url, out var res)) ?  res : sessions.Add<string,CookieSession>(url, new CookieSession(url)) ?? new CookieSession(url);
 
     public void Dispose()
     {

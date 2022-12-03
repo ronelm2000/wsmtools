@@ -265,7 +265,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
                 card.Side = TranslateToSide(value);//  <img src=\"../partimages/s.gif\">"
                 break;
             case "card type":
-                card.Type = value.Trim().ToEnum<CardType>().Value;
+                card.Type = value.Trim().ToEnum<CardType>() ?? throw new SetParsingException(new CannotBeParsedCode("CardType"));
                 break;
             case "level":
                 card.Level = value.Trim().AsParsed<int>(int.TryParse);
@@ -324,8 +324,8 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
 
     private async Task<List<WeissSchwarzTrait>> TranslateToTraitsAsync(string value)
     {
-        var traitInnerHTML = (await value.ParseHTML()).Body.Children[0].InnerHtml;
-        return traitInnerHTML.Split("・").Select(s => new WeissSchwarzTrait() { EN = s, JP = "" }).ToList();
+        var traitInnerHTML = (await value.ParseHTML()).Body?.Children[0].InnerHtml;
+        return traitInnerHTML?.Split("・").Select(s => new WeissSchwarzTrait() { EN = s, JP = "" }).ToList() ?? new List<WeissSchwarzTrait>();
     }
 
     private async Task<Trigger[]> TranslateToTriggers(string value)

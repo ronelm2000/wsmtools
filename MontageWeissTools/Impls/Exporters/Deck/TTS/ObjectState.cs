@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 
+
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
 
 public class SaveState //Holds a state of the game
@@ -17,8 +18,8 @@ public class SaveState //Holds a state of the game
     public List<CustomAssetState> CustomUIAssets = new();
     public string LuaScript = "";
     public string LuaScriptState = ""; // Serialized running Lua code; will run nothing as it's just a save state.    
-    public List<ObjectState> ObjectStates; //Objects on the table
-    public List<DecalState> Decals; //Decals not attached to objects
+    public List<ObjectState> ObjectStates = new List<ObjectState>(); //Objects on the table
+    public List<DecalState> Decals = new List<DecalState>(); //Decals not attached to objects
     public Dictionary<int, TabState> TabStates = new Dictionary<int, TabState>(); //Notepad tabs
     public string VersionNumber = "";
 }
@@ -54,9 +55,9 @@ public class ObjectState //Moveable objects
     public bool? FogHidePointers;
     public bool? FogReverseHiding;
     public bool? FogSeethrough;
-    public List<int> DeckIDs;
+    public List<int> DeckIDs = new List<int>();
     public Dictionary<int, CustomDeckState> CustomDeck = new(); //Key matches the hundreth place of the id (ex. id = 354, index = 3)
-    public CustomMeshState CustomMesh;
+    public CustomMeshState? CustomMesh;
     public CustomImageState CustomImage = new();
     public CustomAssetbundleState CustomAssetbundle = new();
     public FogOfWarSaveState FogOfWar = new();
@@ -87,21 +88,16 @@ public class ObjectState //Moveable objects
     public bool EqualsObject(object obj)
     {
         if (obj == null)
-        {
             return false;
-        }
-
-        ObjectState os = obj as ObjectState;
-        if (os == null)
-        {
+        
+        if (obj is not ObjectState os)
             return false;
-        }
 
-        TransformState ThisTransform = this.Transform;
-        TransformState OtherTransform = os.Transform;
+        TransformState? ThisTransform = this.Transform;
+        TransformState? OtherTransform = os.Transform;
 
-        ColourState ThisColor = this.ColorDiffuse;
-        ColourState OtherColor = os.ColorDiffuse;
+        ColourState? ThisColor = this.ColorDiffuse;
+        ColourState? OtherColor = os.ColorDiffuse;
         /*
         if (ThisColor != null && OtherColor != null && ThisColor.ToColour() != OtherColor.ToColour())
         {
@@ -109,8 +105,8 @@ public class ObjectState //Moveable objects
         }
         */
 
-        string ThisGUID = this.GUID;
-        string OtherGUID = os.GUID;
+        string? ThisGUID = this.GUID;
+        string? OtherGUID = os.GUID;
 
         bool ThisLocked = this.Locked;
         bool ThisGrid = this.Grid;
@@ -267,7 +263,7 @@ public class LightingState
     public int LutIndex = 0;
     public float LutContribution = 1f; //0-1
     //[Tag(TagType.URL)]
-    public string LutURL; //LUT 256x16
+    public string? LutURL; //LUT 256x16
 }
 
 public enum AmbientType
@@ -280,7 +276,7 @@ public class HandsState
     public bool Enable = true;
     public bool DisableUnused = false;
     public HidingType Hiding = HidingType.Default;
-    public List<HandTransformState> HandTransforms;
+    public List<HandTransformState> HandTransforms = new List<HandTransformState>();
 }
 
 public enum HidingType
@@ -290,8 +286,8 @@ public enum HidingType
 
 public class HandTransformState
 {
-    public string Color;
-    public TransformState Transform;
+    public string? Color;
+    public TransformState? Transform;
 }
 
 public class TurnsState
@@ -303,7 +299,7 @@ public class TurnsState
     public bool SkipEmpty;
     public bool DisableInteractions;
     public bool PassTurns = true;
-    public string TurnColor;
+    public string? TurnColor;
 }
 
 public enum TurnType
@@ -313,8 +309,8 @@ public enum TurnType
 
 public class TextState
 {
-    public string Text;
-    public ColourState colorstate;
+    public string? Text;
+    public ColourState? colorstate;
     public int fontSize = 64;
 }
 
@@ -343,14 +339,14 @@ public class TabState
 
 public class SnapPointState
 {
-    public VectorState Position; //World position when not attached and local position when attached to an object
-    public VectorState Rotation; //Rotate is only set for rotation snap points
+    public VectorState? Position; //World position when not attached and local position when attached to an object
+    public VectorState? Rotation; //Rotate is only set for rotation snap points
 }
 
 public class DecalState
 {
-    public TransformState Transform;
-    public CustomDecalState CustomDecal;
+    public TransformState? Transform;
+    public CustomDecalState? CustomDecal;
 }
 
 public class CustomDecalState
@@ -563,10 +559,10 @@ public class CustomImageState
     //[Tag(TagType.URL)]
     public string ImageSecondaryURL = "";
     public float WidthScale; //Holds the scaled size of the object based on the image dimensions
-    public CustomDiceState CustomDice;
-    public CustomTokenState CustomToken;
-    public CustomJigsawPuzzleState CustomJigsawPuzzle;
-    public CustomTileState CustomTile;
+    public CustomDiceState? CustomDice;
+    public CustomTokenState? CustomToken;
+    public CustomJigsawPuzzleState? CustomJigsawPuzzle;
+    public CustomTileState? CustomTile;
 }
 
 public class CustomAssetbundleState
@@ -632,7 +628,7 @@ public class CustomMeshState
     public bool Convex = true;
     public int MaterialIndex = 0; //0 = Plastic, 1 = Wood, 2 = Metal, 3 = Cardboard
     public int TypeIndex = 0; //0 = Generic, 1 = Figurine, 2 = Dice, 3 = Coin, 4 = Board, 5 = Chip, 6 = Bag, 7 = Infinite
-    public CustomShaderState CustomShader; //Used to override the shader
+    public CustomShaderState? CustomShader; //Used to override the shader
     public bool CastShadows = true;
 }
 
@@ -649,14 +645,14 @@ public class FogOfWarSaveState
     public bool HideGmPointer;
     public bool HideObjects;
     public float Height;
-    public Dictionary<string, HashSet<int>> RevealedLocations;
+    public Dictionary<string, HashSet<int>> RevealedLocations = new Dictionary<string, HashSet<int>>();
 }
 
 public class FogOfWarRevealerSaveState
 {
-    public bool Active;
-    public float Range;
-    public string Color;
+    public bool? Active;
+    public float? Range;
+    public string? Color;
 }
 
 public class TabletState
@@ -698,18 +694,18 @@ public class CalculatorState
 
 public class VectorLineState
 {
-    public List<VectorState> points3;
+    public List<VectorState> points3 = new List<VectorState>();
     public ColourState? color;
     public float thickness = 0.1f;
-    public VectorState rotation;
+    public VectorState? rotation;
     public bool? loop;
     public bool? square;
 }
 
 public class CameraState
 {
-    public VectorState Position;
-    public VectorState Rotation;
+    public VectorState? Position;
+    public VectorState? Rotation;
     public float Distance;
     public bool Zoomed = false;
 }

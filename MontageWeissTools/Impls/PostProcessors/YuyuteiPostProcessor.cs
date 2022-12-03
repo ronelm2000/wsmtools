@@ -154,14 +154,14 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
             .Select(s => s.Substring(rarityClassPrefix.Length)).First();
         info.Serial = cardUnitDiv.QuerySelector(cardUnitSerialSelector).GetInnerText().Trim();
         info.ImageUri = cardUnitDiv.QuerySelector<IHtmlImageElement>(cardUnitImageSelector)
-            .Source
-            .Replace("ws/90_126", "ws/front");
+            ?.Source
+            ?.Replace("ws/90_126", "ws/front") ?? string.Empty;
         var priceStringSelector = cardUnitDiv.QuerySelector(cardUnitPriceSelector);
         var priceString = priceStringSelector
-            .QuerySelector(cardUnitSaleSelector)
+            ?.QuerySelector(cardUnitSaleSelector)
             ?.GetInnerText()
             .Trim()
-            .Replace("円", "") ?? null;
+            .Replace("円", "") ?? string.Empty;
         if (string.IsNullOrWhiteSpace(priceString))
             priceString = priceStringSelector?.GetInnerText()
                 .Trim()
@@ -191,11 +191,11 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
 
         if (original.Images.Any(u => u.Authority == "yuyu-tei.jp"))
             original.Images.Add(new Uri(info.ImageUri));
-        Dictionary<DateTime, int> priceTable = null;
+        Dictionary<DateTime, int> priceTable = null!;
         if (original.AdditionalInfo.Any(i => i.Key == "yyt.price.info"))
             priceTable = original.AdditionalInfo
                 .First(i => i.Key == "yyt.price.info")
-                .DeserializeValue<Dictionary<DateTime, int>>();
+                .DeserializeValue<Dictionary<DateTime, int>>() ?? new();
         else
             priceTable = new();
 
@@ -208,9 +208,9 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
 
     private record WSYYTInfo
     {
-        internal string Serial { get; set; }
-        internal string Rarity { get; set; }
-        internal string ImageUri { get; set; }
+        internal string Serial { get; set; } = string.Empty;
+        internal string Rarity { get; set; } = string.Empty;
+        internal string ImageUri { get; set; } = string.Empty;
         internal int Price { get; set; }
     }
 

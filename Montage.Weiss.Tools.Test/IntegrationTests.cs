@@ -14,17 +14,17 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test;
 
+#nullable enable
+
 [TestClass]
 public class IntegrationTests
 {
-    IContainer ioc; //= Bootstrap();
-
     [TestMethod("Full Integration Test (Typical Use Case)")]
     [TestCategory("Manual")]
     public async Task FullTestRun()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        ioc = Program.Bootstrap();
+        var ioc = Program.Bootstrap();
         var progress = NoOpProgress<CommandProgressReport>.Instance;
 
         await new ParseVerb(){ 
@@ -37,7 +37,7 @@ public class IntegrationTests
         }.Run(ioc, progress);
 
         var testSerial = await ioc.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync("LSS/W69-006");
-        Assert.IsTrue(testSerial.Images.Any());
+        Assert.IsTrue(testSerial is not null && testSerial.Images.Any());
 
         var parseCommand = new ExportVerb()
         {
@@ -52,13 +52,13 @@ public class IntegrationTests
     public async Task GFBTestRun()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        ioc = Program.Bootstrap();
+        var ioc = Program.Bootstrap();
         var progressReporter = NoOpProgress<object>.Instance;
 
         await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html" }.Run(ioc, progressReporter);
         await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html" }.Run(ioc, progressReporter);
 
         var testSerial = await ioc.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync("GF/W38-020");
-        Assert.IsTrue(testSerial.Images.Any());
+        Assert.IsTrue(testSerial?.Images.Any());
     }
 }

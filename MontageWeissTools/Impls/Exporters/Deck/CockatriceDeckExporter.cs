@@ -9,6 +9,7 @@ using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.Cockatrice;
 using Montage.Weiss.Tools.Impls.Inspectors.Deck;
 using Montage.Weiss.Tools.Utilities;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
@@ -52,7 +53,8 @@ public class CockatriceDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
             progress.Report(report);
 
             foreach (var card in deck.Ratios.Keys)
-                if (card.IsFoil) deck.ReplaceCard(card, await db.FindNonFoil(card, cancellationToken));
+                if (card.IsFoil && ((await db.FindNonFoil(card, cancellationToken)) is WeissSchwarzCard nonFoilCard))
+                    deck.ReplaceCard(card, nonFoilCard);
         }
 
         report = report with

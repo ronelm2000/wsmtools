@@ -45,7 +45,7 @@ public class FetchVerb : IVerbCommand, IFetchInfo
             setListResults = setList;
             if (!Flags.Contains("nowarn"))
             {
-                Flags = Flags?.Append("skip:external");
+                Flags = Flags.Append("skip:external");
                 Log.Warning("Exporting all sets; adding [skip:external] as a flag.");
                 Log.Warning("This is enabled to protect users using this function from any possible issues due to extensive use of external resources.");
                 Log.Warning("If you wish to enable those post-processors regardless of risk, please add --with nowarn to this command.");

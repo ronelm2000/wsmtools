@@ -66,15 +66,15 @@ public class CockatriceDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCa
             result.Name = cockatriceDeck.DeckName;
             result.Remarks = cockatriceDeck.Comments;
             result.Ratios = cockatriceDeck.Ratios.Ratios
-                .Select(Translate) 
+                .Select(Translate)
                 .Select(p =>
                 {
-                    if (p.card == null)
+                    if (p.card is null)
                         missingSerials.Add(p.serial);
                     return p;
                 })
-                .Where(p => p.card != null) 
-                .ToDictionary(p => p.card, p => p.amount);
+                .Where(p => p.card is not null)
+                .ToDictionary(p => p.card!, p => p.amount);
 
             if (missingSerials.Count > 0)
             {
@@ -96,7 +96,7 @@ public class CockatriceDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCa
         }
     }
 
-    private (string serial, WeissSchwarzCard card, int amount) Translate(CockatriceSerialAmountPair pair)
+    private (string serial, WeissSchwarzCard? card, int amount) Translate(CockatriceSerialAmountPair pair)
     {
         var trueSerial = serialParser.Match(pair.Serial).Groups[1].Value;
         using (var db = _database())

@@ -114,7 +114,7 @@ public static class Policies
                         if (delegateResult.Exception != null)
                             Log.Debug($"Exception: \n{delegateResult.Exception.ToString()}");
 
-                        log.Warning($"Retrying after {retryCount} {Policies.Translate(delegateResult.Exception)}");
+                        log.Warning($"Retrying after {retryCount} {Policies.Translate(delegateResult.Exception!)}");
                     });
     }
 

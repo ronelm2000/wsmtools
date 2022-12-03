@@ -15,7 +15,7 @@ public static class EnumerableExtensions
     }
 
 
-    public static V Add<K,V>(this IDictionary<K,V> dictionary, K key, V valueToAdd)
+    public static V? Add<K,V>(this IDictionary<K,V> dictionary, K key, V valueToAdd)
     {
         if (dictionary.TryAdd(key, valueToAdd))
             return valueToAdd;
@@ -56,8 +56,8 @@ public static class EnumerableExtensions
         public bool Equals([AllowNull] T x, [AllowNull] T y)
         {
             if (x == null) return y == null;
-            var kx = keyFunction(x);
-            var ky = keyFunction(y);
+            var kx = keyFunction(x!);
+            var ky = keyFunction(y!);
             if (kx == null) return ky == null;
             else return kx.Equals(ky);
         }

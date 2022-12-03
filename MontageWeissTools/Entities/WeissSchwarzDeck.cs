@@ -4,9 +4,9 @@ namespace Montage.Weiss.Tools.Entities;
 
 public class WeissSchwarzDeck : IDeck<WeissSchwarzCard>
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public Dictionary<WeissSchwarzCard, int> Ratios { get; set; } = new Dictionary<WeissSchwarzCard, int>();
-    public string Remarks { get; set; }
+    public string Remarks { get; set; } = string.Empty;
 
     public int Count => Ratios.Values.Sum();
     internal Dictionary<string,int> AsSimpleDictionary()

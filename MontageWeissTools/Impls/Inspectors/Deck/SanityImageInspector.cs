@@ -22,7 +22,8 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
             Log.Information("{serial} has no image URL nor a cached image. This deck cannot be exported without an image. Do you want to supply an image instead? [Y/N] (Default is N)", card.Serial);
             if (ConsoleUtils.Prompted(options.IsNonInteractive, false))
             {
-                if (inspectedDeck.ReplaceCard(card, await AddImageFromConsole(card, options)))
+                var newCard = await AddImageFromConsole(card, options);
+                if (newCard is not null && inspectedDeck.ReplaceCard(card, newCard))
                     Log.Information("Checking for other missing images (if any)...");
                 else
                     return WeissSchwarzDeck.Empty;
@@ -41,7 +42,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
     {
         var modifiedCard = card.Clone();
         Log.Information("Please enter a new image URL: ");
-        var newURIString = Console.ReadLine();
+        var newURIString = Console.ReadLine() ?? string.Empty;
         try
         {
             Log.Information("Validating URL...");

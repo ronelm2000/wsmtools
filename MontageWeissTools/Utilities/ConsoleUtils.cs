@@ -5,7 +5,7 @@ namespace Montage.Weiss.Tools.Utilities;
 
 static class ConsoleUtils
 {
-    private static ILogger Log;
+    private static ILogger Log = Serilog.Log.ForContext(typeof(ConsoleUtils));
 
     public static bool Prompted(bool isNonInteractive, bool defaultResult)
     {
@@ -17,7 +17,6 @@ static class ConsoleUtils
 
     public static void RunExecutable(string path, params string[] parameters)
     {
-        Log ??= Serilog.Log.ForContext(typeof(ConsoleUtils));
         path = TransformShortcuts(path);
 
         var cmd = $"{path} {parameters.ConcatAsString()}";

@@ -7,6 +7,7 @@ using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Utilities;
 using System.Threading;
 using System.Runtime.CompilerServices;
+using Montage.Card.API.Exceptions;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Cards;
 
@@ -179,9 +180,9 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
                             c => c.IndexOf(sideText)
                             )
                             .Trim()
-                            .ToEnum<CardColor>()
-                            .Value;
-        } catch (Exception e)
+                            .ToEnum<CardColor>() ?? throw new SetParsingException(new CannotBeParsedCode("CardColor"));
+        }
+        catch (Exception)
         {
             res.Color = HandleColorCorrections(res.Serial, e);
         }
@@ -193,16 +194,14 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
                             c => c.IndexOf(sideText) + sideText.Length + c.Slice(c.IndexOf(sideText) + sideText.Length).IndexOf(' ')
                             )
                             .Trim()
-                            .ToEnum<CardSide>()
-                            .Value;
+                            .ToEnum<CardSide>() ?? throw new SetParsingException(new CannotBeParsedCode("CardSide"));
 
             var sideString = res.Side.ToString();
             res.Type = cursor.CurrentLine.Slice(
                             c => c.IndexOf(sideString, StringComparison.CurrentCultureIgnoreCase) + sideString.Length
                             )
                             .Trim()
-                            .ToEnum<CardType>()
-                            .Value;
+                            .ToEnum<CardType>() ?? throw new SetParsingException(new CannotBeParsedCode("CardType"));
         } catch (Exception)
         {
             (res.Side, res.Type) = HandleCorrections(res.Serial);
@@ -388,8 +387,8 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         triggerString = triggerString.Replace("Stock", "Bag");
         return triggerString.Split(" ")
             .Select(s => s.AsSpan().ToEnum<Trigger>())
-            .Where(e => e.HasValue)
-            .Select(e => e.Value)
+            .Where(e => e is not null)
+            .Select(e => e!.Value)
             .ToArray();
     }
 }

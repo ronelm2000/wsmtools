@@ -39,6 +39,11 @@ public class InspectionOptions
     /// Determines if the inspector must act as if all warnings are ignored. This flag if true must override IsNonInteractive.
     /// </summary>
     public bool NoWarning { get; set; } = false;
+    /// <summary>
+    /// The cancellation token that should be used if cancellation was requested.
+    /// </summary>
+    public CancellationToken CancellationToken { get; set; } = default;
+
     public static implicit operator InspectionOptions((bool IsNonInteractive, bool NoWarning) tuple) 
         => new InspectionOptions() { 
             IsNonInteractive = tuple.IsNonInteractive, 

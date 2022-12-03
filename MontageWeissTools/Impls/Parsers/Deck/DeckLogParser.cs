@@ -112,18 +112,15 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 
             foreach (var cardJSON in items)
             {
-                string serial = cardJSON.card_number.ToString();
-                serial = serial.Replace('＋', '+');
-                if (serial == null)
-                {
-                    Log.Warning("serial is null for some reason!");
-                }
-                var card = await db.WeissSchwarzCards.FindAsync(new[] { serial }, cancellationToken);
-                card = card ?? await WarnAndFindNonFoil(db, serial, cancellationToken);
+                string? serial = cardJSON.card_number.ToString();
+                serial = serial?.Replace('＋', '+');
+                serial = serial ?? throw new ArgumentException("serial is null for some reason!");
+                var card = await db.WeissSchwarzCards.FindAsync(new[] { serial }, cancellationToken) 
+                    ?? await WarnAndFindNonFoil(db, serial, cancellationToken);
                 int quantity = cardJSON.num;
                 if (card != null)
                 {
-                    Log.Debug("Adding: {card} [{quantity}]", card?.Serial, quantity);
+                    Log.Debug("Adding: {card} [{quantity}]", card.Serial, quantity);
                     if (newDeck.Ratios.TryGetValue(card, out int oldVal))
                         newDeck.Ratios[card] = oldVal + quantity;
                     else
@@ -147,14 +144,15 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         }
     }
 
-    private async Task<WeissSchwarzCard> WarnAndFindNonFoil(CardDatabaseContext db, string serial, CancellationToken cancellationToken)
+    private async Task<WeissSchwarzCard?> WarnAndFindNonFoil(CardDatabaseContext db, string serial, CancellationToken cancellationToken)
     {
         var nonFoilSerial = WeissSchwarzCard.RemoveFoil(serial);
         if (nonFoilSerial != serial)
         {
             Log.Warning("Unable to find {serial1}; trying to find {serial2} instead.", serial, nonFoilSerial);
             return await db.WeissSchwarzCards.FindAsync(new[] { nonFoilSerial }, cancellationToken);
-        } else
+        }
+        else
         {
             return null;
         }
@@ -163,7 +161,7 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
     private class DeckLogParserAggregator : IProgress<CommandProgressReport>
     {
         private IProgress<DeckParserProgressReport> progress;
-        private List<string> missingSets;
+        private List<string> missingSets = new();
         internal DeckParserProgressReport report = new DeckParserProgressReport();
 
         public DeckLogParserAggregator(IProgress<DeckParserProgressReport> progress)

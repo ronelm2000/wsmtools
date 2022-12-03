@@ -63,7 +63,8 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
                 if (row[0] == "Code") continue;
                 var card = await db.WeissSchwarzCards.FindAsync(row[0]);
                 var quantity = row[1].AsParsed<int>(int.TryParse).GetValueOrDefault(0);
-                res.Ratios.Add(card, quantity);
+                if (card is not null)
+                    res.Ratios.Add(card, quantity);
             }
 
         res.Remarks = (res.Remarks ?? "") + $"\nParsed: {this.GetType().Name}";
@@ -106,10 +107,10 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
                     wscard = await db.WeissSchwarzCards.FindAsync(new[] { serial }, cancellationToken);
                 }
 
-                if (res.Ratios.TryGetValue(wscard, out int quantity))
-                    res.Ratios[wscard]++;
+                if (res.Ratios.TryGetValue(wscard!, out int quantity))
+                    res.Ratios[wscard!]++;
                 else
-                    res.Ratios[wscard] = 1;
+                    res.Ratios[wscard!] = 1;
             }
         }
         var simpleRatios = res.AsSimpleDictionary();
@@ -139,7 +140,7 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
             builder?.Invoke(parser);
             while (!parser.EndOfData)
             {
-                yield return parser.ReadFields();
+                yield return parser.ReadFields() ?? Array.Empty<string>();
             }
         }
     }

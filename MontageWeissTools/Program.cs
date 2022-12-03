@@ -45,7 +45,7 @@ public class Program
         await Task.CompletedTask;
     }
 
-    private static void ProgressReporter_ProgressChanged(object sender, CommandProgressReport e)
+    private static void ProgressReporter_ProgressChanged(object? sender, CommandProgressReport e)
     {
         Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
         Console.Write($"{e.ReportMessage.EN} [{e.Percentage}%]\r");
@@ -143,7 +143,7 @@ public class Program
     }
 
     public static string AppVersion =>
-        typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
 
 
     public static string AppFilePath =>

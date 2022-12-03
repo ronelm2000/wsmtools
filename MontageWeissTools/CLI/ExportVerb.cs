@@ -4,6 +4,7 @@ using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Services;
@@ -15,7 +16,7 @@ namespace Montage.Weiss.Tools.CLI;
 public class ExportVerb : IVerbCommand, IExportInfo
 {
     [Value(0, HelpText = "Indicates the source file/url.")]
-    public string Source { get; set;  }
+    public string Source { get; set; } = string.Empty;
 
     [Value(1, HelpText = "Indicates the destination; usually a folder.", Default = "./Export/")]
     public string Destination { get; set; } = "./Export/";
@@ -38,7 +39,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
     [Option("nowarn", HelpText = "When set to true, all warning prompts will default to yes without user input. This flag when set ignores noninteractive flag during warnings (and is automatically true).", Default = false)]
     public bool NoWarning { get; set; } = false;
 
-    public IProgress<DeckExportProgressReport> Progress { get; set; }
+    public IProgress<DeckExportProgressReport> Progress { get; set; } = NoOpProgress<DeckExportProgressReport>.Instance;
 
     private readonly ILogger Log = Serilog.Log.ForContext<ExportVerb>();
 

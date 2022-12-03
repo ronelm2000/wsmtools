@@ -17,10 +17,10 @@ public static class UriExtensions
             )
         );
 
-    private static bool LogErrorButContinue(HttpRequestMessage msg, X509Certificate2 cert, X509Chain chain, SslPolicyErrors errors)
+    private static bool LogErrorButContinue(HttpRequestMessage msg, X509Certificate2? cert, X509Chain? chain, SslPolicyErrors errors)
     {
         if (errors != SslPolicyErrors.None)
-            if (cert.Thumbprint == "cf0b1d5c188a542271330ad489d9c7bde9a8abd0")
+            if (cert?.Thumbprint == "cf0b1d5c188a542271330ad489d9c7bde9a8abd0")
             {
                 Log.Warning("There is an known error certifcate error with www.encoredecks.com. This is ignored temporarily as I contact the developer.");
                 return true;

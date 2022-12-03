@@ -25,7 +25,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     private readonly Func<GlobalCookieJar> _cookieJar;
     private readonly Func<ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>> _cacheSrvc;
 
-    private string currentVersion;
+    private string? currentVersion;
 
     private bool isOutdated = false;
 
@@ -171,15 +171,14 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         if (titleCodes.Count < 1)
             return results;
 
-        List<DLCardEntry> temporaryResults = null;
-        // var queryData = GenerateSearchJSON(titleCodes);
-        //Log.Information($"Accessing DeckLog API with the following query data: {JsonConvert.SerializeObject(queryData, Formatting.Indented)}");
+        List<DLCardEntry> temporaryResults = null!;
         var cardParams = await settings.CardParamURL
             .WithRESTHeaders()
             .WithReferrer(settings.Referrer)
             .WithCookies(_cookieJar()[settings.Referrer])
             .PostJsonAsync(new { })
             .ReceiveJson<DLQueryParameters>();
+
         IEnumerable<DLCardQuery> queries = GetCardQueries(cardData, cardParams, titleCodes);
         foreach (var queryData in queries)
         {
@@ -197,7 +196,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                         page = page
                     })
                     .ReceiveJson<List<DLCardEntry>>();
-                foreach (var entry in temporaryResults)
+                foreach (DLCardEntry entry in temporaryResults)
                 {
                     results[entry.Serial + entry.Rarity] = entry;
                     var serialEncoded = WeissSchwarzCard.ParseSerial(entry.Serial);
@@ -206,7 +205,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                 }
                 Log.Information("Got {count} results...", temporaryResults?.Count ?? 0);
                 page++;
-            } while (temporaryResults.Count > 29);
+            } while (temporaryResults?.Count > 29);
         }
         return results;
     }
@@ -248,7 +247,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     private class DLQueryParameters
     {
         [JsonProperty("title_number_select_for_search")]
-        public Dictionary<string, TitleSelection> TitleSelectionsForSearch { get; set; }
+        public Dictionary<string, TitleSelection> TitleSelectionsForSearch { get; set; } = new();
 
         public IEnumerable<string[]> GetTitleSelectionKeys()
         {
@@ -259,20 +258,20 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     private class TitleSelection
     {
         public int Side { get; set; } // -1 = Weiss ; -2 = Schwarz ; -3 = Both
-        public string Label { get; set; }
+        public string Label { get; set; } = string.Empty;
         public int ID { get; set; }
     }
 
     internal class DLCardEntry
     {
         [JsonProperty("card_number")]
-        public string Serial { get; set; }
+        public string? Serial { get; set; }
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [JsonProperty("rare")]
-        public string Rarity { get; set; }  
+        public string? Rarity { get; set; }  
         [JsonProperty("img")]
-        public string ImagePath { get; set; }
+        public string? ImagePath { get; set; }
     }
 
     private class DLCardQuery

@@ -22,7 +22,7 @@ public class CacheVerb : IVerbCommand
     private ILogger Log = Serilog.Log.ForContext<CacheVerb>();
 
     [Value(0, HelpText = "Indicates either Release ID or a full Serial ID.")]
-    public string ReleaseIDorFullSerialID { get; set; }
+    public string ReleaseIDorFullSerialID { get; set; } = string.Empty;
 
     [Value(1, HelpText = "Indicates the Language. This is only applicable if you indicated the Release ID.", Default = "")]
     public string Language { get; set; } = "";

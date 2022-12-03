@@ -58,6 +58,9 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         Name = MultiLanguageString.Empty;
         Rarity = string.Empty;
         Triggers = Array.Empty<Trigger>();
+        Serial = string.Empty;
+        VersionTimestamp = Program.AppVersion;
+        Remarks = string.Empty;
     }
 
     /// <summary>
@@ -203,42 +206,34 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     public static string GetSerial(string subset, string side, string lang, string releaseID, string setID)
     {
         string fullSetID = subset;
-        if (TryGetExceptionalSetFormat(lang, side + releaseID, out var formatter))
-        {
-            return formatter((subset, side, lang, releaseID, setID));
-        }
-        else if (TryGetExceptionalCardFormat(lang, releaseID, setID, out var formatter2))
-        {
-            return formatter2((subset, side, lang, releaseID, setID));
-        }
+        var setFormatter = GetExceptionalSetFormat(lang, side + releaseID);
+        var cardFormatter = GetExceptionalCardFormat(lang, releaseID, setID);
+        if (setFormatter is not null)
+            return setFormatter((subset, side, lang, releaseID, setID));
+        else if (cardFormatter is not null)
+            return cardFormatter((subset, side, lang, releaseID, setID));
         else if (lang == "EN" && !setID.Contains("E") && !releaseID.StartsWith("X"))
-        {
             return $"{subset}/EN-{side}{releaseID}-{setID}"; // This is a DX set serial adjustment.
-        }
         else
-        {
             return $"{subset}/{side}{releaseID}-{setID}";
-        }
     }
 
-    private static bool TryGetExceptionalSetFormat(string lang, string fullReleaseID, out Func<(string subset, string side, string lang, string releaseID, string setID), string> formatter)
+    private static Func<(string subset, string side, string lang, string releaseID, string setID), string>? GetExceptionalSetFormat(string lang, string fullReleaseID)
     {
-        formatter = (lang, fullReleaseID) switch {
+        return (lang, fullReleaseID) switch {
             ("EN", "S04") => (tuple) => $"{tuple.subset}/EN-{tuple.side}{tuple.releaseID}-{tuple.setID}",
             _ => null
         };
-        return formatter != null;
     }
 
-    private static bool TryGetExceptionalCardFormat(string lang, string releaseID, string setID, out Func<(string subset, string side, string lang, string releaseID, string setID), string> formatter)
+    private static Func<(string subset, string side, string lang, string releaseID, string setID), string>? GetExceptionalCardFormat(string lang, string releaseID, string setID)
     {
-        formatter = (lang, releaseID, setID) switch
+        return (lang, releaseID, setID) switch
         {
             ("EN", "X01", "X02") => (tuple) => "BNJ/BCS2019-02",
             var tuple when tuple.lang == "EN" && tuple.setID.Contains("-") => (tuple) => $"{tuple.subset}/{tuple.setID}",
             _ => null
         };
-        return formatter != null;
     }
 
     public string TypeToString(){

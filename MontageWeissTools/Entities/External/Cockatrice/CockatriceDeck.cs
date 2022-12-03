@@ -10,11 +10,11 @@ public class CockatriceDeck
     [XmlAttribute("version")]
     public string Version = "1";
     [XmlElement("deckname")]
-    public string DeckName;
+    public string DeckName = string.Empty;
     [XmlElement("comments")]
-    public string Comments;
+    public string Comments = string.Empty;
     [XmlElement("zone")]
-    public CockatriceDeckRatio Ratios;
+    public CockatriceDeckRatio Ratios = new CockatriceDeckRatio();
 }
 
 [XmlType("zone")]
@@ -31,5 +31,5 @@ public class CockatriceSerialAmountPair
     [XmlAttribute("number")]
     public int Amount;
     [XmlAttribute("name")]
-    public string Serial;
+    public string Serial = string.Empty;
 }

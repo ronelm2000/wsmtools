@@ -33,7 +33,7 @@ public class ActivityLogTranslator : IActivityLogTranslator
 
     private async Task DeleteCards(CardDatabaseContext db, ActivityLog activityLog, CancellationToken ct)
     {
-        var deleteArgs = JsonSerializer.Deserialize<DeleteArgs>(activityLog.Target);
+        var deleteArgs = JsonSerializer.Deserialize<DeleteArgs>(activityLog.Target ?? string.Empty);
         var query = db.WeissSchwarzCards.AsAsyncEnumerable();
         if (!string.IsNullOrWhiteSpace(deleteArgs.Language))
         {

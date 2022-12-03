@@ -183,7 +183,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             return str;
     }
 
-    private Trigger[] TranslateTriggers(List<object> triggers) => triggers.Select(o => o.ToString()).Select(TranslateTrigger).ToArray();
+    private Trigger[] TranslateTriggers(List<object> triggers) => triggers.Select(o => o.ToString() ?? string.Empty).Select(TranslateTrigger).ToArray();
 
     private Trigger TranslateTrigger(string trigger)
     {

@@ -29,7 +29,6 @@ public class SetParsingException : Exception
     protected SetParsingException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
     }
-
 }
 
 public abstract record ParserCode

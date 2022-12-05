@@ -1,28 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
-
-public class SaveState //Holds a state of the game
-{
-    public string SaveName = "";
-    public string GameMode = "";
-    public float Gravity = 0.5f;
-    public float PlayArea = 0.5f;
-    public string Date = "";
-    public string Table = "";
-    public string Sky = "";
-    public string Note = "";
-    public string Rules = "";
-    public string XmlUI = ""; //Custom Xml UI
-    public List<CustomAssetState> CustomUIAssets = new();
-    public string LuaScript = "";
-    public string LuaScriptState = ""; // Serialized running Lua code; will run nothing as it's just a save state.    
-    public List<ObjectState> ObjectStates = new List<ObjectState>(); //Objects on the table
-    public List<DecalState> Decals = new List<DecalState>(); //Decals not attached to objects
-    public Dictionary<int, TabState> TabStates = new Dictionary<int, TabState>(); //Notepad tabs
-    public string VersionNumber = "";
-}
 
 public class ObjectState //Moveable objects
 {
@@ -230,53 +208,14 @@ public class ObjectState //Moveable objects
     }
 }
 
-public class GridState
-{
-    public GridType Type = GridType.Box;
-    public bool Lines = false;
-    public ColourState Color = new ColourState(0, 0, 0);
-    public float Opacity = 0.75f; //0-1 Alpha opacity
-    public bool ThickLines = false;
-    public bool Snapping = false; //Line snapping
-    public bool Offset = false; //Center snapping
-    public bool BothSnapping = false; //Both snapping
-    public float xSize = 2f;
-    public float ySize = 2f;
-    public VectorState PosOffset = new VectorState(0, 1, 0);
-}
-
 public enum GridType
 {
     Box, HexHorizontal, HexVertical
-};
-
-public class LightingState
-{
-    public float LightIntensity = 0.54f; //0-8
-    public ColourState LightColor = new ColourState(1f, 0.9804f, 0.8902f);
-    public float AmbientIntensity = 1.3f; //0-8
-    public AmbientType AmbientType = AmbientType.Background;
-    public ColourState AmbientSkyColor = new ColourState(0.5f, 0.5f, 0.5f);
-    public ColourState AmbientEquatorColor = new ColourState(0.5f, 0.5f, 0.5f);
-    public ColourState AmbientGroundColor = new ColourState(0.5f, 0.5f, 0.5f);
-    public float ReflectionIntensity = 1f; //0-1
-    public int LutIndex = 0;
-    public float LutContribution = 1f; //0-1
-    //[Tag(TagType.URL)]
-    public string? LutURL; //LUT 256x16
 }
 
 public enum AmbientType
 {
     Background, Gradient //Background = ambient light comes from the background, Gradient = ambient light comes from the three ambient colors
-}
-
-public class HandsState
-{
-    public bool Enable = true;
-    public bool DisableUnused = false;
-    public HidingType Hiding = HidingType.Default;
-    public List<HandTransformState> HandTransforms = new List<HandTransformState>();
 }
 
 public enum HidingType
@@ -324,17 +263,6 @@ public class TabState
 
     [JsonConstructor]
     public TabState() { }
-
-    /*
-    public TabState(UITab to)
-    {
-        title = to.title;
-        body = to.body;
-        visibleColor = new ColourState(to.VisibleColor);
-        color = Colour.LabelFromColour(to.VisibleColor);
-        id = to.id;
-    }
-    */
 }
 
 public class SnapPointState
@@ -370,24 +298,6 @@ public class CustomAssetState
     public string? URL;
 }
 
-/*
-public class OrientationState
-{
-    public Vector3 position;
-    public Quaternion rotation;
-    public OrientationState(Vector3 position, Quaternion rotation)
-    {
-        this.position = position;
-        this.rotation = rotation;
-    }
-    public OrientationState()
-    {
-        this.position = Vector3.zero;
-        this.rotation = Quaternion.identity;
-    }
-}
-*/
-
 public class TransformState
 {
     public float posX;
@@ -404,56 +314,6 @@ public class TransformState
 
     [JsonConstructor]
     public TransformState() { }
-
-    /*
-    public TransformState(Transform T)
-    {
-        Vector3 pos = T.position;
-        posX = pos.x;
-        posY = pos.y;
-        posZ = pos.z;
-
-        Vector3 rot = T.eulerAngles;
-        rotX = rot.x;
-        rotY = rot.y;
-        rotZ = rot.z;
-
-        Vector3 scale = T.localScale;
-        scaleX = scale.x;
-        scaleY = scale.y;
-        scaleZ = scale.z;
-    }
-
-    public TransformState(Vector3 pos, Vector3 rot, Vector3 scale)
-    {
-        posX = pos.x;
-        posY = pos.y;
-        posZ = pos.z;
-
-        rotX = rot.x;
-        rotY = rot.y;
-        rotZ = rot.z;
-
-        scaleX = scale.x;
-        scaleY = scale.y;
-        scaleZ = scale.z;
-    }
-
-    public Vector3 ToPosition()
-    {
-        return new Vector3(posX, posY, posZ);
-    }
-
-    public Vector3 ToRotation()
-    {
-        return new Vector3(rotX, rotY, rotZ);
-    }
-
-    public Vector3 ToScale()
-    {
-        return new Vector3(scaleX, scaleY, scaleZ);
-    }
-    */
 }
 
 public class ColourState
@@ -469,20 +329,6 @@ public class ColourState
         this.g = g;
         this.b = b;
     }
-
-    /*
-    public ColourState(Colour c)
-    {
-        this.r = c.r;
-        this.g = c.g;
-        this.b = c.b;
-    }
-
-    public Colour ToColour()
-    {
-        return new Colour(r, g, b);
-    }
-    */
 }
 
 public class VectorState
@@ -498,21 +344,6 @@ public class VectorState
         this.y = y;
         this.z = z;
     }
-
-    /*
-    public VectorState(Vector3 vector)
-    {
-        this.x = vector.x;
-        this.y = vector.y;
-        this.z = vector.z;
-    }
-    
-
-    public Vector3 ToVector()
-    {
-        return new Vector3(x, y, z);
-    }
-    */
 }
 
 public class RigidbodyState
@@ -661,15 +492,6 @@ public class TabletState
     public string PageURL = "";
 }
 
-/*
-public class ClockSaveState
-{
-    public ClockScript.ClockState ClockState;
-    public int SecondsPassed = 0;
-    public bool Paused = false;
-}
-*/
-
 public class CounterState
 {
     public int value = 0;
@@ -709,49 +531,3 @@ public class CameraState
     public float Distance;
     public bool Zoomed = false;
 }
-
-/*
-public class JointState //http://docs.unity3d.com/ScriptReference/Joint.html
-{
-    public string ConnectedBodyGUID = ""; //A reference to another rigidbody this joint connects to.
-    public bool EnableCollision; //Enable collision between bodies connected with the joint.
-    public VectorState Axis = new VectorState(); //The Direction of the axis around which the body is constrained.
-    public VectorState Anchor = new VectorState(); //The Position of the anchor around which the joints motion is constrained.
-    public VectorState ConnectedAnchor = new VectorState(); //Position of the anchor relative to the connected Rigidbody.
-    public float BreakForce; //The force that needs to be applied for this joint to break.
-    public float BreakTorgue; //The torque that needs to be applied for this joint to break.
-
-    public void Assign(JointState jointState)
-    {
-        this.ConnectedBodyGUID = jointState.ConnectedBodyGUID;
-        this.EnableCollision = jointState.EnableCollision;
-        this.Anchor = jointState.Anchor;
-        this.Axis = jointState.Axis;
-        this.ConnectedAnchor = jointState.ConnectedAnchor;
-        this.BreakForce = jointState.BreakForce;
-        this.BreakTorgue = jointState.BreakTorgue;
-    }
-}
-
-public class JointFixedState : JointState //http://docs.unity3d.com/ScriptReference/FixedJoint.html
-{
-}
-
-public class JointHingeState : JointState //http://docs.unity3d.com/ScriptReference/HingeJoint.html
-{
-    public bool UseLimits;
-    public JointLimits Limits; //Limit of angular rotation on the hinge joint. http://docs.unity3d.com/ScriptReference/JointLimits.html
-    public bool UseMotor;
-    public JointMotor Motor; //The motor will apply a force up to a maximum force to achieve the target velocity in degrees per second. http://docs.unity3d.com/ScriptReference/JointMotor.html
-    public bool UseSpring;
-    public JointSpring Spring; //The spring attempts to reach a target angle by adding spring and damping forces. http://docs.unity3d.com/ScriptReference/JointSpring.html
-}
-
-public class JointSpringState : JointState //http://docs.unity3d.com/ScriptReference/SpringJoint.html
-{
-    public float Damper; //The damper force used to dampen the spring force.
-    public float MaxDistance; //The maximum distance between the bodies relative to their initial distance.
-    public float MinDistance; //The minimum distance between the bodies relative to their initial distance.
-    public float Spring; //The spring force used to keep the two objects together.
-}
-*/

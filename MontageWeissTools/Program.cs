@@ -145,7 +145,6 @@ public class Program
     public static string AppVersion =>
         typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
 
-
     public static string AppFilePath =>
         System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? Environment.ProcessPath ?? "";
     public static DateTime AppReleaseDate =>

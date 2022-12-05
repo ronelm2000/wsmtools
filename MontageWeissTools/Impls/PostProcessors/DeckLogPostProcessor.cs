@@ -20,7 +20,6 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
 {
     private ILogger Log = Serilog.Log.ForContext<DeckLogPostProcessor>();
 
-
     private readonly Func<CardDatabaseContext> _db;
     private readonly Func<GlobalCookieJar> _cookieJar;
     private readonly Func<ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>> _cacheSrvc;
@@ -36,7 +35,6 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         _db = () => ioc.GetInstance<CardDatabaseContext>();
         _cookieJar = () => ioc.GetInstance<GlobalCookieJar>();
         _cacheSrvc = () => ioc.GetInstance<ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>>();
-        // _cookieSession = () => ioc.GetInstance<GlobalCookieJar>()["https://decklog.bushiroad.com/"];
     }
 
     public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
@@ -53,15 +51,6 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             Log.Warning("Please check with the developer for a newer version that ensures compatibility with the newest version.");
             isOutdated = true;
         }
-        /*
-        if (cards.Any(c => c.Language == CardLanguage.English))
-            return false;
-        if ((await _getLatestVersion()) != settings.Version)
-        {
-            Log.Warning("DeckLog's API has been updated from {version1} to {version2}.", settings.Version, await _getLatestVersion());
-            Log.Warning("Please check with the developer for a newer version that ensures compatibility with the newest version.");
-        }
-        */
         return true;
     }
 

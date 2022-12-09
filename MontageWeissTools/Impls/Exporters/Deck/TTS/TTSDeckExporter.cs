@@ -116,6 +116,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Formatting = Formatting.Indented;
+                serializer.NullValueHandling = NullValueHandling.Ignore;
                 serializer.Serialize(w, saveState);
             }
         }, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.ReadWrite);
@@ -175,7 +176,10 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
     public async Task SendDeckGeneratorJSON(string host, int ttsPort, SaveState saveState)
     {
         Log.Information("Generating a TTS command...");
-        var serializedObject = JsonConvert.SerializeObject(saveState.ObjectStates[0]).EscapeQuotes();
+        var serializedObject = JsonConvert.SerializeObject(
+            saveState.ObjectStates[0], 
+            settings: new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }
+            ).EscapeQuotes();
         var command = new TTSExternalEditorCommand("-1", 
             $"spawnObjectJSON({{ json = \"{serializedObject}\" }})\n" +
             $"return true"

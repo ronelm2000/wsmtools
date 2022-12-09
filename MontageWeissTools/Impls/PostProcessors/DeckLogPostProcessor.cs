@@ -206,12 +206,12 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
 
     private IEnumerable<DLCardQuery> GetCardQueries(List<WeissSchwarzCard> cardData, DLQueryParameters cardParams, HashSet<string> titleCodes)
     {
-        //var matchesOneNSTitle = cardParams.GetTitleSelectionKeys().Any(a => titleCodes.Except(a).SequenceEqual(Array.Empty<string>()));
-        var titles = cardParams.GetTitleSelectionKeys().Where(a => titleCodes.Intersect(a).Count() > 0).Select(a => titleCodes.Intersect(a).ToArray()).ToArray();
+        var titleSelectionKeys = cardParams.GetTitleSelectionKeys();
+        var titles = titleSelectionKeys.Where(a => titleCodes.Intersect(a).Count() > 0).Select(a => titleCodes.Intersect(a).ToArray()).ToArray();
         Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
         Log.Information("All Titles: {@titles}", titles);
-        Log.Information("Removing Sub-Lists...");
-        titles = titles.Where(t1 => titles.All(t2 => t1 == t2 || !t1.Union(t2).ToHashSet().SetEquals(t2))).ToArray();
+        Log.Information("Removing duplicate sub-lists...");
+        titles = titles.DistinctBy(sa => sa.GetHashCode()).ToArray();
         Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
         Log.Information("All Titles: {@titles}", titles);
         if (titles.Length < 5)

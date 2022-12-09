@@ -32,6 +32,9 @@
     <None Update="Resources\deck_Lucky_Happy_Smile_Yay_v3.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\key_all_stars_clannad.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\test_deck_results.bws.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

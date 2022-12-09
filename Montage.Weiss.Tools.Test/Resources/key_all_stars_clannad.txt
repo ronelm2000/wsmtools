@@ -1,0 +1,335 @@
+﻿Random Text Information May Be Inserted Here.
+For example, you can put some author notes or links to your discord server
+as ads or something.
+================================================================================
+
+春の光の中で 渚
+春の光の中で 渚
+Card No.: Kcl/W102-002  Rarity: RR
+Color: Yellow   Side: Weiss  Character
+Level: 3   Cost: 2   Power: 10000   Soul: 2
+Traits:  Anniversary (Anniversary), 演劇 (Family), だんご (Dango)
+Triggers: Soul 
+Flavor: -
+TEXT: [AUTO] When this card is placed on stage from your hand, you may put the top card of your clock into your waiting room.
+[AUTO] [CX COMBO] [(1) Put 2 cards from your hand into your waiting room] At the end of this character's attack, if you have
+"願いの叶う場所" in your climax area, you may pay the cost. If you do, put the 1 card from the top of your opponent's deck
+to their waiting room. If it's a character or event, put the top 2 cards of your opponent's deck into their clock.
+
+================================================================================
+
+春の光の中で 渚
+春の光の中で 渚
+Card No.: Kcl/W102-002SP  Rarity: SP
+Color: Yellow   Side: Weiss  Character
+Level: 3   Cost: 2   Power: 10000   Soul: 2
+Traits:  Anniversary (Anniversary), 演劇 (Family), だんご (Dango)
+Triggers: Soul 
+Flavor: -
+TEXT: [AUTO] When this card is placed on stage from your hand, you may put the top card of your clock into your waiting room.
+[AUTO] [CX COMBO] [(1) Put 2 cards from your hand into your waiting room] At the end of this character's attack, if you have
+"願いの叶う場所" in your climax area, you may pay the cost. If you do, put the 1 card from the top of your opponent's deck
+to their waiting room. If it's a character or event, put the top 2 cards of your opponent's deck into their clock.
+
+================================================================================
+
+奇跡のカタチ 渚＆朋也
+奇跡のカタチ 渚＆朋也
+Card No.: Kcl/W102-004  Rarity: R
+Color: Yellow   Side: Weiss  Character
+Level: 0   Cost: 0   Power: 1500   Soul: 1
+Traits:  Anniversary (Anniversary), 愛 (Love)
+Triggers: None 
+Flavor: -
+TEXT: [AUTO] When this card is placed on stage from your hand, if your opponent has 1 or less characters in their center stage, 
+choose 1 cost 0 or lower character in your opponent's center stage, and you may put it on the bottom of their deck.
+[AUTO] [(1) Put 1 climax from your hand into your waiting room] When this card is placed on stage from your hand, you may
+pay the cost. If you do, choose 1 climax in your waiting room, and return it into your hand.
+
+================================================================================
+
+奇跡のカタチ 渚＆朋也
+奇跡のカタチ 渚＆朋也
+Card No.: Kcl/W102-004S  Rarity: SR
+Color: Yellow   Side: Weiss  Character
+Level: 0   Cost: 0   Power: 1500   Soul: 1
+Traits:  Anniversary (Anniversary), 愛 (Love)
+Triggers: None 
+Flavor: -
+TEXT: [AUTO] When this card is placed on stage from your hand, if your opponent has 1 or less characters in their center stage, 
+choose 1 cost 0 or lower character in your opponent's center stage, and you may put it on the bottom of their deck.
+[AUTO] [(1) Put 1 climax from your hand into your waiting room] When this card is placed on stage from your hand, you may
+pay the cost. If you do, choose 1 climax in your waiting room, and return it into your hand.
+
+================================================================================
+
+本当の気持ち 杏 	
+本当の気持ち 杏
+Card No.: Kcl/W102-007  Rarity: R
+Color: Yellow   Side: Weiss  Character
+Level: 2   Cost: 1   Power: 8000   Soul: 1
+Traits:  Anniversary (Anniversary), 双子 (Twins), 委員長 (Chairman)
+Triggers: Soul
+Flavor: もっと好きになってもらいたいの
+TEXT: [AUTO] When this card is placed on stage from your hand, if you have 6 or less cards in your deck, put all cards in your
+waiting room, return them into your deck, and shuffle your deck.
+
+================================================================================
+
+本当の気持ち 杏 	
+本当の気持ち 杏
+Card No.: Kcl/W102-007SP  Rarity: SP
+Color: Yellow   Side: Weiss  Character
+Level: 2   Cost: 1   Power: 8000   Soul: 1
+Traits:  Anniversary (Anniversary), 双子 (Twins), 委員長 (Chairman)
+Triggers: Soul
+Flavor: -
+TEXT: [AUTO] When this card is placed on stage from your hand, if you have 6 or less cards in your deck, put all cards in your
+waiting room, return them into your deck, and shuffle your deck.
+
+================================================================================
+
+海産性の違い 風子
+海産性の違い 風子
+Card No.: Kcl/W102-008  Rarity: R
+Color: Yellow   Side: Weiss  Character
+Level: 3   Cost: 2   Power: 10000   Soul: 2
+Traits:  Anniversary (Anniversary), ヒトデ (Starfish)
+Triggers: Soul
+Flavor: ヒトデのこの美しいスタイルこそ、人々の心を癒やす海産物なのです！
+TEXT: [CONT] If you have 2 or less climaxes in your waiting room, this card gets -1 level in your hand.
+[AUTO] When this is palced on stage from your hand, draw 1 card, put 1 card from your hand into your waiting room, choose up to 1
+of your opponent's characters, and return it into their hand.
+
+================================================================================
+
+海産性の違い 風子
+海産性の違い 風子
+Card No.: Kcl/W102-008S  Rarity: SR
+Color: Yellow   Side: Weiss  Character
+Level: 3   Cost: 2   Power: 10000   Soul: 2
+Traits:  Anniversary (Anniversary), ヒトデ (Starfish)
+Triggers: Soul
+Flavor: -
+TEXT: [CONT] If you have 2 or less climaxes in your waiting room, this card gets -1 level in your hand.
+[AUTO] When this is palced on stage from your hand, draw 1 card, put 1 card from your hand into your waiting room, choose up to 1
+of your opponent's characters, and return it into their hand.
+
+================================================================================
+
+グラビアポーズ ことみ
+グラビアポーズ ことみ
+Card No.: Kcl/W102-010  Rarity: U
+Color: Yellow   Side: Weiss  Character
+Level: 0   Cost: 0   Power: 500   Soul: 1
+Traits:  Anniversary (Anniversary), 本 (Book), 音楽 (Music)
+Triggers: None
+Flavor: こう、なの？
+TEXT: [AUTO] When this card is placed on stage from your hand, chooe 1 of your characters, and it gets +2000 power until the end of the turn.
+[AUTO] [Put 1 card from your hand into your waiting room] When this character attacks, you may pay the cost. If you do, during that attack, 
+perform a trigger check 2 times on the trigger step.
+
+================================================================================
+
+グラビアポーズ ことみ
+グラビアポーズ ことみ
+Card No.: Kcl/W102-010S  Rarity: SR
+Color: Yellow   Side: Weiss  Character
+Level: 0   Cost: 0   Power: 500   Soul: 1
+Traits:  Anniversary (Anniversary), 本 (Book), 音楽 (Music)
+Triggers: None
+Flavor: -
+TEXT: [AUTO] When this card is placed on stage from your hand, chooe 1 of your characters, and it gets +2000 power until the end of the turn.
+[AUTO] [Put 1 card from your hand into your waiting room] When this character attacks, you may pay the cost. If you do, during that attack, 
+perform a trigger check 2 times on the trigger step.
+
+================================================================================
+
+憎悪のこもった一球 椋
+憎悪のこもった一球 椋
+Card No.: Kcl/W102-011  Rarity: U
+Color: Yellow   Side: Weiss  Character
+Level: 0   Cost: 0   Power: 500   Soul: 1
+Traits:  Anniversary (Anniversary), 双子 (Twins), 占い (Fortune Telling)
+Triggers: None
+Flavor: この……泥棒猫！
+TEXT: [ACT] Brainstorm [(1)] Flip over 4 cards from the top of your deck, and put them into your waiting room. For each climax revealed this way, 
+resolve the following effect: "Choose 1 character from your waiting room, return it into your hand, and put 1 card from your hand into your
+waiting room."
+[ACT] Memory [Put 1 card from your hand into your waiting room & put this card into your waiting room] If you have a card in your memory, choose
+1 character in your waiting room, and return it into your hand. 
+
+================================================================================
+
+違うだんご 渚
+違うだんご 渚
+Card No.: Kcl/W102-014  Rarity: U
+Color: Yellow   Side: Weiss  Character
+Level: 0   Cost: 0   Power: 1000   Soul: 1
+Traits:  Anniversary (Anniversary), 演劇 (Family), だんご (Dango)
+Triggers: None
+Flavor: ……そんなことできないです
+TEXT: [CONT] [CX COMBO] If this card is in your waiting room, this card's name is also treated as "The Hill Road Where Cherry Blossoms Scatter".
+[AUTO] When this card is placed on your stage from your hand, choose 1 of your characters, and it gets +1000 power until the end of the turn.
+[ACT] [Put this character into your waiting room] If you are level 1 or higher, choose 1 "Ushio, Child of the Two" in your waiting room,
+and put it on the stage position this card was on.
+
+================================================================================
+
+唯一無二の眼鏡ヒロイン 智代 	
+唯一無二の眼鏡ヒロイン 智代
+Card No.: Kcl/W102-019  Rarity: C
+Color: Yellow   Side: Weiss  Character
+Level: 0   Cost: 0   Power: 2000   Soul: 1
+Traits:  Anniversary (Anniversary), 生徒会 (Student Council), スポーツ (Sports)
+Triggers: None
+Flavor: 生徒会長に必要ならば私は封印を解く！
+TEXT: [CONT] If you have 2 or less cards in your stock, this character gets +1500 power.
+[AUTO] When the damage you take is cancelled during battles involving this character, you may return this card into your hand.
+
+================================================================================
+
+唯一無二の眼鏡ヒロイン 智代 	
+唯一無二の眼鏡ヒロイン 智代
+Card No.: Kcl/W102-019S  Rarity: SR
+Color: Yellow   Side: Weiss  Character
+Level: 0   Cost: 0   Power: 2000   Soul: 1
+Traits:  Anniversary (Anniversary), 生徒会 (Student Council), スポーツ (Sports)
+Triggers: None
+Flavor: -
+TEXT: [CONT] If you have 2 or less cards in your stock, this character gets +1500 power.
+[AUTO] When the damage you take is cancelled during battles involving this character, you may return this card into your hand.
+
+================================================================================
+
+幸せな未来 汐＆渚
+幸せな未来 汐＆渚
+Card No.: Kcl/W102-021  Rarity: C
+Color: Yellow   Side: Weiss  Character
+Level: 1   Cost: 0   Power: 4000   Soul: 1
+Traits:  Anniversary (Anniversary), 演劇 (Family), だんご (Dango)
+Triggers: None
+Flavor: -
+TEXT: [CONT] Memory During your turn, if you have a card in your memory, this character gets +2500 power and the following 
+ability. "[AUTO] When this character attacks, if the level of this character's battle opponent is 2, this character gets
++6000 power until the end of the turn."
+
+================================================================================
+
+幸せな未来 汐＆渚
+幸せな未来 汐＆渚
+Card No.: Kcl/W102-021S  Rarity: SR
+Color: Yellow   Side: Weiss  Character
+Level: 1   Cost: 0   Power: 4000   Soul: 1
+Traits:  Anniversary (Anniversary), 演劇 (Family), だんご (Dango)
+Triggers: None
+Flavor: -
+TEXT: [CONT] Memory During your turn, if you have a card in your memory, this character gets +2500 power and the following 
+ability. "[AUTO] When this character attacks, if the level of this character's battle opponent is 2, this character gets
++6000 power until the end of the turn."
+
+================================================================================
+
+双子ビーチバレー 杏
+双子ビーチバレー 杏
+Card No.: Kcl/W102-022  Rarity: C
+Color: Yellow   Side: Weiss  Character
+Level: 1   Cost: 0   Power: 4500   Soul: 1
+Traits:  Anniversary (Anniversary), 双子 (Twins), 委員長 (Chairman)
+Triggers: None
+Flavor: これでも食らいなさい！
+TEXT: [CONT] During your turn, this character gets +1000 power.
+[AUTO] [CX COMBO] When this character attacks, if you have "負けヒロイン団" in your climax area, choose up to 1 cost 0 or lower
+character in your waiting room, put it on an empty stage position of your center stage, and you cannot attack 4 or more times
+this turn.
+
+================================================================================
+
+アフター智代 	
+アフター智代
+Card No.: Kcl/W102-023  Rarity: C
+Color: Yellow   Side: Weiss  Character
+Level: 1   Cost: 1   Power: 4500   Soul: 1
+Traits:  Anniversary (Anniversary), 生徒会 (Student Council), スポーツ (Sports)
+Triggers: Soul
+Flavor: 公子「妹のいるみんなに集まってもらいました」
+TEXT: [AUTO] When this card becomes [REVERSED], if the level of this card’s battle opponent is higher than your opponent’s level, 
+you may put that character into your opponent's stock. If you do, put the bottom card of your opponent's stock into their
+waiting room.
+
+================================================================================
+
+サンマパン 	
+サンマパン
+Card No.: Kcl/W102-027  Rarity: U
+Color: Yellow   Side: Weiss  Event
+Level: 1   Cost: 0   Power: 0   Soul: 0
+Traits:  None
+Triggers: None
+Flavor: 何がいけなかったんでしょう？
+TEXT: If you do not have a yellow character, this card cannot be played from your hand.
+Put the top 2 cards of your deck into your waiting room, choose up to 1 level X or lower character in your waiting room,
+and return it into your hand. X is equal to the sum of the levels of cards put into the waiting room by this effect.
+
+================================================================================
+
+願いの叶う場所 	
+願いの叶う場所
+Card No.: Kcl/W102-029  Rarity: CR
+Color: Yellow   Side: Weiss  Climax
+Level: 0   Cost: 0   Power: 0   Soul: 0
+Traits:  None
+Triggers: Choice
+Flavor: -
+TEXT: [CONT] All of your characters get +1000 power and +1 soul.
+
+================================================================================
+
+願いの叶う場所 	
+願いの叶う場所
+Card No.: Kcl/W102-029KSC  Rarity: KSC
+Color: Yellow   Side: Weiss  Climax
+Level: 0   Cost: 0   Power: 0   Soul: 0
+Traits:  None
+Triggers: Choice
+Flavor: -
+TEXT: [CONT] All of your characters get +1000 power and +1 soul.
+
+================================================================================
+
+願いの叶う場所 	
+願いの叶う場所
+Card No.: Kcl/W102-029R  Rarity: RRR
+Color: Yellow   Side: Weiss  Climax
+Level: 0   Cost: 0   Power: 0   Soul: 0
+Traits:  None
+Triggers: Choice
+Flavor: -
+TEXT: [CONT] All of your characters get +1000 power and +1 soul.
+
+================================================================================
+
+負けヒロイン団 	
+負けヒロイン団
+Card No.: Kcl/W102-031  Rarity: CC
+Color: Yellow   Side: Weiss  Climax
+Level: 0   Cost: 0   Power: 0   Soul: 0
+Traits:  None
+Triggers: Soul Shot
+Flavor: 負けヒロイン団！
+TEXT: [CONT] All of your characters get +1000 power and +1 soul.
+
+
+================================================================================
+
+負けヒロイン団 	
+負けヒロイン団
+Card No.: Kcl/W102-031C  Rarity: RRR
+Color: Yellow   Side: Weiss  Climax
+Level: 0   Cost: 0   Power: 0   Soul: 0
+Traits:  None
+Triggers: Soul Shot
+Flavor: -
+TEXT: [CONT] All of your characters get +1000 power and +1 soul.
+
+================================================================================

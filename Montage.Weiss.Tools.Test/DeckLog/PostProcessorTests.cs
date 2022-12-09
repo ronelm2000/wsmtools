@@ -97,4 +97,30 @@ public class PostProcessorTests
             "The expected URI is missing."
             );
     }
+
+    [TestMethod("DeckLog API Set List Test - Bug for Key All-Stars Clannad Only")]
+    [TestCategory("Manual")]
+    public async Task TestPostProcessor3()
+    {
+        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+        Lamar.Container ioc = Program.Bootstrap();
+
+        var progress1 = NoOpProgress<SetParserProgressReport>.Instance;
+        var progress2 = NoOpProgress<PostProcessorProgressReport>.Instance;
+        var progress3 = NoOpProgress<CommandProgressReport>.Instance;
+        var ct = CancellationToken.None;
+
+        await new UpdateVerb().Run(ioc, progress3, ct);
+        var deckLogPP = ioc.GetInstance<DeckLogPostProcessor>();
+
+        var cards = new Tools.Impls.Parsers.Cards.HeartOfTheCardsURLParser()
+            .Parse("./Resources/key_all_stars_clannad.txt", progress1, ct);
+        var resultCards = await deckLogPP.Process(cards, progress2, ct).ToDictionaryAsync(c => c.Serial);
+
+        Assert.IsTrue(resultCards["Kcl/W102-021S"]
+            .Images
+            .Contains(new Uri("https://ws-tcg.com/wordpress/wp-content/images/cardlist/k/key_w102/kcl_w102_021s.png")),
+            "The expected URI is missing."
+            );
+    }
 }

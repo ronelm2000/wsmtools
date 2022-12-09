@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Dom;
 using Flurl.Http;
+using ImTools;
 using Lamar;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
@@ -212,6 +213,9 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         Log.Information("All Titles: {@titles}", titles);
         Log.Information("Removing duplicate sub-lists...");
         titles = titles.DistinctBy(sa => sa.GetHashCode()).ToArray();
+        Log.Information("Removing subsets...");
+        var duplicateTitles = titles.Where(title => titles.Any(tsuperset => title.ToHashSet().IsProperSubsetOf(tsuperset))).ToArray();
+        titles = titles.Except(duplicateTitles).ToArray();
         Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
         Log.Information("All Titles: {@titles}", titles);
         if (titles.Length < 5)

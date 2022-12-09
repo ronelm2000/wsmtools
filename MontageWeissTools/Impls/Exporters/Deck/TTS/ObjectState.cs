@@ -36,15 +36,15 @@ public class ObjectState //Moveable objects
     public List<int> DeckIDs = new List<int>();
     public Dictionary<int, CustomDeckState> CustomDeck = new(); //Key matches the hundreth place of the id (ex. id = 354, index = 3)
     public CustomMeshState? CustomMesh;
-    public CustomImageState CustomImage = new();
-    public CustomAssetbundleState CustomAssetbundle = new();
-    public FogOfWarSaveState FogOfWar = new();
-    public FogOfWarRevealerSaveState FogOfWarRevealer = new();
+    public CustomImageState? CustomImage;
+    public CustomAssetbundleState? CustomAssetbundle;
+    public FogOfWarSaveState? FogOfWar;
+    public FogOfWarRevealerSaveState? FogOfWarRevealer;
     public object? Clock = null; //public ClockSaveState Clock;
-    public CounterState Counter = new();
-    public TabletState Tablet = new();
-    public Mp3PlayerState Mp3Player = new();
-    public CalculatorState Calculator = new();
+    public CounterState? Counter;
+    public TabletState? Tablet;
+    public Mp3PlayerState? Mp3Player;
+    public CalculatorState? Calculator;
     public TextState Text = new();
     public string XmlUI = ""; //Custom Xml UI
     public List<CustomAssetState> CustomUIAssets = new();
@@ -481,7 +481,7 @@ public class FogOfWarSaveState
 
 public class FogOfWarRevealerSaveState
 {
-    public bool? Active;
+    public bool Active = false;
     public float? Range;
     public string? Color;
 }

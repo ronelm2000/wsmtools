@@ -47,7 +47,7 @@ public class InternalSetParser : ICardSetParser<WeissSchwarzCard>
             };
             var jsonObject = await JsonSerializer.DeserializeAsync<WeissSchwarzCard[]>(s, options: jsonSerializerOptions, cancellationToken: cancellationToken);
             var emptyArray = Array.Empty<WeissSchwarzCard>();
-            foreach (var card in jsonObject.DistinctBy(c => c.Serial) ?? emptyArray)
+            foreach (var card in jsonObject?.DistinctBy(c => c.Serial) ?? emptyArray)
             {
                 yield return card;
             }

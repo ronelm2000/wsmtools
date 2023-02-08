@@ -26,7 +26,7 @@ registering on GitHub.
 
 #### Supported Database Exporters
 * [Cockatrice](https://github.com/longagofaraway/Cockatrice)
-* Local Set List JSON
+* Local (via `.ws-set` format)
 
 #### Supported Deck Parsers
 * [Encore Decks](https://www.encoredecks.com/)
@@ -37,6 +37,7 @@ registering on GitHub.
 * HOTC
 * Encore Decks (through their API)
 * [English Weiss Schwarz Official Website](https://en.ws-tcg.com/)
+* Local (via `.ws-set` format)
 
 ---------
 

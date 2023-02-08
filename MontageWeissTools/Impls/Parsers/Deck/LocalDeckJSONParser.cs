@@ -42,7 +42,11 @@ public class LocalDeckJSONParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCar
         progress.Report(report);
 
         var filePath = Path.Get(sourceUrlOrFile);
-        SimpleDeck deckJSON = JsonSerializer.Deserialize<SimpleDeck>(await filePath.ReadBytesAsync(cancellationToken)) ?? throw new DeckParsingException();
+        var jsonOpts = new JsonSerializerOptions()
+        {
+            ReadCommentHandling = JsonCommentHandling.Skip
+        };
+        SimpleDeck deckJSON = JsonSerializer.Deserialize<SimpleDeck>(await filePath.ReadBytesAsync(cancellationToken), jsonOpts) ?? throw new DeckParsingException();
         WeissSchwarzDeck deck = new WeissSchwarzDeck();
         deck.Name = deckJSON.Name;
         deck.Remarks = deckJSON.Remarks;

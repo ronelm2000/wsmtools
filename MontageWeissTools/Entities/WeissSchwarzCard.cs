@@ -86,7 +86,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         return newCard;
     }
 
-    public async Task<System.IO.Stream> GetImageStreamAsync(CookieSession cookieSession, CancellationToken ct)
+    public async Task<System.IO.Stream> GetImageStreamAsync(CookieSession? cookieSession, CancellationToken ct)
     {
         if (!String.IsNullOrWhiteSpace(CachedImagePath) && !CachedImagePath.Contains(".."))
             try

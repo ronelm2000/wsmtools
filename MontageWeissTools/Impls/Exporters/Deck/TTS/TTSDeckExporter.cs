@@ -25,8 +25,10 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 
     private (IImageEncoder, IImageFormat) _pngEncoder = (new PngEncoder(), PngFormat.Instance);
     private (IImageEncoder, IImageFormat) _jpegEncoder = (new JpegEncoder(), JpegFormat.Instance);
-    private readonly Func<Flurl.Url, CookieSession> _cookieSession;
+    private readonly Func<Flurl.Url, CookieSession?> _cookieSession;
     private readonly Func<LocalDeckImageExporter> _localDeckImageExporter;
+
+    private readonly Uri defaultURI = new Uri("https://www.google.com/");
 
     public string[] Alias => new [] { "tts", "tabletopsim" };
 
@@ -64,8 +66,8 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
                 return p;
             })
             .SelectAwaitWithCancellation(async (wsc, ct) =>
-            (card: wsc,
-                stream: await wsc.GetImageStreamAsync(_cookieSession(wsc.Images.Last()), ct))
+            (   card: wsc,
+                stream: await wsc.GetImageStreamAsync(_cookieSession(wsc.Images.LastOrDefault(defaultURI)), ct))
             )
             .ToDictionaryAwaitWithCancellationAsync(
                 async (p, ct) => await ValueTask.FromResult(p.card),

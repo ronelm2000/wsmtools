@@ -17,6 +17,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     private static string[] foilRarities = new[] { "SR", "SSR", "RRR", "SPM", "SPa", "SPb", "SP", "SSP", "SEC", "XR", "BDR" };
     private static string[] englishEditedPrefixes = new[] { "EN-", "S25", "W30" };
     private static string[] englishOriginalPrefixes = new[] { "Wx", "SX", "BSF", "BCS" };
+    private static string[] customPrefixes = new[] { "WC", "SC", "WSC" };
 
     public static IEqualityComparer<WeissSchwarzCard> SerialComparer { get; internal set; } = new WeissSchwarzCardSerialComparerImpl();
 
@@ -129,6 +130,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         if (language != CardLanguage.English) return null;
         else if (englishEditedPrefixes.Any(prefix => releaseID.StartsWith(prefix))) return Entities.EnglishSetType.EnglishEdition;
         else if (englishOriginalPrefixes.Any(prefix => releaseID.StartsWith(prefix))) return Entities.EnglishSetType.EnglishOriginal;
+        else if (customPrefixes.Any(prefix => releaseID.StartsWith(prefix))) return Entities.EnglishSetType.Custom;
         else return Entities.EnglishSetType.JapaneseImport;
     }
 
@@ -350,7 +352,8 @@ public enum EnglishSetType
 {
     JapaneseImport,
     EnglishEdition,
-    EnglishOriginal
+    EnglishOriginal,
+    Custom
 }
 
 public enum CardType

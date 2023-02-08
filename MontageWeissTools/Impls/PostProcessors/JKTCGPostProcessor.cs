@@ -53,6 +53,9 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
         if (firstCard.Language != CardLanguage.English)
             return false;
 
+        if (firstCard.EnglishSetType == EnglishSetType.Custom)
+            return false;
+
         var allReleaseIDs = cards.Select(c => c.ReleaseID)
             .Distinct()
             .Where(rid => !rid.StartsWithAny(globalReleasePrefixes)) // Remove all global prefixes as those are assigned on the same page as the main set.

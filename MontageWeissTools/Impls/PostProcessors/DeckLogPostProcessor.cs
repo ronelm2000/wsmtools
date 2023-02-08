@@ -44,6 +44,8 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         if (languages.Count != 1) {
             return false;
         }
+        if (languages[0] == CardLanguage.English && cards[0].EnglishSetType == EnglishSetType.Custom)
+            return false;
         var settings = (languages[0] == CardLanguage.English) ? DeckLogSettings.English : DeckLogSettings.Japanese;
         var latestVersion = await GetLatestVersion(settings);
         if (latestVersion != settings.Version)

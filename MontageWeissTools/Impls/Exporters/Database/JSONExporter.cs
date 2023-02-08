@@ -26,7 +26,7 @@ public class JSONExporter : CommonDatabaseExporter
         var query = CreateQuery(database.WeissSchwarzCards, info);
         var destPath = Path.Get(info.Destination);
         if (!destPath.HasExtension)
-            destPath = destPath.CreateDirectory().Combine("result.json");
+            destPath = destPath.CreateDirectory().Combine("result.ws-set");
 
         var jsonObject = await GenerateJSONAsync(query, cancellationToken);
         await using (var stream = destPath.GetOpenWriteStream())

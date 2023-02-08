@@ -5,7 +5,7 @@ namespace Montage.Weiss.Tools.Entities.External.DeckLog;
 public class DeckLogSettings
 {
     public CardLanguage Language { get; set; } = CardLanguage.Japanese;
-    public string Version { get; set; } = "20221117.001";
+    public string Version { get; set; } = "20230131.002";
     public string Authority { get; set; } = "https://decklog.bushiroad.com/";
     public Regex DeckURLMatcher { get; set; } = new Regex(@"(.*):\/\/decklog\.bushiroad\.com\/view\/([^\?]*)(.*)");
     public string VersionURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/version/";

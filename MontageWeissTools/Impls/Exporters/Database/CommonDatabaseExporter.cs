@@ -27,6 +27,9 @@ public abstract class CommonDatabaseExporter : IDatabaseExporter<CardDatabaseCon
         foreach (var serial in serialLimitations)
             predicate = predicate.Or(c => c.Serial == serial);
 
-        return query.Where(predicate);
+        if (releaseIDLimitations.Count + serialLimitations.Count > 0)
+            return query.Where(predicate);
+        else
+            return query;
     }
 }

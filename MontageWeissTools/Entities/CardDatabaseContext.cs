@@ -36,6 +36,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
+        options.EnableSensitiveDataLogging();
         options.UseSqlite($"Data Source={_config.DbName}");
     }
 

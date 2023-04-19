@@ -46,6 +46,7 @@ public readonly record struct EncoreDeckSetListEntry {
 
     internal bool HasMatch(string searchTerm)
     {
-        return $"{Side}{Release}".Contains(searchTerm) || Set.Contains(searchTerm);
+        return $"{Side}{Release}".Contains(searchTerm) || Set.Contains(searchTerm)
+            || searchTerm.Contains($"{Side}{Release}"); 
     }
 }

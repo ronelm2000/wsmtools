@@ -126,6 +126,7 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
                 Source: ele.GetAncestor<IHtmlAnchorElement>()?.Href.Replace("\t", "")
                 ))
             .Where(p => p.Serial is not null)
+            .DistinctBy(p => p.Serial ?? "")
             .ToDictionary(p => p.Serial ?? "", p => p.Source);//(setID + "-" + str.AsSpan().Slice(c => c.LastIndexOf('_') + 1, c => c.LastIndexOf(".")).ToString()).ToLower());
 
         await foreach (var card in originalCards.WithCancellation(ct))

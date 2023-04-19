@@ -147,6 +147,22 @@
     "Fetch BNJ": {
       "commandName": "Project",
       "commandLineArgs": "fetch BNJ"
+    },
+    "Parse MKM Set": {
+      "commandName": "Project",
+      "commandLineArgs": "parse \"C:/Users/ronelm2000/Desktop/wstools/machikado_mazoku.ws-set\""
+    },
+    "Export MKM Deck": {
+      "commandName": "Project",
+      "commandLineArgs": "export \"C:/Users/ronelm2000/Desktop/wstools/deck_test_shamimomo_2.json\" --with sendtcp,upscaling --out sharex"
+    },
+    "Export #61 Locally": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/9HkcdZrjq --exporter local"
+    },
+    "Export EN-S01": {
+      "commandName": "Project",
+      "commandLineArgs": "fetch EN-S01"
     }
   }
 }

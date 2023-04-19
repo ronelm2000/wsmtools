@@ -95,6 +95,8 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             result.Color = TranslateColor(setCard.colour);
             result.Remarks = $"Parsed: {this.GetType().Name}";
 
+            result = FixSiteErrata(result);
+
             progressReport = progressReport with
             {
                 ReportMessage = new MultiLanguageString { EN = $"Parsed [{result.Serial}]." },
@@ -169,7 +171,9 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
     {
         "-",
         "0",
-        "－"
+        "－",
+        "ー",
+        "―"
     };
 
     private WeissSchwarzTrait? Construct(object traitEN, object traitJP)
@@ -178,7 +182,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         str.EN = traitEN?.ToString();
         str.JP = traitJP?.ToString();
         str.EN = (String.IsNullOrWhiteSpace(str.EN) || NULL_TRAITS.Contains(str.EN)) ? null : str.EN;
-        str.JP = (String.IsNullOrWhiteSpace(str.JP)) ? null : str.JP;
+        str.JP = (String.IsNullOrWhiteSpace(str.JP) || NULL_TRAITS.Contains(str.JP)) ? null : str.JP;
         if (str.EN is null && str.JP is null)
             return null;
         else
@@ -211,4 +215,22 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             var str => throw new Exception($"Cannot parse {typeof(Trigger).Name} from {str}")
         };
     }
+
+    private WeissSchwarzCard FixSiteErrata(WeissSchwarzCard originalCard)
+    {
+        return originalCard switch
+        {
+            { Serial: "P4/EN-S01-T06" } => originalCard.WithTrait(new [] {
+                new WeissSchwarzTrait() { EN = "Junes", JP = "Junes" },
+                new WeissSchwarzTrait() { EN = "Magic", JP = "Magic" }
+            }),
+            { Serial: "P4/EN-S01-T08" } => originalCard.WithTrait(new[]
+            {
+                new WeissSchwarzTrait() { EN = "Junes", JP = "Junes" },
+                new WeissSchwarzTrait() { EN = "Magic", JP = "Magic" }
+            } ),
+            _ => originalCard
+        };
+    }
+
 }

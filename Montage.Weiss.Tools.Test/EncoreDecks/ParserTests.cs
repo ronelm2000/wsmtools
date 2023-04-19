@@ -96,4 +96,43 @@ public class ParserTests
 
         Assert.IsTrue(prismaIllyaHertz["PI/S40-038"].Name.EN == null);
     }
+
+    [TestMethod("Akiba Null Trait Test")]
+    public async Task TestAkibaNullTraits()
+    {
+        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+        Lamar.Container ioc = Program.Bootstrap();
+        var progress = NoOpProgress<SetParserProgressReport>.Instance;
+        var ct = CancellationToken.None;
+
+        var set = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
+            .Parse("https://www.encoredecks.com/api/series/5f7e38ea5f277795ebad6eec/cards", progress, ct)
+            .ToDictionaryAsync(c => c.Serial);
+
+        Assert.IsTrue(set["DC/W81-007"].Traits.Count == 0);
+
+        set = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
+            .Parse("https://www.encoredecks.com/api/series/5ea363565f277795eba7fea8/cards", progress, ct)
+            .ToDictionaryAsync(c => c.Serial);
+
+        Assert.IsTrue(set["KS/W76-025"].Traits.Count == 0);
+    }
+
+    [TestMethod("Yosuke Bias Trait Test")]
+    public async Task TestYosukeBiasTraits()
+    {
+        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+        Lamar.Container ioc = Program.Bootstrap();
+        var progress = NoOpProgress<SetParserProgressReport>.Instance;
+        var ct = CancellationToken.None;
+
+        var set = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
+            .Parse("https://www.encoredecks.com/api/series/5c7b0f9a7cd9b718cdbd082c/cards", progress, ct)
+            .ToDictionaryAsync(c => c.Serial);
+
+        Assert.IsTrue(set
+            .Where(c => c.Value.Name?.EN?.Contains("Yusuke") ?? false)
+            .All(c => c.Value?.Traits?.Any(t => t.EN == "Junes") ?? false)
+            );
+    }
 }

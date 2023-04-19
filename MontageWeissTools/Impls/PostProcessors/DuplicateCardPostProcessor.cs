@@ -19,6 +19,8 @@ public class DuplicateCardPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     private static ILogger Log = Serilog.Log.ForContext<DuplicateCardPostProcessor>();
     private readonly Func<CardDatabaseContext> _db;
 
+    ConcurrentDictionary<string, WeissSchwarzTrait> traitMap = new();
+
     public int Priority => 2;
 
     public DuplicateCardPostProcessor(IContainer ioc)
@@ -34,7 +36,6 @@ public class DuplicateCardPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards, IProgress<PostProcessorProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         await using var db = _db();
-        ConcurrentDictionary<string, WeissSchwarzTrait> traitMap = new();
         await foreach (var card in originalCards.WithCancellation(cancellationToken))
         {
             var dupCards = await db.WeissSchwarzCards.AsQueryable()

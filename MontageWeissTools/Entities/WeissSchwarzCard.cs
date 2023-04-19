@@ -254,6 +254,13 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         return res;
     }
 
+    internal WeissSchwarzCard WithTrait(WeissSchwarzTrait[] weissSchwarzTraits)
+    {
+        this.Traits.RemoveAll(i => true);
+        this.Traits.AddRange(weissSchwarzTraits);
+        return this;
+    }
+
     internal void AddOptionalInfo<T>(string key, T value)
     {
         if (string.IsNullOrEmpty(key)) return;
@@ -267,6 +274,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
 
         Log.Debug("All Optional Info: {@info}", AdditionalInfo);
     }
+
 }
 
 internal class WeissSchwarzCardSerialComparerImpl : IEqualityComparer<WeissSchwarzCard>

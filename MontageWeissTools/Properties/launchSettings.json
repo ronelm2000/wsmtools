@@ -163,6 +163,10 @@
     "Export EN-S01": {
       "commandName": "Project",
       "commandLineArgs": "fetch EN-S01"
+    },
+    "Export Deck w/ Slash": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/r_Ma2ltoZ"
     }
   }
 }

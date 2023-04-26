@@ -108,7 +108,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         saveState.ObjectStates[0].XmlUI = finalTemplateUIXML;
 
         var nameOfObject = $"Deck Generator ({deck.Name})";
-        var deckGeneratorPath = resultFolder.Combine($"{nameOfObject}.json");
+        var deckGeneratorPath = resultFolder.Combine($"{nameOfObject.AsFileNameFriendly()}.json");
 
         //TODO: Add more progress logs here.
 
@@ -122,7 +122,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
                 serializer.Serialize(w, saveState);
             }
         }, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.ReadWrite);
-        var deckGeneratorImage = resultFolder.Combine($"{nameOfObject}.png");
+        var deckGeneratorImage = resultFolder.Combine($"{nameOfObject.AsFileNameFriendly()}.png");
         deckGeneratorImage.Open(s =>
         {
             using (Image img = Image.Load(TTSResources.WeissSchwarzLogo))

@@ -50,7 +50,7 @@ public class BlakeWSExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             .OrderBy(p => p.Key.Type.GetSortKey())
             .ThenBy(p => p.Key.Level)
             .ThenBy(p => p.Value)
-            .SelectMany(p => Enumerable.Repeat(p.Key.Serial, p.Value))
+            .SelectMany(p => Enumerable.Repeat(p.Key, p.Value))
             .Select(HandleExceptionalSerial)
             .ToList();
 
@@ -77,12 +77,14 @@ public class BlakeWSExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         info.Progress.Report(report.Done(resultDeckPath.FullPath));
     }
 
-    private string HandleExceptionalSerial(string serial)
+    private string HandleExceptionalSerial(WeissSchwarzCard card)
     {
-        return serial switch
+        return card switch
         {
-            var s when s.Contains("EN-W03") => s.Replace("EN-W03", "ENW03"),
-            _ => serial
+            var s when s.Serial.Contains("EN-W03") => s.Serial.Replace("EN-W03", "ENW03"),
+            // Added Exception for HOL as HOL/W91 cannot accept Japanese serials
+            { ReleaseID: "W91", Language: CardLanguage.Japanese } => WeissSchwarzCard.AsEnglishSerial(card.Serial),
+            _ => card.Serial
         };
     }
 

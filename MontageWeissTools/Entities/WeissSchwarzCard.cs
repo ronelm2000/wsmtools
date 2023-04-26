@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Octokit;
 
 namespace Montage.Weiss.Tools.Entities;
 
@@ -177,6 +178,17 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         var regex = new Regex(@"(P|T)?(E)(.+)");
         var match = regex.Match(serialTuple.SetID);
         serialTuple.SetID = $"{match.Groups[1]}{match.Groups[3]}";
+        return serialTuple.AsString();
+    }
+
+    internal static string AsEnglishSerial(string serial)
+    {
+        var lang = GetLanguage(serial);
+        var serialTuple = ParseSerial(serial);
+        if (GetLanguage(serial) != CardLanguage.Japanese) return serial;
+        var regex = new Regex(@"(P|T)?(.+)");
+        var match = regex.Match(serialTuple.SetID);
+        serialTuple.SetID = $"{match.Groups[1]}E{match.Groups[2]}";
         return serialTuple.AsString();
     }
 

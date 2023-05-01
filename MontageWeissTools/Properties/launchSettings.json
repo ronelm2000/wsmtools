@@ -158,7 +158,7 @@
     },
     "Export #61 Locally": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/9HkcdZrjq --exporter local"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/GeQlVbQHV --exporter bws"
     },
     "Export EN-S01": {
       "commandName": "Project",

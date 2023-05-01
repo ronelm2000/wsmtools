@@ -84,6 +84,8 @@ public class BlakeWSExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             var s when s.Serial.Contains("EN-W03") => s.Serial.Replace("EN-W03", "ENW03"),
             // Added Exception for HOL as HOL/W91 cannot accept Japanese serials
             { ReleaseID: "W91", Language: CardLanguage.Japanese } => WeissSchwarzCard.AsEnglishSerial(card.Serial),
+            // Added Exception as there's no EN support for W95
+            { ReleaseID: "W95", Language: CardLanguage.English } => WeissSchwarzCard.AsJapaneseSerial(card.Serial),
             _ => card.Serial
         };
     }

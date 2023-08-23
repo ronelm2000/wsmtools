@@ -117,21 +117,18 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             await foreach (var card in prCards)
             {
                 var entity = db.Attach(card);
-                newPRCards = await TryMutate(entity.Entity, deckLogSearchResults, settings).ToListAsync(cancellationToken);
+                newPRCards = TryMutate(entity.Entity, deckLogSearchResults, settings).ToList();
             }
             var results = await db.SaveChangesAsync();
             Log.Information("Changed: {results} rows.", results);
         }
 
-        var cardList = cardData.ToAsyncEnumerable()
-            .SelectMany(c => TryMutate(c, deckLogSearchResults, settings))
-            .Concat(newPRCards.ToAsyncEnumerable());
-
-        await foreach (var card in cardList)
+        var cardList = cardData.SelectMany(c => TryMutate(c, deckLogSearchResults, settings)).Concat(newPRCards);
+        foreach (var card in cardList)
             yield return card;
     }
 
-    private async IAsyncEnumerable<WeissSchwarzCard> TryMutate(WeissSchwarzCard originalCard, IDictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings)
+    private IEnumerable<WeissSchwarzCard> TryMutate(WeissSchwarzCard originalCard, IDictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings)
     {
         if (!deckLogSearchData.ContainsKey(originalCard.Serial + originalCard.Rarity))
         {
@@ -145,6 +142,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         yield return originalCard;
 
         var foilDeckLogList = deckLogSearchData.Keys
+            .AsParallel()
             .Where(k => k.Contains(originalCard.Serial) && (originalCard.Serial + originalCard.Rarity != k))
             .Select(k => deckLogSearchData[k]);
 

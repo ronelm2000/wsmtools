@@ -75,7 +75,8 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
         {
             using Image img = await Image.LoadAsync(await url.WithImageHeaders().GetStreamAsync(), ct);
             return !IsBadQuality(img);
-        } catch (Exception ex)
+        }
+        catch (Exception)
         {
             return false;
         }

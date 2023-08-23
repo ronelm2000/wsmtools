@@ -118,6 +118,21 @@ public class ParserTests
         Assert.IsTrue(set["KS/W76-025"].Traits.Count == 0);
     }
 
+    [TestMethod("Akiba Wierd Color Test")]
+    public async Task TestAkibaColors()
+    {
+        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+        Lamar.Container ioc = Program.Bootstrap();
+        var progress = NoOpProgress<SetParserProgressReport>.Instance;
+        var ct = CancellationToken.None;
+
+        var set = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
+            .Parse("https://www.encoredecks.com/api/series/5f7e38ea5f277795ebad6eec/cards", progress, ct)
+            .ToDictionaryAsync(c => c.Serial);
+
+        Assert.IsTrue(set["DC4/W81-P06"].Color == CardColor.Yellow);
+    }
+
     [TestMethod("Yosuke Bias Trait Test")]
     public async Task TestYosukeBiasTraits()
     {

@@ -28,7 +28,7 @@ public class PollyHttpClientFactory : DefaultHttpClientFactory
         using (var db = _db())
         {
             db.Database.Migrate();
-            var maxRetries = db.Settings.Find("http.retries")?.GetValue<int>() ?? 10;
+            var maxRetries = db.Settings.Find("http.retries")?.GetValue<int>() ?? 3;
             return new PolicyHandler(maxRetries)
             {
                 InnerHandler = new TimeoutHandler

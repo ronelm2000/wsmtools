@@ -1,14 +1,26 @@
 ﻿using Flurl.Http;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
 using SixLabors.ImageSharp;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Montage.Weiss.Tools.Impls.Inspectors.Deck;
 
 public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>
 {
     private readonly ILogger Log = Serilog.Log.ForContext<SanityImageInspector>();
+
+    private GlobalCookieJar _globalCookieJar;
+    private CardDatabaseContext _db;
+
+    public SanityImageInspector(GlobalCookieJar globalCookieJar, CardDatabaseContext db)
+    {
+        this._globalCookieJar = globalCookieJar;
+        this._db = db;
+    }
 
     public int Priority => 0;
 
@@ -34,8 +46,58 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
                 return WeissSchwarzDeck.Empty;
             }
         }
+
+        Log.Information("Detecting broken image links...");
+        var brokenLinkKeyCards = deck.Ratios.Keys.ToAsyncEnumerable()
+            .WhereAwaitWithCancellation(async (card, ct) => !(await card.IsImagePresentAsync(_globalCookieJar[card.Images[^1].Host], ct)));
+
+        await foreach (var card in brokenLinkKeyCards.WithCancellation(options.CancellationToken))
+        {
+            var nonBrokenLink = card.Images.Reverse<Uri>()
+                .Concat(_db.FindFoils(card).SelectMany(c => c.Images))           
+                .ToAsyncEnumerable()
+                .FirstAwaitWithCancellationAsync(async (u, ct) => await IsImagePresent(u, ct), options.CancellationToken);
+
+            var modifiedCard = card.Clone();
+            modifiedCard.Images.Add(await nonBrokenLink);
+            deck.ReplaceCard(card, modifiedCard);
+
+            Log.Information("Replaced {card}'s URL to: {url}", card, nonBrokenLink);
+        }
+
         Log.Debug("Finished inspection.");
         return inspectedDeck;
+    }
+
+    private async Task<bool> IsImagePresent(Uri url, CancellationToken ct)
+    {
+        try
+        {
+            using Image img = await Image.LoadAsync(await url.WithImageHeaders().GetStreamAsync(), ct);
+            return !IsBadQuality(img);
+        } catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+    private bool IsBadQuality(Image img)
+    {
+        var aspectRatio = (img.Width * 1.0d) / img.Height;
+        var flooredAspectRatio = Math.Floor(aspectRatio * 100);
+        if (flooredAspectRatio < 67 || flooredAspectRatio > 72)
+        {
+            Log.Information("Image Ratio ({aspectRatio}) isn't correct (it must be approx. 0.71428571428); Rejecting replacement image.", aspectRatio);
+            return true;
+        }
+
+        if (img.Width < 400)
+        {
+            Log.Warning("The image is of low quality. Rejecting replacement image.");
+            return true;
+        }
+
+        return false;
     }
 
     private async Task<WeissSchwarzCard?> AddImageFromConsole(WeissSchwarzCard card, InspectionOptions options)

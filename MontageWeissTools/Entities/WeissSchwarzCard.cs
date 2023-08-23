@@ -81,9 +81,10 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     public WeissSchwarzCard Clone()
     {
         WeissSchwarzCard newCard = (WeissSchwarzCard) this.MemberwiseClone();
-        newCard.Name = this.Name;
+        newCard.Name = new MultiLanguageString { EN = this.Name.EN, JP = this.Name.JP };
         newCard.Traits = this.Traits.Select(s => s.Clone()).ToList();
         newCard.AdditionalInfo = this.AdditionalInfo.Select(s => s.Clone()).ToList();
+        newCard.Images = this.Images.ToList();
         return newCard;
     }
 
@@ -113,7 +114,31 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
                         .GetAsync(ct)
                         .ReceiveStream();
     }
-    
+
+    public async Task<bool> IsImagePresentAsync(CookieSession? cookieSession, CancellationToken ct)
+    {
+        if (!String.IsNullOrWhiteSpace(CachedImagePath) && !CachedImagePath.Contains(".."))
+            try
+            {
+                if (System.IO.File.Exists(CachedImagePath))
+                    return true;
+            }
+            catch (Exception) { }
+        
+        var url = Images.Last();
+        try
+        {
+            return (await url.WithImageHeaders()
+                            .WithCookies(cookieSession)
+                            .GetAsync(ct))
+                            .StatusCode == 200;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     private static bool IsExceptionalSerial(string serial)
     {
         var (NeoStandardCode, ReleaseID, SetID) = ParseSerial(serial);

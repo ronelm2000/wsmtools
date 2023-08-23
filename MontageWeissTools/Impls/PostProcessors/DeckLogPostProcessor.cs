@@ -103,6 +103,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         Log.Information("Starting...");
         var titleCodes = cardData.Select(c => c.TitleCode).Distinct().ToArray();
         var deckLogSearchResults = await GetDeckLogSearchResults(cardData, settings);
+        var newPRCards = new List<WeissSchwarzCard>();
         using (var db = _db())
         {
             var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
@@ -116,33 +117,50 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             await foreach (var card in prCards)
             {
                 var entity = db.Attach(card);
-                var newCard = TryMutate(entity.Entity, deckLogSearchResults, settings);
-                entity.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                Log.Debug("New URL: {cards}", newCard.Images);
+                newPRCards = await TryMutate(entity.Entity, deckLogSearchResults, settings).ToListAsync(cancellationToken);
             }
             var results = await db.SaveChangesAsync();
             Log.Information("Changed: {results} rows.", results);
         }
 
-        foreach (var card in cardData)
-            yield return TryMutate(card, deckLogSearchResults, settings);
+        var cardList = cardData.ToAsyncEnumerable()
+            .SelectMany(c => TryMutate(c, deckLogSearchResults, settings))
+            .Concat(newPRCards.ToAsyncEnumerable());
+
+        await foreach (var card in cardList)
+            yield return card;
     }
 
-    private WeissSchwarzCard TryMutate(WeissSchwarzCard originalCard, IDictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings)
+    private async IAsyncEnumerable<WeissSchwarzCard> TryMutate(WeissSchwarzCard originalCard, IDictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings)
     {
-        if (deckLogSearchData.ContainsKey(originalCard.Serial + originalCard.Rarity))
-        {
-            Log.Information("Found and adding data: [{card}]", originalCard.Serial);
-            var deckLogData = deckLogSearchData[originalCard.Serial + originalCard.Rarity];
-            originalCard.Name.JP = deckLogData.Name;
-            originalCard.Images.Add(new Uri($"{settings.ImagePrefix}{deckLogData.ImagePath}"));
-        }
-        else
+        if (!deckLogSearchData.ContainsKey(originalCard.Serial + originalCard.Rarity))
         {
             Log.Warning("Unable to find data for [{serial}], no image data was extracted...", originalCard.Serial);
+            yield break;
         }
-        return originalCard;
+        Log.Information("Found and adding data: [{card}]", originalCard.Serial);
+        var deckLogData = deckLogSearchData[originalCard.Serial + originalCard.Rarity];
+        originalCard.Name.JP = deckLogData.Name;
+        originalCard.Images.Add(new Uri($"{settings.ImagePrefix}{deckLogData.ImagePath}"));
+        yield return originalCard;
+
+        var foilDeckLogList = deckLogSearchData.Keys
+            .Where(k => k.Contains(originalCard.Serial) && (originalCard.Serial + originalCard.Rarity != k))
+            .Select(k => deckLogSearchData[k]);
+
+        foreach (var foilDLData in foilDeckLogList)
+        {
+            var newFoilCard = originalCard.Clone();
+            newFoilCard.Name.JP = foilDLData.Name;
+            newFoilCard.Images.Clear();
+            newFoilCard.Images.Add(new Uri($"{settings.ImagePrefix}{foilDLData.ImagePath}"));
+            newFoilCard.Serial = foilDLData?.Serial ?? throw new NullReferenceException();
+            newFoilCard.Rarity = foilDLData?.Rarity ?? throw new NullReferenceException();
+            Log.Information("Adding Foil: {serial} [{rarity}]", newFoilCard.Serial, newFoilCard.Rarity);
+            yield return newFoilCard;
+        }
     }
+    
     private async Task<IDictionary<string, DLCardEntry>> GetDeckLogSearchResults(List<WeissSchwarzCard> cardData, DeckLogSettings settings)
     {
         var cacheSrvc = _cacheSrvc();

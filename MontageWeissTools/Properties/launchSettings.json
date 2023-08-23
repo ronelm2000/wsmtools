@@ -1,28 +1,12 @@
 {
   "profiles": {
-    "export Batman Ninja via Cockatrice": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE --exporter cockatrice"
-    },
     "export nanana.cod to Local JSON": {
       "commandName": "Project",
       "commandLineArgs": "export ./Export/Na_Na_Na_Na_Batman.cod --exporter local"
     },
-    "Export HHW": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --with upscaling,sendtcp --out sharex"
-    },
     "Export HHW via Cockatrice": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter cockatrice"
-    },
-    "Export 5th Phase KC": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.heartofthecards.com/translations/kantai_collection_5th_phase_booster_pack.html"
-    },
-    "Export Deck from KC 5th Phase": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/SgPpc-bC7"
     },
     "Parse Schwarz Promos": {
       "commandName": "Project",
@@ -140,10 +124,6 @@
       "commandName": "Project",
       "commandLineArgs": "fetch W53"
     },
-    "Export HHW via Blake": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter local"
-    },
     "Fetch BNJ": {
       "commandName": "Project",
       "commandLineArgs": "fetch BNJ"
@@ -158,7 +138,7 @@
     },
     "Export #61 Locally": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/GeQlVbQHV --exporter bws"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/GeQlVbQHV --exporter decklog"
     },
     "Export EN-S01": {
       "commandName": "Project",
@@ -167,6 +147,14 @@
     "Export Deck w/ Slash": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/r_Ma2ltoZ"
+    },
+    "Export Broken HOL Deck": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/q0u2W1bcw"
+    },
+    "Parse HOL vol. 2": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=64cd60a83401020c9a024858"
     }
   }
 }

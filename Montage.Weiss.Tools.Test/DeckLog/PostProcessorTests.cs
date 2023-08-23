@@ -89,6 +89,7 @@ public class PostProcessorTests
             .Parse("https://www.encoredecks.com/?page=1&set=5c6763677cd9b718cdb87eca", progress1, ct);
 
         var resultCards = await deckLogPP.Process(cards, progress2, ct)
+            .Distinct(c => c.Serial)
             .ToDictionaryAsync(c => c.Serial);
 
         Assert.IsTrue(resultCards["BD/W54-008"]
@@ -115,7 +116,9 @@ public class PostProcessorTests
 
         var cards = new Tools.Impls.Parsers.Cards.HeartOfTheCardsURLParser()
             .Parse("./Resources/key_all_stars_clannad.txt", progress1, ct);
-        var resultCards = await deckLogPP.Process(cards, progress2, ct).ToDictionaryAsync(c => c.Serial);
+        var resultCards = await deckLogPP.Process(cards, progress2, ct)
+            .Distinct(c => c.Serial)
+            .ToDictionaryAsync(c => c.Serial);
 
         Assert.IsTrue(resultCards["Kcl/W102-021S"]
             .Images

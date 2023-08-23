@@ -50,12 +50,14 @@ public class ParseVerb : IVerbCommand, IParseInfo
 
         await using (var db = container.GetInstance<CardDatabaseContext>())
         {
-            await foreach (var card in cards.WithCancellation(ct))
-            {
-                card.VersionTimestamp = Program.AppVersion;
-                await db.AddAsync(card);                    
-                Log.Information("Added to DB: {serial}", card.Serial);
-            }
+            var allCards = await cards
+                .Select(c =>
+                {
+                    c.VersionTimestamp = Program.AppVersion;
+                    return c;
+                })
+                .Distinct(c => c.Serial)
+                .ToDictionaryAsync(c => c.Serial, ct);
 
             progress.Report(new CommandProgressReport
             {
@@ -66,6 +68,12 @@ public class ParseVerb : IVerbCommand, IParseInfo
                 Percentage = 75
             });
             var debugView = db.ChangeTracker.DebugView;
+
+            var keys = allCards.Keys.ToList();
+            db.RemoveRange(db.WeissSchwarzCards.Where(c => keys.Contains(c.Serial)));
+            await db.SaveChangesAsync();
+
+            await db.AddRangeAsync(allCards.Values);
             await db.SaveChangesAsync();
         }
 

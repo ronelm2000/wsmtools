@@ -45,6 +45,13 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
         return await WeissSchwarzCards.FindAsync(new[] { WeissSchwarzCard.RemoveFoil(card.Serial) }, ct);
     }
 
+    internal IEnumerable<WeissSchwarzCard> FindFoils(WeissSchwarzCard card, CancellationToken ct = default)
+    {
+        var results = WeissSchwarzCards.Where(c => c.Serial.Contains(card.Serial) && c != card).ToList();
+        Log.Information("Finding foils for: {card} || Found {amount} results.", card.Serial, results.Count);
+        return results;
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<WeissSchwarzCard>(b =>
@@ -64,10 +71,15 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                             , str => (JsonConvert.DeserializeObject<string[]>(str) ?? Array.Empty<string>()).Select(s => new Uri(s)).ToList()
                                 );
 
+            b.Property(c => c.Flavor)
+                .IsRequired(false);
+
             b.OwnsMany(s => s.Traits, bb =>
             {
                 bb.WithOwner().HasForeignKey("Serial");
                 bb.HasKey("TraitID", "Serial");
+                bb.Property<string>("EN").IsRequired(false);
+                bb.Property<string>("JP").IsRequired(false);
             });
 
             b.OwnsOne(s => s.Name, bb =>

@@ -128,6 +128,10 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             "BLUE" => CardColor.Blue,
             "RED" => CardColor.Red,
             "PURPLE" => CardColor.Purple,
+            "色：0" => CardColor.Yellow,
+            "色：1" => CardColor.Green,
+            "色：2" => CardColor.Red,
+            "色：3" => CardColor.Blue,
             _ => throw new Exception($"Cannot parse {typeof(CardColor).Name} from {color}")
         };
      }

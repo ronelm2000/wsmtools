@@ -12,6 +12,7 @@ using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
@@ -103,7 +104,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         Log.Information("Starting...");
         var titleCodes = cardData.Select(c => c.TitleCode).Distinct().ToArray();
         var deckLogSearchResults = await GetDeckLogSearchResults(cardData, settings);
-        var newPRCards = new List<WeissSchwarzCard>();
+        var newPRCards = Enumerable.Empty<WeissSchwarzCard>().ToAsyncEnumerable();
         using (var db = _db())
         {
             var prCards = db.WeissSchwarzCards.AsAsyncEnumerable()
@@ -111,24 +112,27 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                             && c.Language == CardLanguage.Japanese
                             && c.Rarity == "PR"
                             && !c.Images.Any(u => u.AbsoluteUri.StartsWith(settings.ImagePrefix))
-                      );
+                      )
+                .Select(c => db.Attach(c).Entity);
 
             Log.Information("Post-Processing PRs...");
             await foreach (var card in prCards)
-            {
-                var entity = db.Attach(card);
-                newPRCards = TryMutate(entity.Entity, deckLogSearchResults, settings).ToList();
-            }
+                newPRCards = newPRCards.Concat(TryMutate(card, deckLogSearchResults, settings, cancellationToken));
+
             var results = await db.SaveChangesAsync();
             Log.Information("Changed: {results} rows.", results);
         }
 
-        var cardList = cardData.SelectMany(c => TryMutate(c, deckLogSearchResults, settings)).Concat(newPRCards);
-        foreach (var card in cardList)
+        var cardList = cardData.ToAsyncEnumerable()
+            .SelectMany(c => TryMutate(c, deckLogSearchResults, settings, cancellationToken))
+            .Concat(newPRCards)
+            .WithCancellation(cancellationToken);
+
+        await foreach (var card in cardList)
             yield return card;
     }
 
-    private IEnumerable<WeissSchwarzCard> TryMutate(WeissSchwarzCard originalCard, IDictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings)
+    private async IAsyncEnumerable<WeissSchwarzCard> TryMutate(WeissSchwarzCard originalCard, IDictionary<string, DLCardEntry> deckLogSearchData, DeckLogSettings settings, [EnumeratorCancellation] CancellationToken token = default)
     {
         if (!deckLogSearchData.ContainsKey(originalCard.Serial + originalCard.Rarity))
         {
@@ -144,9 +148,10 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         var foilDeckLogList = deckLogSearchData.Keys
             .AsParallel()
             .Where(k => k.Contains(originalCard.Serial) && (originalCard.Serial + originalCard.Rarity != k))
-            .Select(k => deckLogSearchData[k]);
+            .Select(k => deckLogSearchData[k])
+            .ToAsyncEnumerable(token);
 
-        foreach (var foilDLData in foilDeckLogList)
+        await foreach (var foilDLData in foilDeckLogList)
         {
             var newFoilCard = originalCard.Clone();
             newFoilCard.Name.JP = foilDLData.Name;

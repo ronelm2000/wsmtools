@@ -17,7 +17,9 @@ public class DeckLogSettings
     public string CardParamURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/cardparam/2";
     public string DeckViewURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/view/";
     public string DeckPublishURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/publish/2";
-    public string DeckCheckURL { get; set; } = "https://decklog-en.bushiroad.com/system/app/api/check/2";
+    public string DeckCheckURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/check/2";
+
+    public string DeckFriendlyViewURL { get; set; } = "https://decklog.bushiroad.com/view/";
 
     public static DeckLogSettings Japanese => new();
     public static DeckLogSettings English => new DeckLogSettings
@@ -33,6 +35,7 @@ public class DeckLogSettings
         ImagePrefix = "https://en.ws-tcg.com/wp/wp-content/images/cardimages/",
         Referrer = "https://decklog-en.bushiroad.com/create?c=2",
         SearchURL = "https://decklog-en.bushiroad.com/system/app/api/search/2",
-        VersionURL = "https://decklog-en.bushiroad.com/system/app/api/version/"
+        VersionURL = "https://decklog-en.bushiroad.com/system/app/api/version/",
+        DeckFriendlyViewURL = "https://decklog-en.bushiroad.com/view/"
     };
 }

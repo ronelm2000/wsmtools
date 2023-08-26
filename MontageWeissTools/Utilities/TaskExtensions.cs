@@ -1,4 +1,7 @@
-﻿namespace Montage.Weiss.Tools.Utilities;
+﻿using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
+
+namespace Montage.Weiss.Tools.Utilities;
 
 public static class TaskExtensions
 {
@@ -20,5 +23,15 @@ public static class TaskExtensions
                 if (i == retries) temp = e;
             }
         throw temp;
+    }
+
+    public async static IAsyncEnumerable<T> ToAsyncEnumerable<T>(this ParallelQuery<T> parallelQuery, [EnumeratorCancellation] CancellationToken token = default)
+    {
+        var queue = new ConcurrentQueue<T>();
+        var task = Task.Run(() => parallelQuery.WithCancellation(token).ForAll(i => queue.Enqueue(i)), token); ;
+        while (!task.IsCompleted)
+            if (queue.TryDequeue(out var result) && result is not null)
+                yield return result;
+        await task;
     }
 }

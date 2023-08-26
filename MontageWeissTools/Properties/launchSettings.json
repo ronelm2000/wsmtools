@@ -8,10 +8,6 @@
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter cockatrice"
     },
-    "Parse Schwarz Promos": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.heartofthecards.com/translations/schwarz_promos.html"
-    },
     "Export Aobuta DeckLog": {
       "commandName": "Project",
       "commandLineArgs": "export https://decklog.bushiroad.com/view/FHL4 --with upscaling"
@@ -19,10 +15,6 @@
     "Parse Weiss Promos": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
-    },
-    "Parse GFB vol. 2": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html --with noskip:yyt"
     },
     "Cache W38 JP": {
       "commandName": "Project",
@@ -64,10 +56,6 @@
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/JAQjGsFgD --with sendtcp"
     },
-    "Parse Illya 2wei Hertz": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5d9a1ccc7cd9b718cd5b2200"
-    },
     "wstools parse Magia Record TV EN": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=608869f81e41dfffbd963099"
@@ -108,10 +96,6 @@
       "commandName": "Project",
       "commandLineArgs": "fetch W95"
     },
-    "Fetch Da Capo": {
-      "commandName": "Project",
-      "commandLineArgs": "fetch DC,LB"
-    },
     "Help": {
       "commandName": "Project",
       "commandLineArgs": "help"
@@ -123,10 +107,6 @@
     "Fetch LLS vol. 2": {
       "commandName": "Project",
       "commandLineArgs": "fetch W53"
-    },
-    "Fetch BNJ": {
-      "commandName": "Project",
-      "commandLineArgs": "fetch BNJ"
     },
     "Parse MKM Set": {
       "commandName": "Project",
@@ -150,7 +130,7 @@
     },
     "Export Broken HOL Deck": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/q0u2W1bcw"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/CW5ThLgZ7 --exporter decklog"
     },
     "Parse HOL vol. 2": {
       "commandName": "Project",

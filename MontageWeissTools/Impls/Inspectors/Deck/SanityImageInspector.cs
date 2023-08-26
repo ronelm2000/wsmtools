@@ -47,26 +47,38 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
             }
         }
 
+        try
+        {
+            await DetectBrokenImageLinks(deck, options);
+        } catch (Exception ex)
+        {
+            Log.Error("Cannot Find a Non-Broken Link on the local card database. Try to parse the set again, or delete cards.db.");
+            return WeissSchwarzDeck.Empty;
+        }
+
+        Log.Debug("Finished inspection.");
+        return inspectedDeck;
+    }
+
+    private async Task DetectBrokenImageLinks(WeissSchwarzDeck deck, InspectionOptions options)
+    {
         Log.Information("Detecting broken image links...");
         var brokenLinkKeyCards = deck.Ratios.Keys.ToAsyncEnumerable()
             .WhereAwaitWithCancellation(async (card, ct) => !(await card.IsImagePresentAsync(_globalCookieJar[card.Images[^1].Host], ct)));
 
         await foreach (var card in brokenLinkKeyCards.WithCancellation(options.CancellationToken))
         {
-            var nonBrokenLink = card.Images.Reverse<Uri>()
-                .Concat(_db.FindFoils(card).SelectMany(c => c.Images))           
+            var nonBrokenLink = await card.Images.Reverse<Uri>()
+                .Concat(_db.FindFoils(card).SelectMany(c => c.Images))
                 .ToAsyncEnumerable()
                 .FirstAwaitWithCancellationAsync(async (u, ct) => await IsImagePresent(u, ct), options.CancellationToken);
 
             var modifiedCard = card.Clone();
-            modifiedCard.Images.Add(await nonBrokenLink);
+            modifiedCard.Images.Add(nonBrokenLink);
             deck.ReplaceCard(card, modifiedCard);
 
             Log.Information("Replaced {card}'s URL to: {url}", card, nonBrokenLink);
         }
-
-        Log.Debug("Finished inspection.");
-        return inspectedDeck;
     }
 
     private async Task<bool> IsImagePresent(Uri url, CancellationToken ct)

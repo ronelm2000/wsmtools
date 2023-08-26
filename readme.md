@@ -21,8 +21,9 @@ registering on GitHub.
 
 #### Supported Deck Exporters
 * [Tabletop Simulator](https://steamcommunity.com/sharedfiles/filedetails/?id=1321170886)
-* Local Deck JSON
 * [Weiss Schwarz Card Game Simulator by Blake Thoennes](https://blakethoennes.itch.io/weiss-schwarz)
+* [DeckLog](https://decklog-en.bushiroad.com)
+* Local Deck JSON
 
 #### Supported Database Exporters
 * [Cockatrice](https://github.com/longagofaraway/Cockatrice)

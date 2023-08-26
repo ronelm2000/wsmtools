@@ -21,9 +21,21 @@ registering on GitHub.
 
 #### Supported Deck Exporters
 * [Tabletop Simulator](https://steamcommunity.com/sharedfiles/filedetails/?id=1321170886)
+  ```ps
+  ./wstools export https://www.encoredecks.com/deck/CW5ThLgZ7 --with sendtcp
+  ```
 * [Weiss Schwarz Card Game Simulator by Blake Thoennes](https://blakethoennes.itch.io/weiss-schwarz)
+  ```ps
+  ./wstools export https://www.encoredecks.com/deck/CW5ThLgZ7 --exporter bws
+  ```
 * [DeckLog](https://decklog-en.bushiroad.com)
+  ```ps
+  ./wstools export https://www.encoredecks.com/deck/CW5ThLgZ7 --exporter decklog
+  ```
 * Local Deck JSON
+  ```ps
+  ./wstools export https://www.encoredecks.com/deck/CW5ThLgZ7 --exporter local
+  ```
 
 #### Supported Database Exporters
 * [Cockatrice](https://github.com/longagofaraway/Cockatrice)
@@ -31,8 +43,17 @@ registering on GitHub.
 
 #### Supported Deck Parsers
 * [Encore Decks](https://www.encoredecks.com/)
+  ```ps
+  ./wstools export https://www.encoredecks.com/deck/CW5ThLgZ7 --with sendtcp
+  ```
 * [Deck Log](https://decklog.bushiroad.com/)
+  ```ps
+  ./wstools export https://decklog-en.bushiroad.com/view/EQ53 --with sendtcp
+  ```
 * Local Deck JSON
+  ```ps
+  ./wstools export ./my_cool_deck.json --with sendtcp
+  ```
 
 #### Supported Card Set Parsers
 * HOTC

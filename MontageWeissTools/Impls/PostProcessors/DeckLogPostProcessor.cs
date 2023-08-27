@@ -146,10 +146,9 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         yield return originalCard;
 
         var foilDeckLogList = deckLogSearchData.Keys
-            .AsParallel()
+            .ToAsyncEnumerable()
             .Where(k => k.Contains(originalCard.Serial) && (originalCard.Serial + originalCard.Rarity != k))
-            .Select(k => deckLogSearchData[k])
-            .ToAsyncEnumerable(token);
+            .SelectParallelAsync(async k => await ValueTask.FromResult(deckLogSearchData[k]), cancellationToken: token);
 
         await foreach (var foilDLData in foilDeckLogList)
         {

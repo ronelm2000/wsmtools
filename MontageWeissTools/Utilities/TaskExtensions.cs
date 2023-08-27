@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks.Dataflow;
 
 namespace Montage.Weiss.Tools.Utilities;
 
@@ -25,13 +26,28 @@ public static class TaskExtensions
         throw temp;
     }
 
-    public async static IAsyncEnumerable<T> ToAsyncEnumerable<T>(this ParallelQuery<T> parallelQuery, [EnumeratorCancellation] CancellationToken token = default)
+    public static async IAsyncEnumerable<R> SelectParallelAsync<T, R>(this IAsyncEnumerable<T> source, Func<T, Task<R>> body, [EnumeratorCancellation] CancellationToken cancellationToken = default!, int maxDegreeOfParallelism = DataflowBlockOptions.Unbounded, TaskScheduler? scheduler = null)
     {
-        var queue = new ConcurrentQueue<T>();
-        var task = Task.Run(() => parallelQuery.WithCancellation(token).ForAll(i => queue.Enqueue(i)), token); ;
-        while (!task.IsCompleted)
-            if (queue.TryDequeue(out var result) && result is not null)
-                yield return result;
-        await task;
+        var options = new ExecutionDataflowBlockOptions
+        {
+            MaxDegreeOfParallelism = maxDegreeOfParallelism,
+            CancellationToken = cancellationToken
+        };
+        if (scheduler is not null)
+            options.TaskScheduler = scheduler;
+
+        var transformBlock = new TransformBlock<T, Task<R>>(body, options);
+
+        // Queue everything.
+        await foreach (var item in source)
+            transformBlock.Post(item);
+        transformBlock.Complete();
+
+        // Recieve Everything Asynchronously
+        await foreach (var task in transformBlock.ReceiveAllAsync(cancellationToken))
+            yield return await task;
+
+        // Post Completion in case of cancellation
+        await transformBlock.Completion;
     }
 }

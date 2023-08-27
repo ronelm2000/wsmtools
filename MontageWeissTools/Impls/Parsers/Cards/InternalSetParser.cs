@@ -35,7 +35,7 @@ public class InternalSetParser : ICardSetParser<WeissSchwarzCard>
     public async IAsyncEnumerable<WeissSchwarzCard> Parse(string urlOrLocalFile, IProgress<SetParserProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         Log.Information("Starting...");
-        using (Stream s = await GetStreamFromURIOrFile(urlOrLocalFile))
+        await using (Stream s = await GetStreamFromURIOrFile(urlOrLocalFile, cancellationToken))
         {
             var jsonSerializerOptions = new JsonSerializerOptions()
             {
@@ -48,16 +48,14 @@ public class InternalSetParser : ICardSetParser<WeissSchwarzCard>
             var jsonObject = await JsonSerializer.DeserializeAsync<WeissSchwarzCard[]>(s, options: jsonSerializerOptions, cancellationToken: cancellationToken);
             var emptyArray = Array.Empty<WeissSchwarzCard>();
             foreach (var card in jsonObject?.DistinctBy(c => c.Serial) ?? emptyArray)
-            {
                 yield return card;
-            }
         }
     }
-    private static async Task<Stream> GetStreamFromURIOrFile(string urlOrLocalFile)
+    private static async Task<Stream> GetStreamFromURIOrFile(string urlOrLocalFile, CancellationToken ct)
     {
         if (Uri.TryCreate(urlOrLocalFile, UriKind.Absolute, out var uri) && !uri.IsFile)
         {
-            return await urlOrLocalFile.WithRESTHeaders().GetStreamAsync();
+            return await urlOrLocalFile.WithRESTHeaders().GetStreamAsync(cancellationToken: ct);
         }
         else
             return Fluent.IO.Path.Get(urlOrLocalFile).GetStream();

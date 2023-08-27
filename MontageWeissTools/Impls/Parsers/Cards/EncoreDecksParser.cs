@@ -4,6 +4,7 @@ using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -62,41 +63,9 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         };
         progress.Report(progressReport);
 
-        foreach (var setCard in setCards)
+        var setCardResults = setCards.ToAsyncEnumerable().SelectParallelAsync(this.Decode, cancellationToken: cancellationToken);
+        await foreach (var result in setCardResults)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            WeissSchwarzCard result = new WeissSchwarzCard();
-            result.Name = new MultiLanguageString();
-            var enOptional = DynamicExtensions.AsOptional(setCard.locale.EN);
-            var jpOptional = DynamicExtensions.AsOptional(setCard.locale.NP);
-            if (((string)enOptional.source)?.ToLower() != "akiba")
-                result.Name.EN = enOptional.name;
-            result.Name.JP = jpOptional.name;
-            (List<object>, List<object>) attributes = (enOptional.attributes, jpOptional.attributes);
-            result.Traits = TranslateTraits(attributes).ToList();
-            result.Effect = ((List<object>)enOptional.ability)?.Cast<string>().ToArray() ?? Array.Empty<string>();
-            result.Rarity = setCard.rarity;
-            result.Side = TranslateSide(setCard.side);
-            result.Level = (int?) setCard.level;
-            result.Cost = (int?) setCard.cost;
-            result.Power = (int?) setCard.power;    
-            result.Soul = (int?) setCard.soul;
-            result.Triggers = TranslateTriggers(setCard.trigger);
-
-            //result.Serial = setCard.cardcode;
-            if (!String.IsNullOrEmpty(setCard.imagepath))
-                result.Images.Add(new Uri($"https://www.encoredecks.com/images/{setCard.imagepath}"));
-
-            // TODO: Delete all methods related with generating serial.
-            // TODO: Switch once LLDX checkbox is checked properly. See: https://trello.com/c/WCT94Sk0/2-card-code-needs-to-be-stored-seperatly-from-side-release
-            result.Serial = WeissSchwarzCard.GetSerial(setCard.set.ToString(), setCard.side.ToString(), setCard.lang.ToString(), setCard.release.ToString(), setCard.sid.ToString());
-
-            result.Type = TranslateType(setCard.cardtype);
-            result.Color = TranslateColor(setCard.colour);
-            result.Remarks = $"Parsed: {this.GetType().Name}";
-
-            result = FixSiteErrata(result);
-
             progressReport = progressReport with
             {
                 ReportMessage = new MultiLanguageString { EN = $"Parsed [{result.Serial}]." },
@@ -104,10 +73,44 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
                 CardsParsed = progressReport.CardsParsed + 1
             };
             progress.Report(progressReport);
-
             yield return result;
         }
-        yield break;
+    }
+
+    private async Task<WeissSchwarzCard> Decode(dynamic setCard)
+    {
+        WeissSchwarzCard result = new WeissSchwarzCard();
+        result.Name = new MultiLanguageString();
+        var enOptional = DynamicExtensions.AsOptional(setCard.locale.EN);
+        var jpOptional = DynamicExtensions.AsOptional(setCard.locale.NP);
+        if (((string)enOptional.source)?.ToLower() != "akiba")
+            result.Name.EN = enOptional.name;
+        result.Name.JP = jpOptional.name;
+        (List<object>, List<object>) attributes = (enOptional.attributes, jpOptional.attributes);
+        result.Traits = TranslateTraits(attributes).ToList();
+        result.Effect = ((List<object>)enOptional.ability)?.Cast<string>().ToArray() ?? Array.Empty<string>();
+        result.Rarity = setCard.rarity;
+        result.Side = TranslateSide(setCard.side);
+        result.Level = (int?)setCard.level;
+        result.Cost = (int?)setCard.cost;
+        result.Power = (int?)setCard.power;
+        result.Soul = (int?)setCard.soul;
+        result.Triggers = TranslateTriggers(setCard.trigger);
+
+        //result.Serial = setCard.cardcode;
+        if (!String.IsNullOrEmpty(setCard.imagepath))
+            result.Images.Add(new Uri($"https://www.encoredecks.com/images/{setCard.imagepath}"));
+
+        // TODO: Delete all methods related with generating serial.
+        // TODO: Switch once LLDX checkbox is checked properly. See: https://trello.com/c/WCT94Sk0/2-card-code-needs-to-be-stored-seperatly-from-side-release
+        result.Serial = WeissSchwarzCard.GetSerial(setCard.set.ToString(), setCard.side.ToString(), setCard.lang.ToString(), setCard.release.ToString(), setCard.sid.ToString());
+
+        result.Type = TranslateType(setCard.cardtype);
+        result.Color = TranslateColor(setCard.colour);
+        result.Remarks = $"Parsed: {this.GetType().Name}";
+
+        result = FixSiteErrata(result);
+        return await ValueTask.FromResult(result);
     }
 
     private string TransformIntoAPIFormat(string urlOrFile)

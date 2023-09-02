@@ -14,6 +14,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using SQLitePCL;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
 
@@ -22,6 +23,8 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
 /// </summary>
 public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 {
+    private static readonly DecoderOptions _decoderOptions = new DecoderOptions { };
+
     public string[] Alias => new[] { "local_image", "image" };
     private ILogger Log = Serilog.Log.ForContext<LocalDeckImageExporter>();
     private (IImageEncoder, IImageFormat) _pngEncoder = (new PngEncoder(), PngFormat.Instance);
@@ -65,7 +68,7 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
             )
             .ToDictionaryAwaitWithCancellationAsync(
                 async (p, ct) => await ValueTask.FromResult(p.card),
-                async (p, ct) => PreProcess(await Image.LoadAsync(Configuration.Default, p.stream, ct)),
+                async (p, ct) => PreProcess(await Image.LoadAsync(_decoderOptions, p.stream, ct)),
                 cancellationToken
                 );
             //.ToDictionaryAsync(p => p.card, p => PreProcess(Image.LoadAsync(p.stream)));

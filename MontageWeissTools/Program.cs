@@ -91,6 +91,7 @@ public class Program
         if (!IsOutputRedirected)
             config = config.WriteTo.Console(
                             restrictedToMinimumLevel: LogEventLevel.Information,
+                            standardErrorFromLevel: LogEventLevel.Debug,
                             outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
                             );
         else

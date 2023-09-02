@@ -8,13 +8,13 @@
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter cockatrice"
     },
-    "Export Aobuta DeckLog": {
+    "Export 5th Phase KC": {
       "commandName": "Project",
-      "commandLineArgs": "export https://decklog.bushiroad.com/view/FHL4 --with upscaling"
+      "commandLineArgs": "parse https://www.heartofthecards.com/translations/kantai_collection_5th_phase_booster_pack.html"
     },
-    "Parse Weiss Promos": {
+    "Parse Schwarz Promos": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
+      "commandLineArgs": "parse https://www.heartofthecards.com/translations/schwarz_promos.html"
     },
     "Cache W38 JP": {
       "commandName": "Project",
@@ -56,6 +56,10 @@
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/JAQjGsFgD --with sendtcp"
     },
+    "Parse Illya 2wei Hertz": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5d9a1ccc7cd9b718cd5b2200"
+    },
     "wstools parse Magia Record TV EN": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=608869f81e41dfffbd963099"
@@ -96,6 +100,10 @@
       "commandName": "Project",
       "commandLineArgs": "fetch W95"
     },
+    "Fetch Da Capo": {
+      "commandName": "Project",
+      "commandLineArgs": "fetch DC,LB"
+    },
     "Help": {
       "commandName": "Project",
       "commandLineArgs": "help"
@@ -108,6 +116,14 @@
       "commandName": "Project",
       "commandLineArgs": "fetch W53"
     },
+    "Export HHW via Blake": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter local"
+    },
+    "Fetch BNJ": {
+      "commandName": "Project",
+      "commandLineArgs": "fetch BNJ"
+    },
     "Parse MKM Set": {
       "commandName": "Project",
       "commandLineArgs": "parse \"C:/Users/ronelm2000/Desktop/wstools/machikado_mazoku.ws-set\""
@@ -118,23 +134,19 @@
     },
     "Export #61 Locally": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/GeQlVbQHV --exporter decklog"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/9HkcdZrjq --exporter local"
     },
     "Export EN-S01": {
       "commandName": "Project",
       "commandLineArgs": "fetch EN-S01"
     },
-    "Export Deck w/ Slash": {
+    "Merge Sample": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/r_Ma2ltoZ"
+      "commandLineArgs": "merge https://www.encoredecks.com/deck/YVZJ0-VGb ./sample.json"
     },
-    "Export Broken HOL Deck": {
+    "HOL BWS": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/CW5ThLgZ7 --exporter decklog"
-    },
-    "Parse HOL vol. 2": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=64cd60a83401020c9a024858"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/gIMn9X7DL --exporter bws"
     }
   }
 }

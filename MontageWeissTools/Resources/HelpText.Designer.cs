@@ -86,5 +86,41 @@ namespace Montage.Weiss.Tools.Resources {
                 return ResourceManager.GetString("Fetch_WithHelpText", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Any flags that should be passed for parsing the deck..
+        /// </summary>
+        public static string Merge_FlagsHelpText {
+            get {
+                return ResourceManager.GetString("Merge_FlagsHelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Merges a deck with a list of cards to replace, and puts the output into stdout..
+        /// </summary>
+        public static string Merge_HelpText {
+            get {
+                return ResourceManager.GetString("Merge_HelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The merge map that will be used for the original deck..
+        /// </summary>
+        public static string Merge_MergeMapJSONPathHelpText {
+            get {
+                return ResourceManager.GetString("Merge_MergeMapJSONPathHelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The source for the original deck..
+        /// </summary>
+        public static string Merge_SourceHelpText {
+            get {
+                return ResourceManager.GetString("Merge_SourceHelpText", resourceCulture);
+            }
+        }
     }
 }

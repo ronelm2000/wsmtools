@@ -126,4 +126,16 @@
   <data name="Fetch_WithHelpText" xml:space="preserve">
     <value>Provides a hint as to what parser should be used or if post-processors are skipped (if any).</value>
   </data>
+  <data name="Merge_FlagsHelpText" xml:space="preserve">
+    <value>Any flags that should be passed for parsing the deck.</value>
+  </data>
+  <data name="Merge_HelpText" xml:space="preserve">
+    <value>Merges a deck with a list of cards to replace, and puts the output into stdout.</value>
+  </data>
+  <data name="Merge_MergeMapJSONPathHelpText" xml:space="preserve">
+    <value>The merge map that will be used for the original deck.</value>
+  </data>
+  <data name="Merge_SourceHelpText" xml:space="preserve">
+    <value>The source for the original deck.</value>
+  </data>
 </root>

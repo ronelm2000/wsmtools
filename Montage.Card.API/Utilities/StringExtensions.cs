@@ -64,6 +64,7 @@ public static class StringExtensions
         res = res.Replace('\\', replacement);
         res = res.Replace('/', replacement);
         res = res.Replace(' ', replacement);
+        res = res.Replace('!', replacement);
         return res;
     }
 

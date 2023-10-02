@@ -1,4 +1,5 @@
 ﻿using Flurl.Http;
+using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
@@ -64,7 +65,12 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
     {
         Log.Information("Detecting broken image links...");
         var brokenLinkKeyCards = deck.Ratios.Keys.ToAsyncEnumerable()
-            .WhereAwaitWithCancellation(async (card, ct) => !(await card.IsImagePresentAsync(_globalCookieJar[card.Images[^1].Host], ct)));
+            .WhereAwaitWithCancellation(async (card, ct) =>
+            {
+                var host = card.Images.LastOrDefault()?.Host;
+                var cookieSession = (host is null) ? null : _globalCookieJar[host];
+                return !(await card.IsImagePresentAsync(cookieSession, ct));
+            });
 
         await foreach (var card in brokenLinkKeyCards.WithCancellation(options.CancellationToken))
         {

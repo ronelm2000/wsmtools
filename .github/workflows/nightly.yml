@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -26,7 +26,7 @@ jobs:
     - name: Publish
       run: |
         dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishAot=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
-        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishAot=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
+        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true  -p:PublishTrimmed=false  --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
     - name: Upload Artifact (win-x64)
       if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v1

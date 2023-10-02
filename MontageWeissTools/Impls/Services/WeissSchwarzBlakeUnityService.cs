@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -92,7 +93,7 @@ public class WeissSchwarzBlakeUnityService
         var dateTimeString = System.Text.ASCIIEncoding.ASCII.GetString(byteArray);
         // 16:32  11/14/2022\0
         var dtStyles = System.Globalization.DateTimeStyles.AllowWhiteSpaces | System.Globalization.DateTimeStyles.AssumeLocal;
-        if (DateTime.TryParse(dateTimeString[..^1], default, dtStyles, out var result))
+        if (DateTime.TryParse(dateTimeString[..^1], CultureInfo.InvariantCulture, dtStyles, out var result))
             return result;
         else
             return null;

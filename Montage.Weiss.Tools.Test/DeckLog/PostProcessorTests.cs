@@ -3,8 +3,8 @@ using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Services;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Impls.PostProcessors;
+using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Test.Commons;
 using System;
 using System.Collections.Generic;
@@ -101,6 +101,7 @@ public class PostProcessorTests
 
     [TestMethod("DeckLog API Set List Test - Bug for Key All-Stars Clannad Only")]
     [TestCategory("Manual")]
+    [DeploymentItem("Resources/key_all_stars_clannad.txt")]
     public async Task TestPostProcessor3()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
@@ -115,7 +116,7 @@ public class PostProcessorTests
         var deckLogPP = ioc.GetInstance<DeckLogPostProcessor>();
 
         var cards = new Tools.Impls.Parsers.Cards.HeartOfTheCardsURLParser()
-            .Parse("./Resources/key_all_stars_clannad.txt", progress1, ct);
+            .Parse("./key_all_stars_clannad.txt", progress1, ct);
         var resultCards = await deckLogPP.Process(cards, progress2, ct)
             .Distinct(c => c.Serial)
             .ToDictionaryAsync(c => c.Serial);

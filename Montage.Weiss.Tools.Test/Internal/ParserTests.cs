@@ -22,7 +22,7 @@ public class ParserTests
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
         var progressReporter = NoOpProgress<object>.Instance;
 
-        var filePath = "./Resources/machikado_mazoku.ws-set";
+        var filePath = "./machikado_mazoku.ws-set";
         var dict = await new InternalSetParser().Parse(filePath, progressReporter, CancellationToken.None)
             .ToDictionaryAsync(
                 c => c.Serial,

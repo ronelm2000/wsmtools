@@ -53,7 +53,7 @@ public class ServiceTests
         timeToImport = new DateTime(timeToImport.Year, timeToImport.Month, timeToImport.Day, timeToImport.Hour, timeToImport.Minute, 0, timeToImport.Kind);
 
         wsblakeSrvc.ExportDeckData(dataToImport);
-        wsblakeSrvc.ExportDeckDate(DateTime.Now);
+        wsblakeSrvc.ExportDeckDate(timeToImport);
 
         string importedData = wsblakeSrvc.GetExportDeckData();
         DateTime? importedDateTime = wsblakeSrvc.GetExportDate();
@@ -77,11 +77,11 @@ public class ServiceTests
 
         await new ExportVerb
         {
-            Source = "./Resources/deck_Lucky_Happy_Smile_Yay_v3.json",
+            Source = "./deck_Lucky_Happy_Smile_Yay_v3.json",
             Exporter = "bws"
         }.Run(ioc, NoOpProgress<CommandProgressReport>.Instance);
 
-        var resourceStream = await Path.Get("./Resources/test_deck_results.bws.txt").ReadBytesAsync();
+        var resourceStream = await Path.Get("./test_deck_results.bws.txt").ReadBytesAsync();
         var resultStream = await Path.Get("./Export/Lucky_Happy_Smile_Yay_v3.bws.txt").ReadBytesAsync();
         var hasher = SHA512.Create();
         var resourceHash = hasher.ComputeHash(resourceStream);

@@ -25,7 +25,7 @@ public class DeckLogSettings
     public static DeckLogSettings English => new DeckLogSettings
     {
         Language = CardLanguage.English,
-        Version = "20230623.002",
+        Version = "20230914.001",
         Authority = "https://decklog-en.bushiroad.com/",
         DeckURLMatcher = new Regex(@"(.*):\/\/decklog-en\.bushiroad\.com\/view\/([^\?]*)(.*)"),
         CardParamURL = "https://decklog-en.bushiroad.com/system/app/api/cardparam/2",

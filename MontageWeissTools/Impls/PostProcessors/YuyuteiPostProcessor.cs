@@ -152,18 +152,18 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
         info.Rarity = cardUnitDiv.ClassList
             .Where(s => s.StartsWith(rarityClassPrefix))
             .Select(s => s.Substring(rarityClassPrefix.Length)).First();
-        info.Serial = cardUnitDiv.QuerySelector(cardUnitSerialSelector).GetInnerText().Trim();
+        info.Serial = cardUnitDiv.QuerySelector(cardUnitSerialSelector)!.Text().Trim();
         info.ImageUri = cardUnitDiv.QuerySelector<IHtmlImageElement>(cardUnitImageSelector)
             ?.Source
             ?.Replace("ws/90_126", "ws/front") ?? string.Empty;
         var priceStringSelector = cardUnitDiv.QuerySelector(cardUnitPriceSelector);
         var priceString = priceStringSelector
             ?.QuerySelector(cardUnitSaleSelector)
-            ?.GetInnerText()
+            ?.Text()
             .Trim()
             .Replace("円", "") ?? string.Empty;
         if (string.IsNullOrWhiteSpace(priceString))
-            priceString = priceStringSelector?.GetInnerText()
+            priceString = priceStringSelector?.Text()
                 .Trim()
                 .Replace("円", "") ?? "0";
         info.Price = int.Parse(priceString);

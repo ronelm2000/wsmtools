@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Services;
@@ -16,7 +17,7 @@ public class EncoreDecksService
     {
         return await defaultEDAPI.SetList
             .WithRESTHeaders()
-            .GetJsonAsync<List<EncoreDeckSetListEntry>>(cancellationToken);
+            .GetJsonAsync<List<EncoreDeckSetListEntry>>(cancellationToken: cancellationToken);
     }
 
     public string GetCardListURI(EncoreDeckSetListEntry result) => defaultEDAPI.SetCards(result.ID);
@@ -34,7 +35,7 @@ public readonly record struct EncoreDeckSetListEntry {
     {
     }
 
-    [Newtonsoft.Json.JsonProperty("_id")]
+    [JsonPropertyName("_id")]
     public string ID { get; init; } = default!;
     public bool Enabled { get; init; } = true;
     public string Set { get; init; } = default!;

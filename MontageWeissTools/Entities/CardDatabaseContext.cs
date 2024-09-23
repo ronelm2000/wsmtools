@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
-using Newtonsoft.Json;
 using System.IO;
+using System.Text.Json;
 
 namespace Montage.Weiss.Tools.Entities;
 
@@ -27,11 +27,8 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
     public CardDatabaseContext()
     {
         Log.Debug("Instantiating with no arguments.");
-        using (StreamReader file = File.OpenText(@"app.json"))
-        using (JsonTextReader reader = new JsonTextReader(file))
-        {
-            _config = JToken.ReadFrom(reader).ToObject<AppConfig>() ?? new AppConfig();
-        }
+        using var stream = File.Open(@"app.json", FileMode.OpenOrCreate);
+        _config = JsonSerializer.Deserialize<AppConfig>(stream) ?? new();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
@@ -54,6 +51,8 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var options = new JsonSerializerOptions { };
+
         modelBuilder.Entity<WeissSchwarzCard>(b =>
         {
             b.HasKey(c => c.Serial);
@@ -62,13 +61,13 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                             , str => str.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.ToEnum<Trigger>() ?? Trigger.Soul).ToArray()
                         );
             b.Property(c => c.Effect)
-                .HasConversion(arr => JsonConvert.SerializeObject(arr)
-                            , str => JsonConvert.DeserializeObject<string[]>(str) ?? Array.Empty<string>()
+                .HasConversion(arr => JsonSerializer.Serialize(arr, options)
+                            , str => JsonSerializer.Deserialize<string[]>(str, options) ?? Array.Empty<string>()
                                 );
-            
+
             b.Property(c => c.Images)
-                .HasConversion(arr => JsonConvert.SerializeObject(arr.Select(uri => uri.ToString()).ToArray())
-                            , str => (JsonConvert.DeserializeObject<string[]>(str) ?? Array.Empty<string>()).Select(s => new Uri(s)).ToList()
+                .HasConversion(arr => JsonSerializer.Serialize(arr.Select(uri => uri.ToString()).ToArray(), options)
+                            , str => (JsonSerializer.Deserialize<string[]>(str, options) ?? Array.Empty<string>()).Select(s => new Uri(s)).ToList()
                                 );
 
             b.Property(c => c.Flavor)

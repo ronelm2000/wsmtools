@@ -16,6 +16,7 @@ namespace Montage.Weiss.Tools.Test.ENWS;
 public class ParserTests
 {
     [TestMethod("EN WS Parser Test")]
+    [Ignore("Currently not working due to new site.")]
     public async Task TestParser()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();

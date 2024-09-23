@@ -6,8 +6,10 @@ using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Utilities;
-using Newtonsoft.Json;
 using Montage.Card.API.Entities.Impls;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Deck;
 
@@ -68,77 +70,77 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         Log.Information("Parsing ID: {deckID}", deckID);
         var response = await $"{settings.DeckViewURL}{deckID}" //
             .WithReferrer(sourceUrlOrFile) //
-            .PostJsonAsync(null, cancellationToken);
-        var json = JsonConvert.DeserializeObject<dynamic>(await response.GetStringAsync());
+            .PostJsonAsync(null, cancellationToken: cancellationToken);
+        var json = JsonSerializer.Deserialize<DeckLogDeck>(await response.GetStringAsync())!;
         var newDeck = new WeissSchwarzDeck();
         var missingSerials = new List<string>();
-        newDeck.Name = json?.title?.ToString() ?? throw new DeckParsingException("Cannot parse the deck name.");
-        newDeck.Remarks = json?.memo?.ToString() ?? throw new DeckParsingException("Cannot parse the deck remarks.");
+        newDeck.Name = json.Title.ToString() ?? throw new DeckParsingException("Cannot parse the deck name.");
+        newDeck.Remarks = json.Memo.ToString() ?? throw new DeckParsingException("Cannot parse the deck remarks.");
 
         aggregator.ReportParsedDeckData(newDeck);
 
-        List<dynamic> items = new List<dynamic>();
-        items.AddRange(json.list);
-        items.AddRange(json.sub_list);
+        List<DeckLogCardRatio> items = new List<DeckLogCardRatio>();
+        items.AddRange(json.MainList);
+        items.AddRange(json.SubList                                                                                                                                                                     );
 
-        using (var db = _database())
+        using var db = _database();
+
+        var missingSets = await items.Select(ratio => ratio.CardNumber.Replace('＋', '+'))
+                .ToAsyncEnumerable()
+                .WhereAwaitWithCancellation(async (serial, ct) =>  (await db.WeissSchwarzCards.FindAsync(new[] { serial }, ct)) == null
+                                                                && (await db.WeissSchwarzCards.FindAsync(new[] { WeissSchwarzCard.RemoveFoil(serial) }, ct)) == null
+                                            )
+                .Select(serial => WeissSchwarzCard.ParseSerial(serial).ReleaseID)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
+        if (missingSets.Count > 0)
         {
-            var missingSets = await items.Select(cardJSON => (string)(cardJSON.card_number.ToString()).Replace('＋', '+'))
-                    .ToAsyncEnumerable()
-                    .WhereAwaitWithCancellation(async (serial, ct) =>  (await db.WeissSchwarzCards.FindAsync(new[] { serial }, ct)) == null
-                                                                    && (await db.WeissSchwarzCards.FindAsync(new[] { WeissSchwarzCard.RemoveFoil(serial) }, ct)) == null
-                                               )
-                    .Select(serial => WeissSchwarzCard.ParseSerial(serial).ReleaseID)
-                    .Distinct()
-                    .ToListAsync(cancellationToken);
+            aggregator.ReportMissingSets(missingSets);
+            Log.Warning("The following sets are missing from the database: @{sets}", missingSets);
+            Log.Information("Parsing all missing sets from EncoreDecks. (Some sets may still be untranslated tho!)");
+            var deckLogSetList = await "https://www.encoredecks.com/api/serieslist"
+                .WithRESTHeaders()
+                .GetJsonAsync<List<dynamic>>(cancellationToken: cancellationToken);
 
-            if (missingSets.Count > 0)
+            await deckLogSetList
+                .Where(set => missingSets.Contains($"{set.side}{set.release}"))
+                .Select(set => (string)set._id)
+                .ToAsyncEnumerable()
+                .ForEachAwaitWithCancellationAsync((set, ct) => _parse(set, aggregator, ct), cancellationToken);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        foreach (var cardJSON in items)
+        {
+            string? serial = cardJSON.CardNumber;
+            serial = serial?.Replace('＋', '+');
+            serial = serial ?? throw new ArgumentException("serial is null for some reason!");
+            var card = await db.WeissSchwarzCards.FindAsync(new[] { serial }, cancellationToken) 
+                ?? await WarnAndFindNonFoil(db, serial, cancellationToken);
+            int quantity = cardJSON.Num;
+            if (card != null)
             {
-                aggregator.ReportMissingSets(missingSets);
-                Log.Warning("The following sets are missing from the database: @{sets}", missingSets);
-                Log.Information("Parsing all missing sets from EncoreDecks. (Some sets may still be untranslated tho!)");
-                var deckLogSetList = await "https://www.encoredecks.com/api/serieslist"
-                    .WithRESTHeaders()
-                    .GetJsonAsync<List<dynamic>>(cancellationToken);
-
-                await deckLogSetList
-                    .Where(set => missingSets.Contains($"{set.side}{set.release}"))
-                    .Select(set => (string)set._id)
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitWithCancellationAsync((set, ct) => _parse(set, aggregator, ct), cancellationToken);
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            foreach (var cardJSON in items)
-            {
-                string? serial = cardJSON.card_number.ToString();
-                serial = serial?.Replace('＋', '+');
-                serial = serial ?? throw new ArgumentException("serial is null for some reason!");
-                var card = await db.WeissSchwarzCards.FindAsync(new[] { serial }, cancellationToken) 
-                    ?? await WarnAndFindNonFoil(db, serial, cancellationToken);
-                int quantity = cardJSON.num;
-                if (card != null)
-                {
-                    Log.Debug("Adding: {card} [{quantity}]", card.Serial, quantity);
-                    if (newDeck.Ratios.TryGetValue(card, out int oldVal))
-                        newDeck.Ratios[card] = oldVal + quantity;
-                    else
-                        newDeck.Ratios.Add(card, quantity);
-                }
+                Log.Debug("Adding: {card} [{quantity}]", card.Serial, quantity);
+                if (newDeck.Ratios.TryGetValue(card, out int oldVal))
+                    newDeck.Ratios[card] = oldVal + quantity;
                 else
-                {
-                    missingSerials.Add(serial);
-                    //throw new DeckParsingException($"MISSING_SERIAL_{serial}");
-                    Log.Debug("Serial has been effectively skipped because it's not found on the local db: [{serial}]", serial);
-                }
+                    newDeck.Ratios.Add(card, quantity);
+            }
+            else
+            {
+                missingSerials.Add(serial);
+                //throw new DeckParsingException($"MISSING_SERIAL_{serial}");
+                Log.Debug("Serial has been effectively skipped because it's not found on the local db: [{serial}]", serial);
             }
         }
+        
         if (missingSerials.Count > 0)
             throw new DeckParsingException($"The following serials are missing from the DB:\n{missingSerials.ConcatAsString("\n")}");
         else
         {
-            Log.Debug($"Result Deck: {JsonConvert.SerializeObject(newDeck.AsSimpleDictionary())}");
+            Log.Debug($"Result Deck: {JsonSerializer.Serialize(newDeck.AsSimpleDictionary())}");
             aggregator.ReportSuccessfulParsedDeckData(newDeck);
             return newDeck;
         }
@@ -203,5 +205,23 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
             report = report.SuccessfullyParsedDeck(newDeck);
             progress.Report(report);
         }
+    }
+
+    private record DeckLogDeck
+    {
+        required public string Title { get; init; }
+        required public string Memo { get; init; }
+
+        [JsonPropertyName("list")]
+        required public List<DeckLogCardRatio> MainList { get; init; }
+
+        [JsonPropertyName("sub_list")]
+        required public List<DeckLogCardRatio> SubList { get; init; }
+    }
+
+    private record DeckLogCardRatio
+    {
+        public required string CardNumber { get; init; }
+        public required int Num { get; init; }
     }
 }

@@ -54,6 +54,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
         } catch (Exception ex)
         {
             Log.Error("Cannot Find a Non-Broken Link on the local card database. Try to parse the set again, or delete cards.db.");
+            Log.Verbose("Details", ex);
             return WeissSchwarzDeck.Empty;
         }
 

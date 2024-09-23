@@ -16,8 +16,4 @@ public class ActivityLogExecutionException : Exception
     public ActivityLogExecutionException(string message, Exception innerException) : base(message, innerException)
     {
     }
-
-    protected ActivityLogExecutionException(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
-    }
 }

@@ -82,7 +82,7 @@ public static class StringExtensions
     }
     public static async Task<IDocument> ParseHTML(this string content)
     {
-        var config = AngleSharp.Configuration.Default.WithCss();
+        var config = AngleSharp.Configuration.Default;
         var context = AngleSharp.BrowsingContext.New(config);
         //Create a virtual request to specify the document to load (here from our fixed string)
         return await context.OpenAsync(req => req.Content(content));

@@ -9,11 +9,11 @@ using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors;
 
@@ -183,18 +183,18 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             return results;
 
         List<DLCardEntry> temporaryResults = null!;
-        var cardParams = await settings.CardParamURL
+        var cardParams = await settings.SuggestURL
             .WithRESTHeaders()
             .WithReferrer(settings.Referrer)
             .WithCookies(_cookieJar()[settings.Referrer])
-            .PostJsonAsync(new { })
-            .ReceiveJson<DLQueryParameters>();
+            .PostJsonAsync(new { Param = "" })
+            .ReceiveJson<Dictionary<string,string>>();
 
         IEnumerable<DLCardQuery> queries = GetCardQueries(cardData, cardParams, titleCodes);
         foreach (var queryData in queries)
         {
             int page = 1;
-            Log.Information($"Accessing DeckLog API with the following query data: {JsonConvert.SerializeObject(queryData, Formatting.Indented)}");
+            Log.Information($"Accessing DeckLog API with the following query data: {JsonSerializer.Serialize(queryData, new JsonSerializerOptions { WriteIndented = true })}");
             do
             {
                 Log.Information("Extracting Page {pagenumber}...", page);
@@ -226,30 +226,56 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         return results;
     }
 
-    private IEnumerable<DLCardQuery> GetCardQueries(List<WeissSchwarzCard> cardData, DLQueryParameters cardParams, HashSet<string> titleCodes)
+    private IEnumerable<DLCardQuery> GetCardQueries(List<WeissSchwarzCard> cardData, Dictionary<string,string> cardParams, HashSet<string> titleCodes)
     {
-        var titleSelectionKeys = cardParams.GetTitleSelectionKeys();
-        var titles = titleSelectionKeys.Where(a => titleCodes.Intersect(a).Count() > 0).Select(a => titleCodes.Intersect(a).ToArray()).ToArray();
-        Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
+        var titles = cardParams.Keys
+            .Select(s => (s, s.Split("##", StringSplitOptions.RemoveEmptyEntries)))
+            .Where(p => p.Item2.Intersect(titleCodes).Count() == p.Item2.Length)
+            .Select(p => p.s)
+            .ToArray();
+
+        if ((titles?.Length ?? 0) < 1)
+            titles = cardParams.Keys
+                .Select(s => (s, s.Split("##", StringSplitOptions.RemoveEmptyEntries)))
+                .Where(p => p.Item2.Intersect(titleCodes).Count() == titleCodes.Count)
+                .Select(p => p.s)
+                .ToArray();
+
+        //        var titles = cardParams.Keys
+        //            .Select(s => s.Split("##", StringSplitOptions.RemoveEmptyEntries))
+        //            .Where(a => titleCodes.Intersect(a).Count() > 0)
+        //            .Select(a => titleCodes.Intersect(a).ToArray())
+        //            .ToArray();
+        //        Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
+        //       Log.Information("All Titles: {@titles}", titles);
+        //       Log.Information("Removing duplicate sub-lists...");
+        //      titles = titles.DistinctBy(sa => sa.GetHashCode()).ToArray();
+        //      Log.Information("Removing subsets...");
+        //     var duplicateTitles = titles.Where(title => titles.Any(tsuperset => title.ToHashSet().IsProperSubsetOf(tsuperset))).ToArray();
+        //    titles = titles.Except(duplicateTitles).ToArray();
+        Log.Information("Neo-Standard Titles Found: {count}", titles?.Length ?? 0);
         Log.Information("All Titles: {@titles}", titles);
-        Log.Information("Removing duplicate sub-lists...");
-        titles = titles.DistinctBy(sa => sa.GetHashCode()).ToArray();
-        Log.Information("Removing subsets...");
-        var duplicateTitles = titles.Where(title => titles.Any(tsuperset => title.ToHashSet().IsProperSubsetOf(tsuperset))).ToArray();
-        titles = titles.Except(duplicateTitles).ToArray();
-        Log.Information("Neo-Standard Titles Found: {count}", titles.Length);
-        Log.Information("All Titles: {@titles}", titles);
-        if (titles.Length < 5)
-            return GenerateSearchJSON(titles.SelectMany(t => t).Distinct());
+        if ((titles?.Length ?? 0) < 5)
+            return GenerateSearchJSONV2(titles!);
         else
             return GenerateSearchJSON(cardData);
     }
 
+    private IEnumerable<DLCardQuery> GenerateSearchJSONV2(IEnumerable<string> nsKeys)
+    {
+        foreach (var nsKey in nsKeys)
+            yield return new DLCardQuery
+            {
+                DeckConstruction = DeckConstructionType.NeoStandard,
+                DeckConstructionParameter = nsKey
+            };
+    }
     private IEnumerable<DLCardQuery> GenerateSearchJSON(IEnumerable<string> titleCodes)
     {
         yield return new DLCardQuery
         {
-            Titles = $"##{titleCodes.ConcatAsString("##")}##"
+            DeckConstruction = DeckConstructionType.NeoStandard,
+            DeckConstructionParameter = $"##{titleCodes.ConcatAsString("##")}##"
         };
     }
 
@@ -265,7 +291,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
 
     private class DLQueryParameters
     {
-        [JsonProperty("title_number_select_for_search")]
+        [JsonPropertyName("title_number_select_for_search")]
         public Dictionary<string, TitleSelection> TitleSelectionsForSearch { get; set; } = new();
 
         public IEnumerable<string[]> GetTitleSelectionKeys()
@@ -283,110 +309,124 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
 
     internal class DLCardEntry
     {
-        [JsonProperty("card_number")]
-        public string? Serial { get; set; }
-        [JsonProperty("name")]
-        public string? Name { get; set; }
-        [JsonProperty("rare")]
-        public string? Rarity { get; set; }  
-        [JsonProperty("img")]
-        public string? ImagePath { get; set; }
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("num")]
+        public int Number { get; set; }
+        
+        [JsonPropertyName("card_kind")]
+        public int CardType { get; set; }
+        
+        [JsonPropertyName("card_number")]
+        required public string Serial { get; set; }
+        
+        [JsonPropertyName("name")]
+        required public string Name { get; set; }
+        
+        [JsonPropertyName("rare")]
+        required public string Rarity { get; set; }  
+        
+        [JsonPropertyName("img")]
+        required public string ImagePath { get; set; }
     }
 
     private class DLCardQuery
     {
-        [JsonProperty("title_number")]
+        [JsonPropertyName("title_number")]
         public string Titles { get; set; } = "";
-        [JsonProperty("keyword")]
+        [JsonPropertyName("keyword")]
         public string Keyword { get; set; } = "";
-        [JsonProperty("keyword_type")]
+        [JsonPropertyName("keyword_type")]
         public string[] KeywordQueryType { get; set; } = new string[] { "name", "text", "no", "feature" };
-        [JsonProperty("side")]
+        [JsonPropertyName("side")]
         public string Side { get; set; } = "";
-        [JsonProperty("card_kind")]
+        [JsonPropertyName("card_kind")]
         public CardType TypeQuery { get; set; } = CardType.All;
-        [JsonProperty("color")]
+        [JsonPropertyName("color")]
         public CardColor ColorQuery { get; set; } = CardColor.All;
-        [JsonProperty("option_clock")]
+        [JsonPropertyName("parallel")]
+        public string Parallel { get; set; } = "";
+        [JsonPropertyName("option_clock")]
         public bool CounterCardsOnly { get; set; } = false;
-        [JsonProperty("option_counter")]
+        [JsonPropertyName("option_counter")]
         public bool ClockCardsOnly { get; set; } = false;
-        [JsonProperty("deck_param1")]
-        public DeckConstructionType DeckConstruction { get; set; } = DeckConstructionType.Others;
+        [JsonPropertyName("deck_param1")]
+        public DeckConstructionType DeckConstruction { get; set; }
 
-        [JsonProperty("deck_param2")]
+        [JsonPropertyName("deck_param2")]
         public string DeckConstructionParameter { get; set; } = "";
 
-        [JsonProperty("cost_e")]
+        [JsonPropertyName("cost_e")]
         public string CostEnd = "";
         
-        [JsonProperty("cost_s")]
+        [JsonPropertyName("cost_s")]
         public string CostStart = "";
 
-        [JsonProperty("level_e")]
+        [JsonPropertyName("level_e")]
         public string LevelStart = "";
         
-        [JsonProperty("level_s")]
+        [JsonPropertyName("level_s")]
         public string LevelEnd = "";
 
-        [JsonProperty("power_e")]
+        [JsonPropertyName("power_e")]
         public string PowerEnd = "";
 
-        [JsonProperty("power_s")]
+        [JsonPropertyName("power_s")]
         public string PowerStart = "";
 
-        [JsonProperty("soul_e")]
+        [JsonPropertyName("soul_e")]
         public string SoulEnd = "";
 
-        [JsonProperty("soul_s")]
+        [JsonPropertyName("soul_s")]
         public string SoulStart = "";
 
-        [JsonProperty("trigger")]
+        [JsonPropertyName("trigger")]
         public string Trigger = ""; //TODO: Replace this with string--based enum.
 
         //TODO: There's actually alot of missing variables that can be placed here, but these are ignored for now.
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     [DataContract]
     private enum CardType {
-        [EnumMember(Value = "0")]
+        [JsonStringEnumMemberName("0")]
         All,
-        [EnumMember(Value = "2")]
+        [JsonStringEnumMemberName("2")]
         Character,
-        [EnumMember(Value = "3")]
+        [JsonStringEnumMemberName("3")]
         Event,
-        [EnumMember(Value = "4")]
+        [JsonStringEnumMemberName("4")]
         Climax
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     [DataContract]
     private enum CardColor
     {
-        [EnumMember(Value = "0")]
+        [JsonStringEnumMemberName("0")]
         All,
-        [EnumMember(Value = "yellow")]
+        [JsonStringEnumMemberName("yellow")]
         Yellow,
-        [EnumMember(Value = "green")]
+        [JsonStringEnumMemberName("green")]
         Green,
-        [EnumMember(Value = "red")]
+        [JsonStringEnumMemberName("red")] 
         Red,
-        [EnumMember(Value = "blue")]
+        [JsonStringEnumMemberName("blue")]
         Blue
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     [DataContract]
     private enum DeckConstructionType
     {
-        [EnumMember(Value = "S")]
+        [JsonStringEnumMemberName("S")]
         Standard,
-        [EnumMember(Value = "N")]
+        [JsonStringEnumMemberName("N")]
         NeoStandard,
-        [EnumMember(Value = "T")]
+        [JsonStringEnumMemberName("T")]
         TitleOnly,
-        [EnumMember(Value = "O")]
+        [JsonStringEnumMemberName("O")]
         Others
     }
 }

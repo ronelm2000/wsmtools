@@ -5,7 +5,7 @@ namespace Montage.Weiss.Tools.Entities.External.DeckLog;
 public class DeckLogSettings
 {
     public CardLanguage Language { get; set; } = CardLanguage.Japanese;
-    public string Version { get; set; } = "20230621.001";
+    public string Version { get; set; } = "20240918.001";
     public string Authority { get; set; } = "https://decklog.bushiroad.com/";
     public Regex DeckURLMatcher { get; set; } = new Regex(@"(.*):\/\/decklog\.bushiroad\.com\/view\/([^\?]*)(.*)");
     public string VersionURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/version/";
@@ -14,7 +14,8 @@ public class DeckLogSettings
 
     public string Referrer { get; set; } = "https://decklog.bushiroad.com/create?c=2";
     public string SearchURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/search/2";
-    public string CardParamURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/cardparam/2";
+    // public string CardParamURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/cardparam/2";
+    public string SuggestURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/suggest/2";
     public string DeckViewURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/view/";
     public string DeckPublishURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/publish/2";
     public string DeckCheckURL { get; set; } = "https://decklog.bushiroad.com/system/app/api/check/2";
@@ -25,10 +26,10 @@ public class DeckLogSettings
     public static DeckLogSettings English => new DeckLogSettings
     {
         Language = CardLanguage.English,
-        Version = "20230914.001",
+        Version = "20240712.001",
         Authority = "https://decklog-en.bushiroad.com/",
         DeckURLMatcher = new Regex(@"(.*):\/\/decklog-en\.bushiroad\.com\/view\/([^\?]*)(.*)"),
-        CardParamURL = "https://decklog-en.bushiroad.com/system/app/api/cardparam/2",
+        SuggestURL = "https://decklog-en.bushiroad.com/system/app/api/suggest/2",
         DeckViewURL = "https://decklog-en.bushiroad.com/system/app/api/view/",
         DeckPublishURL = "https://decklog-en.bushiroad.com/system/app/api/publish/2",
         DeckCheckURL = "https://decklog-en.bushiroad.com/system/app/api/check/2",

@@ -25,10 +25,6 @@ public class SetParsingException : Exception
     public SetParsingException(string? message, Exception? innerException) : base(message, innerException)
     {
     }
-
-    protected SetParsingException(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
-    }
 }
 
 public abstract record ParserCode

@@ -37,7 +37,8 @@ public static class UriExtensions
 
     public static async Task<IDocument> DownloadHTML(this Uri uri, CancellationToken cancellationToken = default)
     {
-        var content = await uri.WithClient(customizedClient)
+        
+        var content = await customizedClient.Request(uri)
             .WithHeaders(new
             {
                 User_Agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36",
@@ -47,9 +48,7 @@ public static class UriExtensions
             })
             .GetStringAsync(cancellationToken: cancellationToken)
             ;
-        var config = Configuration.Default.WithDefaultLoader()
-                .WithCss()
-                ;
+        var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
         return await context.OpenAsync(req =>
         {
@@ -60,7 +59,7 @@ public static class UriExtensions
 
     public static async Task<IDocument> DownloadHTML(this Uri uri, CancellationToken cancel, params (string Key, string Value)[] keyValuePairs)
     {
-        var req = uri.WithClient(customizedClient)
+        var req = customizedClient.Request(uri)
             .WithHeaders(new
             {
                 User_Agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36",
@@ -73,9 +72,7 @@ public static class UriExtensions
             req = req.WithHeader(kvp.Key, kvp.Value);
 
         var content = await req.GetStringAsync(cancellationToken: cancel);
-        var config = Configuration.Default.WithDefaultLoader()
-                .WithCss()
-                ;
+        var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
         return await context.OpenAsync(req =>
             {
@@ -89,8 +86,8 @@ public static class UriExtensions
     public static IFlurlRequest WithReferrer(this Flurl.Url url, string referrerUrl) => new FlurlRequest(url).WithReferrer(referrerUrl);
     public static IFlurlRequest WithRESTHeaders(this IFlurlRequest request)
     {
-        return request.WithClient(customizedClient)
-                        .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
+        request.Client = customizedClient;
+        return request  .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
                         .WithHeader("Accept", "*/*")
                         .WithHeader("Accept-Encoding", "gzip, deflate, br")
                         .WithHeader("Referer", request.Url.Authority);
@@ -131,11 +128,9 @@ public static class UriExtensions
     public static async Task<IDocument> GetHTMLAsync(this IFlurlRequest flurlReq, CancellationToken cancel = default)
     {
         //var content = wc.DownloadString(uri);
-        var config = Configuration.Default.WithDefaultLoader()
-                .WithCss()
-                ;
+        var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
-        var stream = await flurlReq.GetStreamAsync(cancel);
+        var stream = await flurlReq.GetStreamAsync(cancellationToken: cancel);
         return await context.OpenAsync(req =>
         {
             req.Address(flurlReq.Url.ToString());
@@ -145,9 +140,7 @@ public static class UriExtensions
 
     public static async Task<IDocument> RecieveHTML(this Task<IFlurlResponse> flurlResponse, CancellationToken cancel = default)
     {
-        var config = Configuration.Default.WithDefaultLoader()
-                .WithCss()
-                ;
+        var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
         var response = await flurlResponse;
         var url = response.ResponseMessage?.RequestMessage?.RequestUri?.AbsoluteUri;

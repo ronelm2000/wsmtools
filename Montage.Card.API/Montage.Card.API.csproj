@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>11.0</LangVersion>
     <AssemblyName>montage.card.api</AssemblyName>
     <UserSecretsId>094af219-82ef-49de-9dcb-15e70c8b9ef5</UserSecretsId>
@@ -11,14 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.17.1" />
-    <PackageReference Include="AngleSharp.Css" Version="0.16.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.0" />
+    <PackageReference Include="AngleSharp" Version="1.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.8" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="Serilog" Version="4.0.1" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-    <PackageReference Include="System.Text.Json" Version="7.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
   </ItemGroup>
 
 </Project>

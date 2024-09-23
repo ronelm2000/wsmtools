@@ -17,8 +17,4 @@ public class DeckParsingException : Exception
     public DeckParsingException(string message, Exception innerException) : base(message, innerException)
     {
     }
-
-    protected DeckParsingException(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
-    }
 }

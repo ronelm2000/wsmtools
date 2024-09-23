@@ -16,6 +16,7 @@ namespace Montage.Weiss.Tools;
 
 public class Program
 {
+//    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Options))]
     public static async Task Main(string[] args)
     {
         Serilog.Log.Logger = BootstrapLogging().CreateLogger();
@@ -26,7 +27,6 @@ public class Program
         Log.Debug(container.WhatDoIHave(serviceType: typeof(IVerbCommand)));
         Log.Debug(container.WhatDoIHave(serviceType: typeof(IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>)));
         Log.Debug(container.WhatDoIHave(serviceType: typeof(ICardSetParser<WeissSchwarzCard>)));
-        FlurlHttp.Configure(settings => settings.HttpClientFactory = container.GetService<PollyHttpClientFactory>());
 
         var progressReporter = new Progress<CommandProgressReport>();
         var cts = new CancellationTokenSource();

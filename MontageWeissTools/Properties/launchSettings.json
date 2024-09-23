@@ -42,7 +42,7 @@
     },
     "Export Deck (#31)": {
       "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/gO_JKfCsm --with sendtcp"
+      "commandLineArgs": "export https://www.encoredecks.com/deck/gO_JKfCsm --out sharex --with sendtcp"
     },
     "Prase Batman Ninja (ED)": {
       "commandName": "Project",
@@ -135,6 +135,14 @@
     "Parse HOL vol. 2": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=64cd60a83401020c9a024858"
+    },
+    "Export Custom Deck": {
+      "commandName": "Project",
+      "commandLineArgs": "export \"R:\\Misc\\Kirara Fantasia\\Kirara Fantasia Draft Sample\\Deck Test\\new_game_kirafan.json\" --with sendtcp --out sharex"
+    },
+    "Parse KiraFan": {
+      "commandName": "Project",
+      "commandLineArgs": "parse \"R:\\Misc\\Kirara Fantasia\\Kirara Fantasia Draft Sample\\kirafan_draft_1.ws-set\""
     }
   }
 }

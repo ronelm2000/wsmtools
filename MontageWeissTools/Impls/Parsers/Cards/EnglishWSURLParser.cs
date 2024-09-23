@@ -131,11 +131,13 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
         progress.Report(progressReport);
 
         var uri = new Uri(urlOrLocalFile);
-        using (var fc = new FlurlClient())
         using (var cs = new CookieSession("https://en.ws-tcg.com/"))
         {
-            fc.Settings.BeforeCall = this.Debug;
-            await _WS_SEARCH_PAGE.WithClient(fc).WithHTMLHeaders().WithCookies(cs).GetAsync(cancellationToken); // To get some initial cookies.
+            await _WS_SEARCH_PAGE.BeforeCall(this.Debug)
+                .WithHTMLHeaders()
+                .WithCookies(cs)
+                .GetAsync(cancellationToken: cancellationToken); // To get some initial cookies.
+
             var serial = uri.Query.Substring(_CARD_NO_QUERY.Length);
             var serialID = WeissSchwarzCard.ParseSerial(serial);
 
@@ -143,7 +145,6 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
 
             var wsSearchPage = await cs
                 .Request(_WS_SEARCH_PAGE_EXEC)
-                .WithClient(fc)
                 .WithHTMLHeaders()
                 .WithHeader("Referer", _WS_SEARCH_PAGE)
                 .PostUrlEncodedAsync(new Dictionary<string,object>{
@@ -175,7 +176,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
 
             var divsToProcess = wsSearchPage.QuerySelectorAll(_CARD_UNIT_SELECTOR).ToAsyncEnumerable();
             var pageResultDiv = wsSearchPage.QuerySelector<IHtmlAnchorElement>(".pageLink :nth-last-child(2)")?.InnerHtml ?? null;
-            var resultCountString = wsSearchPage.QuerySelector("#exFilterForm ~ p").GetInnerText();
+            var resultCountString = wsSearchPage.QuerySelector("#exFilterForm ~ p")!.Text();
 
             Func<int,ValueTask<IDocument>> followupDivs = async p => await cs
                 .Request(_WS_SEARCH_PAGE_EXEC)
@@ -183,7 +184,6 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
                 {
                     page = p
                 })
-                .WithClient(fc)
                 .WithHTMLHeaders()
                 .WithHeader("Referer", _WS_SEARCH_PAGE_EXEC)
                 .WithHeader("Cache-Control", "no-cache")
@@ -319,7 +319,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
     private async Task<string?> CleanupFlavorText(string value)
     {
         var doc = await value.ParseHTML();
-        return doc.Body?.Children[0]?.GetInnerText();//.InnerHtml;
+        return doc.Body?.Children[0]?.Text();//.InnerHtml;
     }
 
     private async Task<List<WeissSchwarzTrait>> TranslateToTraitsAsync(string value)

@@ -12,31 +12,53 @@ using System.Net.Sockets;
 
 namespace Montage.Weiss.Tools.Impls.Utilities;
 
-public class PollyHttpClientFactory : DefaultHttpClientFactory
+public class PollyHttpClientFactoryConfigurer
 {
-    private ILogger Log = Serilog.Log.ForContext<PollyHttpClientFactory>();
-    private Func<CardDatabaseContext> _db;
+    private ILogger Log = Serilog.Log.ForContext<PollyHttpClientFactoryConfigurer>();
 
-    public PollyHttpClientFactory(IContainer ioc)
+    public PollyHttpClientFactoryConfigurer(CardDatabaseContext cardDatabaseContext)
     {
         Log.Debug("Starting...");
-        _db = () => ioc.GetInstance<CardDatabaseContext>();
+        setup(cardDatabaseContext);
     }
 
-    public override HttpMessageHandler CreateMessageHandler()
+    private void setup(CardDatabaseContext cardDatabaseContext)
     {
-        using (var db = _db())
-        {
-            db.Database.Migrate();
-            var maxRetries = db.Settings.Find("http.retries")?.GetValue<int>() ?? 3;
-            return new PolicyHandler(maxRetries)
+        using var db = cardDatabaseContext;
+        db.Database.Migrate();
+        int maxRetries = FindRetries() ?? 10;
+        FlurlHttp.Clients.WithDefaults(builder => builder
+            .AddMiddleware(() => new PolicyHandler(maxRetries)
             {
-                InnerHandler = new TimeoutHandler
+                InnerHandler = new TimeoutHandler()
                 {
-                    InnerHandler = base.CreateMessageHandler(),
-                    Timeout = TimeSpan.FromSeconds(db.Settings.Find("http.timeout")?.GetValue<int>() ?? 100)
+                    Timeout = TimeSpan.FromSeconds(FindTimeout() ?? 100)
                 }
-            };
+            })
+        );
+
+        int? FindRetries()
+        {
+            try
+            {
+                return db.Settings.Find("http.retries")?.GetValue<int>();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        int? FindTimeout()
+        {
+            try
+            {
+                return db.Settings.Find("http.timeout")?.GetValue<int>();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }

@@ -1,68 +1,70 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
 
 public class ObjectState //Moveable objects
 {
-    public string Name = ""; //Internal object name
-    public TransformState? Transform; //Position, Rotation, Scale
-    public string Nickname = ""; //Name supplied in game
-    public string Description = "";
-    public ColourState? ColorDiffuse; //Material color tint
+    public string Name { get; set; } = ""; //Internal object name
+    public TransformState? Transform { get; set; } //Position, Rotation, Scale
+    public string Nickname { get; set; } = ""; //Name supplied in game
+    public string Description { get; set; } = "";
+    public ColourState? ColorDiffuse { get; set; } //Material color tint
     /*Toggles*/
-    public bool Locked = false; //Freeze object in place
-    public bool Grid = true; //Object will snap to grid
-    public bool Snap = true; //Object will snap to snap points  
-    public bool Autoraise = true; //Object will raise above others and avoid collision
-    public bool Sticky = true; //When picked up objects above this one will be attached to it
-    public bool Tooltip = true; //When hovering object will display tooltips
-    public bool GridProjection = false; //Grid will project on this object
+    public bool Locked { get; set; } = false; //Freeze object in place
+    public bool Grid { get; set; } = true; //Object will snap to grid
+    public bool Snap { get; set; } = true; //Object will snap to snap points  
+    public bool Autoraise { get; set; } = true; //Object will raise above others and avoid collision
+    public bool Sticky { get; set; } = true; //When picked up objects above this one will be attached to it
+    public bool Tooltip { get; set; } = true; //When hovering object will display tooltips
+    public bool GridProjection { get; set; } = false; //Grid will project on this object
     /*Nullable to hide object specific properties and save space*/
-    public bool? HideWhenFaceDown; //When face down object is question mark hidden
-    public bool? Hands; //Object will enter player hands
-    public bool? AltSound; //Some objects have 2 materials, with two sound sets
-    public int? MaterialIndex; //Some objects can have multiple materials
-    public int? MeshIndex; //Some objects can have multiple meshes
-    public int? Layer; //Sound Layer
-    public int? Number;
-    public int? CardID;
-    public bool? SidewaysCard;
-    public bool? RPGmode;
-    public bool? RPGdead;
-    public string? FogColor = null;
-    public bool? FogHidePointers;
-    public bool? FogReverseHiding;
-    public bool? FogSeethrough;
-    public List<int> DeckIDs = new List<int>();
-    public Dictionary<int, CustomDeckState> CustomDeck = new(); //Key matches the hundreth place of the id (ex. id = 354, index = 3)
-    public CustomMeshState? CustomMesh;
-    public CustomImageState? CustomImage;
-    public CustomAssetbundleState? CustomAssetbundle;
-    public FogOfWarSaveState? FogOfWar;
-    public FogOfWarRevealerSaveState? FogOfWarRevealer;
-    public object? Clock = null; //public ClockSaveState Clock;
-    public CounterState? Counter;
-    public TabletState? Tablet;
-    public Mp3PlayerState? Mp3Player;
-    public CalculatorState? Calculator;
-    public TextState Text = new();
-    public string XmlUI = ""; //Custom Xml UI
-    public List<CustomAssetState> CustomUIAssets = new();
-    public string LuaScript = "";
-    public string LuaScriptState = ""; // Serialized running Lua code
-    public List<ObjectState> ContainedObjects = new(); //Objects inside this one
-    public PhysicsMaterialState PhysicsMaterial = new(); //Use to modify the physics material (friction, bounce, etc.) http://docs.unity3d.com/Manual/class-PhysicMaterial.html
-    public RigidbodyState Rigidbody = new(); //Use to modify the physical properties (mass, drag, etc) http://docs.unity3d.com/Manual/class-Rigidbody.html
-    public object? JointFixed = null;                    //public JointFixedState JointFixed; //Joints can be used to attached/link objects together check the classes below
-    public object? JointHingeState = null;               //public JointHingeState JointHinge;
-    public object? JointSpring = null;                   //public JointSpringState JointSpring;
-    public string? GUID = null; //Used so objects can reference other objects, ex. joints or scripting
-    public List<SnapPointState> AttachedSnapPoints = new(); //Snap points that are stuck to this object, happens when placing a snap point on a locked object
-    public List<VectorLineState> AttachedVectorLines = new(); // Vector lines that are stuck to this object, happens when drawing a vector line on a locked object
-    public List<DecalState> AttachedDecals = new(); //Decals that are attached to this objects
-    public Dictionary<int, ObjectState> States = new(); //Objects can have multiple states which can be swapped between    
-    public List<RotationValueState> RotationValues = new(); //Rotation values are tooltip values tied to rotations
-
+    public bool? HideWhenFaceDown { get; set; } //When face down object is question mark hidden
+    public bool? Hands { get; set; } //Object will enter player hands
+    public bool? AltSound { get; set; } //Some objects have 2 materials, with two sound sets
+    public int? MaterialIndex { get; set; } //Some objects can have multiple materials
+    public int? MeshIndex { get; set; } //Some objects can have multiple meshes
+    public int? Layer { get; set; } //Sound Layer
+    public int? Number { get; set; }
+    public int? CardID { get; set; }
+    public bool? SidewaysCard { get; set; }
+    public bool? RPGmode { get; set; }
+    public bool? RPGdead { get; set; }
+    public string? FogColor { get; set; } = null;
+    public bool? FogHidePointers { get; set; }
+    public bool? FogReverseHiding { get; set; }
+    public bool? FogSeethrough { get; set; }
+    public List<int> DeckIDs { get; set; } = new List<int>();
+    public Dictionary<int, CustomDeckState> CustomDeck { get; set; } = new(); //Key matches the hundreth place of the id (ex. id = 354, index = 3)
+    public CustomMeshState? CustomMesh { get; set; }
+    public CustomImageState? CustomImage { get; set; }
+    public CustomAssetbundleState? CustomAssetbundle { get; set; }
+    public FogOfWarSaveState? FogOfWar { get; set; }
+    public FogOfWarRevealerSaveState? FogOfWarRevealer { get; set; }
+    public object? Clock { get; set; } //public ClockSaveState Clock;
+    public CounterState? Counter { get; set; }
+    public TabletState? Tablet { get; set; }
+    public Mp3PlayerState? Mp3Player { get; set; }
+    public CalculatorState? Calculator { get; set; }
+    public TextState Text { get; set; } = new();
+    public string XmlUI { get; set; } = ""; //Custom Xml UI
+    public List<CustomAssetState> CustomUIAssets { get; set; } = new();
+    public string LuaScript { get; set; } = "";
+    public string LuaScriptState { get; set; } = ""; // Serialized running Lua code
+    public List<ObjectState> ContainedObjects { get; set; } = new(); //Objects inside this one
+    public PhysicsMaterialState PhysicsMaterial { get; set; } = new(); //Use to modify the physics material (friction, bounce, etc.) http://docs.unity3d.com/Manual/class-PhysicMaterial.html
+    public RigidbodyState Rigidbody { get; set; } = new(); //Use to modify the physical properties (mass, drag, etc) http://docs.unity3d.com/Manual/class-Rigidbody.html
+    public object? JointFixed { get; set; } = null;                    //public JointFixedState JointFixed; //Joints can be used to attached/link objects together check the classes below
+    public object? JointHingeState { get; set; } = null;               //public JointHingeState JointHinge;
+    public object? JointSpring { get; set; } = null;                   //public JointSpringState JointSpring;
+    public string? GUID { get; set; } = null; //Used so objects can reference other objects, ex. joints or scripting
+    public List<SnapPointState> AttachedSnapPoints { get; set; } = new(); //Snap points that are stuck to this object, happens when placing a snap point on a locked object
+    public List<VectorLineState> AttachedVectorLines { get; set; } = new(); // Vector lines that are stuck to this object, happens when drawing a vector line on a locked object
+    public List<DecalState> AttachedDecals { get; set; } = new(); //Decals that are attached to this objects
+    public Dictionary<int, ObjectState> States { get; set; } = new(); //Objects can have multiple states which can be swapped between    
+    public List<RotationValueState> RotationValues { get; set; } = new(); //Rotation values are tooltip values tied to rotations
+    public string? GMNotes { get; set; }
+    public bool? IgnoreFoW { get; set; }
     public bool EqualsObject(object obj)
     {
         if (obj == null)
@@ -168,12 +170,15 @@ public class ObjectState //Moveable objects
 
     public ObjectState Clone()
     {
-        return JsonConvert.DeserializeObject<ObjectState>(this.ToJson()) ?? new ObjectState();// Json.Clone(this);
+        return JsonSerializer.Deserialize<ObjectState>(this.ToJson(), new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        }) ?? new ObjectState();// Json.Clone(this);
     }
 
     public string ToJson()
     {
-        return JsonConvert.SerializeObject(this);///.GetJson(this);
+        return JsonSerializer.Serialize(this);///.GetJson(this);
     }
 
     public static List<ObjectState> RemoveDuplicates(List<ObjectState> objectStates)
@@ -300,17 +305,23 @@ public class CustomAssetState
 
 public class TransformState
 {
-    public float posX;
-    public float posY;
-    public float posZ;
+    public float PosX { get; set; }
 
-    public float rotX;
-    public float rotY;
-    public float rotZ;
+    public float PosY { get; set; }
 
-    public float scaleX;
-    public float scaleY;
-    public float scaleZ;
+    public float PosZ { get; set; }
+
+    public float RotX { get; set; }
+
+    public float RotY { get; set; }
+
+    public float RotZ { get; set; }
+
+    public float ScaleX { get; set; }
+
+    public float ScaleY { get; set; }
+
+    public float ScaleZ { get; set; }
 
     [JsonConstructor]
     public TransformState() { }
@@ -318,32 +329,35 @@ public class TransformState
 
 public class ColourState
 {
-    public float r, g, b;
-
     public ColourState() { }
 
     [JsonConstructor]
     public ColourState(float r, float g, float b)
     {
-        this.r = r;
-        this.g = g;
-        this.b = b;
+        this.R = r;
+        this.G = g;
+        this.B = b;
     }
+    public float R { get; set; }
+    public float G { get; set; }
+    public float B { get; set; }
 }
 
 public class VectorState
 {
-    public float x, y, z;
-
     public VectorState() { }
 
     [JsonConstructor]
     public VectorState(float x, float y, float z)
     {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.X = x;
+        this.Y = y;
+        this.Z = z;
     }
+
+    public float X { get; set; }
+    public float Y { get; set; }
+    public float Z { get; set; }
 }
 
 public class RigidbodyState

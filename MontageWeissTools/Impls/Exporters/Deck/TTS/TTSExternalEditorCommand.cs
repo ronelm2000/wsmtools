@@ -1,18 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
 
 public class TTSExternalEditorCommand
 {
-    [JsonProperty("messageID")]
+    [JsonPropertyName("messageID")]
     public CommandType CommandType { get; set; } = CommandType.GetLuaScripts;
 
-    [JsonProperty("guid", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("guid")]
     public string? GUID { get; set; } = null;
-    [JsonProperty("script", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("script")]
     public string? Script { get; set; } = null;
    
-    [JsonProperty("scriptStates", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("scriptStates")]
     public List<ObjectState>? ObjectStates { get; set; } = null;
 
     public TTSExternalEditorCommand() { }

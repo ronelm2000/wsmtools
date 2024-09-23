@@ -8,6 +8,7 @@ using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
+using System.Drawing;
 using System.IO;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Deck;
@@ -82,10 +83,10 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         var deckID = localPath.Substring(localPath.LastIndexOf('/') + 1);
         Log.Information("Deck ID: {deckID}", deckID);
 
-        dynamic deckJSON = await GetDeckJSON(encoreDecksDeckAPIURL, deckID, cancellationToken);
+        var deckJSON = await GetDeckJSON(encoreDecksDeckAPIURL, deckID, cancellationToken);
 
         WeissSchwarzDeck res = new WeissSchwarzDeck();
-        res.Name = deckJSON.name;
+        res.Name = deckJSON.Name;
 
         report = report.ObtainedParseDeckData(res);
         progress.Report(report);
@@ -96,17 +97,22 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         {
             await db.Database.MigrateAsync(cancellationToken);
 
-            foreach (dynamic card in deckJSON.cards)
+            foreach (var card in deckJSON.Cards)
             {
-                string serial = WeissSchwarzCard.GetSerial(card.set.ToString(), card.side.ToString(), card.lang.ToString(), card.release.ToString(), card.sid.ToString());
+                string serial = card.toSerial();
                 WeissSchwarzCard? wscard = await db.WeissSchwarzCards.FindAsync(serial);
                 if (wscard is null)
                 {
-                    string setID = card.series;
+                    string setID = card.Series;
                     await _parse($"https://www.encoredecks.com/api/series/{setID}/cards", parseTranslator, cancellationToken);
                     wscard = await db.WeissSchwarzCards.FindAsync(new[] { serial }, cancellationToken);
                 }
-
+                    
+                if (wscard is null)
+                {
+                    Log.Error("Cannot Find Card from DB: {serial}", serial);
+                    throw new Exception();
+                }
                 if (res.Ratios.TryGetValue(wscard!, out int quantity))
                     res.Ratios[wscard!]++;
                 else
@@ -123,14 +129,14 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         return res;
     }
 
-    async Task<dynamic> GetDeckJSON(string encoreDecksDeckAPIURL, string deckID, CancellationToken ct = default)
+    async Task<EncoreDecksDeck> GetDeckJSON(string encoreDecksDeckAPIURL, string deckID, CancellationToken ct = default)
     {
         return await encoreDecksDeckAPIURL
                         .AppendPathSegment(deckID)
                         .WithRESTHeaders()
                         .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
                         .WithHeader("Accept", "text/plain")
-                        .GetJsonAsync<dynamic>(ct);
+                        .GetJsonAsync<EncoreDecksDeck>(cancellationToken: ct);
     }
 
     private IEnumerable<string[]> ParseCSV(string csvFile, Action<TextFieldParser> builder)
@@ -147,4 +153,24 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 
     private DeckParserProgressReport TranslateProgress(CommandProgressReport arg)
         => arg.AsRatio<CommandProgressReport, DeckParserProgressReport>(10, 0.20f);
+
+    private record EncoreDecksDeck
+    {
+        required public String Name { get; init; }
+        required public List<EncoreDecksDeckRatio> Cards { get; init; }
+    }
+
+    private record EncoreDecksDeckRatio
+    {
+        required public String Set { get; init; }
+        required public String Side { get; init; }
+        required public String Lang { get; init; }
+        required public String Release { get; init; }
+        required public String Sid { get; init; }
+        required public String Series { get; init; }
+        public String toSerial()
+        {
+            return WeissSchwarzCard.GetSerial(Set, Side, Lang, Release, Sid);
+        }
+    }
 }

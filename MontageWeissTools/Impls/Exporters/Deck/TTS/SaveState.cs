@@ -1,24 +1,26 @@
-﻿namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
+﻿using System.Text.Json.Serialization;
 
-public class SaveState //Holds a state of the game
+namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
+
+public record SaveState //Holds a state of the game
 {
-    public string SaveName = "";
-    public string GameMode = "";
-    public float Gravity = 0.5f;
-    public float PlayArea = 0.5f;
-    public string Date = "";
-    public string Table = "";
-    public string Sky = "";
-    public string Note = "";
-    public string Rules = "";
-    public string XmlUI = ""; //Custom Xml UI
-    public List<CustomAssetState> CustomUIAssets = new();
-    public string LuaScript = "";
-    public string LuaScriptState = ""; // Serialized running Lua code; will run nothing as it's just a save state.    
-    public List<ObjectState> ObjectStates = new List<ObjectState>(); //Objects on the table
-    public List<DecalState> Decals = new List<DecalState>(); //Decals not attached to objects
-    public Dictionary<int, TabState> TabStates = new Dictionary<int, TabState>(); //Notepad tabs
-    public string VersionNumber = "";
+    required public string SaveName { get; init; } = "";
+    required public string GameMode { get; init; } = "";
+    required public float Gravity { get; init; } = 0.5f;
+    required public float PlayArea { get; init; } = 0.5f;
+    required public string Date { get; init; } = "";
+    required public string Table { get; init; } = "";
+    required public string Sky { get; init; } = "";
+    required public string Note { get; init; } = "";
+    required public string Rules { get; init; } = "";
+    required public string XmlUI { get; init; } = ""; //Custom Xml UI
+    required public List<CustomAssetState> CustomUIAssets = new();
+    required public string LuaScript { get; init; } = "";
+    required public string LuaScriptState { get; init; } = ""; // Serialized running Lua code; will run nothing as it's just a save state.    
+    required public List<ObjectState> ObjectStates { get; init; } = new List<ObjectState>(); //Objects on the table
+    public List<DecalState> Decals { get; init; } = new List<DecalState>(); //Decals not attached to objects
+    public Dictionary<int, TabState> TabStates { get; init; } = new Dictionary<int, TabState>(); //Notepad tabs
+    public string VersionNumber { get; init; } = "";
 }
 
 /*

@@ -4,9 +4,8 @@ using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
-using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
+using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Cards;
 
@@ -25,7 +24,6 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         if (encoreDecksAPIMatcher.IsMatch(urlOrFile))
         {
             Log.Information("Compatibility Passed for: {urlOrFile}", urlOrFile);
-            
             return await ValueTask.FromResult(true);
         }
         else if (encoreDecksSiteSetMatcher.IsMatch(urlOrFile))
@@ -47,7 +45,6 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
 
         var progressReport = new SetParserProgressReport
         {
-
             ReportMessage = new MultiLanguageString
             {
                 EN = "Obtaining list of cards..."
@@ -55,7 +52,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             Percentage = 1
         };
         progress.Report(progressReport);
-        var setCards = await urlOrLocalFile.WithRESTHeaders().GetJsonListAsync(cancellationToken);
+        var setCards = await urlOrLocalFile.WithRESTHeaders().GetJsonAsync<List<EncoreDeckCard>>(cancellationToken: cancellationToken);
 
         progressReport = progressReport with {
             ReportMessage = new MultiLanguageString { EN = $"Obtained [{setCards.Count}] cards." }, 
@@ -77,36 +74,36 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         }
     }
 
-    private async Task<WeissSchwarzCard> Decode(dynamic setCard)
+    private async Task<WeissSchwarzCard> Decode(EncoreDeckCard setCard)
     {
         WeissSchwarzCard result = new WeissSchwarzCard();
         result.Name = new MultiLanguageString();
-        var enOptional = DynamicExtensions.AsOptional(setCard.locale.EN);
-        var jpOptional = DynamicExtensions.AsOptional(setCard.locale.NP);
-        if (((string)enOptional.source)?.ToLower() != "akiba")
-            result.Name.EN = enOptional.name;
-        result.Name.JP = jpOptional.name;
-        (List<object>, List<object>) attributes = (enOptional.attributes, jpOptional.attributes);
+        var enOptional = setCard.Locale.EN;
+        var jpOptional = setCard.Locale.NP;
+        if (enOptional?.Source?.ToLower() != "akiba")
+            result.Name.EN = enOptional!.Name;
+        result.Name.JP = jpOptional?.Name;
+        (List<string>?, List<string>?) attributes = (enOptional?.Attributes, jpOptional?.Attributes);
         result.Traits = TranslateTraits(attributes).ToList();
-        result.Effect = ((List<object>)enOptional.ability)?.Cast<string>().ToArray() ?? Array.Empty<string>();
-        result.Rarity = setCard.rarity;
-        result.Side = TranslateSide(setCard.side);
-        result.Level = (int?)setCard.level;
-        result.Cost = (int?)setCard.cost;
-        result.Power = (int?)setCard.power;
-        result.Soul = (int?)setCard.soul;
-        result.Triggers = TranslateTriggers(setCard.trigger);
+        result.Effect = enOptional?.Ability?.ToArray() ?? Array.Empty<string>();
+        result.Rarity = setCard.Rarity!;
+        result.Side = TranslateSide(setCard.Side);
+        result.Level = setCard.Level;
+        result.Cost = setCard.Cost;
+        result.Power = setCard.Power;
+        result.Soul = setCard.Soul;
+        result.Triggers = TranslateTriggers(setCard.Trigger ?? Enumerable.Empty<String>());
 
         //result.Serial = setCard.cardcode;
-        if (!String.IsNullOrEmpty(setCard.imagepath))
-            result.Images.Add(new Uri($"https://www.encoredecks.com/images/{setCard.imagepath}"));
+        if (!String.IsNullOrEmpty(setCard.ImagePath))
+            result.Images.Add(new Uri($"https://www.encoredecks.com/images/{setCard.ImagePath}"));
 
         // TODO: Delete all methods related with generating serial.
         // TODO: Switch once LLDX checkbox is checked properly. See: https://trello.com/c/WCT94Sk0/2-card-code-needs-to-be-stored-seperatly-from-side-release
-        result.Serial = WeissSchwarzCard.GetSerial(setCard.set.ToString(), setCard.side.ToString(), setCard.lang.ToString(), setCard.release.ToString(), setCard.sid.ToString());
+        result.Serial = WeissSchwarzCard.GetSerial(setCard.Set!, setCard.Side!, setCard.Lang!, setCard.Release!, setCard.SID!);
 
-        result.Type = TranslateType(setCard.cardtype);
-        result.Color = TranslateColor(setCard.colour);
+        result.Type = TranslateType(setCard.CardType!);
+        result.Color = TranslateColor(setCard.Colour!);
         result.Remarks = $"Parsed: {this.GetType().Name}";
 
         result = FixSiteErrata(result);
@@ -150,7 +147,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         };
     }
 
-    private CardSide TranslateSide(string side)
+    private CardSide TranslateSide(string? side)
     {
         return side switch
         {
@@ -160,9 +157,12 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         };
     }
 
-    private IEnumerable<WeissSchwarzTrait> TranslateTraits((List<object> EN, List<object> JP) attributes)
+    private IEnumerable<WeissSchwarzTrait> TranslateTraits((List<string>? EN, List<string>? JP) attributes)
     {
-        var nullCheckedAttributes = (EN: attributes.EN ?? Enumerable.Empty<object>().ToList(), JP: attributes.JP ?? Enumerable.Empty<object>().ToList());
+        var nullCheckedAttributes = (
+            EN: attributes.EN ?? Enumerable.Empty<string>().ToList(),
+            JP: attributes.JP ?? Enumerable.Empty<string>().ToList()
+            );
         var maxlength = Math.Max(nullCheckedAttributes.EN.Count, nullCheckedAttributes.JP.Count);
         var enSpan = nullCheckedAttributes.EN.ToArray();
         var jpSpan = nullCheckedAttributes.JP.ToArray();
@@ -183,7 +183,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         "―"
     };
 
-    private WeissSchwarzTrait? Construct(object traitEN, object traitJP)
+    private WeissSchwarzTrait? Construct(string? traitEN, string? traitJP)
     {
         WeissSchwarzTrait str = new WeissSchwarzTrait();
         str.EN = traitEN?.ToString();
@@ -196,7 +196,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             return str;
     }
 
-    private Trigger[] TranslateTriggers(List<object> triggers) => triggers.Select(o => o.ToString() ?? string.Empty).Select(TranslateTrigger).ToArray();
+    private Trigger[] TranslateTriggers(IEnumerable<string> triggers) => triggers.Select(o => o ?? string.Empty).Select(TranslateTrigger).ToArray();
 
     private Trigger TranslateTrigger(string trigger)
     {
@@ -239,5 +239,42 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             _ => originalCard
         };
     }
+}
 
+internal record EncoreDeckCard
+{
+    [JsonPropertyName("cardcode")]
+    public required string Serial { get; init; }
+
+    [JsonPropertyName("locale")]
+    public required LocaleRecords Locale { get; init; }
+    
+    public string? Rarity { get; init; }
+    public string? Side { get; init; }
+    public int? Level { get; init; }
+    public int? Cost { get; init; }
+    public int? Power { get; init; }
+    public int? Soul { get; init; }
+    public List<string>? Trigger { get; init; }
+    public string? ImagePath { get; init; }
+    public string? CardType { get; init; }
+    public string? Colour { get; init; }
+    public string? Set { get; init; }
+    public string? Lang { get; init; }
+    public string? Release { get; init; }
+    public string? SID { get; init; }
+}
+
+internal record LocaleRecords
+{
+    public LocaleRecord? EN { get; init; }
+    public LocaleRecord? NP { get; init; }
+}
+
+internal record LocaleRecord
+{
+    public string? Source { get; init; }
+    public string? Name { get; init; }
+    public List<string>? Attributes { get; init; }
+    public List<string>? Ability { get; init; }
 }

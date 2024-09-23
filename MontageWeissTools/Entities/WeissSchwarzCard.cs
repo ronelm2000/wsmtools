@@ -111,7 +111,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         Log.Debug("Loading URL: {url}", url.AbsoluteUri);
         return await url.WithImageHeaders()
                         .WithCookies(cookieSession)
-                        .GetAsync(ct)
+                        .GetAsync(cancellationToken: ct)
                         .ReceiveStream();
     }
 
@@ -130,7 +130,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         {
             return (await url.WithImageHeaders()
                             .WithCookies(cookieSession)
-                            .GetAsync(ct))
+                            .GetAsync(cancellationToken: ct))
                             .StatusCode == 200;
         }
         catch (Exception)

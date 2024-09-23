@@ -28,6 +28,7 @@ public class CardTests
            "CCS/BSF2019-02",
            "RANDOM"
         };
+#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
         var expectedOutput = new (string NeoStandardCode, string ReleaseID, string SetID)?[]
         {
             ("LSS", "W69", "054"),
@@ -35,6 +36,7 @@ public class CardTests
             ("CCS", "BSF2019", "02"),
             (null,null,null)
         };
+#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
 
         for (int i = 0; i < serials.Length; i++)
         {
@@ -123,7 +125,7 @@ public class CardTests
 
     [TestMethod]
     [Ignore]
-    public async Task TestTTSCommand()
+    public async Task TestTTSCommand(Task<string?> task)
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
         var Log = Serilog.Log.Logger.ForContext<CardTests>();
@@ -145,7 +147,7 @@ public class CardTests
             Log.Information($"Running: {json}");
             await writer.WriteAsync(json);
             await writer.FlushAsync();
-            string response = await reader.ReadLineAsync();
+            string response = await (reader?.ReadLineAsync() ?? Task.FromResult<string?>(""))! ?? "";
             Log.Information("Logging Response: {response}", response);
         }
     }

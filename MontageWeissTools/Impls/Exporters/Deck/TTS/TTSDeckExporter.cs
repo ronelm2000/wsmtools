@@ -8,7 +8,6 @@ using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Resources.TTS;
 using Montage.Weiss.Tools.Utilities;
-using Newtonsoft.Json;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -16,6 +15,8 @@ using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System.Net.Sockets;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
 
@@ -100,12 +101,18 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 
         var finalTemplateLUA = TTSResources.LuaTemplate
             .Replace("<deck_name_info_placeholder>", $"\"{deck.Name.EscapeQuotes()}\"")
-            .Replace("<serials_placeholder>", $"\"{JsonConvert.SerializeObject(serialStringList).EscapeQuotes()}\"")
-            .Replace("<serial_info_placeholder>", $"\"{JsonConvert.SerializeObject(serialDictionary).EscapeQuotes()}\"")
+            .Replace("<serials_placeholder>", $"\"{JsonSerializer.Serialize(serialStringList).EscapeQuotes()}\"")
+            .Replace("<serial_info_placeholder>", $"\"{JsonSerializer.Serialize(serialDictionary).EscapeQuotes()}\"")
             ;
 
         var finalTemplateUIXML = TTSResources.XMLUITemplate;
-        var saveState = JsonConvert.DeserializeObject<SaveState>(Encoding.UTF8.GetString(TTSResources.CustomObject)) ?? throw new InvalidOperationException();
+        var saveState = JsonSerializer.Deserialize<SaveState>(Encoding.UTF8.GetString(TTSResources.CustomObject), new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            PreferredObjectCreationHandling = System.Text.Json.Serialization.JsonObjectCreationHandling.Populate,
+            UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow,
+            ReadCommentHandling = JsonCommentHandling.Skip
+        }) ?? throw new InvalidOperationException();
         saveState.ObjectStates[0].LuaScript = finalTemplateLUA;
         saveState.ObjectStates[0].XmlUI = finalTemplateUIXML;
 
@@ -114,16 +121,16 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 
         //TODO: Add more progress logs here.
 
-        deckGeneratorPath.Open(s =>
+        await using (var deckGenStream = deckGeneratorPath.GetOpenWriteStream())
         {
-            using (System.IO.StreamWriter w = new System.IO.StreamWriter(s))
+            await JsonSerializer.SerializeAsync(deckGenStream, saveState, options: new JsonSerializerOptions
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Formatting = Formatting.Indented;
-                serializer.NullValueHandling = NullValueHandling.Ignore;
-                serializer.Serialize(w, saveState);
-            }
-        }, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.ReadWrite);
+                AllowTrailingCommas = true,
+                WriteIndented = true,
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            });
+        }
+
         var deckGeneratorImage = resultFolder.Combine($"{nameOfObject.AsFileNameFriendly()}.png");
         deckGeneratorImage.Open(s =>
         {
@@ -180,9 +187,9 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
     public async Task SendDeckGeneratorJSON(string host, int ttsPort, SaveState saveState)
     {
         Log.Information("Generating a TTS command...");
-        var serializedObject = JsonConvert.SerializeObject(
+        var serializedObject = JsonSerializer.Serialize(
             saveState.ObjectStates[0], 
-            settings: new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }
+            new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }
             ).EscapeQuotes();
         var command = new TTSExternalEditorCommand("-1", 
             $"spawnObjectJSON({{ json = \"{serializedObject}\" }})\n" +
@@ -228,7 +235,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         using (var writer = new System.IO.StreamWriter(stream))
             try
             {
-                await writer.WriteAsync(JsonConvert.SerializeObject(command));
+                await writer.WriteAsync(JsonSerializer.Serialize(command));
                 await writer.FlushAsync();
             }
             finally
@@ -252,8 +259,8 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
                         Log.Debug($"Recieved Data: {data}");
                         try
                         {
-                            dynamic? json = JsonConvert.DeserializeObject(data);
-                            if (json?.messageID == 4 && json?.customMessage?.StopID?.ToString() == stopSignalGUID.ToString())
+                            JsonNode? json = JsonSerializer.Deserialize<JsonNode>(data);
+                            if (json?["messageID"]?.GetValue<int>() == 4 && json?["customMessage"]?["StopID"]?.ToString() == stopSignalGUID.ToString())
                                 return;
                         }
                         catch (Exception) { }

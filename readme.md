@@ -107,6 +107,7 @@ registering on GitHub.
 ---------
 
 ### Known Issues
+* The English Weiss Schwarz exporter is currently not working due to the new website design. This will be fixed in a new version.
 * Some decks from Encore Decks will be untranslated. This is true for all sets without a community translation.
   In order to resolve this, you must (begrudgingly) use HOTC translations by running the following command first.
   Personally, I discourage anyone with a 10-foot pole to use it because they don't like people using their translations

@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET 7
+    - name: Setup .NET 8
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
     - name: Install dependencies
       run: dotnet restore
     - name: Build
@@ -29,13 +29,15 @@ jobs:
         dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true  -p:PublishTrimmed=false  --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
     - name: Upload Artifact (win-x64)
       if: ${{ !env.ACT }}
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: wstools-win-x64
         path: publish/wstools.exe
+        if-no-files-found: warn
     - name: Upload Artifact (linux-x64)
       if: ${{ !env.ACT }}
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: wstools-linux-x64
         path: publish/wstools
+        if-no-files-found: warn

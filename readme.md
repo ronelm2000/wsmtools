@@ -24,7 +24,7 @@ registering on GitHub.
   ```ps
   ./wstools export https://www.encoredecks.com/deck/CW5ThLgZ7 --with sendtcp
   ```
-* [Weiss Schwarz Card Game Simulator by Blake Thoennes](https://blakethoennes.itch.io/weiss-schwarz)
+* Weiss Schwarz Card Game Simulator by Blake Thoennes
   ```ps
   ./wstools export https://www.encoredecks.com/deck/CW5ThLgZ7 --exporter bws
   ```

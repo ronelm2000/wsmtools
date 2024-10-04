@@ -47,13 +47,13 @@ jobs:
       if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v4
       with:
-        name: wstools-win-x64
+        name: wsm-gui-win-x64
         path: publish/wsm-gui.exe
         if-no-files-found: warn
     - name: Upload Artifact (wsm-gui linux-x64)
       if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v4
       with:
-        name: wstools-linux-x64
+        name: wsm-gui-linux-x64
         path: publish/wsm-gui
         if-no-files-found: warn

@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Logging;
 using Serilog;
+using Splat;
+using Splat.Serilog;
 
 namespace Montage.Weiss.Tools.GUI.Extensions;
 public static class AppBuilderExtensions
@@ -11,6 +13,8 @@ public static class AppBuilderExtensions
             .WriteTo.Debug()
             .WriteTo.File("wsm-gui.log", Serilog.Events.LogEventLevel.Debug)
             .CreateLogger();
+
+        Locator.CurrentMutable.UseSerilogFullLogger();
 
         Logger.Sink = new SerilogLogSink();
 

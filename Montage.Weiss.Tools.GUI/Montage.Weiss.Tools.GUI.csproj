@@ -31,6 +31,7 @@
     <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.1.0.4" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
     <PackageReference Include="ReactiveUI" Version="20.1.63" />
+    <PackageReference Include="Splat.Serilog" Version="15.2.22" />
   </ItemGroup>
 
   <ItemGroup>

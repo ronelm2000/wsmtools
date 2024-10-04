@@ -14,27 +14,17 @@ using System.Linq;
 using ReactiveUI;
 using System.Reactive;
 using Montage.Weiss.Tools.GUI.Extensions;
-using Avalonia.Metadata;
 using Avalonia.Platform.Storage;
-using System.Data.Entity.ModelConfiguration.Conventions;
-using System.Reflection.Metadata.Ecma335;
 using Fluent.IO;
-using DynamicData.Binding;
 using System.Reactive.Linq;
 using System.Threading;
 using Montage.Weiss.Tools.Impls.Exporters.Deck;
 using Montage.Card.API.Entities;
-using Montage.Card.API.Services;
-using System.Diagnostics;
-using System.Collections.Generic;
 using Montage.Weiss.Tools.Impls.Parsers.Deck;
 using Montage.Card.API.Interfaces.Services;
 using Avalonia.Controls;
-using Avalonia;
-using SQLitePCL;
 using System.Text.RegularExpressions;
-using Avalonia.Media;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Avalonia.Threading;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
@@ -83,7 +73,7 @@ public partial class MainWindowViewModel : ViewModelBase
             DatabaseViewList = new ObservableCollection<CardEntryViewModel>(
             [
                 new CardEntryViewModel(
-                new Uri("avares://Montage.Weiss.Tools.GUI/Assets/Samples/sample_card.jpg"),
+                new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
                 new MultiLanguageString { EN = "Sample 1", JP = "Sample 1 But JP" },
                 [
                     new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" },
@@ -91,19 +81,19 @@ public partial class MainWindowViewModel : ViewModelBase
                 ]
              ),
             new CardEntryViewModel(
-                new Uri("avares://Montage.Weiss.Tools.GUI/Assets/Samples/sample_card.jpg"),
+                new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
                 new MultiLanguageString { EN = "Sample 2", JP = "Sample 2 But JP" },
                 [ new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" } ]
             ),
             new CardEntryViewModel(
-                new Uri("avares://Montage.Weiss.Tools.GUI/Assets/Samples/sample_card.jpg"),
+                new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
                 new MultiLanguageString { EN = "Sample 3", JP = "Sample 3 But JP" },
                 [ new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" } ]
             )
             ]);
 
             DeckRatioList.Add(new CardRatioViewModel());
-            DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri("avares://Montage.Weiss.Tools.GUI/Assets/Samples/sample_card.jpg").Load() });
+            DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg").Load() });
         }
         else
         {
@@ -227,13 +217,16 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Log.Information("Refreshing Card List...");
 
-        DatabaseViewList.Clear();
-
-        foreach (var card in searchCardList)
+        await Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var cardView = new CardEntryViewModel(card);
-            DatabaseViewList.Add(cardView);
-        }
+            DatabaseViewList.Clear();
+
+            foreach (var card in searchCardList)
+            {
+                var cardView = new CardEntryViewModel(card);
+                DatabaseViewList.Add(cardView);
+            }
+        });
 
         log.Information("All Serials: {ser}", DatabaseViewList.Select(v => v.Card.Serial).Distinct().Count());
         log.Information("All Cards: {ser}", DatabaseViewList.Count);
@@ -317,7 +310,8 @@ public partial class MainWindowViewModel : ViewModelBase
             log.Information("From: {path}", filesFolderPath.FullPath);
             log.Information("To: {newPath}", imagePath.FullPath);
 
-            filesFolderPath.AllFiles().Copy(imagePath);
+            foreach (var filesPath in filesFolderPath.AllFiles())
+                filesPath.Copy(imagePath, Overwrite.Always);
         }
     }
 

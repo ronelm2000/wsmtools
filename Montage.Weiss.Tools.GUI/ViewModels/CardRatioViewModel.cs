@@ -1,7 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicData.Binding;
@@ -42,7 +40,7 @@ public partial class CardRatioViewModel : ViewModelBase
         if (Design.IsDesignMode)
         {
             Ratio = 4;
-            Image = new Uri("avares://Montage.Weiss.Tools.GUI/Assets/Samples/sample_card.jpg").Load();
+            Image = new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg").Load();
             Effects = ["[AUTO] aaaaaaaaaaaaaaa"];
         }
 

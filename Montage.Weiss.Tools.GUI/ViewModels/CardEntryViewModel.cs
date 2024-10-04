@@ -22,7 +22,7 @@ namespace Montage.Weiss.Tools.GUI.ViewModels;
 public partial class CardEntryViewModel : ViewModelBase
 {
     public static CardEntryViewModel Sample { get; } = new(
-        new Uri("avares://Montage.Weiss.Tools.GUI/Assets/Samples/KRac_WC002_E065.jpg"),
+        new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
         new MultiLanguageString { EN = "Sample 1", JP = "Sample 1 But JP" },
         [
                 new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" },
@@ -84,7 +84,7 @@ public partial class CardEntryViewModel : ViewModelBase
         Power = 5000;
         Soul = 1;
         CardType = CardType.Character;
-        EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri("avares://Montage.Weiss.Tools.GUI/Assets/Symbols/cx_combo.png")), 12) };
+        EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri("avares://wsm-gui/Assets/Symbols/cx_combo.png")), 12) };
         Image = imageUri.Load();
         Effects = ["[AUTO] Aaaaaaaaa"];
     }
@@ -123,8 +123,8 @@ public partial class CardEntryViewModel : ViewModelBase
 
     private IEnumerable<Uri> TranslateEffect(string effect)
     {
-        var cxcSymbol = new Uri("avares://Montage.Weiss.Tools.GUI/Assets/Symbols/cx_combo.png");
-        var counter = new Uri("avares://Montage.Weiss.Tools.GUI/Assets/Symbols/backup.png");
+        var cxcSymbol = new Uri("avares://wsm-gui/Assets/Symbols/cx_combo.png");
+        var counter = new Uri("avares://wsm-gui/Assets/Symbols/backup.png");
 
         // Assume English Text For Now
         if (effect.Contains("CXCOMBO"))

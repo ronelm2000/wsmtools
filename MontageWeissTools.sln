@@ -17,6 +17,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Montage.Weiss.Tools.Test", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Montage.Card.API", "Montage.Card.API\Montage.Card.API.csproj", "{D4B69600-AC71-4A82-B0BF-8ED9185BC972}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Montage.Weiss.Tools.GUI", "Montage.Weiss.Tools.GUI\Montage.Weiss.Tools.GUI.csproj", "{8BA74E7D-AC5F-4248-B644-BE94D60A36BF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1A0D3FF8-59D2-4548-988E-E66CC1BAC914} = {1A0D3FF8-59D2-4548-988E-E66CC1BAC914}
+		{D4B69600-AC71-4A82-B0BF-8ED9185BC972} = {D4B69600-AC71-4A82-B0BF-8ED9185BC972}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +55,14 @@ Global
 		{D4B69600-AC71-4A82-B0BF-8ED9185BC972}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D4B69600-AC71-4A82-B0BF-8ED9185BC972}.Release|x64.ActiveCfg = Release|Any CPU
 		{D4B69600-AC71-4A82-B0BF-8ED9185BC972}.Release|x64.Build.0 = Release|Any CPU
+		{8BA74E7D-AC5F-4248-B644-BE94D60A36BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BA74E7D-AC5F-4248-B644-BE94D60A36BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BA74E7D-AC5F-4248-B644-BE94D60A36BF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8BA74E7D-AC5F-4248-B644-BE94D60A36BF}.Debug|x64.Build.0 = Debug|Any CPU
+		{8BA74E7D-AC5F-4248-B644-BE94D60A36BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BA74E7D-AC5F-4248-B644-BE94D60A36BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BA74E7D-AC5F-4248-B644-BE94D60A36BF}.Release|x64.ActiveCfg = Release|Any CPU
+		{8BA74E7D-AC5F-4248-B644-BE94D60A36BF}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

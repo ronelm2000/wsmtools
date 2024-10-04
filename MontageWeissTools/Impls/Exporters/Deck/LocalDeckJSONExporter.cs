@@ -22,7 +22,7 @@ public class LocalDeckJSONExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwar
     };
     private readonly Func<IFileOutCommandProcessor> _focProcessor;
 
-    public string[] Alias => new[]{ "local", "json" };
+    public string[] Alias => new[] { "local", "json" };
 
     public LocalDeckJSONExporter(IContainer ioc)
     {
@@ -36,7 +36,28 @@ public class LocalDeckJSONExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwar
         var progress = info.Progress;
         progress.Report(report);
 
-        var jsonFilename = Path.CreateDirectory(info.Destination).Combine($"deck_{deck.Name.AsFileNameFriendly()}.json");
+        var destination = Path.CreateDirectory(info.Destination).Combine($"deck_{deck.Name.AsFileNameFriendly()}.ws-dek");
+        await Export(deck, report, progress, info.OutCommand, destination, cancellationToken);
+    }
+
+    public async Task Export(WeissSchwarzDeck deck, IProgress<DeckExportProgressReport> progress, Path jsonPath, CancellationToken cancellationToken = default)
+    {
+        Log.Information("Exporting as Deck JSON.");
+        var report = DeckExportProgressReport.Starting(deck.Name, ".dek Exporter");
+        progress.Report(report);
+
+        await Export(deck, report, progress, null, jsonPath, cancellationToken);
+    }
+
+    private async Task Export(
+        WeissSchwarzDeck deck, 
+        DeckExportProgressReport report, 
+        IProgress<DeckExportProgressReport> progress,
+        string? outCommand, 
+        Path jsonPath,
+        CancellationToken cancellationToken
+        )
+    {
         var simplifiedDeck = new
         {
             Name = deck.Name,
@@ -44,18 +65,18 @@ public class LocalDeckJSONExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwar
             Ratios = deck.AsSimpleDictionary()
         };
 
-        jsonFilename.Open(
+        jsonPath.Open(
             async s => await JsonSerializer.SerializeAsync(s, simplifiedDeck, options: _defaultOptions, cancellationToken),
             System.IO.FileMode.Create,
             System.IO.FileAccess.Write,
             System.IO.FileShare.ReadWrite
         );
 
-        Log.Information($"Done: {jsonFilename.FullPath}");
-        report = report.Done(jsonFilename.FullPath);
+        Log.Information($"Done: {jsonPath.FullPath}");
+        report = report.Done(jsonPath.FullPath);
         progress.Report(report);
 
-        if (!String.IsNullOrWhiteSpace(info.OutCommand))
-            await _focProcessor().Process(info.OutCommand, jsonFilename.FullPath, cancellationToken);
+        if (!String.IsNullOrWhiteSpace(outCommand))
+            await _focProcessor().Process(outCommand, jsonPath.FullPath, cancellationToken);
     }
 }

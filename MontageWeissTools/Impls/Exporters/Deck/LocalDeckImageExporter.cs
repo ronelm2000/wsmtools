@@ -32,6 +32,8 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
     private readonly Func<Flurl.Url, CookieSession> _cookieSession;
     private readonly Func<string, string, CancellationToken, Task> _processOutCommand;
 
+    private readonly Regex limitFlagRegex = new Regex(@"limit-width\((\d+)\)");
+
     public LocalDeckImageExporter(IContainer ioc)
     {
         _cookieSession = (url) => ioc.GetInstance<GlobalCookieJar>()[url.Root];
@@ -130,6 +132,15 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
             report = report.SizingImages("Upscaling", bounds);
             progress.Report(report);
         }
+        else if (info.Flags.Any(limitFlagRegex.IsMatch))
+        {
+            var limitString = info.Flags.First(limitFlagRegex.IsMatch);
+            var limitValueString = limitFlagRegex.Match(limitString).Groups[1].Value;
+            var limitWidth = int.Parse(limitValueString);
+            var maxBounds = selection.Aggregate((a, b) => (Math.Max(a.Width, b.Width), Math.Max(a.Height, b.Height)));
+            bounds = (limitWidth, (int)((float)maxBounds.Height / (float)maxBounds.Width * limitWidth));
+            Log.Information("Adjusting image sizing to the limited bounds: {@minimumBounds}", bounds);
+        } 
         else
         {
             bounds = selection.Aggregate((a, b) => (Math.Min(a.Width, b.Width), Math.Min(a.Height, b.Height)));

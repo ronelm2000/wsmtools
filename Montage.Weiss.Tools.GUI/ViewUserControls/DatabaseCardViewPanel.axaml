@@ -1,0 +1,150 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dd="clr-namespace:Montage.Weiss.Tools.GUI.ViewModels;assembly=wsm-gui"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="220"
+             d:DataContext="{x:Static dd:CardEntryViewModel.Sample}"
+             x:Class="Montage.Weiss.Tools.GUI.ViewUserControls.DatabaseCardViewPanel"
+             x:DataType="dd:CardEntryViewModel"
+             >
+  <Grid Name="CardGrid"
+        RowDefinitions="Auto,Auto"
+        >
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="40*"></ColumnDefinition>
+      <ColumnDefinition Width="60*"></ColumnDefinition>
+    </Grid.ColumnDefinitions>
+    <ToolTip.Tip>
+      <ItemsControl Name="EffectsListPanel" ItemsSource="{Binding Effects}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding {}}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ToolTip.Tip>
+
+    <Border Name="CardNameBorder"
+            Padding="2"
+            Margin="5"
+            Grid.ColumnSpan="2"
+            Grid.Row="0"
+            PointerReleased="Generic_PointerReleased"
+            >
+      <TextBlock Name="CardName" TextAlignment="Center">
+        <Run Text="{Binding Name.EN}" />
+        <LineBreak />
+        <Run Classes="InlineSerial" Text="{Binding Serial}" />
+      </TextBlock>
+
+    </Border>
+
+    <Border Margin="2,2,2,2"
+            Grid.Column="0"
+            Grid.Row="1"
+            >
+      <Image  Source="{Binding Image^}"
+              ClipToBounds="false"
+              MaxWidth="150"
+              PointerReleased="Generic_PointerReleased"
+              />
+    </Border>
+
+    <StackPanel Orientation="Vertical"
+                Grid.Column="1"
+                Grid.Row="1"
+                PointerReleased="Generic_PointerReleased"
+                >
+      <ItemsControl Name="TraitListPanel" ItemsSource="{Binding Traits}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel HorizontalAlignment="Center" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Border Name="TraitBorder" Margin="5,0,5,5">
+              <TextBlock Text="{Binding EN}" Padding="2" />
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <Grid Name="CardStats" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="50*"></ColumnDefinition>
+          <ColumnDefinition Width="50*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Grid ColumnDefinitions="49*,2*,49*"
+              Grid.Column="0"
+              Grid.Row="1"
+              IsVisible="{Binding IsCharacterOrEvent^}"
+              >
+          <Border Grid.Column="0">
+            <TextBlock Text="Level" />
+          </Border>
+          <Border Grid.Column="2">
+            <TextBlock Text="Cost" />
+          </Border>
+        </Grid>
+
+        <TextBlock Grid.Column="1" Grid.Row="1" IsVisible="{Binding IsCharacterOrEvent^}">
+          <Run Text="{Binding Level}" />
+          <Run Text=" / " />
+          <Run Text="{Binding Cost}" />
+        </TextBlock>
+
+        <Grid ColumnDefinitions="49*,2*,49*"
+              Grid.Column="0"
+              Grid.Row="2"
+              IsVisible="{Binding IsCharacter^}"
+              >
+          <Border Grid.Column="0" Grid.Row="1">
+            <TextBlock Text="Power" />
+          </Border>
+          <Border Grid.Column="2" Grid.Row="1">
+            <TextBlock Text="Soul" />
+          </Border>
+        </Grid>
+        <TextBlock Grid.Column="1"
+                   Grid.Row="2"
+                   IsVisible="{Binding IsCharacter^}"
+                   >
+          <Run Text="{Binding Power}" />
+          <Run Text=" / " />
+          <Run Text="{Binding Soul}" />
+        </TextBlock>
+
+        <TextBlock Text="Trigger" Grid.Column="0" Grid.Row="3"/>
+        <TextBlock Text="-"  Grid.Column="1" Grid.Row="3" />
+
+        <TextBlock Classes="notVisibleOnSmallScreen notVisibleOnMediumScreen"
+                   Text="Effect"
+                   Grid.Column="0"
+                   Grid.Row="4"/>
+        <ItemsControl Classes="notVisibleOnSmallScreen notVisibleOnMediumScreen"
+                      ItemsSource="{Binding EffectMarkers}"
+                      Grid.Column="1" Grid.Row="4"
+                      >
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel VerticalAlignment="Center" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Image Source="{Binding .}" Height="12" VerticalAlignment="Center" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </Grid>
+    </StackPanel>
+  </Grid>
+</UserControl>

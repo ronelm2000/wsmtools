@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Octokit;
+using Fluent.IO;
 
 namespace Montage.Weiss.Tools.Entities;
 
@@ -42,7 +43,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     public string Remarks { get; set; }
 
     public virtual List<WeissSchwarzCardOptionalInfo> AdditionalInfo { get; set; } = new List<WeissSchwarzCardOptionalInfo>();
-    
+
     /// <summary>
     /// File Path Relative Link into a cached image. This property is usually assigned exactly once by
     /// <see cref="IExportedDeckInspector">Deck Inspectors</see>
@@ -50,7 +51,6 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     [JsonIgnore]
     [NotMapped]
     public string? CachedImagePath { get; set; }
-
     //public readonly WeissSchwarzCard Empty = new WeissSchwarzCard();
 
     public WeissSchwarzCard()
@@ -88,6 +88,14 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         return newCard;
     }
 
+    public Path? GetCachedImagePath(String imagePath = "Images")
+    {
+        return Path.Current.Add("Images")
+                        .Files($"{Serial.Replace('-', '_').AsFileNameFriendly()}.*", true)
+                        .WhereExtensionIs(".png", ".jpeg", ".jpg", "jfif")
+                        .FirstOrDefault();
+    }
+
     public async Task<System.IO.Stream> GetImageStreamAsync(CookieSession? cookieSession, CancellationToken ct)
     {
         if (!String.IsNullOrWhiteSpace(CachedImagePath) && !CachedImagePath.Contains(".."))
@@ -109,10 +117,12 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
             catch (Exception) { }
         var url = Images.Last();
         Log.Debug("Loading URL: {url}", url.AbsoluteUri);
-        return await url.WithImageHeaders()
-                        .WithCookies(cookieSession)
-                        .GetAsync(cancellationToken: ct)
-                        .ReceiveStream();
+
+        var builder = url.WithImageHeaders();
+        if (cookieSession is not null)
+            builder = builder.WithCookies(cookieSession!);
+        
+        return await builder.GetAsync(cancellationToken: ct).ReceiveStream();
     }
 
     public async Task<bool> IsImagePresentAsync(CookieSession? cookieSession, CancellationToken ct)

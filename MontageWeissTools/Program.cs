@@ -111,17 +111,7 @@ public class Program
     {
         return new Container(x =>
         {
-            //x.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));
-            x.AddSingleton<GlobalCookieJar>();
-            x.AddSingleton<ILogger>(Serilog.Log.Logger);
-            x.AddSingleton<DeckLogCacheService>();
-            x.Scan(s =>
-            {
-                s.AssemblyContainingType<Program>();
-                s.WithDefaultConventions();
-                s.RegisterConcreteTypesAgainstTheFirstInterface();
-            });
-
+            x.BootstrapDefaultServices();
         });
     }
 
@@ -149,4 +139,21 @@ public class Program
         System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? Environment.ProcessPath ?? "";
     public static DateTime AppReleaseDate =>
         System.IO.File.GetLastWriteTime(AppFilePath);
+}
+
+public static class LamarContainerExtensions {
+    public static ServiceRegistry BootstrapDefaultServices(this ServiceRegistry registry)
+    {
+        //x.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));
+        registry.AddSingleton<GlobalCookieJar>();
+        registry.AddSingleton<ILogger>(Serilog.Log.Logger);
+        registry.AddSingleton<DeckLogCacheService>();
+        registry.Scan(s =>
+        {
+            s.AssemblyContainingType<Program>();
+            s.WithDefaultConventions();
+            s.RegisterConcreteTypesAgainstTheFirstInterface();
+        });
+        return registry;
+    }
 }

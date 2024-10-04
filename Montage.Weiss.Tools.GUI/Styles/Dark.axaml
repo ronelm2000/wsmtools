@@ -1,0 +1,86 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vw="clr-namespace:Montage.Weiss.Tools.GUI.ViewModels;assembly=wsm-gui" 
+        xmlns:g="using:Avalonia.VisualTree"
+        xmlns:c="clr-namespace:Montage.Weiss.Tools.GUI.Converters;assembly=wsm-gui"
+        >
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <!-- Add Controls for Previewer Here -->
+    </Border>
+  </Design.PreviewWith>
+
+  <!-- Add Styles Here -->
+  <Style Selector="TextBlock">
+    <Setter Property="Foreground" Value="#1ba0d0" />
+  </Style>
+  <Style Selector="Border#DatabaseView">
+    <Setter Property="Background" Value="#0b0c0d" />
+  </Style>
+  <!-- Visibility -->
+  <Style Selector=":SmallScreen TextBlock.notVisibleOnSmallScreen">
+    <Setter Property="IsVisible" Value="false" />
+  </Style>
+  <Style Selector=":MediumScreen TextBlock.notVisibleOnMediumScreen">
+    <Setter Property="IsVisible" Value="false" />
+  </Style>
+  <Style Selector=":SmallScreen ItemsControl.notVisibleOnSmallScreen">
+    <Setter Property="IsVisible" Value="false" />
+  </Style>
+  <Style Selector=":MediumScreen ItemsControl.notVisibleOnMediumScreen">
+    <Setter Property="IsVisible" Value="false" />
+  </Style>
+  <!-- Status -->
+  <Style Selector="Border.StatusBorder">
+    <Setter Property="Background" Value="#0b0c0d" />
+  </Style>
+  <!-- Traits -->
+  <Style Selector="Border#TraitBorder">
+    <Setter Property="CornerRadius" Value="4" />
+  </Style>
+  <Style Selector="ItemsControl#TraitListPanel > ContentPresenter:nth-child(1) > Border#TraitBorder">
+    <Setter Property="Background" Value="#7988d8" />
+  </Style>
+  <Style Selector="ItemsControl#TraitListPanel > ContentPresenter:nth-child(1) > Border#TraitBorder > TextBlock">
+    <Setter Property="Foreground" Value="#0b0c0d" />
+  </Style>
+  <Style Selector="ItemsControl#TraitListPanel > ContentPresenter:nth-child(2) > Border#TraitBorder">
+    <Setter Property="Background" Value="#4b5baa" />
+  </Style>
+  <!-- Name -->
+  <Style Selector="Border#CardNameBorder">
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="BorderBrush" Value="#22337d" />
+  </Style>
+  <Style Selector="Run.InlineSerial">
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="FontStyle" Value="Italic" />
+  </Style>
+  <!-- Stats -->
+  <Style Selector="Grid#CardStats > TextBlock">
+    <Setter Property="Margin" Value="2" />
+    <Setter Property="Padding" Value="2" />
+  </Style>
+  <Style Selector="Grid#CardStats > Grid">
+    <Setter Property="Margin" Value="2" />
+  </Style>
+  <Style Selector="Grid#CardStats > Grid:nth-child(4n+1) > Border">
+    <Setter Property="Background" Value="#292e33" />
+  </Style>
+  <Style Selector="Grid#CardStats > Grid:nth-child(4n+1) > Border > TextBlock">
+    <Setter Property="Background" Value="#292e33" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Grid#CardStats > Grid:nth-child(4n+3) > Border > TextBlock">
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Grid#CardStats > TextBlock:nth-child(4n+2)">
+    <Setter Property="Background" Value="#404971" />
+  </Style>
+  <Style Selector="Grid#CardStats > TextBlock:nth-child(4n+1)">
+    <Setter Property="Background" Value="#292e33" />
+  </Style>
+</Styles>

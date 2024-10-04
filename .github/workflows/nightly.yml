@@ -27,17 +27,33 @@ jobs:
       run: |
         dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishSingleFile=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
         dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true  -p:PublishTrimmed=false  --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
-    - name: Upload Artifact (win-x64)
+        dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Release -r win-x64 -o publish -p:PublishSingleFile=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
+        dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true  -p:PublishTrimmed=false  --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
+    - name: Upload Artifact (wstools win-x64)
       if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v4
       with:
         name: wstools-win-x64
         path: publish/wstools.exe
         if-no-files-found: warn
-    - name: Upload Artifact (linux-x64)
+    - name: Upload Artifact (wstools linux-x64)
       if: ${{ !env.ACT }}
       uses: actions/upload-artifact@v4
       with:
         name: wstools-linux-x64
         path: publish/wstools
+        if-no-files-found: warn
+    - name: Upload Artifact (wsm-gui win-x64)
+      if: ${{ !env.ACT }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: wstools-win-x64
+        path: publish/wsm-gui.exe
+        if-no-files-found: warn
+    - name: Upload Artifact (wsm-gui linux-x64)
+      if: ${{ !env.ACT }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: wstools-linux-x64
+        path: publish/wsm-gui
         if-no-files-found: warn

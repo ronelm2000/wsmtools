@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Montage.Weiss.Tools.GUI.ViewModels;assembly=wsm-gui"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="150"
+             x:Class="Montage.Weiss.Tools.GUI.ViewUserControls.CardRatioViewPanel"
+             x:DataType="vm:CardRatioViewModel">
+  <Design.DataContext>
+    <vm:CardRatioViewModel />
+  </Design.DataContext>
+  <RelativePanel MaxWidth="{Binding RatioMaxWidth^}">
+    <ToolTip.Tip>
+      <ItemsControl Name="EffectsListPanel" ItemsSource="{Binding Effects}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding {}}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ToolTip.Tip>
+
+    <Border Margin="{Binding FirstCardAdjustment^}"
+            RelativePanel.AlignTopWithPanel="True"
+            RelativePanel.AlignHorizontalCenterWithPanel="True"
+            PointerReleased="Generic_PointerReleased"
+            Name="FirstCardBorder"
+            ZIndex="1"
+            >
+      <Border.RenderTransform>
+        <RotateTransform Angle="{Binding ImageAngle^}" />
+      </Border.RenderTransform>
+      <Image Source="{Binding Image^}" Width="150" />
+    </Border>
+    <Border Margin="0,0,30,0"
+            RelativePanel.AlignTopWith="FirstCardBorder"
+            RelativePanel.AlignRightWith="FirstCardBorder"
+            IsVisible="{Binding IsFourOrMore^}"
+            PointerReleased="Generic_PointerReleased"
+            >
+      <Border.RenderTransform>
+        <RotateTransform Angle="{Binding ImageAngle^}" />
+      </Border.RenderTransform>
+      <Image Source="{Binding Image^}" Width="150" />
+    </Border>
+    <Border Margin="0,0,20,0"
+            RelativePanel.AlignTopWith="FirstCardBorder"
+            RelativePanel.AlignRightWith="FirstCardBorder"
+            IsVisible="{Binding IsThreeOrMore^}"
+            PointerReleased="Generic_PointerReleased"
+            >
+      <Border.RenderTransform>
+        <RotateTransform Angle="{Binding ImageAngle^}" />
+      </Border.RenderTransform>
+      <Image Source="{Binding Image^}" Width="150" />
+    </Border>
+    <Border Margin="0,0,10,0"
+            RelativePanel.AlignTopWith="FirstCardBorder"
+            RelativePanel.AlignRightWith="FirstCardBorder"
+            IsVisible="{Binding IsTwoOrMore^}"
+            PointerReleased="Generic_PointerReleased"
+            >
+      <Border.RenderTransform>
+        <RotateTransform Angle="{Binding ImageAngle^}" />
+      </Border.RenderTransform>
+      <Image Source="{Binding Image^}" Width="150" />
+    </Border>
+    <!--
+
+    -->
+  </RelativePanel>
+</UserControl>

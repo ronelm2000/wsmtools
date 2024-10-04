@@ -14,6 +14,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -292,53 +293,5 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             });
         }
         return image;
-    }
-
-    private void GenerateDeckImage(IExportInfo info, int rows, List<WeissSchwarzCard> serialList, Dictionary<WeissSchwarzCard, Image> imageDictionary, IImageEncoder encoder, Path deckImagePath)
-    {
-        using (var _ = imageDictionary.GetDisposer())
-        {
-            var selection = imageDictionary.Select(p => (p.Value.Width, p.Value.Height));
-            (int Width, int Height) bounds = (0, 0);
-            if (info.Flags.Contains("upscaling"))
-            {
-                bounds = selection.Aggregate((a, b) => (Math.Max(a.Width, b.Width), Math.Max(a.Height, b.Height)));
-                Log.Information("Adjusting image sizing to the maximum bounds: {@minimumBounds}", bounds);
-            }
-            else
-            {
-                bounds = selection.Aggregate((a, b) => (Math.Min(a.Width, b.Width), Math.Min(a.Height, b.Height)));
-                Log.Information("Adjusting image sizing to the minimum bounds: {@minimumBounds}", bounds);
-            }
-            foreach (var image in imageDictionary.Values)
-                image.Mutate(x => x.Resize(bounds.Width, bounds.Height));
-
-            var grid = (Width: bounds.Width * 10, Height: bounds.Height * rows);
-            Log.Information("Creating Full Grid of {x}x{y}...", grid.Width, grid.Height);
-
-            using (var fullGrid = new Image<Rgba32>(bounds.Width * 10, bounds.Height * rows))
-            {
-                for (int i = 0; i < serialList.Count; i++)
-                {
-                    var x = i % 10;
-                    var y = i / 10;
-                    var point = new Point(x * bounds.Width, y * bounds.Height);
-
-                    fullGrid.Mutate(ctx =>
-                    {
-                        ctx.DrawImage(imageDictionary[serialList[i]], point, 1);
-                    });
-                }
-
-                Log.Information("Finished drawing all cards in serial order; saving image...");
-                deckImagePath.Open(s => fullGrid.Save(s, encoder));
-
-                if (Program.IsOutputRedirected) // Enable Non-Interactive Path stdin Passthrough of the deck png
-                    using (var stdout = Console.OpenStandardOutput())
-                        fullGrid.Save(stdout, encoder);
-
-                Log.Information($"Done! Result PNG: {deckImagePath.FullPath}");
-            }
-        }
     }
 }

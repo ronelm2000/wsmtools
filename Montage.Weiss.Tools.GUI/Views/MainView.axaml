@@ -1,0 +1,156 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Montage.Weiss.Tools.GUI.ViewModels;assembly=wsm-gui"
+             xmlns:bh="clr-namespace:Montage.Weiss.Tools.GUI.Interactions;assembly=wsm-gui"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:vuc="clr-namespace:Montage.Weiss.Tools.GUI.ViewUserControls;assembly=wsm-gui" 
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700" 
+             x:Class="Montage.Weiss.Tools.GUI.Views.MainView"
+             x:DataType="vm:MainWindowViewModel"
+             Loaded="UserControl_Loaded"
+             >
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainWindowViewModel />
+  </Design.DataContext>
+    
+  <i:Interaction.Behaviors>
+    <bh:ScreenPseudoClassesBehaviour SmallMediumLimit="640" MediumLargeLimit="1008" />
+  </i:Interaction.Behaviors>
+  
+  <DockPanel>
+    <Menu DockPanel.Dock="Top">
+      <MenuItem Header="_File">
+        <MenuItem Header="_Open Deck..." Command="{Binding OpenDeckCommand}" />
+        <MenuItem Header="O_pen Local Set..." Command="{Binding OpenLocalSetCommand}" />
+        <Separator/>
+        <MenuItem Header="_Import Deck..." IsEnabled="False" />
+        <MenuItem Header="I_mport Set..." IsEnabled="False" Command="{Binding ImportSetCommand}" />
+        <Separator/>
+        <MenuItem Header="_Save Deck..." Command="{Binding SaveDeckCommand}"/>
+      </MenuItem>
+      <MenuItem Header="_Export">
+        <MenuItem Header="_Tabletop Simulator" Command="{Binding ExportDeckToTabletopCommand}"/>
+        <Separator/>
+        <MenuItem Header="_DeckLog" IsEnabled="False" />
+        <MenuItem Header="_EncoreDecks" IsEnabled="False" />
+      </MenuItem>
+    </Menu>
+    <TextBlock/>
+    
+    <Border Classes="StatusBorder" DockPanel.Dock="Bottom">
+      <TextBlock Classes="Status" Text="{Binding Status}" Padding="0,0,30,0"/>
+    </Border>
+    
+    <Grid Name="Main">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="75*"></ColumnDefinition>
+        <ColumnDefinition Width="4"></ColumnDefinition>
+        <ColumnDefinition Width="25*"></ColumnDefinition>
+      </Grid.ColumnDefinitions>
+
+      <DockPanel>
+        <Grid DockPanel.Dock="Bottom" 
+              ColumnDefinitions="80*,20*"
+              RowDefinitions="*,*"
+              >
+          <TextBox Text="{Binding DeckName}" 
+                   Watermark="Deck Name"
+                   Margin="2"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   />
+          <TextBlock Text="{Binding DeckStats}" 
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     Grid.Row="0"
+                     Grid.Column="1"
+                     />
+          <TextBox Text="{Binding DeckRemarks}"
+                   Watermark="Deck Remarks"
+                   Margin="2"
+                   Grid.Row="1"
+                   Grid.ColumnSpan="2"
+                   />
+        </Grid>
+        
+        <Border Background="Gray"
+                BorderThickness="1"
+                Padding="10"
+                Grid.Column="0"
+                Grid.Row="1"
+                >
+          <ItemsControl ItemsSource="{Binding DeckRatioList}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                  <vuc:CardRatioViewPanel Click="CardRatioViewPanel_Click" 
+                                          Margin="0,5,0,5" />
+              </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal" ItemHeight="200" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </Border>
+      
+      </DockPanel>
+
+      <GridSplitter Grid.Column="1" Background="Black" ResizeDirection="Columns"/>
+
+      <Border Name="DatabaseView"
+              BorderThickness="0"
+              Grid.Column="2"
+              Grid.Row="1"
+              MinWidth="200"
+              >
+
+        <Grid RowDefinitions="Auto,Auto,*">
+          <Border Margin="6,5,2,0" Grid.Row="0" >
+            <!-- Search Terms Go Here -->
+          </Border>
+         
+          <Border Margin="6,5,2,0" Grid.Row="1" >
+            <TextBox Watermark="Search..." Text="{Binding SearchBarText}" />
+          </Border>
+          <ScrollViewer Padding="5,5,20,5" 
+                        Grid.Row="2" 
+                        PointerWheelChanged="ScrollViewer_PointerWheelChanged"
+                        >
+            <StackPanel>
+              <ItemsControl ItemsSource="{Binding DatabaseViewList}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Border Margin="2,2,2,2"
+                            CornerRadius="1"
+                            BorderBrush="Gray" BorderThickness="1"
+                            Padding="5,5,2,5"
+                            
+                            >
+                      <Border.ContextMenu>
+                        <ContextMenu>
+                          <MenuItem Header="Add"/>
+                          <Separator />
+                          <MenuItem Header="Find CXC" />
+                          <MenuItem Header="Find Traits" />
+                          <MenuItem Header="Find Names" />
+                        </ContextMenu>
+                      </Border.ContextMenu>
+                      <vuc:DatabaseCardViewPanel Click="DatabaseCardViewPanel_Click" />
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+    </Grid>
+
+  </DockPanel>
+
+</UserControl>

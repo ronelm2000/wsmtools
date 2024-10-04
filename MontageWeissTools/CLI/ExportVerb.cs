@@ -71,10 +71,15 @@ public class ExportVerb : IVerbCommand, IExportInfo
             .OrderByDescending(parser => parser.Priority)
             .FirstAsync(cancellationToken);
         var deck = await parser.Parse(Source, deckParserProgress, cancellationToken);
+        deck = await Run(ioc, deck);
+    }
+
+    public async Task<WeissSchwarzDeck> Run(IContainer ioc, WeissSchwarzDeck deck)
+    {
         var inspectionOptions = new InspectionOptions()
         {
-            IsNonInteractive = this.NonInteractive,
-            NoWarning = this.NoWarning
+            IsNonInteractive = NonInteractive,
+            NoWarning = NoWarning
         };
         var exporter = ioc.GetAllInstances<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>>()
             .Where(exporter => exporter.Alias.Contains(Exporter))
@@ -91,6 +96,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
 
         if (deck != WeissSchwarzDeck.Empty)
             await exporter.Export(deck, this);
+        return deck;
     }
 
     internal class CommandProgressAggregator

@@ -1,6 +1,6 @@
 WSMTools (Weiss Schwarz Montage Tools)
 ===========
-![.NET Core](https://github.com/ronelm2000/wsmtools/workflows/.NET%20Core/badge.svg)
+[![Nightly](https://github.com/ronelm2000/wsmtools/actions/workflows/nightly.yml/badge.svg)](https://github.com/ronelm2000/wsmtools/actions/workflows/nightly.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/ronelm2000/wsmtools/badge)](https://www.codefactor.io/repository/github/ronelm2000/wsmtools)
 [![Discord](https://img.shields.io/discord/831048458608705627?label=Discord)](https://discord.gg/9T55jJGHJD)
 [![Downloads](https://img.shields.io/github/downloads/ronelm2000/wsmtools/total.svg)](https://tooomm.github.io/github-release-stats/?username=ronelm2000&repository=wsmtools)

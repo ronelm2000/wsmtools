@@ -9,6 +9,7 @@ public static class AppBuilderExtensions
     {
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Debug()
+            .WriteTo.File("wsm-gui.log", Serilog.Events.LogEventLevel.Debug)
             .CreateLogger();
 
         Logger.Sink = new SerilogLogSink();

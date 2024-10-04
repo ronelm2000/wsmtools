@@ -34,6 +34,7 @@ using Avalonia;
 using SQLitePCL;
 using System.Text.RegularExpressions;
 using Avalonia.Media;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
@@ -153,6 +154,9 @@ public partial class MainWindowViewModel : ViewModelBase
             DefaultExtension = DeckFiles.Patterns?[0][2..] ?? "ws-dek",
             FileTypeChoices = [ DeckFiles ]
         });
+        if (savePath is null)
+            return;
+
         var deck = new WeissSchwarzDeck
         {
             Name = DeckName,
@@ -160,7 +164,7 @@ public partial class MainWindowViewModel : ViewModelBase
             Ratios = DeckRatioList.ToDictionary(vw => vw.Card, vw => vw.Ratio)
         };
 
-        var finalPath = Path.Get(savePath!.Path.LocalPath);
+        var finalPath = Path.Get(savePath.Path.LocalPath);
 
         var localDeckExporter = Container!.GetService<LocalDeckJSONExporter>()!;
         await localDeckExporter.Export(deck, progressReporter, finalPath, token);
@@ -175,7 +179,9 @@ public partial class MainWindowViewModel : ViewModelBase
             Title = "Opening Local Deck...",
             FileTypeFilter = [DeckFiles]
         });
-        var firstPath = loadPaths.First();
+        var firstPath = loadPaths.FirstOrDefault();
+        if (firstPath is null)
+            return;
 
         var localDeckParser = Container!.GetService<LocalDeckJSONParser>()!;
         var deck = await localDeckParser.Parse(firstPath.Path.AbsolutePath, progressReporter, token);
@@ -305,7 +311,13 @@ public partial class MainWindowViewModel : ViewModelBase
             if (!filesFolderPath.Exists)
                 continue;
 
-            filesFolderPath.AllFiles().Copy(Path.Current.Add("Images"));
+            var imagePath = Path.Current.Add("Images");
+
+            log.Information("Copying all files");
+            log.Information("From: {path}", filesFolderPath.FullPath);
+            log.Information("To: {newPath}", imagePath.FullPath);
+
+            filesFolderPath.AllFiles().Copy(imagePath);
         }
     }
 

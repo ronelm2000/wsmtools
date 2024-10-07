@@ -204,7 +204,7 @@ public partial class MainWindowViewModel : ViewModelBase
             .ToAsyncEnumerable()
             .Where(c => searchTerms.All(st => st.Invoke(c)))
             .Distinct(c => c.Serial)
-            .Take(100)
+            .Take(300)
             .ToListAsync(token);
         var cacheList = searchCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom)
             .DistinctBy(c => c.ReleaseID)
@@ -279,6 +279,22 @@ public partial class MainWindowViewModel : ViewModelBase
                 var majorNSCode = scryfallMatch.Groups[2].Value.ToUpper();
                 return c => WeissSchwarzCard.ParseSerial(c.Serial).NeoStandardCode
                     .StartsWith(majorNSCode);
+            }
+            else if (scryfallMatch.Groups[1].Value.Equals("l", StringComparison.CurrentCultureIgnoreCase) ||
+                     scryfallMatch.Groups[1].Value.Equals("level", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (int.TryParse(scryfallMatch.Groups[2].Value, out var level))
+                    return c => (c.Level ?? 0) == level;
+                else
+                    return c => true;
+            }
+            else if (scryfallMatch.Groups[1].Value.Equals("c", StringComparison.CurrentCultureIgnoreCase) ||
+                     scryfallMatch.Groups[1].Value.Equals("cost", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (int.TryParse(scryfallMatch.Groups[2].Value, out var cost))
+                    return c => (c.Cost ?? 0) == cost;
+                else
+                    return c => true;
             }
             else
             {

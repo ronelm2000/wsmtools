@@ -35,6 +35,6 @@ public class ParserTests
             NoWarning = true
         }.Run(ioc, progressReporter);
 
-        Assert.IsTrue(Path.Get("./Export/deck_date_a_live.json").Exists);
+        Assert.IsTrue(Path.Get("./Export/deck_date_a_live.ws-dek").Exists);
     }
 }

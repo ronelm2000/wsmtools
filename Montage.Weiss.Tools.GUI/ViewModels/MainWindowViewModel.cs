@@ -19,34 +19,33 @@ using Fluent.IO;
 using System.Reactive.Linq;
 using System.Threading;
 using Montage.Weiss.Tools.Impls.Exporters.Deck;
-using Montage.Card.API.Entities;
 using Montage.Weiss.Tools.Impls.Parsers.Deck;
-using Montage.Card.API.Interfaces.Services;
 using Avalonia.Controls;
 using System.Text.RegularExpressions;
 using Avalonia.Threading;
 using JasperFx.Core;
 using Montage.Weiss.Tools.GUI.Utilities;
+using Montage.Weiss.Tools.GUI.Views;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private static readonly Regex searchRegex = new Regex(@"(?:(\w+)\:(?:(\w+)|\""([\w ]+)\"")|(\w+))");
+    private static readonly Regex searchRegex = ScryfallStyleRegex();
 
     private ILogger log;
-    public Func<Avalonia.Controls.Window> Parent { get; init; }
+    public Func<Window>? Parent { get; init; }
     public Lamar.IContainer? Container { get; init; }
 
     public ObservableCollection<CardEntryViewModel> DatabaseViewList { get; set; }
 
-    public ObservableCollection<CardRatioViewModel> DeckRatioList { get; set; } = new();
+    public ObservableCollection<CardRatioViewModel> DeckRatioList { get; set; } = [];
 
     public ReactiveCommand<Unit, Unit> ImportSetCommand { get; init; }
     public ReactiveCommand<Unit, Unit> OpenLocalSetCommand { get; init; }
     public ReactiveCommand<Unit, Unit> SaveDeckCommand { get; init; }
     public ReactiveCommand<Unit, Unit> OpenDeckCommand { get; init; }
-    public ReactiveCommand<Unit, CardEntryViewModel> AddCardCommand { get; init; }
+//    public ReactiveCommand<Unit, CardEntryViewModel> AddCardCommand { get; init; }
     public ReactiveCommand<string, string> UpdateDatabaseViewCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ExportDeckToTabletopCommand { get; init; }
 
@@ -65,9 +64,15 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _deckStats;
 
+    [ObservableProperty]
+    public ImportSetViewModel _importSetDC;
+
     public MainWindowViewModel()
     {
         Status = "";
+        DeckName = "";
+        DeckRemarks = "";
+        SearchBarText = "";
         DeckStats = "[ 0 / 0 / 0 / 0 ]";
 
         if (Design.IsDesignMode)
@@ -96,11 +101,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
             DeckRatioList.Add(new CardRatioViewModel());
             DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg").Load() });
+            ImportSetDC = new ImportSetViewModel { IsVisible = false, Parent = () => null };
         }
         else
         {
-            DatabaseViewList = new ObservableCollection<CardEntryViewModel>();
+            DatabaseViewList = [];
+            ImportSetDC = new ImportSetViewModel { IsVisible = false, Parent = () => this };
         }
+
+        log = Serilog.Log.Logger.ForContext<MainWindowViewModel>();
 
         ImportSetCommand = ReactiveCommand.CreateFromTask(ImportSet);
         OpenLocalSetCommand = ReactiveCommand.CreateFromTask(OpenLocalSet);
@@ -108,6 +117,7 @@ public partial class MainWindowViewModel : ViewModelBase
         OpenDeckCommand = ReactiveCommand.CreateFromTask(OpenDeck);
         UpdateDatabaseViewCommand = ReactiveCommand.CreateFromTask<string, string>(UpdateDatabaseView);
         ExportDeckToTabletopCommand = ReactiveCommand.CreateFromTask(ExportDeckToTabletop);
+
 
         this.WhenAnyValue(r => r.SearchBarText)
             .Throttle(TimeSpan.FromSeconds(1))
@@ -138,7 +148,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task SaveDeck(CancellationToken token)
     {
         var progressReporter = new ProgressReporter(log, message => Status = message);
-        var storage = Parent().StorageProvider;
+        var storage = Parent!().StorageProvider;
         var savePath = await storage.SaveFilePickerAsync(new FilePickerSaveOptions()
         {
             Title = "Saving Local Deck...",
@@ -165,7 +175,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task OpenDeck(CancellationToken token)
     {
         var progressReporter = new ProgressReporter(log, message => Status = message);
-        var storage = Parent().StorageProvider;
+        var storage = Parent!().StorageProvider;
         var loadPaths = await storage.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
             Title = "Opening Local Deck...",
@@ -312,12 +322,12 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task OpenLocalSet()
     {
         var progressReporter = new ProgressReporter(log, message => Status = message);
-        var storage = Parent().StorageProvider;
+        var storage = Parent!().StorageProvider;
         var localPaths = await storage.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
             Title = "Opening Local Set...",
             //You can add either custom or from the built-in file types. See "Defining custom file types" on how to create a custom one.
-            FileTypeFilter = new[] { SetFiles }
+            FileTypeFilter = [SetFiles]
         });
         foreach (var path in localPaths)
         {
@@ -359,7 +369,7 @@ public partial class MainWindowViewModel : ViewModelBase
         DatabaseViewList.Clear();
         DeckRatioList.Clear();
 
-        using var db = Container.GetInstance<CardDatabaseContext>();
+        using var db = Container!.GetInstance<CardDatabaseContext>();
         var initialCardList = db.WeissSchwarzCards.Take(100).ToList();
         var cacheList = initialCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom)
             .DistinctBy(c => c.ReleaseID)
@@ -392,6 +402,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     internal async Task ImportSet()
     {
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            ImportSetDC.IsVisible = true;
+        });
+        // ImportSetVM = new ImportSetViewModel { Parent = this };
+        /*
         var progressReporter = new ProgressReporter(log, message => Status = message);
 
         await new ParseVerb
@@ -400,6 +416,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }.Run(Container!, progressReporter);
 
         await LoadDatabase(progressReporter);
+        */
     }
 
     internal async Task AddCard(WeissSchwarzCard card)
@@ -428,6 +445,8 @@ public partial class MainWindowViewModel : ViewModelBase
             SortDeck();
         }
         UpdateDeckStats();
+
+        await ValueTask.CompletedTask;
     }
 
     internal async Task RemoveCard(WeissSchwarzCard card)
@@ -443,6 +462,8 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             UpdateDeckStats();
         }
+
+        await ValueTask.CompletedTask;
     }
     private void SortDeck()
     {
@@ -452,7 +473,7 @@ public partial class MainWindowViewModel : ViewModelBase
             cardTypeKey: TranslateSortKey(crv.Card.Type)
         ));
 
-        int TranslateSortKey(CardType type) => type switch
+        static int TranslateSortKey(CardType type) => type switch
         {
             CardType.Climax => 0,
             CardType.Event => 1,
@@ -478,39 +499,18 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public static FilePickerFileType SetFiles { get; } = new("WS Set Files")
     {
-        Patterns = new[] { "*.ws-set" },
-        AppleUniformTypeIdentifiers = new[] { "public.ronelm2000.ws.set" },
-        MimeTypes = new[] { "application/json" }
+        Patterns = ["*.ws-set"],
+        AppleUniformTypeIdentifiers = ["public.ronelm2000.ws.set"],
+        MimeTypes = ["application/json"]
     };
 
     public static FilePickerFileType DeckFiles { get; } = new("WS Decks")
     {
-        Patterns = new[] { "*.ws-dek" },
-        AppleUniformTypeIdentifiers = new[] { "public.ronelm2000.ws.deck" },
-        MimeTypes = new[] { "application/json" }
+        Patterns = ["*.ws-dek"],
+        AppleUniformTypeIdentifiers = ["public.ronelm2000.ws.deck"],
+        MimeTypes = ["application/json"]
     };
 
-    private class ProgressReporter(ILogger log, Action<string> actionPass) : IProgress<CommandProgressReport>, IProgress<DeckExportProgressReport>, IProgress<DeckParserProgressReport>
-    {
-        public void Report(CommandProgressReport report)
-        {
-            var message = report.ReportMessage.EN ?? report.ToString();
-            log.Debug(message);
-            actionPass(message);
-        }
-
-        public void Report(DeckExportProgressReport report)
-        {
-            var message = report.ReportMessage.EN ?? report.ToString();
-            log.Debug(message);
-            actionPass(message);
-        }
-
-        public void Report(DeckParserProgressReport report)
-        {
-            var message = report.ReportMessage.EN ?? report.ToString();
-            log.Debug(message);
-            actionPass(message);
-        }
-    }
+    [GeneratedRegex(@"(?:(\w+)\:(?:(\w+)|\""([\w ]+)\"")|(\w+))")]
+    private static partial Regex ScryfallStyleRegex();
 }

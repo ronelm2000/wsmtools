@@ -26,7 +26,7 @@ public partial class App : Application
             desktop.MainWindow = new MainWindow
             {
                 DataContext = new MainWindowViewModel {
-                    Parent = () => desktop.MainWindow,
+                    Parent = () => desktop.MainWindow!,
                     Container = new Container(c => {
                         c.BootstrapDefaultServices();
                         c.Scan(s =>

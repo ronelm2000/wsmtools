@@ -16,7 +16,7 @@ namespace Montage.Weiss.Tools.GUI.ViewModels;
 public partial class CardRatioViewModel : ViewModelBase
 {
     [ObservableProperty]
-    WeissSchwarzCard _card;
+    private WeissSchwarzCard _card;
 
     [ObservableProperty]
     private int _ratio;
@@ -36,12 +36,17 @@ public partial class CardRatioViewModel : ViewModelBase
 
     public CardRatioViewModel()
     {
-        Card ??= new WeissSchwarzCard();
+        Card = WeissSchwarzCard.Empty;
         if (Design.IsDesignMode)
         {
             Ratio = 4;
-            Image = new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg").Load();
-            Effects = ["[AUTO] aaaaaaaaaaaaaaa"];
+            Image ??= new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg").Load();
+            Effects ??= ["[AUTO] aaaaaaaaaaaaaaa"];
+        } else
+        {
+            Effects = [];
+            Image = Task.FromException<Bitmap?>(new Exception());
+            Ratio = 0;
         }
 
         IsTwoOrMore = this.WhenPropertyChanged(r => r.Ratio)
@@ -72,6 +77,6 @@ public partial class CardRatioViewModel : ViewModelBase
         Card = card;
         Ratio = ratio;
         Image = card.LoadImage();
-        Effects = card.Effect.ToList();
+        Effects = [.. card.Effect];
     }
 }

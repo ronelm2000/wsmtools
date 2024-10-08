@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.Views;
 
-public partial class MainView : UserControl{
+public partial class MainView : UserControl {
     public static Func<ILogger?> Logger { get; set; } = () => Serilog.Log.ForContext<DatabaseCardViewPanel>();
 
     /*
@@ -75,6 +75,6 @@ public partial class MainView : UserControl{
         if (e.KeyModifiers.HasFlag(Avalonia.Input.KeyModifiers.Shift))
             delta *= 30; //.WithY(delta.Y * 4);
 
-        scrollViewer.Offset = scrollViewer.Offset + delta;
+        scrollViewer.Offset += delta;
     }
 }

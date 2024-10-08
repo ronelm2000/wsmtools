@@ -52,12 +52,12 @@ public class ScreenPseudoClassesBehaviour : Behavior<Control>
         classes.Set(":LargeScreen", isLargeScreen);
     }
 
-    private void AssociatedObject_AttachedToVisualTree(object sender, VisualTreeAttachmentEventArgs e)
+    private void AssociatedObject_AttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         SetPseudoClasses();
     }
 
-    private void AssociatedObject_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    private void AssociatedObject_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property == Control.BoundsProperty)
         {

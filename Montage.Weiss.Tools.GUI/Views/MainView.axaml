@@ -6,6 +6,7 @@
              xmlns:bh="clr-namespace:Montage.Weiss.Tools.GUI.Interactions;assembly=wsm-gui"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:vuc="clr-namespace:Montage.Weiss.Tools.GUI.ViewUserControls;assembly=wsm-gui" 
+             xmlns:v="clr-namespace:Montage.Weiss.Tools.GUI.Views;assembly=wsm-gui" 
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700" 
              x:Class="Montage.Weiss.Tools.GUI.Views.MainView"
              x:DataType="vm:MainWindowViewModel"
@@ -28,7 +29,7 @@
         <MenuItem Header="O_pen Local Set..." Command="{Binding OpenLocalSetCommand}" />
         <Separator/>
         <MenuItem Header="_Import Deck..." IsEnabled="False" />
-        <MenuItem Header="I_mport Set..." IsEnabled="False" Command="{Binding ImportSetCommand}" />
+        <MenuItem Header="I_mport Set..." Command="{Binding ImportSetCommand}" />
         <Separator/>
         <MenuItem Header="_Save Deck..." Command="{Binding SaveDeckCommand}"/>
       </MenuItem>
@@ -151,33 +152,10 @@
       </Border>
 
       <!-- Inline Dialogs -->
+      <v:ImportSetDialog Name="ImportSetDialog" 
+                         DataContext="{Binding ImportSetDC}"
+                         />
       
-      <Border Grid.ColumnSpan="3"
-              Name="DialogToastBox"
-              Background="{Binding $parent[Window].Background}"
-              VerticalAlignment="Center"
-              HorizontalAlignment="Center"
-              IsVisible="False"
-              >
-        <StackPanel>
-          <TextBlock Text="Parse Set" Margin="5,5,5,10" />
-          <TextBox Watermark="Set URL..." MinWidth="400"/>
-          <StackPanel Orientation="Horizontal">
-            <Button MinWidth="200"
-                    HorizontalContentAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    >
-              Cancel
-            </Button>
-            <Button MinWidth="200"
-                    HorizontalContentAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    >
-              Parse
-            </Button>
-          </StackPanel>
-        </StackPanel>
-      </Border>
     </Grid>
 
   </DockPanel>

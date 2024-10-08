@@ -20,14 +20,14 @@ internal static class Parsers
         {
             return int.Parse(text, style, provider);
         }
-        catch (OverflowException e)
+        catch (OverflowException)
         {
             return int.MaxValue;
         }
-        catch (FormatException e)
+        catch (FormatException)
         {
             return null;
-        } catch (ArgumentNullException e)
+        } catch (ArgumentNullException)
         {
             return null;
         }

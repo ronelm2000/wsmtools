@@ -17,6 +17,9 @@
   <Style Selector="Border#DatabaseView">
     <Setter Property="Background" Value="#0b0c0d" />
   </Style>
+  <Style Selector="Border.DialogBox">
+    <Setter Property="Background" Value="#0b0c0d" />
+  </Style>
   <!-- Visibility -->
   <Style Selector=":SmallScreen TextBlock.notVisibleOnSmallScreen">
     <Setter Property="IsVisible" Value="false" />

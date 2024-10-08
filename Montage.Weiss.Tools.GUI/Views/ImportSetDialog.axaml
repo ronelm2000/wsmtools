@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Montage.Weiss.Tools.GUI.ViewModels;assembly=wsm-gui"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="100"
+             x:Class="Montage.Weiss.Tools.GUI.Views.ImportSetDialog"
+             x:DataType="vm:ImportSetViewModel" 
+             >
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:ImportSetViewModel />
+  </Design.DataContext>
+
+  <Design.DesignStyle>
+    <Styles>
+      <StyleInclude Source="avares://wsm-gui/Styles/Dark.axaml" />
+    </Styles>
+  </Design.DesignStyle>
+  
+  <Border Grid.ColumnSpan="3"
+          Name="DialogToastBox"
+          Classes="DialogBox" 
+          VerticalAlignment="Center"
+          HorizontalAlignment="Center"
+          IsVisible="{Binding IsVisible}"
+          >
+    
+    <StackPanel>
+      <TextBlock Text="Parse Set" Margin="5,5,5,10" />
+      <TextBox Watermark="Set URL..." 
+               Text="{Binding SetUrl}"
+               MinWidth="400"
+               />
+      <UniformGrid HorizontalAlignment="Stretch"
+                   Columns="2"
+                   Rows="1"
+                   >
+        <Button MinWidth="200"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Click="CancelButton_Click"
+                Grid.Column="1"
+                >
+          Cancel
+        </Button>
+        
+        <Button MinWidth="200"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Click="ParseButton_Click"
+                Grid.Column="2"
+                >
+          Parse
+        </Button>
+      </UniformGrid>
+    </StackPanel>
+  </Border>
+</UserControl>

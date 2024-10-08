@@ -22,6 +22,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     private static string[] customPrefixes = new[] { "WC", "SC", "WSC" };
 
     public static IEqualityComparer<WeissSchwarzCard> SerialComparer { get; internal set; } = new WeissSchwarzCardSerialComparerImpl();
+    public static readonly WeissSchwarzCard Empty = new WeissSchwarzCard();
 
     public string Serial { get; set; }
     public MultiLanguageString Name { get; set; }
@@ -51,8 +52,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     [JsonIgnore]
     [NotMapped]
     public string? CachedImagePath { get; set; }
-    //public readonly WeissSchwarzCard Empty = new WeissSchwarzCard();
-
+    
     public WeissSchwarzCard()
     {
         Log ??= Serilog.Log.ForContext<WeissSchwarzCard>();

@@ -19,7 +19,9 @@ public class ParseVerb : IVerbCommand, IParseInfo
     public string URI { get; set; } = string.Empty;
 
     [Option("with", HelpText = "Provides a hint as to what parser should be used or if post-processors are skipped (if any).", Default = new string[] { })]
-    public IEnumerable<string> ParserHints { get; set; } = new string[] { };
+    public IEnumerable<string> ParserHints { get; set; } = Array.Empty<string>();
+
+    public event EventHandler<string> SetParsed = (_,_) => { };
 
     public async Task Run(IContainer container, IProgress<CommandProgressReport> progress, CancellationToken ct = default)
     {
@@ -71,10 +73,12 @@ public class ParseVerb : IVerbCommand, IParseInfo
 
             var keys = allCards.Keys.ToList();
             db.RemoveRange(db.WeissSchwarzCards.Where(c => keys.Contains(c.Serial)));
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(ct);
 
-            await db.AddRangeAsync(allCards.Values);
-            await db.SaveChangesAsync();
+            await db.AddRangeAsync(allCards.Values, ct);
+            await db.SaveChangesAsync(ct);
+
+            SetParsed(this, WeissSchwarzCard.ParseSerial(keys[0]).NeoStandardCode);
         }
 
         Log.Information("Successfully parsed: {uri}", URI);
@@ -91,7 +95,7 @@ public class ParseVerb : IVerbCommand, IParseInfo
 
 internal class CommandProgressAggregator : IProgress<SetParserProgressReport>, IProgress<PostProcessorProgressReport>, IProgress<DatabaseUpdateReport>
 {
-    private CommandProgressReport _totalReport = new CommandProgressReport();
+    private CommandProgressReport _totalReport = new();
     private IProgress<CommandProgressReport> _progress;
     public int PostProcessorCount { get; internal set; }
 

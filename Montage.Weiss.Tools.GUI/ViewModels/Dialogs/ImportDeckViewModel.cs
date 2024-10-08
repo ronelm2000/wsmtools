@@ -18,6 +18,9 @@ public partial class ImportDeckViewModel : ViewModelBase
     private bool _isVisible;
 
     [ObservableProperty]
+    private bool _isCommandEnabled;
+
+    [ObservableProperty]
     private Func<MainWindowViewModel?> _parent;
 
     [ObservableProperty]
@@ -27,6 +30,7 @@ public partial class ImportDeckViewModel : ViewModelBase
     {
         Parent = () => null;
         IsVisible = Design.IsDesignMode;
+        IsCommandEnabled = true;
         DeckUrl = string.Empty;
     }
 
@@ -37,30 +41,40 @@ public partial class ImportDeckViewModel : ViewModelBase
         if (parentModel.Container is not IContainer container)
             return;
 
-        var progressReporter = new ProgressReporter(Log, message => parentModel.Status = message);
+        IsCommandEnabled = false;
 
-        var command = new ExportVerb { Source = DeckUrl, NonInteractive = true, NoWarning = true };
-        var deck = await command.Parse(container, progressReporter);
+        try
+        {
+            var progressReporter = new ProgressReporter(Log, message => parentModel.Status = message);
+            var command = new ExportVerb { Source = DeckUrl, NonInteractive = true, NoWarning = true };
+            var deck = await command.Parse(container, progressReporter);
 
-        parentModel.DeckName = deck.Name;
-        parentModel.DeckRemarks = deck.Remarks;
+            parentModel.DeckName = deck.Name;
+            parentModel.DeckRemarks = deck.Remarks;
 
-        var cacheList = deck.Ratios.Keys.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom)
-            .DistinctBy(c => c.ReleaseID)
-            .Select(c => new CacheVerb { Language = (c.Language == CardLanguage.English ? "en" : "jp"), ReleaseIDorFullSerialID = c.ReleaseID })
-            .ToList();
+            var cacheList = deck.Ratios.Keys.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom).ToAsyncEnumerable();
+            await new CacheVerb { }.Cache(container, progressReporter, cacheList);
 
-        foreach (var cacheCommand in cacheList)
-            await cacheCommand.Run(container, progressReporter);
+            parentModel.DeckRatioList.Clear();
 
-        parentModel.DeckRatioList.Clear();
+            foreach (var ratio in deck.Ratios)
+                parentModel.DeckRatioList.Add(new CardRatioViewModel(ratio.Key, ratio.Value));
 
-        foreach (var ratio in deck.Ratios)
-            parentModel.DeckRatioList.Add(new CardRatioViewModel(ratio.Key, ratio.Value));
+            parentModel.SortDeck();
+            parentModel.UpdateDeckStats();
 
-        parentModel.SortDeck();
-        parentModel.UpdateDeckStats();
+            parentModel.Status = $"Done Importing: {DeckUrl}";
 
-        IsVisible = false;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error occurred", ex);
+            parentModel.Status = ex.Message;
+        } finally
+        {
+
+            IsVisible = false;
+            IsCommandEnabled = true;
+        }
     }
 }

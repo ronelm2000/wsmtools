@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Fluent.IO;
+using Flurl;
 using Flurl.Http;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
@@ -34,27 +35,13 @@ public class CacheVerb : IVerbCommand
         progress.Report(report);
 
         var language = InterpretLanguage(Language);
-        Func<Flurl.Url, CookieSession> _cookieSession = (url) => ioc.GetInstance<GlobalCookieJar>()[url.Root];
 
         using (var db = ioc.GetInstance<CardDatabaseContext>())
         {
             await db.Database.MigrateAsync(cancellationToken);
             var list = GenerateQuery(db, language);
 
-            await foreach (var card in list.WithCancellation(cancellationToken))
-            {
-                report = report with
-                {
-                    MessageType = MessageType.InProgress,
-                    ReportMessage = new Card.API.Entities.Impls.MultiLanguageString
-                    {
-                        EN = $"Caching [${card.Serial}]..."
-                    },
-                    Percentage = 50
-                };
-                progress.Report(report);
-                await AddCachedImageAsync(card, _cookieSession, cancellationToken);
-            }
+            await Cache(ioc, progress, list, cancellationToken);
 
             Log.Information("Done.");
             Log.Information("PS: Please refrain from executing this command continuously as this may cause your IP address to get tagged as a DDoS bot.");
@@ -64,6 +51,25 @@ public class CacheVerb : IVerbCommand
 
         report = report.AsDone(CommandProgressReportVerbType.Caching);
         progress.Report(report);
+    }
+
+    public async Task Cache(IContainer container, IProgress<CommandProgressReport> progress, IAsyncEnumerable<WeissSchwarzCard> list, CancellationToken cancellationToken = default)
+    {
+        Func<Flurl.Url, CookieSession> _cookieSession = (url) => container.GetInstance<GlobalCookieJar>()[url.Root];
+        await foreach (var card in list.WithCancellation(cancellationToken))
+        {
+            var report = new CommandProgressReport
+            {
+                MessageType = MessageType.InProgress,
+                ReportMessage = new Card.API.Entities.Impls.MultiLanguageString
+                {
+                    EN = $"Caching [{card.Serial}]..."
+                },
+                Percentage = 50
+            };
+            progress.Report(report);
+            await AddCachedImageAsync(card, _cookieSession, cancellationToken);
+        }
     }
 
     private IAsyncEnumerable<WeissSchwarzCard> GenerateQuery(CardDatabaseContext db, CardLanguage? language)

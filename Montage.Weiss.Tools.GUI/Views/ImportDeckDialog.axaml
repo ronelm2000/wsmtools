@@ -52,6 +52,7 @@
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center"
                 Click="ParseButton_Click"
+                IsEnabled="{Binding IsCommandEnabled}"
                 Grid.Column="2"
                 >
           Parse

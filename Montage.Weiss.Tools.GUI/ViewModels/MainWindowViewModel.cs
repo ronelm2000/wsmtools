@@ -226,11 +226,9 @@ public partial class MainWindowViewModel : ViewModelBase
             .Distinct(c => c.Serial)
             .Take(300)
             .ToListAsync(token);
-        var cacheList = searchCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom)
-            .DistinctBy(c => c.ReleaseID)
-            .Select(c => new CacheVerb { Language = (c.Language == CardLanguage.English ? "en" : "jp"), ReleaseIDorFullSerialID = c.ReleaseID })
-            .ToList();
-        await Task.WhenAll(cacheList.Select(v => v.Run(Container, progressReporter)));
+
+        var cacheList = searchCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom).ToAsyncEnumerable();
+        await new CacheVerb { }.Cache(Container, progressReporter, cacheList, token);
 
         if (token.IsCancellationRequested)
             return searchText;
@@ -379,11 +377,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         using var db = Container!.GetInstance<CardDatabaseContext>();
         var initialCardList = db.WeissSchwarzCards.Take(100).ToList();
-        var cacheList = initialCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom)
-            .DistinctBy(c => c.ReleaseID)
-            .Select(c => new CacheVerb { Language = (c.Language == CardLanguage.English ? "en" : "jp"), ReleaseIDorFullSerialID = c.ReleaseID })
-            .ToList();
-        await Task.WhenAll(cacheList.Select(v => v.Run(Container, progressReporter)));
+        var cacheList = initialCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom).ToAsyncEnumerable();
+        await new CacheVerb { }.Cache(Container, progressReporter, cacheList);
 
         foreach (var card in initialCardList)
         {
@@ -414,17 +409,6 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             ImportSetDC.IsVisible = true;
         });
-        // ImportSetVM = new ImportSetViewModel { Parent = this };
-        /*
-        var progressReporter = new ProgressReporter(log, message => Status = message);
-
-        await new ParseVerb
-        {
-            URI = "https://www.encoredecks.com/?page=1&set=608869f81e41dfffbd963099"
-        }.Run(Container!, progressReporter);
-
-        await LoadDatabase(progressReporter);
-        */
     }
 
     internal async Task ImportDeck()

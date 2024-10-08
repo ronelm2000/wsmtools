@@ -71,7 +71,11 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         var response = await $"{settings.DeckViewURL}{deckID}" //
             .WithReferrer(sourceUrlOrFile) //
             .PostJsonAsync(null, cancellationToken: cancellationToken);
-        var json = JsonSerializer.Deserialize<DeckLogDeck>(await response.GetStringAsync())!;
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var json = JsonSerializer.Deserialize<DeckLogDeck>(await response.GetStringAsync(), options)!;
         var newDeck = new WeissSchwarzDeck();
         var missingSerials = new List<string>();
         newDeck.Name = json.Title.ToString() ?? throw new DeckParsingException("Cannot parse the deck name.");
@@ -101,11 +105,11 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
             Log.Information("Parsing all missing sets from EncoreDecks. (Some sets may still be untranslated tho!)");
             var deckLogSetList = await "https://www.encoredecks.com/api/serieslist"
                 .WithRESTHeaders()
-                .GetJsonAsync<List<dynamic>>(cancellationToken: cancellationToken);
+                .GetJsonAsync<List<EncoreDecksEntry>>(cancellationToken: cancellationToken);
 
             await deckLogSetList
-                .Where(set => missingSets.Contains($"{set.side}{set.release}"))
-                .Select(set => (string)set._id)
+                .Where(set => missingSets.Contains($"{set.Side}{set.Release}"))
+                .Select(set => set.Id)
                 .ToAsyncEnumerable()
                 .ForEachAwaitWithCancellationAsync((set, ct) => _parse(set, aggregator, ct), cancellationToken);
         }
@@ -186,7 +190,7 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         internal void ReportMissingSets(List<string> missingSets)
         {
             this.missingSets = missingSets;
-            report = report with { Percentage = 10, ReportMessage = new MultiLanguageString { EN = $"Found Missing Sets; Parsing using EncoreDecks: [{missingSets.ConcatAsString(",")}" } };
+            report = report with { Percentage = 10, ReportMessage = new MultiLanguageString { EN = $"Found Missing Sets; Parsing using EncoreDecks: [{missingSets.ConcatAsString(",")}]" } };
             progress.Report(report);
         }
 
@@ -221,7 +225,20 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 
     private record DeckLogCardRatio
     {
+        [JsonPropertyName("card_number")]
         public required string CardNumber { get; init; }
+
+        [JsonPropertyName("num")]
         public required int Num { get; init; }
+    }
+
+    private record EncoreDecksEntry
+    {
+        [JsonPropertyName("side")]
+        public required string Side { get; init; }
+        [JsonPropertyName("release")]
+        public required string Release { get; init; }
+        [JsonPropertyName("_id")]
+        public required string Id { get; init; }
     }
 }

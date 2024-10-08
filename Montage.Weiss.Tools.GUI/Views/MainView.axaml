@@ -28,7 +28,7 @@
         <MenuItem Header="_Open Deck..." Command="{Binding OpenDeckCommand}" />
         <MenuItem Header="O_pen Local Set..." Command="{Binding OpenLocalSetCommand}" />
         <Separator/>
-        <MenuItem Header="_Import Deck..." IsEnabled="False" />
+        <MenuItem Header="_Import Deck..." Command="{Binding ImportDeckCommand}" />
         <MenuItem Header="I_mport Set..." Command="{Binding ImportSetCommand}" />
         <Separator/>
         <MenuItem Header="_Save Deck..." Command="{Binding SaveDeckCommand}"/>
@@ -155,6 +155,9 @@
       <v:ImportSetDialog Name="ImportSetDialog" 
                          DataContext="{Binding ImportSetDC}"
                          />
+      <v:ImportDeckDialog Name="ImportDeckDialog"
+                          DataContext="{Binding ImportDeckDC}"
+                          />
       
     </Grid>
 

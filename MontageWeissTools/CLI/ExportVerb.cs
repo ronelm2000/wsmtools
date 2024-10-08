@@ -65,13 +65,19 @@ public class ExportVerb : IVerbCommand, IExportInfo
 
         Log.Information("Running...");
 
+        var deck = await Parse(ioc, deckParserProgress, cancellationToken);
+        deck = await Run(ioc, deck);
+    }
+
+    public async Task<WeissSchwarzDeck> Parse(IContainer ioc, IProgress<DeckParserProgressReport> deckParserProgress, CancellationToken cancellationToken = default)
+    {
         var parser = await ioc.GetAllInstances<IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>>()
             .ToAsyncEnumerable()
             .WhereAwait(async parser => await parser.IsCompatible(Source))
             .OrderByDescending(parser => parser.Priority)
             .FirstAsync(cancellationToken);
         var deck = await parser.Parse(Source, deckParserProgress, cancellationToken);
-        deck = await Run(ioc, deck);
+        return deck;
     }
 
     public async Task<WeissSchwarzDeck> Run(IContainer ioc, WeissSchwarzDeck deck)

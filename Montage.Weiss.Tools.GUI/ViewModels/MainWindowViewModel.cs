@@ -26,6 +26,7 @@ using Avalonia.Threading;
 using JasperFx.Core;
 using Montage.Weiss.Tools.GUI.Utilities;
 using Montage.Weiss.Tools.GUI.Views;
+using Montage.Weiss.Tools.GUI.ViewModels.Dialogs;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
@@ -42,6 +43,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<CardRatioViewModel> DeckRatioList { get; set; } = [];
 
     public ReactiveCommand<Unit, Unit> ImportSetCommand { get; init; }
+    public ReactiveCommand<Unit, Unit> ImportDeckCommand { get; init; }
     public ReactiveCommand<Unit, Unit> OpenLocalSetCommand { get; init; }
     public ReactiveCommand<Unit, Unit> SaveDeckCommand { get; init; }
     public ReactiveCommand<Unit, Unit> OpenDeckCommand { get; init; }
@@ -66,6 +68,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     public ImportSetViewModel _importSetDC;
+
+    [ObservableProperty]
+    public ImportDeckViewModel _importDeckDC;
 
     public MainWindowViewModel()
     {
@@ -102,16 +107,19 @@ public partial class MainWindowViewModel : ViewModelBase
             DeckRatioList.Add(new CardRatioViewModel());
             DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg").Load() });
             ImportSetDC = new ImportSetViewModel { IsVisible = false, Parent = () => null };
+            ImportDeckDC = new ImportDeckViewModel { IsVisible = false, Parent = () => null };
         }
         else
         {
             DatabaseViewList = [];
             ImportSetDC = new ImportSetViewModel { IsVisible = false, Parent = () => this };
+            ImportDeckDC = new ImportDeckViewModel { IsVisible = false, Parent = () => this };
         }
 
         log = Serilog.Log.Logger.ForContext<MainWindowViewModel>();
 
         ImportSetCommand = ReactiveCommand.CreateFromTask(ImportSet);
+        ImportDeckCommand = ReactiveCommand.CreateFromTask(ImportDeck);
         OpenLocalSetCommand = ReactiveCommand.CreateFromTask(OpenLocalSet);
         SaveDeckCommand = ReactiveCommand.CreateFromTask(SaveDeck);
         OpenDeckCommand = ReactiveCommand.CreateFromTask(OpenDeck);
@@ -419,6 +427,14 @@ public partial class MainWindowViewModel : ViewModelBase
         */
     }
 
+    internal async Task ImportDeck()
+    {
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            ImportDeckDC.IsVisible = true;
+        });
+    }
+
     internal async Task AddCard(WeissSchwarzCard card)
     {
         var existingRatio = DeckRatioList.Where(crv => crv.Card.Serial == card.Serial).FirstOrDefault();
@@ -465,7 +481,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         await ValueTask.CompletedTask;
     }
-    private void SortDeck()
+    internal void SortDeck()
     {
         DeckRatioList.SortByDescending(crv => (
             level: crv.Card.Level,
@@ -482,7 +498,7 @@ public partial class MainWindowViewModel : ViewModelBase
         };   
     }
 
-    private void UpdateDeckStats()
+    internal void UpdateDeckStats()
     {
         var totalCards = DeckRatioList.Select(crv => crv.Ratio).Sum();
         var totalCharas = DeckRatioList.Where(crv => crv.Card.Type == CardType.Character)

@@ -149,6 +149,35 @@
           </ScrollViewer>
         </Grid>
       </Border>
+
+      <!-- Inline Dialogs -->
+      
+      <Border Grid.ColumnSpan="3"
+              Name="DialogToastBox"
+              Background="{Binding $parent[Window].Background}"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Center"
+              IsVisible="False"
+              >
+        <StackPanel>
+          <TextBlock Text="Parse Set" Margin="5,5,5,10" />
+          <TextBox Watermark="Set URL..." MinWidth="400"/>
+          <StackPanel Orientation="Horizontal">
+            <Button MinWidth="200"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    >
+              Cancel
+            </Button>
+            <Button MinWidth="200"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    >
+              Parse
+            </Button>
+          </StackPanel>
+        </StackPanel>
+      </Border>
     </Grid>
 
   </DockPanel>

@@ -25,6 +25,8 @@ using Montage.Card.API.Interfaces.Services;
 using Avalonia.Controls;
 using System.Text.RegularExpressions;
 using Avalonia.Threading;
+using JasperFx.Core;
+using Montage.Weiss.Tools.GUI.Utilities;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
@@ -283,15 +285,19 @@ public partial class MainWindowViewModel : ViewModelBase
             else if (scryfallMatch.Groups[1].Value.Equals("l", StringComparison.CurrentCultureIgnoreCase) ||
                      scryfallMatch.Groups[1].Value.Equals("level", StringComparison.CurrentCultureIgnoreCase))
             {
-                if (int.TryParse(scryfallMatch.Groups[2].Value, out var level))
-                    return c => (c.Level ?? 0) == level;
+                var levelString = Strings.Or(() => scryfallMatch.Groups[2].Value, () => scryfallMatch.Groups[3].Value);
+                var level = Parsers.ParseInt(levelString.AsSpan(), style: System.Globalization.NumberStyles.Number);
+                if (level is not null)
+                    return c => (c.Level ?? 0) == level!;
                 else
                     return c => true;
             }
-            else if (scryfallMatch.Groups[1].Value.Equals("c", StringComparison.CurrentCultureIgnoreCase) ||
+            else if (scryfallMatch.Groups[1].Value.Equals("co", StringComparison.CurrentCultureIgnoreCase) ||
                      scryfallMatch.Groups[1].Value.Equals("cost", StringComparison.CurrentCultureIgnoreCase))
             {
-                if (int.TryParse(scryfallMatch.Groups[2].Value, out var cost))
+                var costString = Strings.Or(() => scryfallMatch.Groups[2].Value, () => scryfallMatch.Groups[3].Value);
+                var cost = Parsers.ParseInt(costString.AsSpan(), style: System.Globalization.NumberStyles.Number);
+                if (cost is not null)
                     return c => (c.Cost ?? 0) == cost;
                 else
                     return c => true;

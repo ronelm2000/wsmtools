@@ -25,8 +25,10 @@ using System.Text.RegularExpressions;
 using Avalonia.Threading;
 using JasperFx.Core;
 using Montage.Weiss.Tools.GUI.Utilities;
-using Montage.Weiss.Tools.GUI.Views;
 using Montage.Weiss.Tools.GUI.ViewModels.Dialogs;
+using DynamicData.Binding;
+using System.Collections.Generic;
+using DynamicData;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
@@ -42,13 +44,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<CardRatioViewModel> DeckRatioList { get; set; } = [];
 
+    public ObservableCollection<CardSearchQueryViewModel> SearchQueries { get; set; } = [];
+
     public ReactiveCommand<Unit, Unit> ImportSetCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ImportDeckCommand { get; init; }
     public ReactiveCommand<Unit, Unit> OpenLocalSetCommand { get; init; }
     public ReactiveCommand<Unit, Unit> SaveDeckCommand { get; init; }
     public ReactiveCommand<Unit, Unit> OpenDeckCommand { get; init; }
 //    public ReactiveCommand<Unit, CardEntryViewModel> AddCardCommand { get; init; }
-    public ReactiveCommand<string, string> UpdateDatabaseViewCommand { get; init; }
+    public ReactiveCommand<string, bool> UpdateDatabaseViewFromSearchBarCommand { get; init; }
+    public ReactiveCommand<Unit, bool> UpdateDatabaseViewCommand { get; init; }
+
     public ReactiveCommand<Unit, Unit> ExportDeckToTabletopCommand { get; init; }
 
     [ObservableProperty]
@@ -67,10 +73,10 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _deckStats;
 
     [ObservableProperty]
-    public ImportSetViewModel _importSetDC;
+    private ImportSetViewModel _importSetDC;
 
     [ObservableProperty]
-    public ImportDeckViewModel _importDeckDC;
+    private ImportDeckViewModel _importDeckDC;
 
     public MainWindowViewModel()
     {
@@ -91,17 +97,17 @@ public partial class MainWindowViewModel : ViewModelBase
                     new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" },
                     new MultiLanguageString { EN = "BBBB", JP = "BBBB JP" }
                 ]
-             ),
+             ) { Parent = this },
             new CardEntryViewModel(
                 new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
                 new MultiLanguageString { EN = "Sample 2", JP = "Sample 2 But JP" },
                 [ new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" } ]
-            ),
+            ) { Parent = this },
             new CardEntryViewModel(
                 new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
                 new MultiLanguageString { EN = "Sample 3", JP = "Sample 3 But JP" },
                 [ new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" } ]
-            )
+            ) { Parent = this }
             ]);
 
             DeckRatioList.Add(new CardRatioViewModel());
@@ -123,13 +129,27 @@ public partial class MainWindowViewModel : ViewModelBase
         OpenLocalSetCommand = ReactiveCommand.CreateFromTask(OpenLocalSet);
         SaveDeckCommand = ReactiveCommand.CreateFromTask(SaveDeck);
         OpenDeckCommand = ReactiveCommand.CreateFromTask(OpenDeck);
-        UpdateDatabaseViewCommand = ReactiveCommand.CreateFromTask<string, string>(UpdateDatabaseView);
+        UpdateDatabaseViewFromSearchBarCommand = ReactiveCommand.CreateFromTask<string,bool>(UpdateDatabaseView);
+        UpdateDatabaseViewCommand = ReactiveCommand.CreateFromTask<Unit, bool>((_,t) => UpdateDatabaseView(t));
         ExportDeckToTabletopCommand = ReactiveCommand.CreateFromTask(ExportDeckToTabletop);
-
 
         this.WhenAnyValue(r => r.SearchBarText)
             .Throttle(TimeSpan.FromSeconds(1))
+            .InvokeCommand(UpdateDatabaseViewFromSearchBarCommand);
+
+        SearchQueries.ToObservableChangeSet(x => x)
+            .Select(changes => Unit.Default)
             .InvokeCommand(UpdateDatabaseViewCommand);
+
+        OpenLocalSetCommand.ThrownExceptions.Subscribe(ReportException);
+        UpdateDatabaseViewFromSearchBarCommand.ThrownExceptions.Subscribe(ReportException);
+        UpdateDatabaseViewCommand.ThrownExceptions.Subscribe(ReportException);
+    }
+
+    private void ReportException(Exception exception)
+    {
+        Log.Error(exception, "Error occurred");
+        Status = exception.Message;
     }
 
     private async Task ExportDeckToTabletop(CancellationToken token)
@@ -207,22 +227,37 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateDeckStats();
     }
 
-    private async Task<string> UpdateDatabaseView(string searchText, CancellationToken token)
+    private async Task<bool> UpdateDatabaseView(string sender, CancellationToken token)
     {
-        if (searchText is null || string.IsNullOrWhiteSpace(searchText))
-            return "";
+        if (string.IsNullOrWhiteSpace(SearchBarText) && SearchQueries.Count == 0)
+            return false;
         if (token.IsCancellationRequested)
-            return searchText;
+            return false;
+        return await UpdateDatabaseView(token);
+    }
+
+    private async Task<bool> UpdateDatabaseView(IReadOnlyCollection<CardSearchQueryViewModel> changedModels, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(SearchBarText) && SearchQueries.Count == 0)
+            return false;
+        if (token.IsCancellationRequested)
+            return false;
+        return await UpdateDatabaseView(token);
+    }
+
+    private async Task<bool> UpdateDatabaseView(CancellationToken token) {
+        if (Container is null)
+            return false;
 
         var progressReporter = new ProgressReporter(log, message => Status = message);
-        var searchTerms = searchRegex.Matches(searchText)
+        var searchTerms = searchRegex.Matches(SearchBarText)
             .Select(x => TranslateMatch(x))
             .ToList();
 
-        using var db = Container!.GetInstance<CardDatabaseContext>();
+        using var db = Container.GetInstance<CardDatabaseContext>();
         var searchCardList = await db.WeissSchwarzCards
             .ToAsyncEnumerable()
-            .Where(c => searchTerms.All(st => st.Invoke(c)))
+            .Where(c => searchTerms.All(st => st.Invoke(c)) && SearchQueries.All(sq => sq.ToPredicate().Invoke(c)))
             .Distinct(c => c.Serial)
             .Take(300)
             .ToListAsync(token);
@@ -231,7 +266,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await new CacheVerb { }.Cache(Container, progressReporter, cacheList, token);
 
         if (token.IsCancellationRequested)
-            return searchText;
+            return false;
 
         Log.Information("Refreshing Card List...");
 
@@ -241,7 +276,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             foreach (var card in searchCardList)
             {
-                var cardView = new CardEntryViewModel(card);
+                var cardView = new CardEntryViewModel(card) { Parent = this };
                 DatabaseViewList.Add(cardView);
             }
         });
@@ -251,7 +286,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Status = "Done";
 
-        return searchText;
+        return true;
 
         Func<WeissSchwarzCard,bool> TranslateMatch(Match scryfallMatch)
         {
@@ -318,6 +353,13 @@ public partial class MainWindowViewModel : ViewModelBase
                 else
                     return c => true;
             }
+            else if (scryfallMatch.Groups[1].Value.Equals("tr", StringComparison.CurrentCultureIgnoreCase) ||
+                     scryfallMatch.Groups[1].Value.Equals("trait", StringComparison.CurrentCultureIgnoreCase) ||
+                     scryfallMatch.Groups[1].Value.Equals("traits", StringComparison.CurrentCultureIgnoreCase)) {
+                var traitString = Strings.Or(() => scryfallMatch.Groups[2].Value, () => scryfallMatch.Groups[3].Value);
+                var traits = traitString?.Split(',') ?? [];
+                return c => c.Traits.Any(t => traits.Contains(t.EN ?? string.Empty) || traits.Contains(t.JP ?? string.Empty));
+            }
             else
             {
                 return c => c.Serial.Contains(scryfallMatch.Value) || (c.Name.EN?.Contains(scryfallMatch.Value) ?? false) || (c.Name.JP?.Contains(scryfallMatch.Value) ?? false);
@@ -342,14 +384,25 @@ public partial class MainWindowViewModel : ViewModelBase
             if (!filesFolderPath.Exists)
                 continue;
 
-            var imagePath = Path.Current.Add("Images");
+            var imagePath = Path.Current.Combine("Images");
+            if (!imagePath.Exists)
+                imagePath.CreateDirectory();
 
             log.Information("Copying all files");
             log.Information("From: {path}", filesFolderPath.FullPath);
             log.Information("To: {newPath}", imagePath.FullPath);
 
+            filesFolderPath.AllFiles().Copy(imagePath, Overwrite.Always);
+
+            /*
             foreach (var filesPath in filesFolderPath.AllFiles())
-                filesPath.Copy(imagePath, Overwrite.Always);
+            {
+                var origin = filesPath;
+                var destination = imagePath.Combine(filesPath.FileName);
+                log.Information("{origin} -> {destination}", origin.FullPath, destination.FullPath);
+                origin.Copy(destination, Overwrite.Always);
+            }
+            */
         }
     }
 
@@ -382,7 +435,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         foreach (var card in initialCardList)
         {
-            var cardView = new CardEntryViewModel(card);
+            var cardView = new CardEntryViewModel(card) { Parent = this };
             DatabaseViewList.Add(cardView);
         }
 

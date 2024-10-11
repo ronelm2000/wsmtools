@@ -17,7 +17,7 @@ public partial class ImportDeckDialog : UserControl
     {
         if (DataContext is not ImportDeckViewModel vm)
             return;
-        vm.IsVisible = false;
+        vm.IsVisible = false;                                                                               
     }
 
     private void ParseButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

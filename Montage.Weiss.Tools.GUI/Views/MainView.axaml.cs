@@ -2,6 +2,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using DynamicData;
 using Montage.Weiss.Tools.GUI.ViewModels;
 using Montage.Weiss.Tools.GUI.ViewUserControls;
 using Montage.Weiss.Tools.Impls.Services;
@@ -76,5 +77,16 @@ public partial class MainView : UserControl {
             delta *= 30; //.WithY(delta.Y * 4);
 
         scrollViewer.Offset += delta;
+    }
+
+    private void SearchQueryBorder_PointerReleased(object? sender, Avalonia.Input.PointerReleasedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel viewModel)
+            return;
+        if (e.Source is not IDataContextProvider dcp)
+            return;
+        if (dcp.DataContext is not CardSearchQueryViewModel cardSearchQueryViewModel)
+            return;
+        viewModel.SearchQueries.Remove(cardSearchQueryViewModel);
     }
 }

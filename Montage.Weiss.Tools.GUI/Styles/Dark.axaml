@@ -60,6 +60,22 @@
     <Setter Property="FontSize" Value="10" />
     <Setter Property="FontStyle" Value="Italic" />
   </Style>
+  <!-- Search Queries -->
+  <Style Selector="Border.SearchQuery">
+    <Setter Property="CornerRadius" Value="4" />
+  </Style>
+  <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+1) > Border.SearchQuery">
+    <Setter Property="Background" Value="#7988d8" />
+  </Style>
+  <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+1) > Border.SearchQuery:pointerover">
+    <Setter Property="Background" Value="#5a238d" />
+  </Style>
+  <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+1) > Border.SearchQuery > TextBlock">
+    <Setter Property="Foreground" Value="#0b0c0d" />
+  </Style>
+  <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+2) > Border.SearchQuery">
+    <Setter Property="Background" Value="#4b5baa" />
+  </Style>
   <!-- Stats -->
   <Style Selector="Grid#CardStats > TextBlock">
     <Setter Property="Margin" Value="2" />

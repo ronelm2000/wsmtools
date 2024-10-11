@@ -80,6 +80,14 @@ public static class StringExtensions
                     .Replace('(', replacement);
         return res;
     }
+
+    public static string Limit(this string str, int characterLimit, string continuationPhrase = " [..]")
+    {
+        var limit = int.Min(str.Length, characterLimit);
+        if (limit == str.Length) return str;
+        else return str[0..(limit - continuationPhrase.Length)] + continuationPhrase;
+    }
+
     public static async Task<IDocument> ParseHTML(this string content)
     {
         var config = AngleSharp.Configuration.Default;

@@ -113,6 +113,30 @@
         <Grid RowDefinitions="Auto,Auto,*">
           <Border Margin="6,5,2,0" Grid.Row="0" >
             <!-- Search Terms Go Here -->
+            <ItemsControl Classes="SearchQueryControl" ItemsSource="{Binding SearchQueries}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Classes="SearchQuery"
+                          Margin="4"
+                          Padding="6"
+                          PointerReleased="SearchQueryBorder_PointerReleased"
+                          >
+                    <ToolTip.Tip>
+                        <TextBlock Text="{Binding ToolTip}" />
+                    </ToolTip.Tip>
+                    
+                    <TextBlock Classes="SearchQuery">
+                      <Run Text="{Binding DisplayText}" />
+                    </TextBlock>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
           </Border>
          
           <Border Margin="6,5,2,0" Grid.Row="1" >
@@ -136,7 +160,7 @@
                         <ContextMenu>
                           <MenuItem Header="Add"/>
                           <Separator />
-                          <MenuItem Header="Find CXC" />
+                          <MenuItem Header="Find CXC" Command="{Binding FindClimaxCombosCommand}" />
                           <MenuItem Header="Find Traits" />
                           <MenuItem Header="Find Names" />
                         </ContextMenu>

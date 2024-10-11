@@ -12,15 +12,19 @@ using DynamicData.Binding;
 using ReactiveUI;
 using System.Reactive.Linq;
 using DynamicData;
-using Avalonia.Media;
 using Avalonia.Platform;
-using Lamar;
+using Serilog;
+using System.Reactive;
+using Montage.Weiss.Tools.GUI.ViewModels.Query;
+using Avalonia.Threading;
 
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
 public partial class CardEntryViewModel : ViewModelBase
 {
+    private static ILogger Log = Serilog.Log.ForContext<CardEntryViewModel>();
+
     public static CardEntryViewModel Sample { get; } = new(
         new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
         new MultiLanguageString { EN = "Sample 1", JP = "Sample 1 But JP" },
@@ -69,8 +73,12 @@ public partial class CardEntryViewModel : ViewModelBase
     [ObservableProperty]
     private List<string> _effects;
 
+    public MainWindowViewModel? Parent { get; init; } = null;
+
     public IObservable<bool> IsCharacter { get; private set; }
     public IObservable<bool> IsCharacterOrEvent { get; private set; }
+
+    public ReactiveCommand<Unit, Unit> FindClimaxCombosCommand { get; private set; }
 
     public CardEntryViewModel(Uri imageUri, MultiLanguageString name, List<MultiLanguageString> traits)
     {
@@ -119,6 +127,20 @@ public partial class CardEntryViewModel : ViewModelBase
         IsCharacterOrEvent = this.WhenPropertyChanged(c => c.CardType)
             .Select(t => t.Value == CardType.Character || t.Value == CardType.Event)
             .AsObservable();
+
+        FindClimaxCombosCommand = ReactiveCommand.CreateFromTask(FindClimaxCombos);
+
+        FindClimaxCombosCommand.ThrownExceptions
+            .Subscribe(ReportException);
+    }
+
+    private async Task FindClimaxCombos()
+    {
+        if (Parent is null)
+            throw new NotImplementedException();
+
+        var newQuery = new ClimaxComboQueryViewModel(Card);
+        await Dispatcher.UIThread.InvokeAsync(() => Parent.SearchQueries.Add(newQuery));
     }
 
     private IEnumerable<Uri> TranslateEffect(string effect)
@@ -136,4 +158,16 @@ public partial class CardEntryViewModel : ViewModelBase
         if (effect.Contains("COUNTER"))
             yield return counter;
     }
+
+    private void ReportException(Exception exception)
+    {
+        Log.Error(exception, "Exception Occurred.");
+
+        if (Parent is null)
+            return;
+
+        Parent.Status = exception.Message;
+    }
+
+
 }

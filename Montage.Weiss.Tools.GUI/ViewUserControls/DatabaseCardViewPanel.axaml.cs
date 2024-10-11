@@ -10,6 +10,7 @@ namespace Montage.Weiss.Tools.GUI.ViewUserControls;
 public partial class DatabaseCardViewPanel : UserControl
 {
     public static readonly RoutedEvent<RoutedEventArgs> ClickEvent = RoutedEvent.Register<DatabaseCardViewPanel, RoutedEventArgs>(nameof(Click), RoutingStrategies.Bubble | RoutingStrategies.Direct);
+
     public static Func<ILogger?> Logger { get; set; } = () => Serilog.Log.ForContext<DatabaseCardViewPanel>();
 
     public static void AddClickHandler(Interactive element, EventHandler<RoutedEventArgs> handler) =>

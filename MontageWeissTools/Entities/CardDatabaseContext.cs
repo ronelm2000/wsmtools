@@ -149,6 +149,13 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                     Activity = ActivityType.Delete,
                     Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.12.0""}",
                     DateAdded = new DateTime(2022, 11, 28, 20, 51, 28, 983, DateTimeKind.Local).AddTicks(6076)
+                },
+                new ActivityLog
+                {
+                    LogID = 5,
+                    Activity = ActivityType.Delete,
+                    Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.15.0""}",
+                    DateAdded = DateTime.FromBinary(-8584722569801376902)
                 }
             );
         });

@@ -1,5 +1,6 @@
 ﻿using Montage.Card.API.Entities;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Entities;
 
@@ -9,6 +10,7 @@ public class WeissSchwarzCardOptionalInfo : IExactCloneable<WeissSchwarzCardOpti
     public string Key { get; set; }
     public string? ValueJSON { get; set; }
 
+    [JsonIgnore]
     public virtual WeissSchwarzCard? Card { get; set; }
 
     public WeissSchwarzCardOptionalInfo()
@@ -26,7 +28,13 @@ public class WeissSchwarzCardOptionalInfo : IExactCloneable<WeissSchwarzCardOpti
 
     public T? DeserializeValue<T>()
     {
-        return JsonSerializer.Deserialize<T>(ValueJSON ?? string.Empty);
+        try
+        {
+            return JsonSerializer.Deserialize<T>(ValueJSON ?? string.Empty);
+        } catch (JsonException)
+        {
+            return default;
+        }
     }
 
     public void SerializeValue<T>(T rawValue)

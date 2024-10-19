@@ -3,6 +3,7 @@ using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Entities.External.EncoreDeck;
 using Montage.Weiss.Tools.Utilities;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
@@ -17,6 +18,8 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
     private readonly Regex encoreDecksAPIMatcher = new Regex(@"http(?:s)?:\/\/www\.encoredecks\.com\/api\/series\/(.+)\/cards");
     private readonly Regex encoreDecksSiteSetMatcher = new Regex(@"http(?:s)?:\/\/www.encoredecks\.com\/?.+&set=([a-f0-9]+).*");
     private readonly ILogger Log = Serilog.Log.ForContext<EncoreDecksParser>();
+
+    public readonly static string ParserInfoKey = "parsers.encoredecks.info";
 
     public async Task<bool> IsCompatible(IParseInfo info)
     {
@@ -106,8 +109,34 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         result.Color = TranslateColor(setCard.Colour!);
         result.Remarks = $"Parsed: {this.GetType().Name}";
 
+        result.AddOptionalInfo("internal.parser", new string[] { nameof(EncoreDecksParser) });
+        result.AddOptionalInfo(ParserInfoKey, new EncoreDeckOptionalInfo
+        {
+            HasEnglishTranslations = enOptional?.Ability is not null
+        });
+
         result = FixSiteErrata(result);
         return await ValueTask.FromResult(result);
+    }
+
+    /// <summary>
+    /// Finds if EncoreDecks found translations on a specified card.
+    /// 
+    /// If no optional info is found for the card (for example if this was parsed via other means), it will also return true.
+    /// 
+    /// </summary>
+    /// <param name="card">card to check</param>
+    /// <returns></returns>
+    internal static bool HasNoTranslations(WeissSchwarzCard card)
+    {
+        var info = card.AdditionalInfo.FirstOrDefault(oi => oi.Key == ParserInfoKey);
+        if (info is null)
+            return true;
+
+        if (info.DeserializeValue<EncoreDeckOptionalInfo>() is not EncoreDeckOptionalInfo parsedInfo)
+            return true;
+
+        return !parsedInfo.HasEnglishTranslations;
     }
 
     private string TransformIntoAPIFormat(string urlOrFile)

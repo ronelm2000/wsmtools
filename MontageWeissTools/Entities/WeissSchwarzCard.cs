@@ -83,7 +83,6 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         WeissSchwarzCard newCard = (WeissSchwarzCard) this.MemberwiseClone();
         newCard.Name = new MultiLanguageString { EN = this.Name.EN, JP = this.Name.JP };
         newCard.Traits = this.Traits.Select(s => s.Clone()).ToList();
-        newCard.AdditionalInfo = this.AdditionalInfo.Select(s => s.Clone()).ToList();
         newCard.Images = this.Images.ToList();
         return newCard;
     }
@@ -315,11 +314,11 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         var json = JsonSerializer.Serialize<T>(value);
         if (string.IsNullOrEmpty(json)) return;
         var info = AdditionalInfo.FirstOrDefault(i => i.Key == key, new WeissSchwarzCardOptionalInfo(this, key));
+        info.Card = this;
         info.SerializeValue<T>(value);
+
         AdditionalInfo.Remove(info);
         AdditionalInfo.Add(info);
-
-        Log.Debug("All Optional Info: {@info}", AdditionalInfo);
     }
 
 }

@@ -40,10 +40,6 @@
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE --with sendtcp,upscaling --out sharex"
     },
-    "Export Deck (#31)": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/gO_JKfCsm --out sharex --with sendtcp"
-    },
     "Prase Batman Ninja (ED)": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards"
@@ -143,6 +139,14 @@
     "Parse KiraFan": {
       "commandName": "Project",
       "commandLineArgs": "parse \"R:\\Misc\\Kirara Fantasia\\Kirara Fantasia Draft Sample\\kirafan_draft_1.ws-set\""
+    },
+    "Export Deck (#69)": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/5f4xiDxR8 --out sharex --with sendtcp"
+    },
+    "Export Deck (#69 - Frieren)": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/mZAbG-auc --out sharex --with sendtcp"
     }
   }
 }

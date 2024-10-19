@@ -27,6 +27,8 @@ internal class SerilogLogSink : ILogSink
 {
     public bool IsEnabled(LogEventLevel level, string area)
     {
+        if (area == "Layout")
+            return false;
         return Serilog.Log.IsEnabled(ToSerilogLevel(level));
     }
 
@@ -48,6 +50,7 @@ internal class SerilogLogSink : ILogSink
             LogEventLevel.Information => Serilog.Events.LogEventLevel.Information,
             LogEventLevel.Debug => Serilog.Events.LogEventLevel.Debug,
             LogEventLevel.Verbose => Serilog.Events.LogEventLevel.Verbose,
+            LogEventLevel.Error => Serilog.Events.LogEventLevel.Error,
             _ => Serilog.Events.LogEventLevel.Information
         };
     }

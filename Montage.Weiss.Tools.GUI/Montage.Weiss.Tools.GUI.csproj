@@ -9,6 +9,9 @@
     <AssemblyName>wsm-gui</AssemblyName>
     <VersionPrefix>0.1.0</VersionPrefix>
   </PropertyGroup>
+  <PropertyGroup Label="Avalonia">
+    <AvaloniaXamlVerboseExceptions>True</AvaloniaXamlVerboseExceptions>
+  </PropertyGroup>
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />

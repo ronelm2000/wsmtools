@@ -29,6 +29,7 @@ using Montage.Weiss.Tools.GUI.ViewModels.Dialogs;
 using DynamicData.Binding;
 using System.Collections.Generic;
 using DynamicData;
+using Montage.Weiss.Tools.GUI.ViewModels.Query;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
@@ -37,10 +38,14 @@ public partial class MainWindowViewModel : ViewModelBase
     private static readonly Regex searchRegex = ScryfallStyleRegex();
 
     private ILogger log;
+    private bool _isBootstrapped = false;
+    private SourceList<CardEntryViewModel> _databaseViewSourceList;
+    private ReadOnlyObservableCollection<CardEntryViewModel> _databaseViewList;
+
     public Func<Window>? Parent { get; init; }
     public Lamar.IContainer? Container { get; init; }
 
-    public ObservableCollection<CardEntryViewModel> DatabaseViewList { get; set; }
+    public ReadOnlyObservableCollection<CardEntryViewModel> DatabaseViewList => _databaseViewList;
 
     public ObservableCollection<CardRatioViewModel> DeckRatioList { get; set; } = [];
 
@@ -51,11 +56,9 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> OpenLocalSetCommand { get; init; }
     public ReactiveCommand<Unit, Unit> SaveDeckCommand { get; init; }
     public ReactiveCommand<Unit, Unit> OpenDeckCommand { get; init; }
-//    public ReactiveCommand<Unit, CardEntryViewModel> AddCardCommand { get; init; }
-    public ReactiveCommand<string, bool> UpdateDatabaseViewFromSearchBarCommand { get; init; }
     public ReactiveCommand<Unit, bool> UpdateDatabaseViewCommand { get; init; }
-
     public ReactiveCommand<Unit, Unit> ExportDeckToTabletopCommand { get; init; }
+    public ReactiveCommand<Unit, Unit> InjectSearchQueryCommand { get; init; }
 
     [ObservableProperty]
     private string _status;
@@ -88,27 +91,29 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (Design.IsDesignMode)
         {
-            DatabaseViewList = new ObservableCollection<CardEntryViewModel>(
-            [
-                new CardEntryViewModel(
-                new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
-                new MultiLanguageString { EN = "Sample 1", JP = "Sample 1 But JP" },
+            _databaseViewSourceList = new SourceList<CardEntryViewModel>();
+            _databaseViewSourceList.AddRange(
                 [
-                    new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" },
-                    new MultiLanguageString { EN = "BBBB", JP = "BBBB JP" }
+                    new CardEntryViewModel(
+                    new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
+                    new MultiLanguageString { EN = "Sample 1", JP = "Sample 1 But JP" },
+                    [
+                        new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" },
+                        new MultiLanguageString { EN = "BBBB", JP = "BBBB JP" }
+                    ]
+                 ) { Parent = this },
+                new CardEntryViewModel(
+                    new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
+                    new MultiLanguageString { EN = "Sample 2", JP = "Sample 2 But JP" },
+                    [ new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" } ]
+                ) { Parent = this },
+                new CardEntryViewModel(
+                    new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
+                    new MultiLanguageString { EN = "Sample 3", JP = "Sample 3 But JP" },
+                    [ new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" } ]
+                ) { Parent = this }
                 ]
-             ) { Parent = this },
-            new CardEntryViewModel(
-                new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
-                new MultiLanguageString { EN = "Sample 2", JP = "Sample 2 But JP" },
-                [ new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" } ]
-            ) { Parent = this },
-            new CardEntryViewModel(
-                new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
-                new MultiLanguageString { EN = "Sample 3", JP = "Sample 3 But JP" },
-                [ new MultiLanguageString { EN = "AAAA", JP = "AAAA JP" } ]
-            ) { Parent = this }
-            ]);
+            );
 
             DeckRatioList.Add(new CardRatioViewModel());
             DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg").Load() });
@@ -117,33 +122,68 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         else
         {
-            DatabaseViewList = [];
+            _databaseViewSourceList = new SourceList<CardEntryViewModel>();
             ImportSetDC = new ImportSetViewModel { IsVisible = false, Parent = () => this };
             ImportDeckDC = new ImportDeckViewModel { IsVisible = false, Parent = () => this };
         }
 
         log = Serilog.Log.Logger.ForContext<MainWindowViewModel>();
 
+        _databaseViewSourceList.Connect()
+            .Bind(out _databaseViewList)
+            .Subscribe();
+
         ImportSetCommand = ReactiveCommand.CreateFromTask(ImportSet);
         ImportDeckCommand = ReactiveCommand.CreateFromTask(ImportDeck);
         OpenLocalSetCommand = ReactiveCommand.CreateFromTask(OpenLocalSet);
         SaveDeckCommand = ReactiveCommand.CreateFromTask(SaveDeck);
         OpenDeckCommand = ReactiveCommand.CreateFromTask(OpenDeck);
-        UpdateDatabaseViewFromSearchBarCommand = ReactiveCommand.CreateFromTask<string,bool>(UpdateDatabaseView);
         UpdateDatabaseViewCommand = ReactiveCommand.CreateFromTask<Unit, bool>((_,t) => UpdateDatabaseView(t));
         ExportDeckToTabletopCommand = ReactiveCommand.CreateFromTask(ExportDeckToTabletop);
+        InjectSearchQueryCommand = ReactiveCommand.CreateFromTask(InjectSearchQuery);
 
         this.WhenAnyValue(r => r.SearchBarText)
-            .Throttle(TimeSpan.FromSeconds(1))
-            .InvokeCommand(UpdateDatabaseViewFromSearchBarCommand);
-
-        SearchQueries.ToObservableChangeSet(x => x)
-            .Select(changes => Unit.Default)
+            .Merge(SearchQueries.ToObservableChangeSet(x => x).Select(changes => "bruh"))
+            .ObserveOn(RxApp.TaskpoolScheduler)
+            .Select(sender => Unit.Default)
+            .Throttle(TimeSpan.FromSeconds(1), RxApp.TaskpoolScheduler)
+            .SubscribeOn(RxApp.TaskpoolScheduler)
             .InvokeCommand(UpdateDatabaseViewCommand);
 
         OpenLocalSetCommand.ThrownExceptions.Subscribe(ReportException);
-        UpdateDatabaseViewFromSearchBarCommand.ThrownExceptions.Subscribe(ReportException);
         UpdateDatabaseViewCommand.ThrownExceptions.Subscribe(ReportException);
+    }
+
+    private async Task InjectSearchQuery()
+    {
+        var aaaa = SearchBarText;
+        var searchRegexResults = searchRegex.Matches(SearchBarText);
+        var searchTerms = searchRegexResults
+            .SelectMany(x => TranslateMatch(x))
+            .ToList();
+
+        await Observable.Start(() =>
+        {
+            SearchQueries.AddRange(searchTerms, 0);
+            SearchBarText = searchRegex.Replace(SearchBarText, "");
+        }, RxApp.MainThreadScheduler);
+
+        IEnumerable<CardSearchQueryViewModel> TranslateMatch(Match searchRegexMatch) {
+            var valueString = Strings.Or(() => searchRegexMatch.Groups[2].Value, () => searchRegexMatch.Groups[3].Value);
+            CardSearchQueryViewModel? result = searchRegexMatch.Groups[1].Value switch
+            {
+                "c" when valueString is not null => new ColorQueryViewModel(valueString.Split(",")),
+                "cx" when valueString is not null => new ClimaxComboQueryViewModel(valueString),
+                ("o" or "e" or "effect") when valueString is not null => new EffectQueryViewModel(valueString),
+                ("set" or "ns") when valueString is not null => new NeoStandardCodeQueryViewModel(valueString.Split(",")),
+                ("tr" or "trait" or "traits") when valueString is not null => new TraitQueryViewModel(valueString.Split(",")),
+                _ => null
+            };
+            if (result is not null)
+            {
+                yield return result;
+            }
+        }
     }
 
     private void ReportException(Exception exception)
@@ -248,19 +288,33 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task<bool> UpdateDatabaseView(CancellationToken token) {
         if (Container is null)
             return false;
+        if (!_isBootstrapped)
+            return false;
+
+        Log.Information("Executing on: {name}", Thread.CurrentThread.Name);
 
         var progressReporter = new ProgressReporter(log, message => Status = message);
         var searchTerms = searchRegex.Matches(SearchBarText)
             .Select(x => TranslateMatch(x))
             .ToList();
 
+        Log.Information("Loading Database and Obtaining Data...");
+        await Dispatcher.UIThread.InvokeAsync(() => Status = "Loading Database", DispatcherPriority.ApplicationIdle);
+
         using var db = Container.GetInstance<CardDatabaseContext>();
         var searchCardList = await db.WeissSchwarzCards
             .ToAsyncEnumerable()
             .Where(c => searchTerms.All(st => st.Invoke(c)) && SearchQueries.All(sq => sq.ToPredicate().Invoke(c)))
             .Distinct(c => c.Serial)
+            .OrderBy(c =>
+            {
+                var serial = WeissSchwarzCard.ParseSerial(c.Serial);
+                return (serial.ReleaseID, serial.SetID, !c.IsFoil, c.Rarity);
+            })
             .Take(300)
             .ToListAsync(token);
+
+        await Dispatcher.UIThread.InvokeAsync(() => Status = "Caching when applicable...", DispatcherPriority.ApplicationIdle);
 
         var cacheList = searchCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom).ToAsyncEnumerable();
         await new CacheVerb { }.Cache(Container, progressReporter, cacheList, token);
@@ -269,20 +323,34 @@ public partial class MainWindowViewModel : ViewModelBase
             return false;
 
         Log.Information("Refreshing Card List...");
+        log.Information("All Cards: {ser}", searchCardList?.Count ?? 0);
 
+        if (searchCardList is null || searchCardList.Count == 0)
+            return false;
+
+        Log.Information("Dehydrating list.");
         await Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            DatabaseViewList.Clear();
-
-            foreach (var card in searchCardList)
+            _databaseViewSourceList.Edit(list =>
             {
-                var cardView = new CardEntryViewModel(card) { Parent = this };
-                DatabaseViewList.Add(cardView);
-            }
-        });
+                list.Clear();
+            }), DispatcherPriority.ApplicationIdle
+            );
 
-        log.Information("All Serials: {ser}", DatabaseViewList.Select(v => v.Card.Serial).Distinct().Count());
-        log.Information("All Cards: {ser}", DatabaseViewList.Count);
+        Log.Information("Refreshing list.");
+        foreach (var card in searchCardList)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() => 
+            {
+                Status = $"Loading [{card.Serial}]";
+                _databaseViewSourceList.Add(new CardEntryViewModel(card) { Parent = this });
+//                _databaseViewSourceList.Edit(list => list.Add(model));
+            }, 
+            DispatcherPriority.ApplicationIdle
+            );
+        }
+
+        log.Information("All Serials: {ser}", _databaseViewSourceList.Items.Select(v => v.Card.Serial).Distinct().Count());
+        log.Information("All Cards: {ser}", _databaseViewSourceList.Count);
 
         Status = "Done";
 
@@ -425,19 +493,25 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task LoadDatabase(ProgressReporter progressReporter)
     {
-        DatabaseViewList.Clear();
         DeckRatioList.Clear();
+
+        await Dispatcher.UIThread.InvokeAsync(() => Status = "Loading Database...", DispatcherPriority.ApplicationIdle);
 
         using var db = Container!.GetInstance<CardDatabaseContext>();
         var initialCardList = db.WeissSchwarzCards.Take(100).ToList();
         var cacheList = initialCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom).ToAsyncEnumerable();
         await new CacheVerb { }.Cache(Container, progressReporter, cacheList);
 
+        await Dispatcher.UIThread.InvokeAsync(() => Status = "Loading List...", DispatcherPriority.ApplicationIdle);
+
+        _databaseViewSourceList.Edit(list => list.Clear());
+
         foreach (var card in initialCardList)
         {
-            var cardView = new CardEntryViewModel(card) { Parent = this };
-            DatabaseViewList.Add(cardView);
+            await Dispatcher.UIThread.InvokeAsync(() => _databaseViewSourceList.Add(new CardEntryViewModel(card) { Parent = this }), DispatcherPriority.ApplicationIdle);
         }
+
+        _isBootstrapped = true;
 
         Status = "Done";
     }
@@ -564,6 +638,6 @@ public partial class MainWindowViewModel : ViewModelBase
         MimeTypes = ["application/json"]
     };
 
-    [GeneratedRegex(@"(?:(\w+)\:(?:(\w+)|\""([\w ]+)\"")|(\w+))")]
+    [GeneratedRegex(@"(?:(\w+)\:(?:(\w+)|""(.*?)"")|(\w+))")]
     private static partial Regex ScryfallStyleRegex();
 }

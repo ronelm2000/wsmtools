@@ -22,6 +22,10 @@ public abstract partial class CardSearchQueryViewModel : ViewModelBase
 
     public enum QueryType
     {
-        ClimaxComboSearch
+        ClimaxCombo,
+        Color,
+        NeoStandardCode,
+        Effect,
+        Trait
     }
 }

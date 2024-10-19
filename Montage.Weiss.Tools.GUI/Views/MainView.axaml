@@ -124,10 +124,13 @@
                     <ToolTip.Tip>
                         <TextBlock Text="{Binding ToolTip}" />
                     </ToolTip.Tip>
-                    
+
+                    <StackPanel>
                     <TextBlock Classes="SearchQuery">
                       <Run Text="{Binding DisplayText}" />
                     </TextBlock>
+
+                    </StackPanel>
                   </Border>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
@@ -140,7 +143,12 @@
           </Border>
          
           <Border Margin="6,5,2,0" Grid.Row="1" >
-            <TextBox Watermark="Search..." Text="{Binding SearchBarText}" />
+            <StackPanel>
+              <TextBox Name="SearchTB"
+                       Watermark="Search..." 
+                       Text="{Binding SearchBarText}" 
+                       />
+            </StackPanel>
           </Border>
           <ScrollViewer Padding="5,5,20,5" 
                         Grid.Row="2" 
@@ -154,7 +162,6 @@
                             CornerRadius="1"
                             BorderBrush="Gray" BorderThickness="1"
                             Padding="5,5,2,5"
-                            
                             >
                       <Border.ContextMenu>
                         <ContextMenu>
@@ -182,7 +189,13 @@
       <v:ImportDeckDialog Name="ImportDeckDialog"
                           DataContext="{Binding ImportDeckDC}"
                           />
-      
+
+      <!-- Invisible Buttons -->
+      <Button IsDefault="{Binding #SearchTB.IsFocused}"
+              IsVisible="True"
+              ZIndex="-4"
+              Command="{Binding InjectSearchQueryCommand}"
+              />
     </Grid>
 
   </DockPanel>

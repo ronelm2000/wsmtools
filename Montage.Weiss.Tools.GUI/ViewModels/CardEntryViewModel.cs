@@ -17,6 +17,8 @@ using Serilog;
 using System.Reactive;
 using Montage.Weiss.Tools.GUI.ViewModels.Query;
 using Avalonia.Threading;
+using JasperFx.Core;
+using Montage.Card.API.Entities;
 
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
@@ -114,7 +116,7 @@ public partial class CardEntryViewModel : ViewModelBase
             .Distinct()
             .Select(u => Bitmap.DecodeToHeight(AssetLoader.Open(u), 12))
             .ToList();
-        Image = card.LoadImage();
+        Image = Task.Run(() => card.LoadImage());
         Effects = card.Effect.ToList();
     }
 
@@ -130,8 +132,7 @@ public partial class CardEntryViewModel : ViewModelBase
 
         FindClimaxCombosCommand = ReactiveCommand.CreateFromTask(FindClimaxCombos);
 
-        FindClimaxCombosCommand.ThrownExceptions
-            .Subscribe(ReportException);
+        FindClimaxCombosCommand.ThrownExceptions.Subscribe(ReportException);
     }
 
     private async Task FindClimaxCombos()
@@ -158,6 +159,26 @@ public partial class CardEntryViewModel : ViewModelBase
         if (effect.Contains("COUNTER"))
             yield return counter;
     }
+
+    internal void Update(WeissSchwarzCard card)
+    {
+        Card = card;
+        Name = card.Name;
+        Traits = card.Traits.Select(t => new MultiLanguageString { EN = t.EN, JP = t.JP }).ToList();
+        Serial = card.Serial;
+        CardType = card.Type;
+        Level = card.Level;
+        Cost = card.Cost;
+        Power = card.Power;
+        Soul = card.Soul;
+        EffectMarkers = card.Effect.SelectMany(e => TranslateEffect(e))
+            .Distinct()
+            .Select(u => Bitmap.DecodeToHeight(AssetLoader.Open(u), 12))
+            .ToList();
+        Image = card.LoadImage();
+        Effects = card.Effect.ToList();
+    }
+
 
     private void ReportException(Exception exception)
     {

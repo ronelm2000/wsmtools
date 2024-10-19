@@ -64,13 +64,18 @@
   <Style Selector="Border.SearchQuery">
     <Setter Property="CornerRadius" Value="4" />
   </Style>
+
+  <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter > Border.SearchQuery:pointerover">
+    <Setter Property="Background" Value="#5a238d" />
+  </Style>
+  <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter > Border.SearchQuery:pointerover > StackPanel > TextBlock">
+    <Setter Property="Foreground" Value="#1ba0d0" />
+  </Style>
+
   <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+1) > Border.SearchQuery">
     <Setter Property="Background" Value="#7988d8" />
   </Style>
-  <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+1) > Border.SearchQuery:pointerover">
-    <Setter Property="Background" Value="#5a238d" />
-  </Style>
-  <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+1) > Border.SearchQuery > TextBlock">
+  <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+1) > Border.SearchQuery > StackPanel > TextBlock">
     <Setter Property="Foreground" Value="#0b0c0d" />
   </Style>
   <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+2) > Border.SearchQuery">

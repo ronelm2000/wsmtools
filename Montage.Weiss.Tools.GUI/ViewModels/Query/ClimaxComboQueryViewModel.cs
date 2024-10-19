@@ -23,9 +23,20 @@ public partial class ClimaxComboQueryViewModel : CardSearchQueryViewModel
 
         var climaxesToSearchString = _climaxesToSearch.ConcatAsString(", ");
 
-        Type = QueryType.ClimaxComboSearch;
+        Type = QueryType.ClimaxCombo;
         DisplayText = climaxesToSearchString.Limit(10);
         ToolTip = $"Finds any cards with names or abilities referring to any of the following: {climaxesToSearchString}"; 
+    }
+
+    public ClimaxComboQueryViewModel(string climaxName) : base()
+    {
+        _climaxesToSearch = [climaxName];
+
+        var climaxesToSearchString = _climaxesToSearch.ConcatAsString(", ");
+
+        Type = QueryType.ClimaxCombo;
+        DisplayText = climaxesToSearchString.Limit(10);
+        ToolTip = $"Finds any cards with names or abilities referring to any of the following: {climaxesToSearchString}";
     }
 
     public override Func<WeissSchwarzCard, bool> ToPredicate()

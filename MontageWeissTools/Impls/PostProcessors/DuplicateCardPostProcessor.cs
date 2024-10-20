@@ -47,9 +47,10 @@ public class DuplicateCardPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                 .ToListAsync(cancellationToken);
             if (dupCards.Count > 0)
             {
-                card.AdditionalInfo = dupCards[0].AdditionalInfo
+                card.AdditionalInfo.AddRange(dupCards[0].AdditionalInfo
                     .Select(i => new WeissSchwarzCardOptionalInfo(card, i.Key) { ValueJSON = i.ValueJSON })
-                    .ToList();
+                );
+                card.AdditionalInfo = card.AdditionalInfo.DistinctBy(oi => oi.Key).ToList();
                 db.RemoveRange(dupCards);
             }
 

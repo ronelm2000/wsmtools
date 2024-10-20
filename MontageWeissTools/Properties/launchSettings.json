@@ -147,6 +147,10 @@
     "Export Deck (#69 - Frieren)": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/mZAbG-auc --out sharex --with sendtcp"
+    },
+    "Export Set (Frieren)": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/api/series/6581f1ecee85df630166d7ac/cards"
     }
   }
 }

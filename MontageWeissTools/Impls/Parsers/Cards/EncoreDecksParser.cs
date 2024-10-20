@@ -112,7 +112,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         result.AddOptionalInfo("internal.parser", new string[] { nameof(EncoreDecksParser) });
         result.AddOptionalInfo(ParserInfoKey, new EncoreDeckOptionalInfo
         {
-            HasEnglishTranslations = enOptional?.Ability is not null
+            HasEnglishTranslations = (enOptional?.Ability?.Count ?? 0) > 0
         });
 
         result = FixSiteErrata(result);

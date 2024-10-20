@@ -460,17 +460,7 @@ public partial class MainWindowViewModel : ViewModelBase
             log.Information("From: {path}", filesFolderPath.FullPath);
             log.Information("To: {newPath}", imagePath.FullPath);
 
-            filesFolderPath.AllFiles().Copy(imagePath, Overwrite.Always);
-
-            /*
-            foreach (var filesPath in filesFolderPath.AllFiles())
-            {
-                var origin = filesPath;
-                var destination = imagePath.Combine(filesPath.FileName);
-                log.Information("{origin} -> {destination}", origin.FullPath, destination.FullPath);
-                origin.Copy(destination, Overwrite.Always);
-            }
-            */
+            await Task.Run(() => filesFolderPath.AllFiles().Copy(imagePath, Overwrite.Always));
         }
     }
 

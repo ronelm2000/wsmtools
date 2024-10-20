@@ -29,6 +29,8 @@ public class TTSCardCorrector : IExportedDeckInspector<WeissSchwarzDeck, WeissSc
             ("】", "]"),
             ("《", "<<"),
             ("》", ">>"),
+            ("\u2013", "-"),
+            ("\uFF08", "("),
             // These are shortcuts from HOTC
             ("[A]", "[AUTO]"),
             ("[C]", "[CONT]"),

@@ -151,6 +151,10 @@
     "Export Set (Frieren)": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/api/series/6581f1ecee85df630166d7ac/cards"
+    },
+    "Export Set (Assault Lily)": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/api/series/61df3a641e41dfffbda3e1c8/cards"
     }
   }
 }

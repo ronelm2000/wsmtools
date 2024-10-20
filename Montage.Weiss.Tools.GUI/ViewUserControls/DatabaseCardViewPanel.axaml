@@ -38,7 +38,7 @@
             PointerReleased="Generic_PointerReleased"
             >
       <TextBlock Name="CardName" TextAlignment="Center">
-        <Run Text="{Binding Name.EN}" />
+        <Run Text="{Binding Name}" />
         <LineBreak />
         <Run Classes="InlineSerial" Text="{Binding Serial}" />
       </TextBlock>

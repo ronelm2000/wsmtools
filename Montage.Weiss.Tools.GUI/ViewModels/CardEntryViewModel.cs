@@ -40,7 +40,7 @@ public partial class CardEntryViewModel : ViewModelBase
     private WeissSchwarzCard _card;
 
     [ObservableProperty]
-    private MultiLanguageString _name;
+    private string _name;
 
     [ObservableProperty]
     private string _serial;
@@ -86,7 +86,7 @@ public partial class CardEntryViewModel : ViewModelBase
     {
         DeclareObservables();
 
-        Name = name;
+        Name = name.AsNonEmptyString();
         Traits = traits;
         Serial = "XXX/WS01-100";
         Level = 1;
@@ -104,7 +104,7 @@ public partial class CardEntryViewModel : ViewModelBase
         DeclareObservables();
 
         Card = card;
-        Name = card.Name;
+        Name = card.Name.AsNonEmptyString();
         Traits = card.Traits.Select(t => new MultiLanguageString {  EN = t.EN, JP = t.JP }).ToList();
         Serial = card.Serial;
         CardType = card.Type;
@@ -163,7 +163,7 @@ public partial class CardEntryViewModel : ViewModelBase
     internal void Update(WeissSchwarzCard card)
     {
         Card = card;
-        Name = card.Name;
+        Name = card.Name.AsNonEmptyString();
         Traits = card.Traits.Select(t => new MultiLanguageString { EN = t.EN, JP = t.JP }).ToList();
         Serial = card.Serial;
         CardType = card.Type;

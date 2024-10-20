@@ -2,6 +2,7 @@
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.EncoreDeck;
 using Montage.Weiss.Tools.Utilities;
@@ -88,7 +89,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         result.Name.JP = jpOptional?.Name;
         (List<string>?, List<string>?) attributes = (enOptional?.Attributes, jpOptional?.Attributes);
         result.Traits = TranslateTraits(attributes).ToList();
-        result.Effect = enOptional?.Ability?.ToArray() ?? Array.Empty<string>();
+        result.Effect = enOptional?.Ability?.ToArray() ?? jpOptional?.Ability?.ToArray() ?? Array.Empty<string>();
         result.Rarity = setCard.Rarity!;
         result.Side = TranslateSide(setCard.Side);
         result.Level = setCard.Level;
@@ -109,10 +110,13 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         result.Color = TranslateColor(setCard.Colour!);
         result.Remarks = $"Parsed: {this.GetType().Name}";
 
+        var hasBeenTranslated = (enOptional?.Ability?.Count ?? 0) > 0
+            && (enOptional?.Source != "akiba" || (enOptional?.Ability?.All(e => !e.StartsWithAny("【自】", "【起】", "【永】")) ?? false));
+
         result.AddOptionalInfo("internal.parser", new string[] { nameof(EncoreDecksParser) });
         result.AddOptionalInfo(ParserInfoKey, new EncoreDeckOptionalInfo
         {
-            HasEnglishTranslations = (enOptional?.Ability?.Count ?? 0) > 0
+            HasEnglishTranslations = hasBeenTranslated
         });
 
         result = FixSiteErrata(result);

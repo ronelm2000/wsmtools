@@ -40,6 +40,10 @@ public static class StringExtensions
     {
         return allReplacements.Aggregate(str, (str, p) => str.Replace(p.searchString, p.replaceString));
     }
+    public static bool StartsWithAny(this string str, params string[] values)
+    {
+        return StartsWithAny(str, values.AsEnumerable());
+    }
 
     public static bool StartsWithAny(this string str, IEnumerable<string> values)
     {

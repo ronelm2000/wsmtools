@@ -176,8 +176,8 @@
                           <MenuItem Header="Add"/>
                           <Separator />
                           <MenuItem Header="Find CXC" Command="{Binding FindClimaxCombosCommand}" />
-                          <MenuItem Header="Find Traits" />
-                          <MenuItem Header="Find Names" />
+                          <MenuItem Header="Find Traits" Command="{Binding FindTraitsCommand}" />
+                          <MenuItem Header="Find Names" Command="{Binding FindNamesCommand}" />
                         </ContextMenu>
                       </Border.ContextMenu>
                       <vuc:DatabaseCardViewPanel Click="DatabaseCardViewPanel_Click" />

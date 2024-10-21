@@ -19,6 +19,7 @@ using Montage.Weiss.Tools.GUI.ViewModels.Query;
 using Avalonia.Threading;
 using JasperFx.Core;
 using Montage.Card.API.Entities;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
@@ -81,11 +82,14 @@ public partial class CardEntryViewModel : ViewModelBase
     public IObservable<bool> IsCharacterOrEvent { get; private set; }
 
     public ReactiveCommand<Unit, Unit> FindClimaxCombosCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> FindTraitsCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> FindNamesCommand { get; private set; }
 
     public CardEntryViewModel(Uri imageUri, MultiLanguageString name, List<MultiLanguageString> traits)
     {
         DeclareObservables();
 
+        Card = new WeissSchwarzCard();
         Name = name.AsNonEmptyString();
         Traits = traits;
         Serial = "XXX/WS01-100";
@@ -120,6 +124,14 @@ public partial class CardEntryViewModel : ViewModelBase
         Effects = card.Effect.ToList();
     }
 
+    [MemberNotNull(
+        nameof(IsCharacter), 
+        nameof(IsCharacterOrEvent), 
+        nameof(FindClimaxCombosCommand), 
+        nameof(FindClimaxCombosCommand), 
+        nameof(FindTraitsCommand),
+        nameof(FindNamesCommand)
+        )]
     private void DeclareObservables()
     {
         IsCharacter = this.WhenPropertyChanged(c => c.CardType)
@@ -131,8 +143,30 @@ public partial class CardEntryViewModel : ViewModelBase
             .AsObservable();
 
         FindClimaxCombosCommand = ReactiveCommand.CreateFromTask(FindClimaxCombos);
+        FindTraitsCommand = ReactiveCommand.CreateFromTask(FindTraits);
+        FindNamesCommand = ReactiveCommand.CreateFromTask(FindNames);
 
         FindClimaxCombosCommand.ThrownExceptions.Subscribe(ReportException);
+        FindTraitsCommand.ThrownExceptions.Subscribe(ReportException);
+        FindNamesCommand.ThrownExceptions.Subscribe(ReportException);
+    }
+
+    private async Task FindNames()
+    {
+        if (Parent is null)
+            throw new NotImplementedException();
+
+        var newQuery = new NameQueryViewModel(Card);
+        await Dispatcher.UIThread.InvokeAsync(() => Parent.SearchQueries.Add(newQuery));
+    }
+
+    private async Task FindTraits()
+    {
+        if (Parent is null)
+            throw new NotImplementedException();
+
+        var newQuery = new TraitQueryViewModel(Card);
+        await Dispatcher.UIThread.InvokeAsync(() => Parent.SearchQueries.Add(newQuery));
     }
 
     private async Task FindClimaxCombos()

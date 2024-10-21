@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 namespace Montage.Weiss.Tools.Utilities;
 
@@ -35,8 +37,20 @@ public static class EnumerableExtensions
     /// <returns></returns>
     public static string ConcatAsString(this IEnumerable<string> stringEnumerable, string separator = "")
     {
-        if (stringEnumerable == null) return "";
-        return stringEnumerable.DefaultIfEmpty("").Aggregate((a, b) => a + separator + b);
+        if (stringEnumerable == null) return string.Empty;
+        return stringEnumerable.DefaultIfEmpty(string.Empty).Aggregate((a, b) => a + separator + b);
+    }
+
+    public static string ConcatAsString(this ReadOnlyMemory<string> stringMemory, string separator = "", string conjunction = "and")
+    {
+        var stringSpan = stringMemory.Span;
+        if (stringSpan.Length == 0) return string.Empty;
+        if (stringSpan.Length == 1) return stringSpan[0];
+        if (stringSpan.Length == 2) return $"{stringSpan[0]} {conjunction} {stringSpan[1]}";
+
+        var firstSlice = stringMemory[0..^1];
+        var lastSlice = stringSpan[^1];
+        return MemoryMarshal.ToEnumerable(firstSlice).ConcatAsString(separator) + $"{separator}{conjunction} {lastSlice}";
     }
 
     public static IEnumerable<T> Distinct<T,K>(this IEnumerable<T> enumerable, Func<T,K> keyFunction) where K : IEquatable<K>

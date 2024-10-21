@@ -172,8 +172,10 @@ public partial class MainWindowViewModel : ViewModelBase
             var valueString = Strings.Or(() => searchRegexMatch.Groups[2].Value, () => searchRegexMatch.Groups[3].Value);
             CardSearchQueryViewModel? result = searchRegexMatch.Groups[1].Value switch
             {
-                "c" when valueString is not null => new ColorQueryViewModel(valueString.Split(",")),
-                "cx" when valueString is not null => new ClimaxComboQueryViewModel(valueString),
+                ("c" or "color") when valueString is not null => new ColorQueryViewModel(valueString.Split(",")),
+                ("co" or "cost") when valueString is not null => new CostQueryViewModel(valueString.Split(",")),
+                ("cx" or "climax") when valueString is not null => new ClimaxComboQueryViewModel(valueString),
+                ("l" or "level") when valueString is not null => new LevelQueryViewModel(valueString.Split(",")),
                 ("o" or "e" or "effect") when valueString is not null => new EffectQueryViewModel(valueString),
                 ("set" or "ns") when valueString is not null => new NeoStandardCodeQueryViewModel(valueString.Split(",")),
                 ("tr" or "trait" or "traits") when valueString is not null => new TraitQueryViewModel(valueString.Split(",")),
@@ -311,7 +313,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 var serial = WeissSchwarzCard.ParseSerial(c.Serial);
                 return (serial.ReleaseID, serial.SetID, !c.IsFoil, c.Rarity);
             })
-            .Take(300)
+            .Take(5000)
             .ToListAsync(token);
 
         await Dispatcher.UIThread.InvokeAsync(() => Status = "Caching when applicable...", DispatcherPriority.ApplicationIdle);

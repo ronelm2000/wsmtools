@@ -142,7 +142,7 @@
             </ItemsControl>
           </Border>
          
-          <Border Margin="6,5,2,0" Grid.Row="1" >
+          <Border Margin="6,5,5,0" Grid.Row="1" >
             <StackPanel>
               <TextBox Name="SearchTB"
                        Watermark="Search..." 
@@ -150,12 +150,20 @@
                        />
             </StackPanel>
           </Border>
-          <ScrollViewer Padding="5,5,20,5" 
-                        Grid.Row="2" 
-                        PointerWheelChanged="ScrollViewer_PointerWheelChanged"
-                        >
-            <StackPanel>
+
+          <Border Padding="5"
+                  Grid.Row="2"
+                  >
+            <ScrollViewer PointerWheelChanged="ScrollViewer_PointerWheelChanged">
               <ItemsControl ItemsSource="{Binding DatabaseViewList}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical" 
+                                            VerticalAlignment="Top"
+                                            />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
                 <ItemsControl.ItemTemplate>
                   <DataTemplate>
                     <Border Margin="2,2,2,2"
@@ -176,9 +184,26 @@
                     </Border>
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
+
+                <ItemsControl.Template>
+                  <ControlTemplate TargetType="ItemsControl">
+                    <Border BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            Background="{TemplateBinding Background}">
+                      <ScrollViewer Padding="{TemplateBinding Padding}"
+                                    Focusable="False"
+                                    PointerWheelChanged="ScrollViewer_PointerWheelChanged"
+                                    >
+                        <ItemsPresenter />
+                      </ScrollViewer>
+                    </Border>
+                  </ControlTemplate>
+                </ItemsControl.Template>
+                
               </ItemsControl>
-            </StackPanel>
-          </ScrollViewer>
+           </ScrollViewer>
+        </Border>
+          
         </Grid>
       </Border>
 

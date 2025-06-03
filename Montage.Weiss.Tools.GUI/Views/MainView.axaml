@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Montage.Weiss.Tools.GUI.ViewModels;assembly=wsm-gui"
              xmlns:bh="clr-namespace:Montage.Weiss.Tools.GUI.Interactions;assembly=wsm-gui"
-             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:vuc="clr-namespace:Montage.Weiss.Tools.GUI.ViewUserControls;assembly=wsm-gui" 
              xmlns:v="clr-namespace:Montage.Weiss.Tools.GUI.Views;assembly=wsm-gui" 
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700" 
@@ -18,9 +17,9 @@
     <vm:MainWindowViewModel />
   </Design.DataContext>
     
-  <i:Interaction.Behaviors>
+  <Interaction.Behaviors>
     <bh:ScreenPseudoClassesBehaviour SmallMediumLimit="640" MediumLargeLimit="1008" />
-  </i:Interaction.Behaviors>
+  </Interaction.Behaviors>
   
   <DockPanel>
     <Menu DockPanel.Dock="Top">

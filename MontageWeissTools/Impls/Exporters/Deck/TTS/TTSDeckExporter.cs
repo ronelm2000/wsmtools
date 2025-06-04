@@ -23,8 +23,6 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
 
 public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 {
-    private static readonly DecoderOptions _decoderOptions = new DecoderOptions { };
-
     private ILogger Log = Serilog.Log.ForContext<TTSDeckExporter>();
 
     private (IImageEncoder, IImageFormat) _pngEncoder = (new PngEncoder(), PngFormat.Instance);
@@ -75,7 +73,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             )
             .ToDictionaryAwaitWithCancellationAsync(
                 async (p, ct) => await ValueTask.FromResult(p.card),
-                async (p, ct) => PreProcess(await Image.LoadAsync(_decoderOptions, p.stream, ct)),
+                async (p, ct) => PreProcess(await Image.LoadAsync(p.stream, ct)),
                 cancellationToken
                 );
 

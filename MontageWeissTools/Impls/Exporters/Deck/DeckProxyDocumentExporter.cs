@@ -81,7 +81,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
                 cancellationToken
             );
 
-        var resultingDocFilePath = resultFolder.Add($"proxy_{fileNameFriendlyDeckName}.docx");
+        var resultingDocFilePath = resultFolder.Combine($"proxy_{fileNameFriendlyDeckName}.docx");
         using (WordDocument document = WordDocument.Create(filePath: resultingDocFilePath.FullPath, autoSave: true))
         {
             document.PageOrientation = PageOrientationValues.Landscape;
@@ -109,7 +109,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
 
                 for (int i = 0; i < quantity; i++)
                 {
-                    paragraph.AddImage(tempImagePath, width: 240d, height: 335d);
+                    paragraph.AddImage(tempImagePath, width: 241d, height: 336d, description: $"{card.Name.AsNonEmptyString()}");
                 }
             }
         }

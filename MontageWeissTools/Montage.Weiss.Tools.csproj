@@ -7,7 +7,6 @@
 	<AssemblyName>wstools</AssemblyName>
     <RootNamespace>Montage.Weiss.Tools</RootNamespace>
     <Product>Weiss Schwarz Montage Tools (wsmtools)</Product>
-	<VersionPrefix>0.16.0</VersionPrefix>
 	<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
     <FileVersion>$(VersionPrefix)</FileVersion>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>

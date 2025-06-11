@@ -7,7 +7,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AssemblyName>wsm-gui</AssemblyName>
-    <VersionPrefix>0.3.0</VersionPrefix>
   </PropertyGroup>
   <PropertyGroup Label="Avalonia">
     <AvaloniaXamlVerboseExceptions>True</AvaloniaXamlVerboseExceptions>

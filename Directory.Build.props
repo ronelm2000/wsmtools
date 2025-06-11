@@ -2,5 +2,11 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <AvaloniaVersion>11.1.0</AvaloniaVersion>
+    <VersionPrefix>0.17.0</VersionPrefix>
+  </PropertyGroup>
+
+  <!-- Override for Montage.Weiss.Tools.GUI project -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Montage.Weiss.Tools.GUI'">
+    <VersionPrefix>0.4.0</VersionPrefix>
   </PropertyGroup>
 </Project>

@@ -34,6 +34,7 @@
       </MenuItem>
       <MenuItem Header="_Export">
         <MenuItem Header="_Tabletop Simulator" Command="{Binding ExportDeckToTabletopCommand}"/>
+        <MenuItem Header="_Proxy Document" Command="{Binding ExportToProxyDocumentCommand}"/>
         <Separator/>
         <MenuItem Header="_DeckLog" IsEnabled="False" />
         <MenuItem Header="_EncoreDecks" IsEnabled="False" />
@@ -213,7 +214,7 @@
       <v:ImportDeckDialog Name="ImportDeckDialog"
                           DataContext="{Binding ImportDeckDC}"
                           />
-
+      
       <!-- Invisible Buttons -->
       <Button IsDefault="{Binding #SearchTB.IsFocused}"
               IsVisible="True"

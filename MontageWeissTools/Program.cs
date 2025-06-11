@@ -1,9 +1,8 @@
 ﻿using CommandLine;
-using Flurl.Http;
 using Lamar;
+using Lamar.Scanning.Conventions;
 using Microsoft.Extensions.DependencyInjection;
 using Montage.Card.API.Interfaces.Services;
-using Montage.Card.API.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Services;
@@ -151,7 +150,7 @@ public static class LamarContainerExtensions {
         registry.Scan(s =>
         {
             s.AssemblyContainingType<Program>();
-            s.WithDefaultConventions();
+            s.WithDefaultConventions(OverwriteBehavior.Never, ServiceLifetime.Singleton);
             s.RegisterConcreteTypesAgainstTheFirstInterface();
         });
         return registry;

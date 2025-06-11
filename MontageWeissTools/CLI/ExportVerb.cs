@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Lamar;
+using Microsoft.Extensions.DependencyInjection;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
@@ -91,7 +92,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
             .Where(exporter => exporter.Alias.Contains(Exporter))
             .First();
 
-        var inspectors = ioc.GetAllInstances<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>()
+        var inspectors = ioc.GetServices<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>()
             .Where(i => !(i is IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>> filter) || filter.IsIncluded(exporter));
         if (exporter is IFilter<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>> filter)
             inspectors = inspectors.Where(filter.IsIncluded);

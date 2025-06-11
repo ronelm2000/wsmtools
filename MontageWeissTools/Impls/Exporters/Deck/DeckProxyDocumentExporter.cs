@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
+﻿using DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Fluent.IO;
 using Flurl.Http;
 using Montage.Card.API.Entities;
@@ -9,11 +10,9 @@ using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
 using OfficeIMO.Word;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
-using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using Color = SixLabors.ImageSharp.Color;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
 
@@ -92,6 +91,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
             document.Margins.Right = 720;
 
             var paragraph = document.AddParagraph();
+            var baseCardNo = 0;
 
             foreach (var entry in deck.Ratios)
             {
@@ -110,7 +110,53 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
                 for (int i = 0; i < quantity; i++)
                 {
                     paragraph.AddImage(tempImagePath, width: 241d, height: 336d, description: $"{card.Name.AsNonEmptyString()}");
+                    var image = paragraph.Image;
+                    if (card.Type != CardType.Climax && card.Language == CardLanguage.Japanese)
+                    {
+                        var textBox = paragraph.AddTextBox(card.Effect.FirstOrDefault()?.Trim() ?? "", WrapTextImage.InFrontOfText);
+                        var textBoxParagraph = textBox.Paragraphs[0];
+                        textBoxParagraph.ParagraphAlignment = JustificationValues.Left;
+                        textBoxParagraph.Color = TranslateToColor(card.Color);
+                        textBoxParagraph.Highlight = TranslateToHighlight(card.Color);
+                        textBoxParagraph.FontSize = 5;
+                        textBoxParagraph.Spacing = -1;
+                        textBoxParagraph.FontFamily = "Calibri";
+
+                        for (var j = 1; j < card.Effect.Length; j++)
+                        {
+                            if (string.IsNullOrEmpty(card.Effect[j]))
+                                continue;
+
+                            var miniParagraph = textBox.Paragraphs[0].AddText(card.Effect[j]);
+                            textBox.Paragraphs.Add(miniParagraph);
+
+                            miniParagraph.ParagraphAlignment = JustificationValues.Left;
+                            miniParagraph.Color = TranslateToColor(card.Color);
+                            miniParagraph.Highlight = TranslateToHighlight(card.Color);
+                            miniParagraph.FontSize = 5;
+                            miniParagraph.Spacing = -2;
+                            miniParagraph.FontFamily = "Calibri";
+                        }
+
+                        if (card.Effect.Length > 1)
+                        {
+                            Log.Verbose("Detected Multiple Lines -- For some reason OOXML is adding another Line Break after Single Paragraphs, so we're just compensating.");
+                            textBoxParagraph.AddBreak();
+                        }
+
+                        textBox.AutoFitToTextSize = false;
+                        textBox.HorizontalPositionRelativeFrom = HorizontalRelativePositionValues.Character;
+                        textBox.VerticalPositionRelativeFrom = VerticalRelativePositionValues.Line;
+                        textBox.HorizontalPositionOffset = (int)(0.45d * 360000.0d) - 135000;
+                        textBox.VerticalPositionOffset = (3 * 360000) - 100000;
+                        textBox.WidthCentimeters = 6.25d;
+                        textBox.HeightCentimeters = 5.75d;
+                        textBox.TextBodyProperties.Anchor = DocumentFormat.OpenXml.Drawing.TextAnchoringTypeValues.Bottom;
+                    }
+                    paragraph = paragraph.AddText(" ");
                 }
+
+                baseCardNo += quantity;
             }
         }
 
@@ -119,7 +165,30 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             System.Diagnostics.Process.Start("explorer", $"\"{resultingDocFilePath.FullPath}\"");
 
-        // throw new NotImplementedException();
+        static Color TranslateToColor(CardColor color)
+        {
+            return color switch
+            {
+                CardColor.Yellow => Color.Black,
+                CardColor.Green => Color.Black,
+                CardColor.Red => Color.White,
+                CardColor.Blue => Color.White,
+                CardColor.Purple => Color.White,
+                _ => Color.Black
+            };
+        }
+        static HighlightColorValues TranslateToHighlight(CardColor color)
+        {
+            return color switch
+            {
+                CardColor.Yellow => HighlightColorValues.Yellow,
+                CardColor.Green => HighlightColorValues.Green,
+                CardColor.Red => HighlightColorValues.DarkRed,
+                CardColor.Blue => HighlightColorValues.DarkBlue,
+                CardColor.Purple => HighlightColorValues.DarkCyan,
+                _ => HighlightColorValues.White
+            };
+        }
     }
 
     private IEnumerable<WeissSchwarzCard> AsOrdered(IEnumerable<WeissSchwarzCard> cards)

@@ -30,6 +30,7 @@ using DynamicData.Binding;
 using System.Collections.Generic;
 using DynamicData;
 using Montage.Weiss.Tools.GUI.ViewModels.Query;
+using Montage.Weiss.Tools.Impls.Inspectors.Deck;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
@@ -58,6 +59,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> OpenDeckCommand { get; init; }
     public ReactiveCommand<Unit, bool> UpdateDatabaseViewCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ExportDeckToTabletopCommand { get; init; }
+    public ReactiveCommand<Unit, Unit> ExportToProxyDocumentCommand { get; init; }
     public ReactiveCommand<Unit, Unit> InjectSearchQueryCommand { get; init; }
 
     [ObservableProperty]
@@ -140,6 +142,7 @@ public partial class MainWindowViewModel : ViewModelBase
         OpenDeckCommand = ReactiveCommand.CreateFromTask(OpenDeck);
         UpdateDatabaseViewCommand = ReactiveCommand.CreateFromTask<Unit, bool>((_,t) => UpdateDatabaseView(t));
         ExportDeckToTabletopCommand = ReactiveCommand.CreateFromTask(ExportDeckToTabletop);
+        ExportToProxyDocumentCommand = ReactiveCommand.CreateFromTask(ExportToProxyDocument);
         InjectSearchQueryCommand = ReactiveCommand.CreateFromTask(InjectSearchQuery);
 
         this.WhenAnyValue(r => r.SearchBarText)
@@ -210,6 +213,26 @@ public partial class MainWindowViewModel : ViewModelBase
             Exporter = "tabletopsim",
             Flags = ["sendtcp", "limit-width(800)"],
             OutCommand = "sharex",
+            Progress = progressReporter
+        };
+        await command.Run(Container!, deck);
+    }
+
+    private async Task ExportToProxyDocument(CancellationToken token)
+    {
+        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var deck = new WeissSchwarzDeck
+        {
+            Name = DeckName,
+            Remarks = DeckRemarks,
+            Ratios = DeckRatioList.ToDictionary(vw => vw.Card, vw => vw.Ratio)
+        };
+
+        var command = new ExportVerb
+        {
+            NonInteractive = true,
+            Exporter = "doc",
+            Flags = ["nowarn"],
             Progress = progressReporter
         };
         await command.Run(Container!, deck);
@@ -476,6 +499,12 @@ public partial class MainWindowViewModel : ViewModelBase
         var updater = Container.GetRequiredService<WeissSchwarzDatabaseUpdater>();
         updater.OnStarting += Updater_OnStarting;
         updater.OnEnding += Updater_OnEnding;
+
+        Container.GetService<SanityTranslationsInspector>()!.Prompter = static async (options) =>
+        {
+            await Task.CompletedTask;
+            return true;
+        };
 
         var progressReporter = new ProgressReporter(log, message => Status = message);
         await Container.GetInstance<UpdateVerb>().Run(Container, progressReporter);

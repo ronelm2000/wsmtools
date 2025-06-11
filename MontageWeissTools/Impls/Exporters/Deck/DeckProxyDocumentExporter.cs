@@ -24,7 +24,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
     private readonly GlobalCookieJar _gcj;
     private readonly IFileOutCommandProcessor _fileProcessor;
 
-    private readonly Func<Flurl.Url, CookieSession> _cookieSessionFunc;
+    private readonly Func<Flurl.Url?, CookieSession?> _cookieSessionFunc;
 
     public string[] Alias => new[] { "doc", "proxy-doc" };
 
@@ -32,8 +32,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
     {
         _gcj = globalCookieJar ?? throw new ArgumentNullException(nameof(globalCookieJar));
         _fileProcessor = fileOutCommandProcessor ?? throw new ArgumentNullException(nameof(fileOutCommandProcessor));
-
-        _cookieSessionFunc = (url) => _gcj[url.Root];
+        _cookieSessionFunc = (url) => url is null ? null : _gcj[url!.Root];
     }
 
     public async Task Export(WeissSchwarzDeck deck, IExportInfo info, CancellationToken cancellationToken = default)
@@ -71,8 +70,8 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
                 return p;
             })
             .SelectAwaitWithCancellation(async (wsc, ct) =>
-            (card: wsc,
-                stream: await wsc.GetImageStreamAsync(_cookieSessionFunc(wsc.Images.Last()), ct))
+            (   card: wsc,
+                stream: await wsc.GetImageStreamAsync( (wsc.Images.Count > 0) ? _cookieSessionFunc(wsc.Images.Last()) : null, ct))
             )
             .ToDictionaryAwaitWithCancellationAsync(
                 async (p, ct) => await ValueTask.FromResult(p.card),
@@ -101,7 +100,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
                 report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = $"Adding {quantity} copies of {card.Serial} to the document." } };
                 progress.Report(report);
 
-                await using var imageStream = await card.GetImageStreamAsync(_cookieSessionFunc(card.Images.Last()), cancellationToken);
+                await using var imageStream = await card.GetImageStreamAsync( (card.Images.Count > 0) ? _cookieSessionFunc(card.Images.Last()) : null, cancellationToken);
                 var rawImage = PreProcess(await Image.LoadAsync(imageStream, cancellationToken));
 
                 var tempImagePath = System.IO.Path.GetTempFileName() + ".jpg";

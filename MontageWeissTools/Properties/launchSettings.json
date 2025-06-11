@@ -16,10 +16,6 @@
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
     },
-    "Cache W38 JP": {
-      "commandName": "Project",
-      "commandLineArgs": "cache w38 jp"
-    },
     "Parse LB vs DC": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/da_capo_vs._little_busters!_extra_pack.html --with skip:yyt"
@@ -52,18 +48,6 @@
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/JAQjGsFgD --with sendtcp"
     },
-    "wstools parse Magia Record TV EN": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=608869f81e41dfffbd963099"
-    },
-    "wstools Parse Magia Record EN": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=603beb4b1e41dfffbd183c46"
-    },
-    "wstools Parse Madoka Rebellion": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=5c7b0e077cd9b718cdbd0798"
-    },
     "Export MOB": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/Vd2zOev3k"
@@ -75,10 +59,6 @@
     "Parse (HOTC Local)": {
       "commandName": "Project",
       "commandLineArgs": "parse \"R:\\Downloads\\illya_hotc.txt\" --with hotc"
-    },
-    "Parse Slime vol. 2 (EncoreDecks)": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=615b69951e41dfffbdd37508"
     },
     "Parse Bandori 5th Anniv (HOTC)": {
       "commandName": "Project",
@@ -100,10 +80,6 @@
       "commandName": "Project",
       "commandLineArgs": "fetch"
     },
-    "Fetch LLS vol. 2": {
-      "commandName": "Project",
-      "commandLineArgs": "fetch W53"
-    },
     "Parse MKM Set": {
       "commandName": "Project",
       "commandLineArgs": "parse \"C:/Users/ronelm2000/Desktop/wstools/machikado_mazoku.ws-set\""
@@ -120,10 +96,6 @@
       "commandName": "Project",
       "commandLineArgs": "fetch EN-S01"
     },
-    "Export Deck w/ Slash": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/r_Ma2ltoZ"
-    },
     "Export Broken HOL Deck": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/CW5ThLgZ7 --exporter decklog"
@@ -131,18 +103,6 @@
     "Parse HOL vol. 2": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=64cd60a83401020c9a024858"
-    },
-    "Export Custom Deck": {
-      "commandName": "Project",
-      "commandLineArgs": "export \"R:\\Misc\\Kirara Fantasia\\Kirara Fantasia Draft Sample\\Deck Test\\new_game_kirafan.json\" --with sendtcp --out sharex"
-    },
-    "Parse KiraFan": {
-      "commandName": "Project",
-      "commandLineArgs": "parse \"R:\\Misc\\Kirara Fantasia\\Kirara Fantasia Draft Sample\\kirafan_draft_1.ws-set\""
-    },
-    "Export Deck (#69)": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/5f4xiDxR8 --out sharex --with sendtcp"
     },
     "Export Set (Frieren)": {
       "commandName": "Project",
@@ -163,6 +123,18 @@
     "Export Deck (Macross - Doc)": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/u9AIOt6zO --exporter doc"
+    },
+    "Export Deck (KiraFan DC)": {
+      "commandName": "Project",
+      "commandLineArgs": "export \"R:\\Pictures\\Sets\\slow_start_kirafan_v3.ws-dek\" --exporter doc"
+    },
+    "Profile 1": {
+      "commandName": "Project",
+      "commandLineArgs": "parse \"R:\\Pictures\\Sets\\kirara_fantasia_vol_1.ws-set\""
+    },
+    "Profile 2": {
+      "commandName": "Project",
+      "commandLineArgs": "parse \"R:\\Pictures\\Sets\\kirara_fantasia_vol_2.ws-set\""
     }
   }
 }

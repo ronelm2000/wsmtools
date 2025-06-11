@@ -29,7 +29,7 @@ public class LocalDeckJSONParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCar
         var filePath = Path.Get(urlOrFile);
         if (!filePath.Exists)
             return false;
-        else if (filePath.Extension != ".json")
+        else if (filePath.Extension != ".json" && filePath.Extension != ".ws-dek")
             return false;
         else
             return true;

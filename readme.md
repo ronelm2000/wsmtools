@@ -36,6 +36,10 @@ registering on GitHub.
   ```ps
   ./wstools export https://www.encoredecks.com/deck/CW5ThLgZ7 --exporter local
   ```
+* Proxy Document (A4 Landscape)
+  ```ps
+  ./wstools export https://www.encoredecks.com/deck/CW5ThLgZ7 --exporter doc
+  ```
 
 #### Supported Database Exporters
 * [Cockatrice](https://github.com/longagofaraway/Cockatrice)

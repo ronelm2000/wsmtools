@@ -127,4 +127,33 @@ public class PostProcessorTests
             "The expected URI is missing."
             );
     }
+
+
+    [TestMethod("DeckLog API Set List Test - Bug for Nanoha")]
+    [TestCategory("Manual")]
+    public async Task TestPostProcessor4()
+    {
+        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
+        Lamar.Container ioc = Program.Bootstrap();
+
+        var progress1 = NoOpProgress<SetParserProgressReport>.Instance;
+        var progress2 = NoOpProgress<PostProcessorProgressReport>.Instance;
+        var progress3 = NoOpProgress<CommandProgressReport>.Instance;
+        var ct = CancellationToken.None;
+
+        await new UpdateVerb().Run(ioc, progress3, ct);
+        var deckLogPP = ioc.GetInstance<DeckLogPostProcessor>();
+
+        var cards = new Tools.Impls.Parsers.Cards.EncoreDecksParser()
+            .Parse("https://www.encoredecks.com/?page=1&set=6862dbb3abea99e627d998b4", progress1, ct);
+        var resultCards = await deckLogPP.Process(cards, progress2, ct)
+            .Distinct(c => c.Serial)
+            .ToDictionaryAsync(c => c.Serial);
+
+        Assert.IsTrue(resultCards["NTA/WE48-25"]
+            .Images
+            .Contains(new Uri("https://ws-tcg.com/wordpress/wp-content/images/cardlist/n/nta_we48/nta_we48_25.png")),
+            "The expected URI is missing."
+            );
+    }
 }

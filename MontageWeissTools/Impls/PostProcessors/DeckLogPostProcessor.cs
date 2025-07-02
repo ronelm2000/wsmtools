@@ -230,7 +230,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     {
         var titles = cardParams.Keys
             .Select(s => (s, s.Split("##", StringSplitOptions.RemoveEmptyEntries)))
-            .Where(p => p.Item2.Intersect(titleCodes).Count() == p.Item2.Length)
+            .Where(p => titleCodes.Any(t => p.Item2.Contains(t))) // p.Item2.Intersect(titleCodes).Count() == p.Item2.Length)
             .Select(p => p.s)
             .ToArray();
 

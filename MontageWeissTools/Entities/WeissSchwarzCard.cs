@@ -307,7 +307,15 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         return this;
     }
 
-    internal void AddOptionalInfo<T>(string key, T value)
+    public T? FindOptionalInfo<T>(string key)
+    {
+        if (string.IsNullOrEmpty(key)) return default;
+        var info = AdditionalInfo.FirstOrDefault(i => i.Key == key, null);
+        if (info is null) return default;
+        return info.DeserializeValue<T>();
+    }
+
+    public void AddOptionalInfo<T>(string key, T value)
     {
         if (string.IsNullOrEmpty(key)) return;
         if (value is null) return;

@@ -66,6 +66,17 @@ public partial class MainView : UserControl {
         Task.Run(async () => await viewModel.RemoveCard(cardRatioViewModel.Card));
     }
 
+    private void CardRatioViewPanel_RequestTranslations(object? sender, ModifyTranslationEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel viewModel)
+            return;
+        if (e.Source is not CardRatioViewPanel viewPanel)
+            return;
+        if (viewPanel.DataContext is not CardRatioViewModel cardRatioViewModel)
+            return;
+        Task.Run(async () => await viewModel.OpenModifyTranslations(cardRatioViewModel));
+    }
+
     private void ScrollViewer_PointerWheelChanged(object? sender, Avalonia.Input.PointerWheelEventArgs e)
     {
         if (sender is not ScrollViewer scrollViewer)

@@ -87,7 +87,8 @@
           <ItemsControl ItemsSource="{Binding DeckRatioList}">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                  <vuc:CardRatioViewPanel Click="CardRatioViewPanel_Click" 
+                  <vuc:CardRatioViewPanel Click="CardRatioViewPanel_Click"
+                                          RequestTranslations="CardRatioViewPanel_RequestTranslations"
                                           Margin="0,5,0,5" />
               </DataTemplate>
               </ItemsControl.ItemTemplate>
@@ -214,6 +215,9 @@
       <v:ImportDeckDialog Name="ImportDeckDialog"
                           DataContext="{Binding ImportDeckDC}"
                           />
+      <v:ImportCustomTranslationsDialog Name="ImportCustomTranslationsDialog"
+                                        DataContext="{Binding ImportTranslationsDC}"
+                                        />
       
       <!-- Invisible Buttons -->
       <Button IsDefault="{Binding #SearchTB.IsFocused}"

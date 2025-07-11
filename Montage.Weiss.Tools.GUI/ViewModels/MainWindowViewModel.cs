@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using DynamicData;
 using Montage.Weiss.Tools.GUI.ViewModels.Query;
 using Montage.Weiss.Tools.Impls.Inspectors.Deck;
+using DocumentFormat.OpenXml.Vml.Spreadsheet;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
@@ -83,6 +84,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private ImportDeckViewModel _importDeckDC;
 
+    [ObservableProperty]
+    private ImportTranslationsViewModel _importTranslationsDC;
+
     public MainWindowViewModel()
     {
         Status = "";
@@ -121,12 +125,14 @@ public partial class MainWindowViewModel : ViewModelBase
             DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg").Load() });
             ImportSetDC = new ImportSetViewModel { IsVisible = false, Parent = () => null };
             ImportDeckDC = new ImportDeckViewModel { IsVisible = false, Parent = () => null };
+            ImportTranslationsDC = new ImportTranslationsViewModel { IsVisible = false, Parent = () => null };
         }
         else
         {
             _databaseViewSourceList = new SourceList<CardEntryViewModel>();
             ImportSetDC = new ImportSetViewModel { IsVisible = false, Parent = () => this };
             ImportDeckDC = new ImportDeckViewModel { IsVisible = false, Parent = () => this };
+            ImportTranslationsDC = new ImportTranslationsViewModel { IsVisible = false, Parent = () => this };
         }
 
         log = Serilog.Log.Logger.ForContext<MainWindowViewModel>();
@@ -140,7 +146,7 @@ public partial class MainWindowViewModel : ViewModelBase
         OpenLocalSetCommand = ReactiveCommand.CreateFromTask(OpenLocalSet);
         SaveDeckCommand = ReactiveCommand.CreateFromTask(SaveDeck);
         OpenDeckCommand = ReactiveCommand.CreateFromTask(OpenDeck);
-        UpdateDatabaseViewCommand = ReactiveCommand.CreateFromTask<Unit, bool>((_,t) => UpdateDatabaseView(t));
+        UpdateDatabaseViewCommand = ReactiveCommand.CreateFromTask<Unit, bool>((_, t) => UpdateDatabaseView(t));
         ExportDeckToTabletopCommand = ReactiveCommand.CreateFromTask(ExportDeckToTabletop);
         ExportToProxyDocumentCommand = ReactiveCommand.CreateFromTask(ExportToProxyDocument);
         InjectSearchQueryCommand = ReactiveCommand.CreateFromTask(InjectSearchQuery);
@@ -171,7 +177,8 @@ public partial class MainWindowViewModel : ViewModelBase
             SearchBarText = searchRegex.Replace(SearchBarText, "");
         }, RxApp.MainThreadScheduler);
 
-        IEnumerable<CardSearchQueryViewModel> TranslateMatch(Match searchRegexMatch) {
+        IEnumerable<CardSearchQueryViewModel> TranslateMatch(Match searchRegexMatch)
+        {
             var valueString = Strings.Or(() => searchRegexMatch.Groups[2].Value, () => searchRegexMatch.Groups[3].Value);
             CardSearchQueryViewModel? result = searchRegexMatch.Groups[1].Value switch
             {
@@ -247,7 +254,7 @@ public partial class MainWindowViewModel : ViewModelBase
             Title = "Saving Local Deck...",
             ShowOverwritePrompt = true,
             DefaultExtension = DeckFiles.Patterns?[0][2..] ?? "ws-dek",
-            FileTypeChoices = [ DeckFiles ]
+            FileTypeChoices = [DeckFiles]
         });
         if (savePath is null)
             return;
@@ -283,7 +290,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         DeckName = deck.Name;
         DeckRemarks = deck.Remarks;
-        
+
         DeckRatioList.Clear();
         foreach (var ratio in deck.Ratios)
             DeckRatioList.Add(new CardRatioViewModel(ratio.Key, ratio.Value));
@@ -310,7 +317,8 @@ public partial class MainWindowViewModel : ViewModelBase
         return await UpdateDatabaseView(token);
     }
 
-    private async Task<bool> UpdateDatabaseView(CancellationToken token) {
+    private async Task<bool> UpdateDatabaseView(CancellationToken token)
+    {
         if (Container is null)
             return false;
         if (!_isBootstrapped)
@@ -364,12 +372,12 @@ public partial class MainWindowViewModel : ViewModelBase
         Log.Information("Refreshing list.");
         foreach (var card in searchCardList)
         {
-            await Dispatcher.UIThread.InvokeAsync(() => 
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 Status = $"Loading [{card.Serial}]";
                 _databaseViewSourceList.Add(new CardEntryViewModel(card) { Parent = this });
-//                _databaseViewSourceList.Edit(list => list.Add(model));
-            }, 
+                //                _databaseViewSourceList.Edit(list => list.Add(model));
+            },
             DispatcherPriority.ApplicationIdle
             );
         }
@@ -381,7 +389,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         return true;
 
-        Func<WeissSchwarzCard,bool> TranslateMatch(Match scryfallMatch)
+        Func<WeissSchwarzCard, bool> TranslateMatch(Match scryfallMatch)
         {
             if (scryfallMatch.Groups[4].Success)
                 return c => c.Serial.Contains(scryfallMatch.Value) || (c.Name.EN?.Contains(scryfallMatch.Value) ?? false) || (c.Name.JP?.Contains(scryfallMatch.Value) ?? false);
@@ -448,7 +456,8 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             else if (scryfallMatch.Groups[1].Value.Equals("tr", StringComparison.CurrentCultureIgnoreCase) ||
                      scryfallMatch.Groups[1].Value.Equals("trait", StringComparison.CurrentCultureIgnoreCase) ||
-                     scryfallMatch.Groups[1].Value.Equals("traits", StringComparison.CurrentCultureIgnoreCase)) {
+                     scryfallMatch.Groups[1].Value.Equals("traits", StringComparison.CurrentCultureIgnoreCase))
+            {
                 var traitString = Strings.Or(() => scryfallMatch.Groups[2].Value, () => scryfallMatch.Groups[3].Value);
                 var traits = traitString?.Split(',') ?? [];
                 return c => c.Traits.Any(t => traits.Contains(t.EN ?? string.Empty) || traits.Contains(t.JP ?? string.Empty));
@@ -493,7 +502,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (Container is null)
             return;
-        
+
         log ??= Serilog.Log.ForContext<MainWindowViewModel>();
 
         var updater = Container.GetRequiredService<WeissSchwarzDatabaseUpdater>();
@@ -567,6 +576,15 @@ public partial class MainWindowViewModel : ViewModelBase
         });
     }
 
+    internal async Task OpenModifyTranslations(CardRatioViewModel cardRatioViewModel)
+    {
+        await ImportTranslationsDC.ApplyTarget(cardRatioViewModel.Card);
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            ImportTranslationsDC.IsVisible = true;
+        });
+    }
+
     internal async Task AddCard(WeissSchwarzCard card)
     {
         var existingRatio = DeckRatioList.Where(crv => crv.Card.Serial == card.Serial).FirstOrDefault();
@@ -627,7 +645,7 @@ public partial class MainWindowViewModel : ViewModelBase
             CardType.Event => 1,
             CardType.Character => 2,
             _ => 3
-        };   
+        };
     }
 
     internal void UpdateDeckStats()

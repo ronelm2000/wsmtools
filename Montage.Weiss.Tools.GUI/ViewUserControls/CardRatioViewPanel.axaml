@@ -25,6 +25,13 @@
       </ItemsControl>
     </ToolTip.Tip>
 
+    <RelativePanel.ContextMenu>
+      <ContextMenu>
+        <MenuItem Header="Find CX Combo" IsEnabled="False"/>
+        <MenuItem Header="Modify Translation" PointerReleased="ModifyTranslation_PointerReleased"/>
+      </ContextMenu>
+    </RelativePanel.ContextMenu>
+
     <Border Margin="{Binding FirstCardAdjustment^}"
             RelativePanel.AlignTopWithPanel="True"
             RelativePanel.AlignHorizontalCenterWithPanel="True"

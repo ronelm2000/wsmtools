@@ -42,4 +42,10 @@
     <ProjectReference Include="..\Montage.Card.API\Montage.Card.API.csproj" />
     <ProjectReference Include="..\MontageWeissTools\Montage.Weiss.Tools.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\ImportCustomTranslationsDialog.axaml.cs">
+      <DependentUpon>ImportCustomTranslationsDialog.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

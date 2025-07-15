@@ -8,6 +8,7 @@ using Montage.Card.API.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
+using Montage.Weiss.Tools.Utilities;
 using OfficeIMO.Word;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
@@ -114,34 +115,21 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
                     {
                         var textBox = paragraph.AddTextBox(card.Effect.FirstOrDefault()?.Trim() ?? "", WrapTextImage.InFrontOfText);
                         var textBoxParagraph = textBox.Paragraphs[0];
-                        textBoxParagraph.ParagraphAlignment = JustificationValues.Left;
-                        textBoxParagraph.Color = TranslateToColor(card.Color);
-                        textBoxParagraph.Highlight = TranslateToHighlight(card.Color);
-                        textBoxParagraph.FontSize = 5;
-                        textBoxParagraph.Spacing = -1;
-                        textBoxParagraph.FontFamily = "Calibri";
 
+                        var currentParagraph = textBoxParagraph;
                         for (var j = 1; j < card.Effect.Length; j++)
                         {
                             if (string.IsNullOrEmpty(card.Effect[j]))
                                 continue;
 
-                            var miniParagraph = textBox.Paragraphs[0].AddText(card.Effect[j]);
-                            textBox.Paragraphs.Add(miniParagraph);
+                            currentParagraph = currentParagraph.AddText(card.Effect[j]);
+                            ApplyParagraphStyle(currentParagraph, card.Color);
 
-                            miniParagraph.ParagraphAlignment = JustificationValues.Left;
-                            miniParagraph.Color = TranslateToColor(card.Color);
-                            miniParagraph.Highlight = TranslateToHighlight(card.Color);
-                            miniParagraph.FontSize = 5;
-                            miniParagraph.Spacing = -2;
-                            miniParagraph.FontFamily = "Calibri";
+                            currentParagraph = currentParagraph.AddBreak();
+                            ApplyParagraphStyle(currentParagraph, card.Color);
                         }
 
-                        if (card.Effect.Length > 1)
-                        {
-                            Log.Verbose("Detected Multiple Lines -- For some reason OOXML is adding another Line Break after Single Paragraphs, so we're just compensating.");
-                            textBoxParagraph.AddBreak();
-                        }
+                        ApplyParagraphStyle(textBoxParagraph, card.Color);
 
                         textBox.AutoFitToTextSize = false;
                         textBox.HorizontalPositionRelativeFrom = HorizontalRelativePositionValues.Character;
@@ -164,6 +152,16 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             System.Diagnostics.Process.Start("explorer", $"\"{resultingDocFilePath.FullPath}\"");
 
+        static void ApplyParagraphStyle(WordParagraph paragraph, CardColor color)
+        {
+            paragraph.ParagraphAlignment = JustificationValues.Left;
+            paragraph.Color = TranslateToColor(color);
+            paragraph.Highlight = TranslateToHighlight(color);
+            paragraph.FontSize = 5;
+            paragraph.Spacing = -1;
+            paragraph.FontFamily = "Calibri";
+        }
+
         static Color TranslateToColor(CardColor color)
         {
             return color switch
@@ -182,7 +180,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
             {
                 CardColor.Yellow => HighlightColorValues.Yellow,
                 CardColor.Green => HighlightColorValues.Green,
-                CardColor.Red => HighlightColorValues.DarkRed,
+                CardColor.Red => HighlightColorValues.Red,
                 CardColor.Blue => HighlightColorValues.DarkBlue,
                 CardColor.Purple => HighlightColorValues.DarkCyan,
                 _ => HighlightColorValues.White

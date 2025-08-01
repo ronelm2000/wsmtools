@@ -113,19 +113,17 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
                     var image = paragraph.Image;
                     if (card.Type != CardType.Climax && card.Language == CardLanguage.Japanese)
                     {
-                        var textBox = paragraph.AddTextBox(card.Effect.FirstOrDefault()?.Trim() ?? "", WrapTextImage.InFrontOfText);
+                        var textBox = paragraph.AddTextBox("", WrapTextImage.InFrontOfText);
                         var textBoxParagraph = textBox.Paragraphs[0];
 
                         var currentParagraph = textBoxParagraph;
-                        for (var j = 1; j < card.Effect.Length; j++)
+                        for (var j = 0; j < card.Effect.Length; j++)
                         {
                             if (string.IsNullOrEmpty(card.Effect[j]))
                                 continue;
 
+                            currentParagraph = currentParagraph.AddParagraphAfterSelf();
                             currentParagraph = currentParagraph.AddText(card.Effect[j]);
-                            ApplyParagraphStyle(currentParagraph, card.Color);
-
-                            currentParagraph = currentParagraph.AddBreak();
                             ApplyParagraphStyle(currentParagraph, card.Color);
                         }
 
@@ -135,7 +133,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
                         textBox.HorizontalPositionRelativeFrom = HorizontalRelativePositionValues.Character;
                         textBox.VerticalPositionRelativeFrom = VerticalRelativePositionValues.Line;
                         textBox.HorizontalPositionOffset = (int)(0.45d * 360000.0d) - 135000;
-                        textBox.VerticalPositionOffset = (3 * 360000) - 100000;
+                        textBox.VerticalPositionOffset = (3 * 360000) - 275000;
                         textBox.WidthCentimeters = 6.25d;
                         textBox.HeightCentimeters = 5.75d;
                         textBox.TextBodyProperties.Anchor = DocumentFormat.OpenXml.Drawing.TextAnchoringTypeValues.Bottom;
@@ -154,7 +152,8 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
 
         static void ApplyParagraphStyle(WordParagraph paragraph, CardColor color)
         {
-            paragraph.ParagraphAlignment = JustificationValues.Left;
+            paragraph.ParagraphAlignment = JustificationValues.Both;
+            paragraph.LineSpacingAfter = 0;
             paragraph.Color = TranslateToColor(color);
             paragraph.Highlight = TranslateToHighlight(color);
             paragraph.FontSize = 5;

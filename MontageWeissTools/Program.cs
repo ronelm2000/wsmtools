@@ -143,15 +143,21 @@ public class Program
 public static class LamarContainerExtensions {
     public static ServiceRegistry BootstrapDefaultServices(this ServiceRegistry registry)
     {
+        registry.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));
+        registry.AddSingleton<ILogger>(Serilog.Log.Logger);
         //x.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));
         registry.AddSingleton<GlobalCookieJar>();
-        registry.AddSingleton<ILogger>(Serilog.Log.Logger);
         registry.AddSingleton<DeckLogCacheService>();
+
         registry.Scan(s =>
         {
             s.AssemblyContainingType<Program>();
-            s.WithDefaultConventions(OverwriteBehavior.Never, ServiceLifetime.Singleton);
+            s.AddAllTypesOf<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>(ServiceLifetime.Singleton);
+            s.AddAllTypesOf<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>>(ServiceLifetime.Singleton);
+
             s.RegisterConcreteTypesAgainstTheFirstInterface();
+
+            s.WithDefaultConventions(OverwriteBehavior.Never, ServiceLifetime.Singleton);
         });
         return registry;
     }

@@ -218,6 +218,9 @@
       <v:ImportCustomTranslationsDialog Name="ImportCustomTranslationsDialog"
                                         DataContext="{Binding ImportTranslationsDC}"
                                         />
+      <v:NoTranslationsWarningDialog Name="NoTranslationsWarningDialog"
+                                     DataContext="{Binding NoTranslationsWarningDC}"
+                                     />
       
       <!-- Invisible Buttons -->
       <Button IsDefault="{Binding #SearchTB.IsFocused}"

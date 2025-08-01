@@ -44,6 +44,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\NoTranslationsWarningDialog.axaml.cs">
+      <DependentUpon>NoTranslationsWarningDialog.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\ImportCustomTranslationsDialog.axaml.cs">
       <DependentUpon>ImportCustomTranslationsDialog.axaml</DependentUpon>
     </Compile>

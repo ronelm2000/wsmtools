@@ -1,37 +1,36 @@
-﻿using Montage.Card.API.Entities.Impls;
-using System.Collections.ObjectModel;
-using System;
+﻿using Avalonia.Controls;
+using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Threading.Tasks;
-using Montage.Weiss.Tools.Impls.Services;
+using DynamicData;
+using DynamicData.Binding;
+using Fluent.IO;
+using JasperFx.Core;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using Montage.Weiss.Tools.Entities;
+using Montage.Card.API.Entities.Impls;
 using Montage.Weiss.Tools.CLI;
+using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.GUI.Extensions;
+using Montage.Weiss.Tools.GUI.Utilities;
+using Montage.Weiss.Tools.GUI.ViewModels.Dialogs;
+using Montage.Weiss.Tools.GUI.ViewModels.Query;
+using Montage.Weiss.Tools.Impls.Exporters.Deck;
+using Montage.Weiss.Tools.Impls.Inspectors.Deck;
+using Montage.Weiss.Tools.Impls.Parsers.Deck;
+using Montage.Weiss.Tools.Impls.Services;
+using ReactiveUI;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using ReactiveUI;
 using System.Reactive;
-using Montage.Weiss.Tools.GUI.Extensions;
-using Avalonia.Platform.Storage;
-using Fluent.IO;
 using System.Reactive.Linq;
-using System.Threading;
-using Montage.Weiss.Tools.Impls.Exporters.Deck;
-using Montage.Weiss.Tools.Impls.Parsers.Deck;
-using Avalonia.Controls;
 using System.Text.RegularExpressions;
-using Avalonia.Threading;
-using JasperFx.Core;
-using Montage.Weiss.Tools.GUI.Utilities;
-using Montage.Weiss.Tools.GUI.ViewModels.Dialogs;
-using DynamicData.Binding;
-using System.Collections.Generic;
-using DynamicData;
-using Montage.Weiss.Tools.GUI.ViewModels.Query;
-using Montage.Weiss.Tools.Impls.Inspectors.Deck;
-using DocumentFormat.OpenXml.Vml.Spreadsheet;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
 
@@ -87,6 +86,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private ImportTranslationsViewModel _importTranslationsDC;
 
+    [ObservableProperty]
+    private NoTranslationsWarningViewModel _noTranslationsWarningDC;
+
     public MainWindowViewModel()
     {
         Status = "";
@@ -126,6 +128,7 @@ public partial class MainWindowViewModel : ViewModelBase
             ImportSetDC = new ImportSetViewModel { IsVisible = false, Parent = () => null };
             ImportDeckDC = new ImportDeckViewModel { IsVisible = false, Parent = () => null };
             ImportTranslationsDC = new ImportTranslationsViewModel { IsVisible = false, Parent = () => null };
+            NoTranslationsWarningDC = new NoTranslationsWarningViewModel { IsVisible = false, Parent = () => null };
         }
         else
         {
@@ -133,6 +136,7 @@ public partial class MainWindowViewModel : ViewModelBase
             ImportSetDC = new ImportSetViewModel { IsVisible = false, Parent = () => this };
             ImportDeckDC = new ImportDeckViewModel { IsVisible = false, Parent = () => this };
             ImportTranslationsDC = new ImportTranslationsViewModel { IsVisible = false, Parent = () => this };
+            NoTranslationsWarningDC = new NoTranslationsWarningViewModel { IsVisible = false, Parent = () => this };
         }
 
         log = Serilog.Log.Logger.ForContext<MainWindowViewModel>();
@@ -336,6 +340,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         using var db = Container.GetInstance<CardDatabaseContext>();
         var searchCardList = await db.WeissSchwarzCards
+            .AsNoTracking()
             .ToAsyncEnumerable()
             .Where(c => searchTerms.All(st => st.Invoke(c)) && SearchQueries.All(sq => sq.ToPredicate().Invoke(c)))
             .Distinct(c => c.Serial)
@@ -509,10 +514,12 @@ public partial class MainWindowViewModel : ViewModelBase
         updater.OnStarting += Updater_OnStarting;
         updater.OnEnding += Updater_OnEnding;
 
-        Container.GetService<SanityTranslationsInspector>()!.Prompter = static async (options) =>
+        Log.Information("Intializing Inspectors...");
+
+        var sanityInspector = Container.GetService<ILocatorService>()!.FindInspector<SanityTranslationsInspector>();
+        sanityInspector.Prompter = async (options) =>
         {
-            await Task.CompletedTask;
-            return true;
+            return await NoTranslationsWarningDC.ShowDialogAsync(options.Cards);
         };
 
         var progressReporter = new ProgressReporter(log, message => Status = message);
@@ -528,7 +535,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await Dispatcher.UIThread.InvokeAsync(() => Status = "Loading Database...", DispatcherPriority.ApplicationIdle);
 
         using var db = Container!.GetInstance<CardDatabaseContext>();
-        var initialCardList = db.WeissSchwarzCards.Take(100).ToList();
+        var initialCardList = db.WeissSchwarzCards.AsNoTracking().Take(100).ToList();
         var cacheList = initialCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom).ToAsyncEnumerable();
         await new CacheVerb { }.Cache(Container, progressReporter, cacheList);
 

@@ -11,9 +11,9 @@ public class SanityTranslationsInspector : IExportedDeckInspector<WeissSchwarzDe
 
     public int Priority => 0;
 
-    public Func<InspectionOptions, Task<bool>> Prompter { get; set; } = static async (options) => await ValueTask.FromResult(ConsoleUtils.Prompted(options.IsNonInteractive, options.NoWarning));
+    public Func<PrompterEventArgs, Task<bool>> Prompter { get; set; } = static async (options) => await ValueTask.FromResult(ConsoleUtils.Prompted(options.IsNonInteractive, options.NoWarning));
 
-    public SanityTranslationsInspector (ILogger log)
+    public SanityTranslationsInspector(ILogger log)
     {
         Log = log.ForContext<SanityTranslationsInspector>();
     }
@@ -31,7 +31,7 @@ public class SanityTranslationsInspector : IExportedDeckInspector<WeissSchwarzDe
         var allNonTranslatedCards = deck.Ratios.Keys.Where(card => String.IsNullOrWhiteSpace(card.Name.EN) && EncoreDecksParser.HasNoTranslations(card))
                                         .Distinct()
                                         .ToList();
-        
+
         if (allEmptyTranslations.Any())
         {
             Log.Warning("The following sets (based on Release ID) do not seem to have proper English translations: {allEmptyTranslations}", allEmptyTranslations.ToList());
@@ -44,7 +44,13 @@ public class SanityTranslationsInspector : IExportedDeckInspector<WeissSchwarzDe
             }
             Log.Warning("This may result in a deck generator with only Japanese text.");
             Log.Warning("Do you wish to continue? [Y/N] (Default is N)");
-            if (await Prompter(options))
+            if (await Prompter(new PrompterEventArgs
+            {
+                CancellationToken = options.CancellationToken,
+                IsNonInteractive = options.IsNonInteractive,
+                NoWarning = options.NoWarning,
+                Cards = allNonTranslatedCards
+            }))
                 return deck;
             else
             {
@@ -53,10 +59,16 @@ public class SanityTranslationsInspector : IExportedDeckInspector<WeissSchwarzDe
                 Log.Information("For more information, please see: {url}", new Uri("https://github.com/ronelm2000/wsmtools"));
                 return WeissSchwarzDeck.Empty;
             }
-        } else
+        }
+        else
         {
             await Task.CompletedTask; //placebo way to stop warning about async/await
             return deck;
         }
+    }
+
+    public class PrompterEventArgs : InspectionOptions
+    {
+        public IEnumerable<WeissSchwarzCard> Cards { get; init; } = Enumerable.Empty<WeissSchwarzCard>();
     }
 }

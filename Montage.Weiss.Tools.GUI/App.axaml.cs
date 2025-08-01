@@ -4,6 +4,8 @@ using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Lamar;
+using Lamar.Scanning.Conventions;
+using Microsoft.Extensions.DependencyInjection;
 using Montage.Weiss.Tools.GUI.ViewModels;
 using Montage.Weiss.Tools.GUI.Views;
 using Serilog;
@@ -32,8 +34,8 @@ public partial class App : Application
                         c.Scan(s =>
                         {
                             s.AssemblyContainingType<MainWindowViewModel>();
-                            s.WithDefaultConventions();
                             s.RegisterConcreteTypesAgainstTheFirstInterface();
+                            s.WithDefaultConventions(OverwriteBehavior.Never, ServiceLifetime.Singleton);
                         });
                    })
                 }

@@ -23,19 +23,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.3.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.3.0" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.0" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0" />
+    <PackageReference Include="Avalonia" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.0" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.2" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="ReactiveUI" Version="20.2.45" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.10" />
-    <PackageReference Include="Splat.Serilog" Version="15.3.1" />
-    <PackageReference Include="Xaml.Behaviors.Avalonia" Version="11.3.0.10" />
-    <PackageReference Include="Xaml.Behaviors.Interactivity" Version="11.3.0.10" />
+    <PackageReference Include="ReactiveUI" Version="20.4.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.11" />
+    <PackageReference Include="Splat.Serilog" Version="15.4.1" />
+    <PackageReference Include="Xaml.Behaviors.Avalonia" Version="11.3.2" />
+    <PackageReference Include="Xaml.Behaviors.Interactivity" Version="11.3.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Montage.Weiss.Tools.GUI.ViewModels.Dialogs;assembly=wsm-gui"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="150"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
              x:Class="Montage.Weiss.Tools.GUI.Views.NoTranslationsWarningDialog"
              x:DataType="vm:NoTranslationsWarningViewModel" 
              >
@@ -32,12 +32,14 @@
                  TextWrapping="Wrap"
                  Margin="5,5,5,10" 
                  />
-      <ItemsControl ItemsSource="{Binding TargetCards}">
+      <ItemsControl ItemsSource="{Binding TargetCards}"
+                    HorizontalAlignment="Center"
+                    >
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
-            <VirtualizingStackPanel Orientation="Vertical"
+            <VirtualizingStackPanel Orientation="Horizontal"
                                     VerticalAlignment="Top"
-                                            />
+                                    />
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
 
@@ -50,24 +52,13 @@
                             >
               <Image  Source="{Binding Image^}"
                       ClipToBounds="false"
-                      MaxWidth="100"
+                      MaxWidth="80"
                       />
             </Border>
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>
-      <!--
-      <TextBox Watermark="Translated Card Name"
-               Text="{Binding CustomEnglishName}"
-               MinWidth="400"
-               />
-      <TextBox Watermark="[AUTO] When this card is translated..." 
-               Text="{Binding CustomTranslation}"
-               MinWidth="400"
-               TextWrapping="WrapWithOverflow"
-               AcceptsReturn="True"
-               />
-      -->
+
       <UniformGrid HorizontalAlignment="Stretch"
                    Columns="2"
                    Rows="1"

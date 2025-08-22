@@ -60,6 +60,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, bool> UpdateDatabaseViewCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ExportDeckToTabletopCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ExportToProxyDocumentCommand { get; init; }
+    public ReactiveCommand<Unit, Unit> ExportToTranslationDocumentCommand { get; init; }
     public ReactiveCommand<Unit, Unit> InjectSearchQueryCommand { get; init; }
 
     [ObservableProperty]
@@ -153,6 +154,7 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateDatabaseViewCommand = ReactiveCommand.CreateFromTask<Unit, bool>((_, t) => UpdateDatabaseView(t));
         ExportDeckToTabletopCommand = ReactiveCommand.CreateFromTask(ExportDeckToTabletop);
         ExportToProxyDocumentCommand = ReactiveCommand.CreateFromTask(ExportToProxyDocument);
+        ExportToTranslationDocumentCommand = ReactiveCommand.CreateFromTask(ExportToTranslationDocument);
         InjectSearchQueryCommand = ReactiveCommand.CreateFromTask(InjectSearchQuery);
 
         this.WhenAnyValue(r => r.SearchBarText)
@@ -243,6 +245,26 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             NonInteractive = true,
             Exporter = "doc",
+            Flags = ["nowarn"],
+            Progress = progressReporter
+        };
+        await command.Run(Container!, deck);
+    }
+
+    private async Task ExportToTranslationDocument(CancellationToken token)
+    {
+        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var deck = new WeissSchwarzDeck
+        {
+            Name = DeckName,
+            Remarks = DeckRemarks,
+            Ratios = DeckRatioList.ToDictionary(vw => vw.Card, vw => vw.Ratio)
+        };
+
+        var command = new ExportVerb
+        {
+            NonInteractive = true,
+            Exporter = "trans-doc",
             Flags = ["nowarn"],
             Progress = progressReporter
         };

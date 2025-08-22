@@ -139,6 +139,10 @@
     "Parse Nanoha 20th": {
       "commandName": "Project",
       "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=6862dbb3abea99e627d998b4"
+    },
+    "Export Deck (IMAS - Translations)": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/v-u3CVjp_ --exporter trans-doc"
     }
   }
 }

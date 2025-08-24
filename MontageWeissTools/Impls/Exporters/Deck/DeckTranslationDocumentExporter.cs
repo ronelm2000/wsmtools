@@ -82,11 +82,8 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
             document.Margins.Right = 720;
 
             var table = document.AddTable(1, 2, WordTableStyle.TableGrid);
-            table.SetWidthPercentage(100);
-            table.ColumnWidthType = TableWidthUnitValues.Pct;
-            table.ColumnWidth[0] = 30 * 50;
-            table.ColumnWidth[1] = 70 * 50;
-
+            //table.SetWidthPercentage(100);
+            //table.ColumnWidthType = TableWidthUnitValues.Pct;
 
             foreach (var entry in deck.Ratios)
             {
@@ -127,6 +124,19 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
             }
 
             table.FirstRow.Remove();
+
+            report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = "Drawing the table specifications..." } };
+            progress.Report(report);
+
+            table.ColumnWidthType = TableWidthUnitValues.Pct;
+
+            var colWidths = table.ColumnWidth;
+            colWidths[0] = 25 * 50;
+            colWidths[1] = 75 * 50;
+            table.ColumnWidth = colWidths;
+            table.GridColumnWidth = colWidths;
+
+            table.StyleDetails.SetBordersForAllSides(BorderValues.BasicWhiteDots, 1, Color.WhiteSmoke);
 
             report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = "Finalizing and saving document..." } };
             progress.Report(report);

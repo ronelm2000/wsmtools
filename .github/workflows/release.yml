@@ -24,8 +24,8 @@ jobs:
       run: |
         dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
         dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
-        dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Release -r win-x64 -o publish -p:PublishSingleFile=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
-        dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true  -p:PublishTrimmed=false  --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true --version-suffix 'rc${{ github.run_number }}'
+        dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Release -r win-x64 -o publish -p:PublishSingleFile=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
+        dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true  -p:PublishTrimmed=false  --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
         cd ./publish
         zip ../wsmtools-win-x64.zip ./wstools.exe
         zip ../wsmtools-linux-x64.zip ./wstools

@@ -310,7 +310,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     public T? FindOptionalInfo<T>(string key)
     {
         if (string.IsNullOrEmpty(key)) return default;
-        var info = AdditionalInfo.FirstOrDefault(i => i.Key == key, null);
+        var info = AdditionalInfo.FirstOrDefault(i => i?.Key == key, null);
         if (info is null) return default;
         return info.DeserializeValue<T>();
     }

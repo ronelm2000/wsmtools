@@ -34,7 +34,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         options.EnableSensitiveDataLogging();
-        options.UseSqlite($"Data Source={_config.DbName}");
+        options.UseSqlite($"Data Source={Directory.GetCurrentDirectory()}/{_config.DbName}");
     }
 
     internal async Task<WeissSchwarzCard?> FindNonFoil(WeissSchwarzCard card, CancellationToken ct = default)

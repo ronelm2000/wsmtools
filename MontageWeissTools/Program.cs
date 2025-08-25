@@ -94,7 +94,7 @@ public class Program
                             );
         else
             config = config.WriteTo.File(
-                    "./wstools.out.log",
+                    $"{AppDomain.CurrentDomain.BaseDirectory}/wstools.out.log",
                     restrictedToMinimumLevel: LogEventLevel.Information,
                     outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
                     );

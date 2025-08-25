@@ -224,7 +224,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             NonInteractive = true,
             Exporter = "tabletopsim",
-            Destination = $"{System.IO.Directory.GetCurrentDirectory()}/Export/",
+            Destination = $"{AppDomain.CurrentDomain.BaseDirectory}/Export/",
             Flags = ["sendtcp", "limit-width(800)"],
             OutCommand = "sharex",
             Progress = progressReporter
@@ -246,7 +246,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             NonInteractive = true,
             Exporter = "doc",
-            Destination = $"{System.IO.Directory.GetCurrentDirectory()}/Export/",
+            Destination = $"{AppDomain.CurrentDomain.BaseDirectory}/Export/",
             Flags = ["nowarn"],
             Progress = progressReporter
         };
@@ -267,7 +267,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             NonInteractive = true,
             Exporter = "trans-doc",
-            Destination = $"{System.IO.Directory.GetCurrentDirectory()}/Export/",
+            Destination = $"{AppDomain.CurrentDomain.BaseDirectory}/Export/",
             Flags = ["nowarn"],
             Progress = progressReporter
         };

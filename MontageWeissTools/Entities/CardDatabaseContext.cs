@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
@@ -34,7 +35,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         options.EnableSensitiveDataLogging();
-        options.UseSqlite($"Data Source={Directory.GetCurrentDirectory()}/{_config.DbName}");
+        options.UseSqlite($"Data Source={AppDomain.CurrentDomain.BaseDirectory}/{_config.DbName}");
     }
 
     internal async Task<WeissSchwarzCard?> FindNonFoil(WeissSchwarzCard card, CancellationToken ct = default)

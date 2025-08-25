@@ -89,7 +89,8 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
 
     public Path? GetCachedImagePath(String imagePath = "Images")
     {
-        return Path.Current.Add("Images")
+        return Path.Get(AppDomain.CurrentDomain.BaseDirectory)
+                        .Add("Images")
                         .Files($"{Serial.Replace('-', '_').AsFileNameFriendly()}.*", true)
                         .WhereExtensionIs(".png", ".jpeg", ".jpg", "jfif")
                         .FirstOrDefault();

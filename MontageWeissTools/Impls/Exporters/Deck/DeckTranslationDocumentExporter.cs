@@ -82,8 +82,6 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
             document.Margins.Right = 720;
 
             var table = document.AddTable(1, 2, WordTableStyle.TableGrid);
-            //table.SetWidthPercentage(100);
-            //table.ColumnWidthType = TableWidthUnitValues.Pct;
 
             foreach (var entry in deck.Ratios)
             {
@@ -99,7 +97,7 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
                 var row = table.AddRow();
                 
                 row.Cells[0].Paragraphs[0].AddImageFromBase64(
-                    Convert.ToBase64String(buffer.Array, 0, (int)rawImageStream.Length),
+                    Convert.ToBase64String(buffer.Array ?? Array.Empty<byte>(), 0, (int)rawImageStream.Length),
                     card.Serial + ".png",
                     width: 143d,
                     height: 200d, 
@@ -149,46 +147,11 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
             report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = $"Opening document: {resultingDocFilePath.FullPath}" } };
             progress.Report(report);
             System.Diagnostics.Process.Start("explorer", $"\"{resultingDocFilePath.FullPath}\"");
-        } else
+        }
+        else
         {
             report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = $"Saved document: {resultingDocFilePath.FullPath}" } };
             progress.Report(report);
-        }
-
-            static void ApplyParagraphStyle(WordParagraph paragraph, CardColor color)
-            {
-                paragraph.ParagraphAlignment = JustificationValues.Both;
-                paragraph.LineSpacingAfter = 0;
-                paragraph.Color = TranslateToColor(color);
-                paragraph.Highlight = TranslateToHighlight(color);
-                paragraph.FontSize = 5;
-                paragraph.Spacing = -1;
-                paragraph.FontFamily = "Calibri";
-            }
-
-        static Color TranslateToColor(CardColor color)
-        {
-            return color switch
-            {
-                CardColor.Yellow => Color.Black,
-                CardColor.Green => Color.Black,
-                CardColor.Red => Color.White,
-                CardColor.Blue => Color.White,
-                CardColor.Purple => Color.White,
-                _ => Color.Black
-            };
-        }
-        static HighlightColorValues TranslateToHighlight(CardColor color)
-        {
-            return color switch
-            {
-                CardColor.Yellow => HighlightColorValues.Yellow,
-                CardColor.Green => HighlightColorValues.Green,
-                CardColor.Red => HighlightColorValues.Red,
-                CardColor.Blue => HighlightColorValues.DarkBlue,
-                CardColor.Purple => HighlightColorValues.DarkCyan,
-                _ => HighlightColorValues.White
-            };
         }
     }
 

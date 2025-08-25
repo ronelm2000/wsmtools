@@ -1,6 +1,5 @@
 ﻿using CommandLine;
 using Fluent.IO;
-using Flurl;
 using Flurl.Http;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
@@ -8,19 +7,17 @@ using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
-using Octokit;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
-using System.Collections.Generic;
 
 namespace Montage.Weiss.Tools.CLI;
 
 [Verb("cache", HelpText = "Downloads all related images and updates it into a file; also edits the image metadata to show proper attribution.")]
 public class CacheVerb : IVerbCommand
 {
-    private static readonly string _IMAGE_CACHE_PATH = "./Images/";
     private ILogger Log = Serilog.Log.ForContext<CacheVerb>();
+    private static readonly string _IMAGE_CACHE_PATH = $"{AppDomain.CurrentDomain.BaseDirectory}/Images/";
 
     [Value(0, HelpText = "Indicates either Release ID or a full Serial ID.")]
     public string ReleaseIDorFullSerialID { get; set; } = string.Empty;

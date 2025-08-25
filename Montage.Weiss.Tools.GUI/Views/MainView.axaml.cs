@@ -39,7 +39,14 @@ public partial class MainView : UserControl {
         if (viewModel.Container is null)
             return;
 
-        Task.Run(viewModel.Load);
+        Task.Run(viewModel.Load).ContinueWith(t =>
+        {
+           if (t.IsFaulted)
+            {
+                Logger()?.Error(t.Exception, "Error Loading the App.");
+                throw t.Exception;
+            }
+        });
     }
 
     private void DatabaseCardViewPanel_Click(object? sender, RoutedEventArgs e)

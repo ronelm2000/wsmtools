@@ -6,6 +6,8 @@ namespace Montage.Card.API.Services;
 public abstract class FileOutCommandProcessor : IFileOutCommandProcessor
 {
     public abstract ILogger Log { get; }
+    
+    public abstract IFileOutCommandProcessor.SaveStreamSupplier CreateFileStream { get; set; }
 
     public async Task Process(string fullOutCommand, string fullFilePath, CancellationToken cancellationToken = default)
     {

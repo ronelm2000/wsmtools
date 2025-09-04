@@ -3,6 +3,7 @@ using Lamar;
 using Lamar.Scanning.Conventions;
 using Microsoft.Extensions.DependencyInjection;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Services;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Services;
@@ -154,6 +155,7 @@ public static class LamarContainerExtensions {
             s.AssemblyContainingType<Program>();
             s.AddAllTypesOf<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>(ServiceLifetime.Singleton);
             s.AddAllTypesOf<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>>(ServiceLifetime.Singleton);
+            s.AddAllTypesOf<IFileOutCommandProcessor>(ServiceLifetime.Singleton);
 
             s.RegisterConcreteTypesAgainstTheFirstInterface();
 

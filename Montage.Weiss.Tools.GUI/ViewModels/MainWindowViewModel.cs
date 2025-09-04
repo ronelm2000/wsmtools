@@ -8,6 +8,7 @@ using Fluent.IO;
 using JasperFx.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Montage.Card.API.Entities.Impls;
+using Montage.Card.API.Services;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.GUI.Extensions;
@@ -89,6 +90,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private NoTranslationsWarningViewModel _noTranslationsWarningDC;
+
+    [ObservableProperty]
+    private string? destinationBookmark;
 
     public MainWindowViewModel()
     {
@@ -234,6 +238,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task ExportToProxyDocument(CancellationToken token)
     {
+        var storage = Parent!().StorageProvider;
+        var folder = DestinationBookmark switch
+        {
+            string b => (await storage.OpenFolderBookmarkAsync(b))!,
+            _ => await AssignExportBookmark(storage)
+        };
+
         var progressReporter = new ProgressReporter(log, message => Status = message);
         var deck = new WeissSchwarzDeck
         {
@@ -246,7 +257,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             NonInteractive = true,
             Exporter = "doc",
-            Destination = $"{AppDomain.CurrentDomain.BaseDirectory}/Export/",
+            Destination =  folder.TryGetLocalPath() ?? string.Empty,
             Flags = ["nowarn"],
             Progress = progressReporter
         };
@@ -255,6 +266,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task ExportToTranslationDocument(CancellationToken token)
     {
+        var storage = Parent!().StorageProvider;
+        var folder = DestinationBookmark switch
+        {
+            string b => (await storage.OpenFolderBookmarkAsync(b))!,
+            _ => await AssignExportBookmark(storage)
+        };
+
         var progressReporter = new ProgressReporter(log, message => Status = message);
         var deck = new WeissSchwarzDeck
         {
@@ -267,7 +285,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             NonInteractive = true,
             Exporter = "trans-doc",
-            Destination = $"{AppDomain.CurrentDomain.BaseDirectory}/Export/",
+            Destination =  folder.TryGetLocalPath() ?? string.Empty,
             Flags = ["nowarn"],
             Progress = progressReporter
         };
@@ -547,6 +565,24 @@ public partial class MainWindowViewModel : ViewModelBase
             return await NoTranslationsWarningDC.ShowDialogAsync(options.Cards);
         };
 
+        var fileProcessor = Container.GetService<IFileOutCommandProcessor>()!;
+        var defaultStreamDriver = fileProcessor.CreateFileStream;
+        fileProcessor.CreateFileStream = async (destinationFolder, fileName) =>
+        {
+            if (!string.IsNullOrWhiteSpace(destinationFolder))
+                return await defaultStreamDriver(destinationFolder, fileName);
+
+            var storage = Parent!().StorageProvider;
+            var saveFolder = (await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                Title = "Choose Export Folder",    
+                AllowMultiple = false
+            }))[0];
+
+            var saveFile = await saveFolder.CreateFileAsync(fileName);
+            return await saveFile!.OpenWriteAsync();
+        };
+
         var progressReporter = new ProgressReporter(log, message => Status = message);
         await Container.GetInstance<UpdateVerb>().Run(Container, progressReporter);
 
@@ -695,6 +731,14 @@ public partial class MainWindowViewModel : ViewModelBase
         DeckStats = $"[ {totalCards} / {totalCharas} / {totalEvents} / {totalCXes} ]";
     }
 
+    private async Task<IStorageFolder> AssignExportBookmark(IStorageProvider storage) {
+        var folders = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions { AllowMultiple = false });
+        var folder = folders[0];
+        if (folder.CanBookmark)
+            DestinationBookmark = await folder.SaveBookmarkAsync() ?? throw new Exception("Cannot save bookmark");
+        return folder;
+    }
+
     public static FilePickerFileType SetFiles { get; } = new("WS Set Files")
     {
         Patterns = ["*.ws-set"],
@@ -707,6 +751,13 @@ public partial class MainWindowViewModel : ViewModelBase
         Patterns = ["*.ws-dek"],
         AppleUniformTypeIdentifiers = ["public.ronelm2000.ws.deck"],
         MimeTypes = ["application/json"]
+    };
+
+    public static FilePickerFileType DocumentFiles { get; } = new("Word Document")
+    {
+        Patterns = ["*.docx"],
+        AppleUniformTypeIdentifiers = ["org.openxmlformats.wordprocessingml.document"],
+        MimeTypes = ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
     };
 
     [GeneratedRegex(@"(?:(\w+)\:(?:(\w+)|""(.*?)"")|(\w+))")]

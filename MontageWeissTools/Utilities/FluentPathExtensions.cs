@@ -5,18 +5,16 @@ namespace Montage.Weiss.Tools.Utilities;
 public static class FluentPathExtensions
 {
     /// <summary>
-    /// Creates a file from the path, exposing a stream in the process.
+    /// Creates a file from the path, exposing a stream in the process. This assumes that the path is the file itself, and not a directory.
     /// </summary>
     /// <param name="path"></param>
     /// <param name="filename"></param>
     /// <returns></returns>
-    public static Fluent.IO.Path CreateFile(this Path path, string filename, Action<System.IO.FileStream> streamAction)
+    public static ValueTask<System.IO.Stream> CreateFileStream(this Path path)
     {
-        // if Path is null TODO: make an exception
-        using (var stream = System.IO.File.Create(path.FullPath))
-            streamAction?.Invoke(stream);
-        return path.Files();
+        return ValueTask.FromResult<System.IO.Stream>(System.IO.File.Create(path.FullPath));
     }
+
 
     public static System.IO.Stream GetStream(this Path path)
     {

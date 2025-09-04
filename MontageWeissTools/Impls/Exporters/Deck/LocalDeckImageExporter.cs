@@ -29,13 +29,14 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
     private (IImageEncoder, IImageFormat) _jpegEncoder = (new JpegEncoder(), JpegFormat.Instance);
     private readonly Func<Flurl.Url, CookieSession> _cookieSession;
     private readonly Func<string, string, CancellationToken, Task> _processOutCommand;
-
+    private readonly IFileOutCommandProcessor _fileProcessor;
     private readonly Regex limitFlagRegex = new Regex(@"limit-width\((\d+)\)");
 
     public LocalDeckImageExporter(IContainer ioc)
     {
         _cookieSession = (url) => ioc.GetInstance<GlobalCookieJar>()[url.Root];
         _processOutCommand = ioc.GetInstance<IFileOutCommandProcessor>().Process;
+        _fileProcessor = ioc.GetInstance<IFileOutCommandProcessor>();
     }
 
     public async Task Export(WeissSchwarzDeck deck, IExportInfo info, CancellationToken cancellationToken = default)
@@ -170,7 +171,10 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
         }
 
         Log.Information("Finished drawing all cards in logical order; saving image...");
-        await deckImagePath.WriteAsync(s => fullGrid.SaveAsync(s, encoder, tc), tc);
+        await using (var stream = await _fileProcessor.CreateFileStream(info.Destination, deckImagePath.FullPath))
+        {
+            await fullGrid.SaveAsync(stream, encoder, tc);
+        }
 
         if (Program.IsOutputRedirected) // Enable Non-Interactive Path stdin Passthrough of the deck png
             using (var stdout = Console.OpenStandardOutput())

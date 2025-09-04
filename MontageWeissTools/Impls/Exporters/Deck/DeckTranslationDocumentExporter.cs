@@ -50,7 +50,7 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
         var serialList = AsOrdered(deck.Ratios.Keys)
             .SelectMany(c => Enumerable.Range(0, deck.Ratios[c]).Select(i => c))
             .ToList();
-        var resultFolder = Path.CreateDirectory(info.Destination);
+        var resultFolder = string.IsNullOrWhiteSpace(info.Destination) ? Path.Current.Combine("Export") : Path.CreateDirectory(info.Destination);
         var fileNameFriendlyDeckName = deck.Name.AsFriendlyToTabletopSimulator();
         var imageDictionary = await AsOrdered(deck.Ratios.Keys)
             .ToAsyncEnumerable()
@@ -72,7 +72,9 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
             );
 
         var resultingDocFilePath = resultFolder.Combine($"translations_{fileNameFriendlyDeckName}.docx");
-        using (WordDocument document = WordDocument.Create(filePath: resultingDocFilePath.FullPath, autoSave: true))
+        
+        await using System.IO.MemoryStream memStream = new(1000);
+        using (WordDocument document = WordDocument.Create(memStream, autoSave: true))
         {
             document.PageOrientation = PageOrientationValues.Portrait;
             document.PageSettings.PageSize = WordPageSize.A4;
@@ -95,12 +97,12 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
                 rawImageStream.TryGetBuffer(out ArraySegment<byte> buffer);
 
                 var row = table.AddRow();
-                
+
                 row.Cells[0].Paragraphs[0].AddImageFromBase64(
                     Convert.ToBase64String(buffer.Array ?? Array.Empty<byte>(), 0, (int)rawImageStream.Length),
                     card.Serial + ".png",
                     width: 143d,
-                    height: 200d, 
+                    height: 200d,
                     description: $"{card.Name.AsNonEmptyString()}"
                     );
                 var descParagraph = row.Cells[1].Paragraphs[0];
@@ -121,7 +123,8 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
                 descParagraph.AddText(card.Effect.ConcatAsString("\n"));
             }
 
-            table.FirstRow.Remove();
+            if (table.RowsCount > 1)
+                table.FirstRow.Remove();
 
             report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = "Drawing the table specifications..." } };
             progress.Report(report);
@@ -140,7 +143,15 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
             progress.Report(report);
         }
 
-        Log.Information("Saved to {path}", resultingDocFilePath.FullPath);
+        await using (System.IO.Stream stream = await _fileProcessor.CreateFileStream(info.Destination, $"translations_{fileNameFriendlyDeckName}.docx"))
+        {
+            await memStream.CopyToAsync(stream);
+        }
+
+        if (string.IsNullOrWhiteSpace(info.Destination))
+            Log.Information("Saved as: {file}", resultingDocFilePath.FileName);
+        else
+            Log.Information("Saved to {path}", resultingDocFilePath.FullPath);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {

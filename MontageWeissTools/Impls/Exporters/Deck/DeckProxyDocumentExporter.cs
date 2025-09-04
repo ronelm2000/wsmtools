@@ -1,7 +1,9 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Fluent.IO;
 using Flurl.Http;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
@@ -44,22 +46,12 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
         var report = DeckExportProgressReport.Starting(deck.Name, "Deck Proxy Document Exporter");
         progress.Report(report);
 
-
-        /*
-        var document = new Openize.Words.Document();
-        var body = new Openize.Words.Body(document);
-        var paragraph = new Openize.Words.IElements.Paragraph();
-
-        var table = new Openize.Words.IElements.Table(3, 3);
-        */
-
-        //      body.AppendChild(paragraph);
-
         var count = deck.Ratios.Keys.Count;
         var serialList = AsOrdered(deck.Ratios.Keys)
             .SelectMany(c => Enumerable.Range(0, deck.Ratios[c]).Select(i => c))
             .ToList();
-        var resultFolder = Path.CreateDirectory(info.Destination);
+
+        var resultFolder = string.IsNullOrWhiteSpace(info.Destination) ? Path.Current.Combine("Export") : Path.CreateDirectory(info.Destination);
         var fileNameFriendlyDeckName = deck.Name.AsFriendlyToTabletopSimulator();
         var imageDictionary = await AsOrdered(deck.Ratios.Keys)
             .ToAsyncEnumerable()
@@ -81,7 +73,9 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
             );
 
         var resultingDocFilePath = resultFolder.Combine($"proxy_{fileNameFriendlyDeckName}.docx");
-        using (WordDocument document = WordDocument.Create(filePath: resultingDocFilePath.FullPath, autoSave: true))
+
+        await using System.IO.MemoryStream memStream = new(1000);
+        using (WordDocument document = WordDocument.Create(memStream, autoSave: true))
         {
             document.PageOrientation = PageOrientationValues.Landscape;
             document.PageSettings.PageSize = WordPageSize.A4;
@@ -101,7 +95,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
                 report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = $"Adding {quantity} copies of {card.Serial} to the document." } };
                 progress.Report(report);
 
-                await using var imageStream = await card.GetImageStreamAsync( (card.Images.Count > 0) ? _cookieSessionFunc(card.Images.Last()) : null, cancellationToken);
+                await using var imageStream = await card.GetImageStreamAsync((card.Images.Count > 0) ? _cookieSessionFunc(card.Images.Last()) : null, cancellationToken);
                 var rawImage = PreProcess(await Image.LoadAsync(imageStream, cancellationToken));
 
                 var tempImagePath = System.IO.Path.GetTempFileName() + ".jpg";
@@ -147,7 +141,15 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
             progress.Report(report);
         }
 
-        Log.Information("Saved to {path}", resultingDocFilePath.FullPath);
+        await using (System.IO.Stream stream = await _fileProcessor.CreateFileStream(info.Destination, $"proxy_{fileNameFriendlyDeckName}.docx"))
+        {
+            await memStream.CopyToAsync(stream);
+        }
+
+        if (string.IsNullOrWhiteSpace(info.Destination))
+            Log.Information("Saved as: {file}", resultingDocFilePath.FileName);
+        else
+            Log.Information("Saved to {path}", resultingDocFilePath.FullPath);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {

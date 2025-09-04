@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "C#: Montage.Weiss.Tools.GUI",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+            "launchConfigurationId": "TargetFramework=;Montage.Weiss.Tools.GUI"
+        }
+    ]
+}

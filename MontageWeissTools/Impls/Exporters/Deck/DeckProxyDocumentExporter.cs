@@ -151,27 +151,21 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
         else
             Log.Information("Saved to {path}", resultingDocFilePath.FullPath);
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = $"Opening document: {resultingDocFilePath.FullPath}" } };
-            progress.Report(report);
-            System.Diagnostics.Process.Start("explorer", $"\"{resultingDocFilePath.FullPath}\"");
-        } else
-        {
-            report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = $"Saved document: {resultingDocFilePath.FullPath}" } };
-            progress.Report(report);
-        }
+        report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = $"Opening document: {resultingDocFilePath.FullPath}" } };
+        progress.Report(report);
 
-            static void ApplyParagraphStyle(WordParagraph paragraph, CardColor color)
-            {
-                paragraph.ParagraphAlignment = JustificationValues.Both;
-                paragraph.LineSpacingAfter = 0;
-                paragraph.Color = TranslateToColor(color);
-                paragraph.Highlight = TranslateToHighlight(color);
-                paragraph.FontSize = 5;
-                paragraph.Spacing = -1;
-                paragraph.FontFamily = "Calibri";
-            }
+        await _fileProcessor.OpenFile(info.Destination, resultingDocFilePath.FileName);
+
+        static void ApplyParagraphStyle(WordParagraph paragraph, CardColor color)
+        {
+            paragraph.ParagraphAlignment = JustificationValues.Both;
+            paragraph.LineSpacingAfter = 0;
+            paragraph.Color = TranslateToColor(color);
+            paragraph.Highlight = TranslateToHighlight(color);
+            paragraph.FontSize = 5;
+            paragraph.Spacing = -1;
+            paragraph.FontFamily = "Calibri";
+        }
 
         static Color TranslateToColor(CardColor color)
         {

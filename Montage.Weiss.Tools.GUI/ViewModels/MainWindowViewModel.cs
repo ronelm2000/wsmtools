@@ -567,20 +567,33 @@ public partial class MainWindowViewModel : ViewModelBase
 
         var fileProcessor = Container.GetService<IFileOutCommandProcessor>()!;
         var defaultStreamDriver = fileProcessor.CreateFileStream;
+        var defaultOpenDriver = fileProcessor.OpenFile;
         fileProcessor.CreateFileStream = async (destinationFolder, fileName) =>
         {
             if (!string.IsNullOrWhiteSpace(destinationFolder))
                 return await defaultStreamDriver(destinationFolder, fileName);
 
             var storage = Parent!().StorageProvider;
-            var saveFolder = (await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
-            {
-                Title = "Choose Export Folder",    
-                AllowMultiple = false
-            }))[0];
-
-            var saveFile = await saveFolder.CreateFileAsync(fileName);
+            var saveFolder = await storage.OpenFolderBookmarkAsync(DestinationBookmark!);
+            var saveFile = await saveFolder!.CreateFileAsync(fileName);
             return await saveFile!.OpenWriteAsync();
+        };
+        fileProcessor.OpenFile = async (destinationFolder, fileName) =>
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(destinationFolder))
+                    await defaultOpenDriver(destinationFolder, fileName);
+
+                var storage = Parent!().StorageProvider;
+                var folder = await storage.OpenFolderBookmarkAsync(DestinationBookmark!);
+                var file = await folder!.GetFileAsync(fileName);
+                await Parent()!.Launcher.LaunchFileAsync(file!);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Cannot open file,");
+            }
         };
 
         var progressReporter = new ProgressReporter(log, message => Status = message);

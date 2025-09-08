@@ -153,17 +153,10 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
         else
             Log.Information("Saved to {path}", resultingDocFilePath.FullPath);
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = $"Opening document: {resultingDocFilePath.FullPath}" } };
-            progress.Report(report);
-            System.Diagnostics.Process.Start("explorer", $"\"{resultingDocFilePath.FullPath}\"");
-        }
-        else
-        {
-            report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = $"Saved document: {resultingDocFilePath.FullPath}" } };
-            progress.Report(report);
-        }
+        report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = $"Opening document: {resultingDocFilePath.FullPath}" } };
+        progress.Report(report);
+
+        await _fileProcessor.OpenFile(info.Destination, resultingDocFilePath.FileName);
     }
 
     private IEnumerable<WeissSchwarzCard> AsOrdered(IEnumerable<WeissSchwarzCard> cards)

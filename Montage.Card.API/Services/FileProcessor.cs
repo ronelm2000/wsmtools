@@ -9,6 +9,8 @@ public abstract class FileOutCommandProcessor : IFileOutCommandProcessor
     
     public abstract IFileOutCommandProcessor.SaveStreamSupplier CreateFileStream { get; set; }
 
+    public abstract IFileOutCommandProcessor.OpenFileSupplier OpenFile { get; set; }
+
     public async Task Process(string fullOutCommand, string fullFilePath, CancellationToken cancellationToken = default)
     {
         if (Environment.OSVersion.Platform == PlatformID.Win32NT && fullOutCommand.ToLower() == "sharex")

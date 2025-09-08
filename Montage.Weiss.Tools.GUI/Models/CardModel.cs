@@ -20,6 +20,8 @@ public class CardModel
     public CardModel(Uri imagePath)
     {
         Image = Load(imagePath);
+        Name ??= new();
+        Traits ??= new(){ };
     }
 
     public static async Task<Bitmap?> Load(Uri url)

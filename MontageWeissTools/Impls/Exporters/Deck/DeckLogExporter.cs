@@ -38,15 +38,26 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
     public async Task Export(WeissSchwarzDeck deck, IExportInfo info, CancellationToken cancellationToken = default)
     {
         var languages = deck.Ratios.Keys.Select(c => c.Language).Distinct();
+        var reportStatus = DeckExportProgressReport.Starting(deck.Name, "DeckLog");
         if (languages.Count() > 1)
         {
+            info.Progress.Report(reportStatus with { ReportMessage = new() { EN = "Error: Cannot support multiple language decks." } });
             throw new NotImplementedException("Cannot support multiple language decks.");
         }
+        var cardTypes = deck.Ratios.Keys.Select(c => c.EnglishSetType).Distinct();
+        if (cardTypes.Contains(EnglishSetType.Custom))
+        {
+            info.Progress.Report(reportStatus with { ReportMessage = new() { EN = "Error: Cannot Custom Weiss Schwarz cards." } });
+            throw new NotImplementedException("Cannot support Custom Weiss Schwarz cards.");
+        }
+
         var lang = languages.First();
         var deckLog = (lang == CardLanguage.Japanese) ? DeckLogSettings.Japanese : DeckLogSettings.English;
         var deckCreationRequest = GenerateDeckCreationRequest(deck);
 
         Log.Information("Checking for any inconsistencies via DeckLog...");
+        info.Progress.Report(reportStatus = reportStatus with { Percentage = 33, ReportMessage = new() { EN = "Performing DeckLog's Deck Check..." } });
+
         var cookieSession = _cookieJar()[deckLog.Authority];
         var checkResultPost = await deckLog.DeckCheckURL
             .WithCookies(cookieSession)
@@ -57,14 +68,17 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             .PostJsonAsync(deckCreationRequest, cancellationToken: cancellationToken);
 
         var checkResult = await checkResultPost.GetJsonAsync<DeckLogCheckResult>();
+        var deckErrors = checkResult.Errors
+            .Concat(checkResult.Require)
+            .Concat(checkResult.RecipeRequire)
+            .Concat(checkResult.PopupRequire)
+            .ToList();
 
-        if (checkResult.Errors.Count() > 0)
+        if (deckErrors.Count > 0)
         {
-            var printedErrors = checkResult.Errors
-                .Select(o => o?.ToString() ?? "")
-                .Where(s => !String.IsNullOrEmpty(s))
-                .ConcatAsString("\n");
+            var printedErrors = deckErrors.ConcatAsString("\n");
             Log.Error("Errors Encountered During Deck Check: \n{errors}", printedErrors);
+            info.Progress.Report(reportStatus with { ReportMessage = new() { EN = $"Encountered Issue: {deckErrors[0]} {(deckErrors.Count > 1 ? " (and more...)" : "")}" } });
             return;
         }
 
@@ -73,6 +87,9 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             Token = "",
             TokenId = ""
         };
+
+        reportStatus = reportStatus with { Percentage = 66, ReportMessage = new() { EN = "Publishing to DeckLog..." } };
+        info.Progress.Report(reportStatus);
 
         var publishResultPost = await deckLog.DeckPublishURL
             .WithCookies(cookieSession)
@@ -89,11 +106,23 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             Log.Error("Publish Result is not OK; this shouldn't ever happen as it has been deck checked already!");
             Log.Error("Result: {@result}", publishResult);
             Log.Error("Please report this to dev at GitHub.");
+            info.Progress.Report(reportStatus with { ReportMessage = new() { EN = "Result Failed! (This shouldn't happen.) Please report this to GitHub! " } });
             return;
         }
 
+        var finalURL = deckLog.DeckFriendlyViewURL + publishResult.DeckID;
         Log.Information("Success!");
-        Log.Information("URL: {url}", (deckLog.DeckFriendlyViewURL + publishResult.DeckID));
+        Log.Information("URL: {url}", finalURL);
+
+        reportStatus = reportStatus with
+        {
+            Percentage = 100,
+            ReportMessage = new()
+            {
+                EN = $"Success! URL: {finalURL}"
+            }
+        };
+        info.Progress.Report(reportStatus);
     }
 
     private DeckLogDeckCheckQuery GenerateDeckCreationRequest(WeissSchwarzDeck deck)
@@ -169,6 +198,12 @@ public record DeckLogCheckResult
 {
     [JsonPropertyName("require")]
     public List<string> Require { get; init; } = new List<string>();
+
+    [JsonPropertyName("recipe_require")]
+    public List<string> RecipeRequire { get; init; } = new List<string>();
+
+    [JsonPropertyName("popup_require")]
+    public List<string> PopupRequire { get; init; } = new List<string>();
 
     [JsonPropertyName("error")]
     public List<string> Errors { get; init; } = new List<string>();

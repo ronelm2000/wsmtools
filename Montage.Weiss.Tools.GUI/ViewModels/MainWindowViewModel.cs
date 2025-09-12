@@ -62,6 +62,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ExportDeckToTabletopCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ExportToProxyDocumentCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ExportToTranslationDocumentCommand { get; init; }
+    public ReactiveCommand<Unit, Unit> ExportToDeckLogCommand { get; init; }
     public ReactiveCommand<Unit, Unit> InjectSearchQueryCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ToggleOverrideRatioLimitsCommand { get; init; }
 
@@ -164,6 +165,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ExportDeckToTabletopCommand = ReactiveCommand.CreateFromTask(ExportDeckToTabletop);
         ExportToProxyDocumentCommand = ReactiveCommand.CreateFromTask(ExportToProxyDocument);
         ExportToTranslationDocumentCommand = ReactiveCommand.CreateFromTask(ExportToTranslationDocument);
+        ExportToDeckLogCommand = ReactiveCommand.CreateFromTask(ExportToDeckLog);
         InjectSearchQueryCommand = ReactiveCommand.CreateFromTask(InjectSearchQuery);
         ToggleOverrideRatioLimitsCommand = ReactiveCommand.Create(() => { OverrideRatioLimits = !OverrideRatioLimits; });
 
@@ -271,6 +273,26 @@ public partial class MainWindowViewModel : ViewModelBase
         await command.Run(Container!, deck);
     }
 
+    private async Task ExportToDeckLog()
+    {
+        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var deck = new WeissSchwarzDeck
+        {
+            Name = DeckName,
+            Remarks = DeckRemarks,
+            Ratios = DeckRatioList.ToDictionary(vw => vw.Card, vw => vw.Ratio)
+        };
+
+        var command = new ExportVerb
+        {
+            NonInteractive = true,
+            Exporter = "decklog",
+            Destination = $"{AppDomain.CurrentDomain.BaseDirectory}/Export/",
+            Progress = progressReporter
+        };
+        await command.Run(Container!, deck);
+    }
+
     private async Task ExportToTranslationDocument(CancellationToken token)
     {
         var storage = Parent!().StorageProvider;
@@ -292,7 +314,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             NonInteractive = true,
             Exporter = "trans-doc",
-            Destination =  folder.TryGetLocalPath() ?? string.Empty,
+            Destination = folder.TryGetLocalPath() ?? string.Empty,
             Flags = ["nowarn"],
             Progress = progressReporter
         };

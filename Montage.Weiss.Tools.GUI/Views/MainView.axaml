@@ -44,8 +44,8 @@
         <MenuItem Header="_Tabletop Simulator" Command="{Binding ExportDeckToTabletopCommand}"/>
         <MenuItem Header="_Proxy Document" Command="{Binding ExportToProxyDocumentCommand}"/>
         <MenuItem Header="T_ranslation Document" Command="{Binding ExportToTranslationDocumentCommand}"/>
+        <MenuItem Header="_DeckLog" Command="{Binding ExportToDeckLogCommand}" />
         <Separator/>
-        <MenuItem Header="_DeckLog" IsEnabled="False" />
         <MenuItem Header="_EncoreDecks" IsEnabled="False" />
       </MenuItem>
     </Menu>

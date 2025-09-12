@@ -118,7 +118,7 @@ public class CacheVerb : IVerbCommand
                 img.Metadata.ExifProfile ??= new ExifProfile();
                 img.Metadata.ExifProfile.SetValue(SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifTag.Copyright, card.Images.Last().Authority);
                 var savePath = Path.Get(_IMAGE_CACHE_PATH).Combine($"{card.Serial.Replace('-', '_').AsFileNameFriendly()}.jpg");
-                await img.SaveAsPngAsync(savePath.FullPath, ct);
+                await img.SaveAsJpegAsync(savePath.FullPath, ct);
             }
         } catch (InvalidOperationException e) when (e.Message == "Sequence contains no elements")
         {

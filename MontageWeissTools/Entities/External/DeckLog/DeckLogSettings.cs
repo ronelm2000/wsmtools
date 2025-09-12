@@ -33,7 +33,7 @@ public class DeckLogSettings
         DeckViewURL = "https://decklog-en.bushiroad.com/system/app/api/view/",
         DeckPublishURL = "https://decklog-en.bushiroad.com/system/app/api/publish/2",
         DeckCheckURL = "https://decklog-en.bushiroad.com/system/app/api/check/2",
-        ImagePrefix = "https://en.ws-tcg.com/wp/wp-content/images/cardimages/",
+        ImagePrefix = "https://en.ws-tcg.com/wordpress/wp-content/images/cardimages/",
         Referrer = "https://decklog-en.bushiroad.com/create?c=2",
         SearchURL = "https://decklog-en.bushiroad.com/system/app/api/search/2",
         VersionURL = "https://decklog-en.bushiroad.com/system/app/api/version/",

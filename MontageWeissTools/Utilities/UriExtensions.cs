@@ -112,17 +112,31 @@ public static class UriExtensions
         return url.AbsoluteUri.WithTimeout(TimeSpan.FromMinutes(10)) //
             .WithHeaders(new
             {
-                User_Agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36",
-                Accept = "*/*",
-                Host = url.Authority
-                /*,
-                Referer = url.Authority
-                */
+                User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0",
+                Accept = "image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                Host = url.Authority,
+                Pragma = "nocache",
+                Priority = "u=0, i",
+
             })
-            .WithHeader("Accept-Encoding", "gzip, deflate, br") //
-            .WithHeader("Postman-Token", System.Guid.NewGuid().ToString()) //
-            .WithHeader("Connection", "keep-alive");
-        //.WithHeader("Host", url.Authority) //
+            .WithHeader("Accept-Encoding", "gzip, deflate, br, ztsd") //
+                                                                      // .WithHeader("Postman-Token", System.Guid.NewGuid().ToString()) //
+            .WithHeader("Cache-Control", "nocache")
+            
+            .OnRedirect(call =>
+            {
+                var log = Log.ForContext<Uri>();
+                if (call.Redirect.Count > 5)
+                {
+                    call.Redirect.Follow = false;
+                }
+                else
+                {
+                    log.Information($"Redirecting from {call.Request.Url} to {call.Redirect.Url}");
+                    call.Redirect.ChangeVerbToGet = false; // Always redirect with original body and headers.
+                    call.Redirect.Follow = true;
+                }
+            });
     }
 
     public static async Task<IDocument> GetHTMLAsync(this IFlurlRequest flurlReq, CancellationToken cancel = default)

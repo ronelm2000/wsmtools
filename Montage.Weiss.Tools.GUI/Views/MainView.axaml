@@ -103,7 +103,7 @@
               </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
-                <WrapPanel Orientation="Horizontal" ItemHeight="200" />
+                <WrapPanel Orientation="Horizontal" ItemHeight="180" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>

@@ -3,11 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicData.Binding;
+using ImTools;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.GUI.Extensions;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -33,6 +35,9 @@ public partial class CardRatioViewModel : ViewModelBase
     public IObservable<int> RatioMaxWidth { get; private set; }
     public IObservable<Thickness> FirstCardAdjustment { get; private set; }
     public IObservable<int> ImageAngle { get; private set; }
+    public IObservable<int> RatioWidth { get; private set; }
+    public IObservable<List<CardMargin>> CardMargins { get; private set; }
+    // public ObservableCollection<CardMargin> CardMargins { get; private set; } = new();
 
     public CardRatioViewModel()
     {
@@ -69,7 +74,20 @@ public partial class CardRatioViewModel : ViewModelBase
         ImageAngle = this.WhenPropertyChanged(c => c.Card)
             .Select(c => c.Value?.Type == CardType.Climax ? 270 : 0)
             .AsObservable();
-
+        CardMargins = this.WhenAnyValue(r => r.Ratio)
+        .Select(ratio => Enumerable.Range(0, ratio)
+            //.Reverse()
+            .Select(i => new CardMargin
+            {
+                Margin = new Thickness(0, 0, i * 10, 0),
+                TopX = (Card.Type == CardType.Climax ? 20 : 0) + i * 10,
+                TopY = 0
+            })
+            .ToList())
+        .AsObservable();
+        RatioWidth = this.WhenPropertyChanged(r => r.Ratio)
+            .Select(r => Card.Type == CardType.Climax ? (170 + r.Value * 10) : ( (170 * 2 / 3) + r.Value * 10))
+            .AsObservable();
     }
 
     public CardRatioViewModel(WeissSchwarzCard card, int ratio) : this()
@@ -79,4 +97,11 @@ public partial class CardRatioViewModel : ViewModelBase
         Image = card.LoadImage();
         Effects = [.. card.Effect];
     }
+}
+
+public record CardMargin
+{
+    public Thickness Margin { get; init; }
+    public int TopX { get; init; }
+    public int TopY { get; init; }
 }

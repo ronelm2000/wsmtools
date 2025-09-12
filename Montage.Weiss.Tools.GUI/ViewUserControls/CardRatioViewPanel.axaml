@@ -9,7 +9,7 @@
   <Design.DataContext>
     <vm:CardRatioViewModel />
   </Design.DataContext>
-  <RelativePanel MaxWidth="{Binding RatioMaxWidth^}">
+  <RelativePanel MaxWidth="{Binding RatioWidth^}" Margin="0,0,10,0">
     <ToolTip.Tip>
       <ItemsControl Name="EffectsListPanel" ItemsSource="{Binding Effects}">
         <ItemsControl.ItemsPanel>
@@ -32,53 +32,29 @@
       </ContextMenu>
     </RelativePanel.ContextMenu>
 
-    <Border Margin="{Binding FirstCardAdjustment^}"
-            RelativePanel.AlignTopWithPanel="True"
-            RelativePanel.AlignHorizontalCenterWithPanel="True"
-            PointerReleased="Generic_PointerReleased"
-            Name="FirstCardBorder"
-            ZIndex="1"
-            >
-      <Border.RenderTransform>
-        <RotateTransform Angle="{Binding ImageAngle^}" />
-      </Border.RenderTransform>
-      <Image Source="{Binding Image^}" Width="150" />
-    </Border>
-    <Border Margin="0,0,30,0"
-            RelativePanel.AlignTopWith="FirstCardBorder"
-            RelativePanel.AlignRightWith="FirstCardBorder"
-            IsVisible="{Binding IsFourOrMore^}"
-            PointerReleased="Generic_PointerReleased"
-            >
-      <Border.RenderTransform>
-        <RotateTransform Angle="{Binding ImageAngle^}" />
-      </Border.RenderTransform>
-      <Image Source="{Binding Image^}" Width="150" />
-    </Border>
-    <Border Margin="0,0,20,0"
-            RelativePanel.AlignTopWith="FirstCardBorder"
-            RelativePanel.AlignRightWith="FirstCardBorder"
-            IsVisible="{Binding IsThreeOrMore^}"
-            PointerReleased="Generic_PointerReleased"
-            >
-      <Border.RenderTransform>
-        <RotateTransform Angle="{Binding ImageAngle^}" />
-      </Border.RenderTransform>
-      <Image Source="{Binding Image^}" Width="150" />
-    </Border>
-    <Border Margin="0,0,10,0"
-            RelativePanel.AlignTopWith="FirstCardBorder"
-            RelativePanel.AlignRightWith="FirstCardBorder"
-            IsVisible="{Binding IsTwoOrMore^}"
-            PointerReleased="Generic_PointerReleased"
-            >
-      <Border.RenderTransform>
-        <RotateTransform Angle="{Binding ImageAngle^}" />
-      </Border.RenderTransform>
-      <Image Source="{Binding Image^}" Width="150" />
-    </Border>
-    <!--
+    <ItemsControl ItemsSource="{Binding CardMargins^}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Border PointerReleased="Generic_PointerReleased">
+            <Border.RenderTransform>
+              <RotateTransform Angle="{Binding $parent[UserControl].((vm:CardRatioViewModel)DataContext).ImageAngle^}" />
+            </Border.RenderTransform>
+            <Image Source="{Binding $parent[UserControl].((vm:CardRatioViewModel)DataContext).Image^}" Height="170" />
+          </Border>
+        </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <Canvas Width="{Binding RatioWidth^}" Height="170" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.Styles>
+        <Style Selector="ContentPresenter"  x:DataType="vm:CardMargin">
+          <Setter Property="Canvas.Left" Value="{Binding TopX}"/>
+          <Setter Property="Canvas.Top" Value="{Binding TopY}"/>
+        </Style>
+      </ItemsControl.Styles>
+   </ItemsControl>
 
-    -->
   </RelativePanel>
 </UserControl>

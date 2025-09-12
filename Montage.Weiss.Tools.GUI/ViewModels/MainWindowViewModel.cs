@@ -621,7 +621,18 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             catch (Exception e)
             {
-                Log.Error(e, "Cannot open file,");
+                Log.Error(e, "Cannot open file.");
+            }
+        };
+        fileProcessor.OpenURL = async (url) =>
+        {
+            try
+            {
+                await Parent!().Launcher.LaunchUriAsync(new Uri(url));
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Cannot open URL.");
             }
         };
 

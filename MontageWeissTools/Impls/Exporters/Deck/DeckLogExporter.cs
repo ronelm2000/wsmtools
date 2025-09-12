@@ -3,6 +3,7 @@ using Lamar;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Impls.Inspectors.Deck;
@@ -13,8 +14,11 @@ using System.Text.Json.Serialization;
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
 public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>, IFilter<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>
 {
+    private readonly static ILogger Log = Serilog.Log.ForContext<DeckLogExporter>();
+
     private readonly Func<CardDatabaseContext> _db;
     private readonly Func<GlobalCookieJar> _cookieJar;
+    private readonly Func<IFileOutCommandProcessor> _fileCommander;
 
     public string[] Alias => new[] { "decklog", "dl" };
 
@@ -22,6 +26,7 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
     {
         _db = () => ioc.GetInstance<CardDatabaseContext>();
         _cookieJar = () => ioc.GetInstance<GlobalCookieJar>();
+        _fileCommander = () => ioc.GetInstance<IFileOutCommandProcessor>();
     }
 
     public bool IsIncluded(IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard> inspector)
@@ -53,12 +58,28 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 
         var lang = languages.First();
         var deckLog = (lang == CardLanguage.Japanese) ? DeckLogSettings.Japanese : DeckLogSettings.English;
-        var deckCreationRequest = GenerateDeckCreationRequest(deck);
+        var cookieSession = _cookieJar()[deckLog.Authority];
+        var deckCreationRequest = await GenerateDeckCreationRequest(deckLog, deck);
 
-        Log.Information("Checking for any inconsistencies via DeckLog...");
+        if (string.IsNullOrEmpty(deckCreationRequest.DeckParam2))
+        {
+            info.Progress.Report(reportStatus with { ReportMessage = new() { EN = $"Encountered Issue: Failed to match to a Neo-Standard specification." } });
+            return;
+        }
+
+        Log.Information("Generating Deck Creation Tokens...");
+        var createPost = await deckLog.CreateURL
+            .WithCookies(cookieSession)
+            .WithHeaders(new
+            {
+                Referer = deckLog.Referrer
+            })
+            .PostAsync(cancellationToken: cancellationToken);
+        var deckCreationTokenResult = await createPost.GetJsonAsync<DeckCreationTokenResult>();
+
+        Log.Information("Performing DeckLog's Deck Check...");
         info.Progress.Report(reportStatus = reportStatus with { Percentage = 33, ReportMessage = new() { EN = "Performing DeckLog's Deck Check..." } });
 
-        var cookieSession = _cookieJar()[deckLog.Authority];
         var checkResultPost = await deckLog.DeckCheckURL
             .WithCookies(cookieSession)
             .WithHeaders(new
@@ -84,8 +105,9 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 
         deckCreationRequest = deckCreationRequest with
         {
-            Token = "",
-            TokenId = ""
+            DeckId = "",
+            Token = deckCreationTokenResult.Token,
+            TokenId = deckCreationTokenResult.TokenID
         };
 
         reportStatus = reportStatus with { Percentage = 66, ReportMessage = new() { EN = "Publishing to DeckLog..." } };
@@ -123,14 +145,41 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             }
         };
         info.Progress.Report(reportStatus);
+
+        await _fileCommander().OpenURL(finalURL);
     }
 
-    private DeckLogDeckCheckQuery GenerateDeckCreationRequest(WeissSchwarzDeck deck)
+    private async Task<DeckLogDeckCheckQuery> GenerateDeckCreationRequest(DeckLogSettings deckLog, WeissSchwarzDeck deck)
     {
-        var nsCodes = deck.Ratios.Keys
+        var titleCodes = deck.Ratios.Keys
             .Select(c => c.TitleCode)
-            .Distinct();
-        var result = new DeckLogDeckCheckQuery($"##{nsCodes.ConcatAsString("##")}##", deck.Name);
+            .Distinct()
+            .ToList();
+
+        Log.Information("Accessing Suggest URL to check best matching Neo-Standard Specification...");
+        var cardParams = await deckLog.SuggestURL
+            .WithRESTHeaders()
+            .WithReferrer(deckLog.Referrer)
+            .WithCookies(_cookieJar()[deckLog.Referrer])
+            .PostJsonAsync(new { Param = "" })
+            .ReceiveJson<Dictionary<string, string>>();
+
+        Log.Information("Match: {@asaa}", cardParams.Values);
+
+        var matchingNsCode = cardParams.Keys
+                .Select(s => (s, s.Split("##", StringSplitOptions.RemoveEmptyEntries)))
+                .Where(p => p.Item2.Intersect(titleCodes).Count() == titleCodes.Count)
+                .Select(p => p.s)
+                .FirstOrDefault();
+
+        Log.Information("Matched Neo-Standard Specification: {nsCode}", matchingNsCode ?? "None");
+        
+        if (matchingNsCode is null)
+        {
+            Log.Warning("No matching Neo-Standard Specification found. DeckLog may reject this deck during publication.");
+        }
+
+        var result = new DeckLogDeckCheckQuery(matchingNsCode ?? "", deck.Name);
 
         foreach (var pair in deck.Ratios)
         {
@@ -159,32 +208,34 @@ public record DeckLogDeckCheckQuery
     [JsonPropertyName("id")]
     public string ID { get; } = "";
     [JsonPropertyName("memo")]
-    public string memo { get; } = "";
-
+    public string Memo { get; } = "";
+    [JsonPropertyName("post_deckrecipe")]
+    public int PostDeckRecipe { get; } = 1;
     [JsonPropertyName("no")]
     public List<string> No { get; } = new List<string>();
     [JsonPropertyName("num")]
     public List<int> Num { get; } = new List<int>();
-
     [JsonPropertyName("p_no")]
-    public Object[] PNo = Array.Empty<object>();
+    public Object[] PNo { get; init; } = Array.Empty<object>();
     [JsonPropertyName("p_num")]
-    public Object[] PNum = Array.Empty<object>();
+    public Object[] PNum { get; init; } = Array.Empty<object>();
+    [JsonPropertyName("p_slot")]
+    public Object[] PSlot { get; init; } = Array.Empty<object>();
     [JsonPropertyName("sub_no")]
-    public Object[] SubNo = Array.Empty<object>();
+    public Object[] SubNo { get; init; } = Array.Empty<object>();
     [JsonPropertyName("sub_num")]
-    public Object[] SubNum = Array.Empty<object>();
-
-
+    public Object[] SubNum { get; init; } = Array.Empty<object>();
     [JsonPropertyName("title")]
-    public string Title;
+    public string Title { get; init; }
 
     // For Publishing
+    [JsonPropertyName("deck_id")]
+    public String? DeckId { get; init; } = null;
     [JsonPropertyName("token")]
-    public String? Token;
+    public String? Token { get; init; } = null;
 
     [JsonPropertyName("token_id")]
-    public String? TokenId;
+    public String? TokenId { get; init; } = null;
 
     internal DeckLogDeckCheckQuery(string nsSearchTerm, string title)
     {
@@ -228,4 +279,12 @@ public record DeckLogPublishResult
 
     [JsonPropertyName("deck_id")]
     public string DeckID { get; init; } = "";
+}
+
+public record DeckCreationTokenResult
+{
+    [JsonPropertyName("token_id")]
+    public string TokenID { get; init; } = "";
+    [JsonPropertyName("token")]
+    public string Token { get; init; } = "";
 }

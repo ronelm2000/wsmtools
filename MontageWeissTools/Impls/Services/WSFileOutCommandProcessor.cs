@@ -11,6 +11,7 @@ public class WSFileOutCommandProcessor : FileOutCommandProcessor
     public override ILogger Log => Serilog.Log.ForContext<WSFileOutCommandProcessor>();
     public override IFileOutCommandProcessor.SaveStreamSupplier CreateFileStream { get; set; } = GenerateSaveFileStream;
     public override IFileOutCommandProcessor.OpenFileSupplier OpenFile { get; set; } = OpenFileByDefault;
+    public override IFileOutCommandProcessor.OpenURLSupplier OpenURL { get; set; } = OpenURLByDefault;
 
     private static async Task<System.IO.Stream> GenerateSaveFileStream(String destinationFolder, String fileName)
     {
@@ -35,6 +36,19 @@ public class WSFileOutCommandProcessor : FileOutCommandProcessor
         catch (PlatformNotSupportedException e)
         {
             Serilog.Log.ForContext<WSFileOutCommandProcessor>().Warning(e, "Platform not supported to open this file, ignoring.");
+        }
+        await Task.CompletedTask;
+    }
+
+    private static async Task OpenURLByDefault(string url)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+        }
+        catch (PlatformNotSupportedException e)
+        {
+            Serilog.Log.ForContext<WSFileOutCommandProcessor>().Warning(e, "Platform not supported to open this URL, ignoring.");
         }
         await Task.CompletedTask;
     }

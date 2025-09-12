@@ -47,13 +47,13 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         if (languages.Count() > 1)
         {
             info.Progress.Report(reportStatus with { ReportMessage = new() { EN = "Error: Cannot support multiple language decks." } });
-            throw new NotImplementedException("Cannot support multiple language decks.");
+            return;
         }
         var cardTypes = deck.Ratios.Keys.Select(c => c.EnglishSetType).Distinct();
         if (cardTypes.Contains(EnglishSetType.Custom))
         {
             info.Progress.Report(reportStatus with { ReportMessage = new() { EN = "Error: Cannot Custom Weiss Schwarz cards." } });
-            throw new NotImplementedException("Cannot support Custom Weiss Schwarz cards.");
+            return;
         }
 
         var lang = languages.First();

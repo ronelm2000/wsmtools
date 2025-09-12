@@ -63,6 +63,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ExportToProxyDocumentCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ExportToTranslationDocumentCommand { get; init; }
     public ReactiveCommand<Unit, Unit> InjectSearchQueryCommand { get; init; }
+    public ReactiveCommand<Unit, Unit> ToggleOverrideRatioLimitsCommand { get; init; }
 
     [ObservableProperty]
     private string _status;
@@ -94,6 +95,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string? destinationBookmark;
 
+    [ObservableProperty]
+    private bool overrideRatioLimits;
+
     public MainWindowViewModel()
     {
         Status = "";
@@ -101,6 +105,7 @@ public partial class MainWindowViewModel : ViewModelBase
         DeckRemarks = "";
         SearchBarText = "";
         DeckStats = "[ 0 / 0 / 0 / 0 ]";
+        OverrideRatioLimits = false;
 
         if (Design.IsDesignMode)
         {
@@ -160,6 +165,8 @@ public partial class MainWindowViewModel : ViewModelBase
         ExportToProxyDocumentCommand = ReactiveCommand.CreateFromTask(ExportToProxyDocument);
         ExportToTranslationDocumentCommand = ReactiveCommand.CreateFromTask(ExportToTranslationDocument);
         InjectSearchQueryCommand = ReactiveCommand.CreateFromTask(InjectSearchQuery);
+        ToggleOverrideRatioLimitsCommand = ReactiveCommand.Create(() => { OverrideRatioLimits = !OverrideRatioLimits; });
+
 
         this.WhenAnyValue(r => r.SearchBarText)
             .Merge(SearchQueries.ToObservableChangeSet(x => x).Select(changes => "bruh"))
@@ -676,7 +683,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var totalCXes = DeckRatioList.Where(crv => crv.Card.Type == CardType.Climax)
             .Select(crv => crv.Ratio)
             .Sum();
-        if (cardsWithTheSameName >= 4)
+        if (!OverrideRatioLimits && cardsWithTheSameName >= 4)
             return;
         if (card.Type == CardType.Climax && totalCXes >= 8)
             return;
@@ -684,7 +691,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         if (existingRatio is not null)
         {
-            existingRatio.Ratio = Math.Min(existingRatio.Ratio + 1, 4);
+            existingRatio.Ratio = OverrideRatioLimits ? existingRatio.Ratio + 1 : Math.Min(existingRatio.Ratio + 1, 4);
         }
         else
         {

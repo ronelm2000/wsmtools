@@ -32,6 +32,14 @@
         <Separator/>
         <MenuItem Header="_Save Deck..." Command="{Binding SaveDeckCommand}"/>
       </MenuItem>
+      <MenuItem Header="_Rules">
+        <MenuItem Header="_Ratio Limits" 
+                  Command="{Binding ToggleOverrideRatioLimitsCommand}">
+          <MenuItem.Icon>
+            <CheckBox IsChecked="{Binding !OverrideRatioLimits, Mode=TwoWay}"/>
+          </MenuItem.Icon>
+        </MenuItem>
+      </MenuItem>
       <MenuItem Header="_Export">
         <MenuItem Header="_Tabletop Simulator" Command="{Binding ExportDeckToTabletopCommand}"/>
         <MenuItem Header="_Proxy Document" Command="{Binding ExportToProxyDocumentCommand}"/>

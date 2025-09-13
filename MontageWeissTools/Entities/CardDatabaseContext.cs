@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
@@ -35,9 +36,12 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         var databasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _config.DbName);
-        Log.Information("Loading Database: {databasePath}", databasePath);
-        options.EnableSensitiveDataLogging();
-        options.UseSqlite($"Data Source={databasePath}");
+        Log.Debug("Loading Database: {databasePath}", databasePath);
+        options.UseSqlite($"Data Source={databasePath}")
+            .LogTo(Log.ForContext<CardDatabaseContext>().Warning, Microsoft.Extensions.Logging.LogLevel.Warning)
+            .ConfigureWarnings(w => w.Log(RelationalEventId.PendingModelChangesWarning))
+            .UseSeeding(SeedLogs)
+            .UseAsyncSeeding(SeedLogsAsync);
     }
 
     internal async Task<WeissSchwarzCard?> FindNonFoil(WeissSchwarzCard card, CancellationToken ct = default)
@@ -99,14 +103,6 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        /*
-        modelBuilder.Entity<WeissSchwarzTrait>(b =>
-        {
-            b.HasKey(t => t.TraitID);
-            b.Property(t => t.TraitID).ValueGeneratedNever();
-        });
-        */
-
         modelBuilder.Entity<WeissSchwarzCardOptionalInfo>(b =>
         {
             b   .HasOne(i => i.Card)
@@ -124,57 +120,70 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
         modelBuilder.Entity<ActivityLog>(b =>
         {
             b.HasKey(a => a.LogID);
-            b.HasData(
-                new ActivityLog
-                {
-                    LogID = 1,
-                    Activity = ActivityType.Delete,
-                    Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.8.0""}",
-                    DateAdded = new DateTime(2021, 8, 10, 10, 2, 57, 51, DateTimeKind.Local).AddTicks(8029)
-                },
-                new ActivityLog
-                {
-                    LogID = 2,
-                    Activity = ActivityType.Delete,
-                    Target = @"{""Language"": ""ALL"", ""VersionLessThan"": ""0.9.0""}",
-                    DateAdded = new DateTime(2021, 8, 11, 10, 2, 57, 51, DateTimeKind.Local).AddTicks(8029)
-                },
-                new ActivityLog
-                {
-                    LogID = 3,
-                    Activity = ActivityType.Delete,
-                    Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.10.0""}",
-                    DateAdded = new DateTime(2021, 12, 14, 10, 2, 57, 51, DateTimeKind.Local).AddTicks(8029)
-                },
-                new ActivityLog
-                {
-                    LogID = 4,
-                    Activity = ActivityType.Delete,
-                    Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.12.0""}",
-                    DateAdded = new DateTime(2022, 11, 28, 20, 51, 28, 983, DateTimeKind.Local).AddTicks(6076)
-                },
-                new ActivityLog
-                {
-                    LogID = 5,
-                    Activity = ActivityType.Delete,
-                    Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.15.0""}",
-                    DateAdded = DateTime.FromBinary(-8584722569801376902)
-                },
-                new ActivityLog
-                {
-                    LogID = 6,
-                    Activity = ActivityType.Delete,
-                    Target = @"{""Language"": ""ALL"", ""VersionLessThan"": ""0.16.0""}",
-                    DateAdded = DateTime.FromBinary(-8584720777293269695)
-                },
-                new ActivityLog
-                {
-                    LogID = 7,
-                    Activity = ActivityType.Delete,
-                    Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.18.0""}",
-                    DateAdded = DateTime.FromBinary(-8584439178187962653)
-                }
-            );
         });
+    }
+    private void SeedLogs(DbContext context, bool wereChangesInvoked)
+    {
+        Task.Run(() => SeedLogsAsync(context, wereChangesInvoked, CancellationToken.None)).GetAwaiter().GetResult();
+    }
+
+    private async Task SeedLogsAsync(DbContext context, bool wereChangesInvoked, CancellationToken token)
+    {
+        var seededLogs = new[] {
+            new ActivityLog
+            {
+                LogID = 1,
+                Activity = ActivityType.Delete,
+                Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.8.0""}",
+                DateAdded = new DateTime(2021, 8, 10, 10, 2, 57, 51, DateTimeKind.Local).AddTicks(8029)
+            },
+            new ActivityLog
+            {
+                LogID = 2,
+                Activity = ActivityType.Delete,
+                Target = @"{""Language"": ""ALL"", ""VersionLessThan"": ""0.9.0""}",
+                DateAdded = new DateTime(2021, 8, 11, 10, 2, 57, 51, DateTimeKind.Local).AddTicks(8029)
+            },
+            new ActivityLog
+            {
+                LogID = 3,
+                Activity = ActivityType.Delete,
+                Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.10.0""}",
+                DateAdded = new DateTime(2021, 12, 14, 10, 2, 57, 51, DateTimeKind.Local).AddTicks(8029)
+            },
+            new ActivityLog
+            {
+                LogID = 4,
+                Activity = ActivityType.Delete,
+                Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.12.0""}",
+                DateAdded = new DateTime(2022, 11, 28, 20, 51, 28, 983, DateTimeKind.Local).AddTicks(6076)
+            },
+            new ActivityLog
+            {
+                LogID = 5,
+                Activity = ActivityType.Delete,
+                Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.15.0""}",
+                DateAdded = DateTime.FromBinary(-8584722569801376902)
+            },
+            new ActivityLog
+            {
+                LogID = 6,
+                Activity = ActivityType.Delete,
+                Target = @"{""Language"": ""ALL"", ""VersionLessThan"": ""0.16.0""}",
+                DateAdded = DateTime.FromBinary(-8584720777293269695)
+            },
+            new ActivityLog
+            {
+                LogID = 7,
+                Activity = ActivityType.Delete,
+                Target = @"{""Language"": ""EN"", ""VersionLessThan"": ""0.18.0""}",
+                DateAdded = DateTime.FromBinary(-8584439178187962653)
+            }
+        };
+
+        var activityLogs = context.Set<ActivityLog>();
+        activityLogs.AddRange(seededLogs.Except(activityLogs, ActivityLog.EqualById));
+
+        await context.SaveChangesAsync();
     }
 }

@@ -107,4 +107,12 @@
   <Style Selector="Grid#CardStats > TextBlock:nth-child(4n+1)">
     <Setter Property="Background" Value="#292e33" />
   </Style>
+  <!-- Ratio -->
+  <Style Selector="Border#RatioBorder">
+    <Setter Property="Background" Value="#292e33" />
+    <Setter Property="CornerRadius" Value="4" />
+  </Style>
+  <Style Selector="Border#RatioBorder > TextBlock">
+    <Setter Property="Foreground" Value="#1ba0d0" />
+  </Style>
 </Styles>

@@ -9,6 +9,7 @@
   <Design.DataContext>
     <vm:CardRatioViewModel />
   </Design.DataContext>
+
   <RelativePanel MaxWidth="{Binding RatioWidth^}" Margin="0,0,10,0">
     <ToolTip.Tip>
       <ItemsControl Name="EffectsListPanel" ItemsSource="{Binding Effects}">
@@ -54,7 +55,18 @@
           <Setter Property="Canvas.Top" Value="{Binding TopY}"/>
         </Style>
       </ItemsControl.Styles>
-   </ItemsControl>
+    </ItemsControl>
 
+    <Border Name="RatioBorder"
+            Margin="4,4,8,4"
+            Padding="1"
+            RelativePanel.AlignBottomWithPanel="True"
+            RelativePanel.AlignRightWithPanel="True"
+            >
+      <TextBlock  Padding="4"
+                  Text="{Binding Ratio}" 
+                  />
+    </Border>
+    
   </RelativePanel>
 </UserControl>

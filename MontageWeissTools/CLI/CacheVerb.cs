@@ -102,6 +102,17 @@ public class CacheVerb : IVerbCommand
     {
         try
         {
+            if (card.EnglishSetType == EnglishSetType.Custom)
+            {
+                Log.Information("Skipping [{card}] (Custom Card Detected). Please manually put images into the Images folder.", card.Serial);
+                return;
+            }
+            if (card.Images.Count < 1)
+            {
+                Log.Warning("Skipping [{card}]. Cannot find any images to cache.", card.Serial);
+                return;
+            }
+
             var imgURL = card.Images.Last();
             Log.Information("Caching: {imgURL}", imgURL);
             var session = _cookieSession(imgURL);

@@ -649,7 +649,10 @@ public partial class MainWindowViewModel : ViewModelBase
         await Dispatcher.UIThread.InvokeAsync(() => Status = "Loading Database...", DispatcherPriority.ApplicationIdle);
 
         using var db = Container!.GetInstance<CardDatabaseContext>();
-        var initialCardList = db.WeissSchwarzCards.AsNoTracking().Take(100).ToList();
+        var initialCardList = db.WeissSchwarzCards.AsNoTracking()
+            .OrderBy(c => c.Serial)
+            .Take(100)
+            .ToList();
         var cacheList = initialCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom).ToAsyncEnumerable();
         await new CacheVerb { }.Cache(Container, progressReporter, cacheList);
 

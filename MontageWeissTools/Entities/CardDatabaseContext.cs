@@ -67,7 +67,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                 .HasConversion(arr => String.Join(',', arr.Select(t => t.ToString()))
                             , str => str.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.ToEnum<Trigger>() ?? Trigger.Soul).ToArray()
                             , new ValueComparer<Trigger[]>(
-                                (c1, c2) => c1.SequenceEqual(c2)
+                                (c1, c2) => (c1 == null && c1 == c2) || c1!.SequenceEqual(c2!)
                                 , c => c.Aggregate(0, (a1, v1) => HashCode.Combine(a1, v1.GetHashCode()))
                                 , c => c.ToArray()
                                 )
@@ -76,9 +76,9 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                 .HasConversion(arr => JsonSerializer.Serialize(arr, options)
                             , str => JsonSerializer.Deserialize<string[]>(str, options) ?? Array.Empty<string>()
                             , new ValueComparer<string[]>(
-                                    (c1, c2) => c1.SequenceEqual(c2)
-                                ,   c => c.Aggregate(0, (a1, v1) => HashCode.Combine(a1, v1.GetHashCode()))
-                                ,   c => c.ToArray()
+                                (c1, c2) => (c1 == null && c1 == c2) || c1!.SequenceEqual(c2!)
+                                , c => c.Aggregate(0, (a1, v1) => HashCode.Combine(a1, v1.GetHashCode()))
+                                , c => c.ToArray()
                                 )
                             );
 
@@ -86,7 +86,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                 .HasConversion( arr => JsonSerializer.Serialize(arr.Select(uri => uri.ToString()).ToArray(), options)
                             ,   str => (JsonSerializer.Deserialize<string[]>(str, options) ?? Array.Empty<string>()).Select(s => new Uri(s)).ToList()
                             ,   new ValueComparer<List<Uri>>(
-                                    (c1, c2) => c1.SequenceEqual(c2)
+                                (c1, c2) => (c1 == null && c1 == c2) || c1!.SequenceEqual(c2!)
                                 , c => c.Aggregate(0, (a1, v1) => HashCode.Combine(a1, v1.GetHashCode()))
                                 , c => c.ToList()
                                 )

@@ -19,6 +19,6 @@ class MockDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 
     public Task<WeissSchwarzDeck> Parse(string sourceUrlOrFile, IProgress<DeckParserProgressReport> progress, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<WeissSchwarzDeck>(null);
+        return Task.FromResult<WeissSchwarzDeck>(WeissSchwarzDeck.Empty);
     }
 }

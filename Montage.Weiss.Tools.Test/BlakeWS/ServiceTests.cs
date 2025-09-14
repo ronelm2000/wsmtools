@@ -30,8 +30,7 @@ public class ServiceTests
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
         Lamar.Container ioc = Program.Bootstrap();
         var wsblakeSrvc = ioc.GetInstance<WeissSchwarzBlakeUnityService>();
-
-        string data = wsblakeSrvc.GetExportDeckData();
+        var data = wsblakeSrvc!.GetExportDeckData();
         Assert.IsNotNull(data);
     }
 
@@ -55,7 +54,7 @@ public class ServiceTests
         wsblakeSrvc.ExportDeckData(dataToImport);
         wsblakeSrvc.ExportDeckDate(timeToImport);
 
-        string importedData = wsblakeSrvc.GetExportDeckData();
+        var importedData = wsblakeSrvc!.GetExportDeckData();
         DateTime? importedDateTime = wsblakeSrvc.GetExportDate();
 
         Assert.IsTrue(importedData == dataToImport, "Data was not imported correctly.");

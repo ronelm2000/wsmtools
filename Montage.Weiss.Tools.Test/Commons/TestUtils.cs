@@ -8,7 +8,7 @@ namespace Montage.Weiss.Tools.Test.Commons;
 
 internal class TestUtils
 {
-    public static LoggerConfiguration BootstrapLogging(Func<LoggerConfiguration, LoggerConfiguration> additionalActions = null)
+    public static LoggerConfiguration BootstrapLogging(Func<LoggerConfiguration, LoggerConfiguration>? additionalActions = null)
     {
         additionalActions ??= (lc => lc);
         var config = new LoggerConfiguration().MinimumLevel.Is(LogEventLevel.Debug)

@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicData;
@@ -65,6 +66,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ExportToDeckLogCommand { get; init; }
     public ReactiveCommand<Unit, Unit> InjectSearchQueryCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ToggleOverrideRatioLimitsCommand { get; init; }
+    public ReactiveCommand<Unit, Unit> ToggleRequestedThemeCommand { get; init; }
 
     [ObservableProperty]
     private string _status;
@@ -168,7 +170,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ExportToDeckLogCommand = ReactiveCommand.CreateFromTask(ExportToDeckLog);
         InjectSearchQueryCommand = ReactiveCommand.CreateFromTask(InjectSearchQuery);
         ToggleOverrideRatioLimitsCommand = ReactiveCommand.Create(() => { OverrideRatioLimits = !OverrideRatioLimits; });
-
+        ToggleRequestedThemeCommand = ReactiveCommand.Create(() => { Parent!().RequestedThemeVariant = (Parent!().ActualThemeVariant == ThemeVariant.Dark) ? ThemeVariant.Light : ThemeVariant.Dark; });
 
         this.WhenAnyValue(r => r.SearchBarText)
             .Merge(SearchQueries.ToObservableChangeSet(x => x).Select(changes => "bruh"))
@@ -426,45 +428,42 @@ public partial class MainWindowViewModel : ViewModelBase
 
         await Dispatcher.UIThread.InvokeAsync(() => Status = "Caching when applicable...", DispatcherPriority.ApplicationIdle);
 
-        var cacheList = searchCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom).ToAsyncEnumerable();
-        await new CacheVerb { }.Cache(Container, progressReporter, cacheList, token);
-
         if (token.IsCancellationRequested)
             return false;
 
         Log.Information("Refreshing Card List...");
         log.Information("All Cards: {ser}", searchCardList?.Count ?? 0);
 
-        if (searchCardList is null || searchCardList.Count == 0)
-            return false;
-
-        Log.Information("Dehydrating list.");
-        await Dispatcher.UIThread.InvokeAsync(() =>
-            _databaseViewSourceList.Edit(list =>
-            {
-                list.Clear();
-            }), DispatcherPriority.ApplicationIdle
-            );
-
-        Log.Information("Refreshing list.");
-        foreach (var card in searchCardList)
+        if ((searchCardList?.Count ?? 0) > 0)
         {
+            Log.Information("Dehydrating list.");
             await Dispatcher.UIThread.InvokeAsync(() =>
+                _databaseViewSourceList.Edit(list =>
+                {
+                    list.Clear();
+                }), DispatcherPriority.ApplicationIdle
+                );
+
+            Log.Information("Refreshing list.");
+            foreach (var card in searchCardList!)
             {
-                Status = $"Loading [{card.Serial}]";
-                _databaseViewSourceList.Add(new CardEntryViewModel(card) { Parent = this });
-                //                _databaseViewSourceList.Edit(list => list.Add(model));
-            },
-            DispatcherPriority.ApplicationIdle
-            );
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    Status = $"Loading [{card.Serial}]";
+                    _databaseViewSourceList.Add(new CardEntryViewModel(card, this));
+                    //                _databaseViewSourceList.Edit(list => list.Add(model));
+                },
+                DispatcherPriority.ApplicationIdle
+                );
+            }
+                
+            log.Information("All Serials: {ser}", _databaseViewSourceList.Items.Select(v => v.Card.Serial).Distinct().Count());
+            log.Information("All Cards: {ser}", _databaseViewSourceList.Count);
         }
 
-        log.Information("All Serials: {ser}", _databaseViewSourceList.Items.Select(v => v.Card.Serial).Distinct().Count());
-        log.Information("All Cards: {ser}", _databaseViewSourceList.Count);
+        Status = $"Done (Cards Found: {searchCardList?.Count ?? 0})";
 
-        Status = "Done";
-
-        return true;
+        return (searchCardList?.Count ?? 0) > 0;
 
         Func<WeissSchwarzCard, bool> TranslateMatch(Match scryfallMatch)
         {
@@ -653,8 +652,6 @@ public partial class MainWindowViewModel : ViewModelBase
             .OrderBy(c => c.Serial)
             .Take(100)
             .ToList();
-        var cacheList = initialCardList.Where(c => c.GetCachedImagePath() is null && c.EnglishSetType != EnglishSetType.Custom).ToAsyncEnumerable();
-        await new CacheVerb { }.Cache(Container, progressReporter, cacheList);
 
         await Dispatcher.UIThread.InvokeAsync(() => Status = "Loading List...", DispatcherPriority.ApplicationIdle);
 
@@ -662,7 +659,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         foreach (var card in initialCardList)
         {
-            await Dispatcher.UIThread.InvokeAsync(() => _databaseViewSourceList.Add(new CardEntryViewModel(card) { Parent = this }), DispatcherPriority.ApplicationIdle);
+            await Dispatcher.UIThread.InvokeAsync(() => _databaseViewSourceList.Add(new CardEntryViewModel(card, this)), DispatcherPriority.ApplicationIdle);
         }
 
         _isBootstrapped = true;

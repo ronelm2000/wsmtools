@@ -49,7 +49,7 @@
             Grid.Column="0"
             Grid.Row="1"
             >
-      <Image  Source="{Binding Image^}"
+      <Image  Source="{Binding Image^, FallbackValue={x:Static dd:CardEntryViewModel.LoadingImage}}"
               ClipToBounds="false"
               MaxWidth="150"
               PointerReleased="Generic_PointerReleased"

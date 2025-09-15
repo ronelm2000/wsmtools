@@ -1,0 +1,48 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  Add Resources Here  -->
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="BackgroundBrush">#f1f2f3</SolidColorBrush>
+            <SolidColorBrush x:Key="ForegroundBrush">Black</SolidColorBrush>
+
+            <!--  Other Main Colors  -->
+            <SolidColorBrush x:Key="TextBrush">#093444</SolidColorBrush>
+            <SolidColorBrush x:Key="BorderBrush">#4b63ce</SolidColorBrush>
+
+            <!--  Traits  -->
+            <SolidColorBrush x:Key="EvenAccentBackgroundBrush">#9ca7e2</SolidColorBrush>
+            <SolidColorBrush x:Key="EvenAccentForegroundBrush">#0b0c0d</SolidColorBrush>
+
+            <SolidColorBrush x:Key="OddAccentBackgroundBrush">#cacfe8</SolidColorBrush>
+            
+            <!--  Search Queries  -->
+            <SolidColorBrush x:Key="SelectedAccentBackgroundBrush">#dac2f0</SolidColorBrush>
+            
+            <!-- Stats -->
+            <SolidColorBrush x:Key="Row1AccentBackgroundBrush">#b8bfc6</SolidColorBrush>
+            <SolidColorBrush x:Key="Row2AccentBackgroundBrush">#aeb4d1</SolidColorBrush>
+            <!-- Stats -->
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="BackgroundBrush">#0b0c0d</SolidColorBrush>
+            <SolidColorBrush x:Key="ForegroundBrush">#1ba0d0</SolidColorBrush>
+
+            <!--  Other Main Colors  -->
+            <SolidColorBrush x:Key="TextBrush">#1ba0d0</SolidColorBrush>
+            <SolidColorBrush x:Key="BorderBrush">#22337d</SolidColorBrush>
+
+            <!--  Traits  -->
+            <SolidColorBrush x:Key="EvenAccentBackgroundBrush">#7988d8</SolidColorBrush>
+            <SolidColorBrush x:Key="EvenAccentForegroundBrush">#0b0c0d</SolidColorBrush>
+
+            <SolidColorBrush x:Key="OddAccentBackgroundBrush">#4b5baa</SolidColorBrush>
+
+            <!--  Search Queries  -->
+            <SolidColorBrush x:Key="SelectedAccentBackgroundBrush">#5a238d</SolidColorBrush>
+
+            <!-- Stats -->
+            <SolidColorBrush x:Key="Row1AccentBackgroundBrush">#292e33</SolidColorBrush>
+            <SolidColorBrush x:Key="Row2AccentBackgroundBrush">#404971</SolidColorBrush>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

@@ -91,11 +91,16 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     {
         try
         {
-            return Path.Get($"{AppDomain.CurrentDomain.BaseDirectory}/{imagePath}/")
+            var result = Path.Get($"{AppDomain.CurrentDomain.BaseDirectory}/{imagePath}/")
                             .Files($"{Serial.Replace('-', '_').AsFileNameFriendly()}.*", true)
                             .WhereExtensionIs(".png", ".jpeg", ".jpg", "jfif")
                             .FirstOrDefault();
-        } catch (System.IO.DirectoryNotFoundException) {
+            Log.Debug("Path: {path}", result?.FullPath ?? "N/A");
+            return result;
+        }
+        catch (System.IO.DirectoryNotFoundException e)
+        {
+            Log.Debug(e, "Cannot find Images folder.");
             return default;
         }
     }

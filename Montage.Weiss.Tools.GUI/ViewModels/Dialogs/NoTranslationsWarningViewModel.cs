@@ -61,7 +61,7 @@ public partial class NoTranslationsWarningViewModel: ViewModelBase
     {
         try
         {
-            TargetCards.AddRange(cardsWithNoTranslation.Select(c => new CardEntryViewModel(c)));
+            TargetCards.AddRange(cardsWithNoTranslation.Select(c => new CardEntryViewModel(c, Parent()!)));
             if (TargetCards.Count < 2)
             {
                 WarningText = "This card is considered to not have any translations available.";

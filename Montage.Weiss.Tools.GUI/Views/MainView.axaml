@@ -48,6 +48,11 @@
         <Separator/>
         <MenuItem Header="_EncoreDecks" IsEnabled="False" />
       </MenuItem>
+      <MenuItem Header="_View">
+        <MenuItem Header="_Toggle Light/Dark"
+                  Command="{Binding ToggleRequestedThemeCommand}"
+                  />
+      </MenuItem>
     </Menu>
     <TextBlock/>
     
@@ -111,7 +116,10 @@
       
       </DockPanel>
 
-      <GridSplitter Grid.Column="1" Background="Black" ResizeDirection="Columns"/>
+      <GridSplitter Name="DatabaseSplitter" 
+                    Grid.Column="1" 
+                    ResizeDirection="Columns"
+                    />
 
       <Border Name="DatabaseView"
               BorderThickness="0"

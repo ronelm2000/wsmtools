@@ -191,11 +191,16 @@ public partial class MainWindowViewModel : ViewModelBase
         var searchTerms = searchRegexResults
             .SelectMany(x => TranslateMatch(x))
             .ToList();
+        if (searchTerms.Count == 0)
+            searchTerms.Add(new NameOrSerialQueryViewModel(SearchBarText));
+
+        Log.Information("Injecting {count} search queries.", searchTerms.Count);
 
         await Observable.Start(() =>
         {
             SearchQueries.AddRange(searchTerms, 0);
-            SearchBarText = searchRegex.Replace(SearchBarText, "");
+            SearchBarText = "";
+            // SearchBarText = searchRegex.Replace(SearchBarText, "");
         }, RxApp.MainThreadScheduler);
 
         IEnumerable<CardSearchQueryViewModel> TranslateMatch(Match searchRegexMatch)

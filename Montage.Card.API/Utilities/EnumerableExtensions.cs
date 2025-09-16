@@ -1,8 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
-namespace Montage.Weiss.Tools.Utilities;
+namespace Montage.Card.API.Utilities;
 
 public static class EnumerableExtensions
 {
@@ -15,7 +19,6 @@ public static class EnumerableExtensions
     {
         return new AsyncDictionaryDisposer<K, V>(originalDictionary);
     }
-
 
     public static V? Add<K,V>(this IDictionary<K,V> dictionary, K key, V valueToAdd)
     {
@@ -53,16 +56,53 @@ public static class EnumerableExtensions
         return MemoryMarshal.ToEnumerable(firstSlice).ConcatAsString(separator) + $"{separator}{conjunction} {lastSlice}";
     }
 
-    public static IEnumerable<T> Distinct<T,K>(this IEnumerable<T> enumerable, Func<T,K> keyFunction) where K : IEquatable<K>
+    /// <summary>
+    /// A special variant for <see cref="FirstOrDefault{T}(IEnumerable{T})"/> that returns null if the enumerable is null or empty.
+    /// The problem with <see cref="FirstOrDefault{T}(IEnumerable{T})"/> is that it returns the default value of the struct type if the enumerable is empty, and
+    /// that can be misleading in some cases. For example, if you have an enumerable of integers and it is empty, <see cref="FirstOrDefault{T}(IEnumerable{T})"/> will return 0, 
+    /// but this ensures that this will return a T? for its class, and null for its value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="enumerable"></param>
+    /// <param name="emptyValue">Value of the struct to return if empty. The default value is null.</param>
+    /// <returns></returns>
+    public static T? FirstOrEmpty<T>(this IEnumerable<T> enumerable, Nullable<T> emptyValue = null) where T : struct
     {
-        return enumerable.Distinct(new PredicateEqualityComparer<T,K>(keyFunction));
+        if (enumerable == null)
+            return emptyValue;
+        if (enumerable.Count() == 0)
+            return emptyValue;
+        else
+            return enumerable.First();
     }
 
-    private class PredicateEqualityComparer<T,K> : IEqualityComparer<T> where K : IEquatable<K>
+    /// <summary>
+    /// A special variant for <see cref="FirstOrDefault{T}(IEnumerable{T})"/> that returns null if the enumerable is null or empty. The only difference is that 
+    /// this will always return null, even if the enumerable itself is null or the count is empty. (Reference Types will usually always be null if empty, but this is just to be sure it does.)
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="enumerable"></param>
+    /// <returns></returns>
+    public static T? FirstOrEmpty<T>(this IEnumerable<T> enumerable) where T : class
     {
-        private Func<T,K> keyFunction;
+        if (enumerable == null)
+            return null;
+        if (enumerable.Count() == 0)
+            return null;
+        else
+            return enumerable.First();
+    }
 
-        public PredicateEqualityComparer(Func<T,K> keyFunction)
+    public static IEnumerable<T> Distinct<T, K>(this IEnumerable<T> enumerable, Func<T, K> keyFunction) where K : IEquatable<K>
+    {
+        return enumerable.Distinct(new PredicateEqualityComparer<T, K>(keyFunction));
+    }
+
+    private class PredicateEqualityComparer<T, K> : IEqualityComparer<T> where K : IEquatable<K>
+    {
+        private Func<T, K> keyFunction;
+
+        public PredicateEqualityComparer(Func<T, K> keyFunction)
         {
             this.keyFunction = keyFunction;
         }

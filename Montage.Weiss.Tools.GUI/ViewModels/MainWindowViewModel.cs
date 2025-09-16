@@ -200,7 +200,6 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             SearchQueries.AddRange(searchTerms, 0);
             SearchBarText = "";
-            // SearchBarText = searchRegex.Replace(SearchBarText, "");
         }, RxApp.MainThreadScheduler);
 
         IEnumerable<CardSearchQueryViewModel> TranslateMatch(Match searchRegexMatch)

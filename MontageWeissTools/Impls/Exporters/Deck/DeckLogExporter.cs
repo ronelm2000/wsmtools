@@ -4,6 +4,7 @@ using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Impls.Inspectors.Deck;
@@ -55,8 +56,13 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             info.Progress.Report(reportStatus with { ReportMessage = new() { EN = "Error: Cannot Custom Weiss Schwarz cards." } });
             return;
         }
+        var lang = languages.FirstOrEmpty();
+        if (lang is null)
+        {
+            info.Progress.Report(reportStatus with { ReportMessage = new() { EN = "Error: No cards and/or no languages." } });
+            return;
+        }
 
-        var lang = languages.First();
         var deckLog = (lang == CardLanguage.Japanese) ? DeckLogSettings.Japanese : DeckLogSettings.English;
         var cookieSession = _cookieJar()[deckLog.Authority];
         var deckCreationRequest = await GenerateDeckCreationRequest(deckLog, deck);

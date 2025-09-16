@@ -7,11 +7,12 @@ using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Utilities;
+using Montage.Card.API.Utilities;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Web;
+using Montage.Weiss.Tools.Utilities;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors;
 
@@ -125,7 +126,7 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
         // Caution on https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=BD%2fW54
         var yytInfoDict = cardUnitListItems.AsParallel()
             .Select(Serialize)
-            .Distinct(yyti => yyti.Serial + yyti.Rarity)
+            .Distinct(static yyti => yyti.Serial + yyti.Rarity)
             .ToDictionary(yyti => new WSKey(yyti.Serial, yyti.Rarity), yyti => yyti);
 
         Log.Information("Processing all new cards...");

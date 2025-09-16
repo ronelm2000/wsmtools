@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using ImTools;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.EncoreDeck;
 using Montage.Weiss.Tools.Impls.Parsers.Cards;

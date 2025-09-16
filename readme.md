@@ -19,6 +19,8 @@ For now this tool is barebones (in its alpha stage, so expect some bugs), but I'
 Somewhat stable releases are on the [appropriate link](https://github.com/ronelm2000/wsmtools/releases), but if you're having some issues with them, you can also try the [latest build](https://github.com/ronelm2000/wsmtools/actions) by
 registering on GitHub. 
 
+[If you're seeing this and just want the instructions to netdeck, click here.](#gui)
+
 #### Supported Deck Exporters
 * [Tabletop Simulator](https://steamcommunity.com/sharedfiles/filedetails/?id=1321170886)
   ```ps
@@ -68,8 +70,46 @@ registering on GitHub.
 ---------
 
 *I know you're probably just here just so that you can quickly netdeck; so how do you do it?*
+* [GUI (New!)](#gui)
+* [GUI For Custom Sets (New!)](#custom-sets)
 * [For Tabletop Simulator (TTS)](#tabletop-simulator)
 * [For Weiss Schwarz Card Game Simulator by Blake Thoennes (BlakeWS)](#weiss-schwarz-card-game-simulator-by-blake-thoennes)
+
+#### GUI
+01. Install [ShareX](https://getsharex.com/) (Do not use the portable edition).
+02. Extract [the binaries](https://github.com/ronelm2000/wsmtools/releases) into the folder of your choice.
+03. Open `wsm-gui.exe` on that folder. (For Linux users, be sure to `chmod` it.)
+    This will then give you access to the GUI.
+04. Go to `File` and click on `Import Deck...`
+    01. Copy / Paste the URL of the deck you're netdecking (Both EncoreDecks and DeckLog are supported!)
+    02. Wait for the deck to load in.
+05. Hover over each image to check the translated text. If there are none, you can right-click on them to change / add in translations.
+06. Open Tabletop Simulator, and create any game. (Single-Player / Multi-Player / Hotseat)
+07. Go to `Export` and click on `Tabletop Simulator`.
+    - You will be warned if there are any cards that have no translations (or are considered to have not been translated properly.)
+08. Check the status on the Status Bar below. Once it says that the deck has been exported, a pop-up UI will open up on TTS.
+09. If ShareX was installed properly, your deck image should also be uploaded.
+10. *(Optional)* You will get the following on your Exports folder if 07 fails for any reason and/or you need to re-upload images: `deck_your deck name.jpg`, `Deck Generator (your deck name).png`,  `Deck Generator (your deck name).png`, and `Deck Generator (your deck name).json`.
+    01. Put the `Deck Generator` files into your Save Objects folder (typically `%HOMEDRIVE%%HOMEPATH%\Documents\My Games\Tabletop Simulator\Saves\Saved Objects`)
+    02. Upload `deck_your deck name.jpg` to your image hoster of choice.
+    03. Load the Saved Object (and make sure no other Deck Generators are loaded!)
+11. In the loaded GUI, place the Deck Image URL Link where provided. *(Optional)* Place your Character Sleeves URL Link where provided.
+    - In ShareX, obtain the Deck Image Link by right-click on the uploaded task, and go to Copy > URL.
+12. You should be able to create decks like this:
+    ![Tho why do you need effects for decks with English art?](https://i.imgur.com/WuRpf9I.png)
+
+#### Custom Sets
+00. Prepare your Custom Set.
+    01. Make sure your [custom set in MSE](https://github.com/ronelm2000/weiss-mse-plugin) has the correct Set ID: `WC`, `SC` or `WSC` corresponds to Weiss, Schwarz, and Both, respectively. (eg. `SC563`).
+    02. Be sure to follow the [guide here](https://github.com/ronelm2000/weiss-mse-plugin/wiki/Exporting-to-wsmtools#exporting-your-set) for exporting the set for use in `wsm-gui`.
+    03. Do not delete the images, as they will be needed to automatically copy them to wsmtools.
+01. Install [ShareX](https://getsharex.com/) (Do not use the portable edition).
+02. Extract [the binaries](https://github.com/ronelm2000/wsmtools/releases) into the folder of your choice.
+03. Open `wsm-gui.exe` on that folder. (For Linux users, be sure to `chmod` it.)
+    This will then give you access to the GUI.
+04. Go to `File` and click on `Import Local Set`, then select the the `.ws-set` from your custom set.
+05. Once loaded, you should be able to search for the cards and create the deck manually through the GUI.
+06. Follow Step #06 onwards from the [GUI Guide](#gui) to export your finished deck into TTS. For obvious reasons, you cannot export the deck to DeckLog or EncoreDecks, but other export options like Deck Proxy will work as normal.
 
 #### Tabletop Simulator
 01. Install [ShareX](https://getsharex.com/) (Do not use the portable edition).

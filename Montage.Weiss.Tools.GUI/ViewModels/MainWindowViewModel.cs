@@ -67,6 +67,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> InjectSearchQueryCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ToggleOverrideRatioLimitsCommand { get; init; }
     public ReactiveCommand<Unit, Unit> ToggleRequestedThemeCommand { get; init; }
+    public ReactiveCommand<Unit, Unit> ToggleDatabaseViewCommand { get; init; }
 
     [ObservableProperty]
     private string _status;
@@ -101,6 +102,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private bool overrideRatioLimits;
 
+    [ObservableProperty]
+    private bool _isDatabaseOpen;
+
     public MainWindowViewModel()
     {
         Status = "";
@@ -109,6 +113,7 @@ public partial class MainWindowViewModel : ViewModelBase
         SearchBarText = "";
         DeckStats = "[ 0 / 0 / 0 / 0 ]";
         OverrideRatioLimits = false;
+        IsDatabaseOpen = false;
 
         if (Design.IsDesignMode)
         {
@@ -171,6 +176,7 @@ public partial class MainWindowViewModel : ViewModelBase
         InjectSearchQueryCommand = ReactiveCommand.CreateFromTask(InjectSearchQuery);
         ToggleOverrideRatioLimitsCommand = ReactiveCommand.Create(() => { OverrideRatioLimits = !OverrideRatioLimits; });
         ToggleRequestedThemeCommand = ReactiveCommand.Create(() => { Parent!().RequestedThemeVariant = (Parent!().ActualThemeVariant == ThemeVariant.Dark) ? ThemeVariant.Light : ThemeVariant.Dark; });
+        ToggleDatabaseViewCommand = ReactiveCommand.Create(() => { IsDatabaseOpen = !IsDatabaseOpen; });
 
         this.WhenAnyValue(r => r.SearchBarText)
             .Merge(SearchQueries.ToObservableChangeSet(x => x).Select(changes => "bruh"))

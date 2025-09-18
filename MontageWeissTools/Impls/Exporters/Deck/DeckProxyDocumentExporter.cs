@@ -74,8 +74,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
 
         var resultingDocFilePath = resultFolder.Combine($"proxy_{fileNameFriendlyDeckName}.docx");
 
-        await using System.IO.MemoryStream memStream = new(1000);
-        using (WordDocument document = WordDocument.Create(memStream, autoSave: true))
+        await using (WordDocument document = await WordDocument.CreateAsync(autoSave: false, cancellationToken: cancellationToken))
         {
             document.PageOrientation = PageOrientationValues.Landscape;
             document.PageSettings.PageSize = WordPageSize.A4;
@@ -98,7 +97,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
                 await using var imageStream = await card.GetImageStreamAsync((card.Images.Count > 0) ? _cookieSessionFunc(card.Images.Last()) : null, cancellationToken);
                 var rawImage = PreProcess(await Image.LoadAsync(imageStream, cancellationToken));
 
-                var tempImagePath = System.IO.Path.GetTempFileName() + ".jpg";
+                var tempImagePath = System.IO.Path.GetTempFileName() + ".bmp";
                 await rawImage.SaveAsBmpAsync(tempImagePath, cancellationToken);
 
                 for (int i = 0; i < quantity; i++)
@@ -139,11 +138,10 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
             }
             report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = "Finalizing and saving document..." } };
             progress.Report(report);
-        }
 
-        await using (System.IO.Stream stream = await _fileProcessor.CreateFileStream(info.Destination, $"proxy_{fileNameFriendlyDeckName}.docx"))
-        {
-            await memStream.CopyToAsync(stream);
+            await using var memStream = document.SaveAsMemoryStream();
+            await using var fileStream = await _fileProcessor.CreateFileStream(info.Destination, $"proxy_{fileNameFriendlyDeckName}.docx");
+            await memStream.CopyToAsync(fileStream, cancellationToken);
         }
 
         if (string.IsNullOrWhiteSpace(info.Destination))

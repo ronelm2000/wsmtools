@@ -73,8 +73,7 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
 
         var resultingDocFilePath = resultFolder.Combine($"translations_{fileNameFriendlyDeckName}.docx");
         
-        await using System.IO.MemoryStream memStream = new(1000);
-        using (WordDocument document = WordDocument.Create(memStream, autoSave: true))
+        await using (WordDocument document = await WordDocument.CreateAsync(autoSave: false, cancellationToken: cancellationToken))
         {
             document.PageOrientation = PageOrientationValues.Portrait;
             document.PageSettings.PageSize = WordPageSize.A4;
@@ -137,15 +136,14 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
             table.ColumnWidth = colWidths;
             table.GridColumnWidth = colWidths;
 
-            table.StyleDetails.SetBordersForAllSides(BorderValues.BasicWhiteDots, 1, Color.WhiteSmoke);
+            table.StyleDetails?.SetBordersForAllSides(BorderValues.BasicWhiteDots, 1, Color.WhiteSmoke);
 
             report = report with { ReportMessage = new Card.API.Entities.Impls.MultiLanguageString { EN = "Finalizing and saving document..." } };
             progress.Report(report);
-        }
 
-        await using (System.IO.Stream stream = await _fileProcessor.CreateFileStream(info.Destination, $"translations_{fileNameFriendlyDeckName}.docx"))
-        {
-            await memStream.CopyToAsync(stream);
+            await using var memStream = document.SaveAsMemoryStream();
+            await using var fileStream = await _fileProcessor.CreateFileStream(info.Destination, $"translations_{fileNameFriendlyDeckName}.docx");
+            await memStream.CopyToAsync(fileStream, cancellationToken);
         }
 
         if (string.IsNullOrWhiteSpace(info.Destination))

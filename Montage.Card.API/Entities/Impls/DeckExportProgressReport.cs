@@ -17,6 +17,16 @@ public record DeckExportProgressReport : UpdateProgressReport
         };
     }
 
+    public static DeckExportProgressReport Cancelling(ReadOnlySpan<char> deckName, ReadOnlySpan<char> exporterName, ReadOnlySpan<char> reason)
+     => new()
+     {
+         Percentage = 0,
+         ReportMessage = new Impls.MultiLanguageString
+         {
+             EN = $"Cancelling [{exporterName}] Export for [{deckName}]: {reason}"
+         }
+     };
+
     public DeckExportProgressReport Done(string fullPath) => this with
     {
         Percentage = 100,

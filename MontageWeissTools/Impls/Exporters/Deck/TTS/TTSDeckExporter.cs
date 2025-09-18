@@ -42,12 +42,20 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 
     public async Task Export(WeissSchwarzDeck deck, IExportInfo info, CancellationToken cancellationToken = default)
     {
+        var count = deck.Ratios.Keys.Count;
+        int rows = (int)Math.Ceiling(deck.Count / 10d);
+
+        if (count < 1)
+        {
+            var fprogress = info.Progress;
+            var freport = DeckExportProgressReport.Cancelling(deck.Name, "TTS", "having 0 cards in deck");
+            fprogress.Report(freport);
+            return;
+        }
+
         var progress = info.Progress;
         var report = DeckExportProgressReport.Starting(deck.Name, "TTS");
         progress.Report(report);
-
-        var count = deck.Ratios.Keys.Count;
-        int rows = (int)Math.Ceiling(deck.Count / 10d);
 
         var serialList = deck.Ratios.Keys
             .OrderBy(c => c.Serial)

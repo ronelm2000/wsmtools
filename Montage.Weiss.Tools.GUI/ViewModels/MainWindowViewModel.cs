@@ -180,6 +180,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
         OpenLocalSetCommand.ThrownExceptions.Subscribe(ReportException);
         UpdateDatabaseViewCommand.ThrownExceptions.Subscribe(ReportException);
+        ExportDeckToTabletopCommand.ThrownExceptions.Subscribe(ReportException);
+        ExportToDeckLogCommand.ThrownExceptions.Subscribe(ReportException);
+        ExportToProxyDocumentCommand.ThrownExceptions.Subscribe(ReportException);
+        ExportToTranslationDocumentCommand.ThrownExceptions.Subscribe(ReportException);
     }
 
     private async Task InjectSearchQuery()

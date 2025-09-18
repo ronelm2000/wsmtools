@@ -269,6 +269,12 @@ public partial class MainWindowViewModel : ViewModelBase
             string b => (await storage.OpenFolderBookmarkAsync(b))!,
             _ => await AssignExportBookmark(storage)
         };
+        if (folder is null)
+        {
+            Log.Information("Export cancelled: no folder selected.");
+            Status = "Export cancelled: no folder selected.";
+            return;
+        }
 
         var progressReporter = new ProgressReporter(log, message => Status = message);
         var deck = new WeissSchwarzDeck
@@ -317,6 +323,12 @@ public partial class MainWindowViewModel : ViewModelBase
             string b => (await storage.OpenFolderBookmarkAsync(b))!,
             _ => await AssignExportBookmark(storage)
         };
+        if (folder is null)
+        {
+            Log.Information("Export cancelled: no folder selected.");
+            Status = "Export cancelled: no folder selected.";
+            return;
+        }
 
         var progressReporter = new ProgressReporter(log, message => Status = message);
         var deck = new WeissSchwarzDeck
@@ -798,11 +810,13 @@ public partial class MainWindowViewModel : ViewModelBase
         DeckStats = $"[ {totalCards} / {totalCharas} / {totalEvents} / {totalCXes} ]";
     }
 
-    private async Task<IStorageFolder> AssignExportBookmark(IStorageProvider storage) {
+    private async Task<IStorageFolder?> AssignExportBookmark(IStorageProvider storage) {
         var folders = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions { AllowMultiple = false });
+        if (folders.Count < 1)
+            return default;
         var folder = folders[0];
         if (folder.CanBookmark)
-            DestinationBookmark = await folder.SaveBookmarkAsync() ?? throw new Exception("Cannot save bookmark");
+            DestinationBookmark = await folder.SaveBookmarkAsync();
         return folder;
     }
 

@@ -27,6 +27,7 @@ public abstract partial class CardSearchQueryViewModel : ViewModelBase
         NeoStandardCode,
         Effect,
         Trait,
-        Level
+        Level,
+        NameOrSerial
     }
 }

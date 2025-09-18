@@ -10,6 +10,7 @@ using Montage.Card.API.Entities.Impls;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Montage.Card.API.Utilities;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Deck;
 

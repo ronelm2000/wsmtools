@@ -10,15 +10,23 @@
     </Border>
   </Design.PreviewWith>
 
+  <Styles.Resources>
+      <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Assets/Colors/ApplicationColors.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
   <!-- Add Styles Here -->
   <Style Selector="TextBlock">
-    <Setter Property="Foreground" Value="#1ba0d0" />
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
   </Style>
   <Style Selector="Border#DatabaseView">
-    <Setter Property="Background" Value="#0b0c0d" />
+    <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
   </Style>
   <Style Selector="Border.DialogBox">
-    <Setter Property="Background" Value="#0b0c0d" />
+    <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
   </Style>
   <!-- Visibility -->
   <Style Selector=":SmallScreen TextBlock.notVisibleOnSmallScreen">
@@ -35,26 +43,26 @@
   </Style>
   <!-- Status -->
   <Style Selector="Border.StatusBorder">
-    <Setter Property="Background" Value="#0b0c0d" />
+    <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
   </Style>
   <!-- Traits -->
   <Style Selector="Border#TraitBorder">
     <Setter Property="CornerRadius" Value="4" />
   </Style>
   <Style Selector="ItemsControl#TraitListPanel > ContentPresenter:nth-child(1) > Border#TraitBorder">
-    <Setter Property="Background" Value="#7988d8" />
+    <Setter Property="Background" Value="{DynamicResource EvenAccentBackgroundBrush}" />
   </Style>
   <Style Selector="ItemsControl#TraitListPanel > ContentPresenter:nth-child(1) > Border#TraitBorder > TextBlock">
-    <Setter Property="Foreground" Value="#0b0c0d" />
+    <Setter Property="Foreground" Value="{DynamicResource EvenAccentForegroundBrush}" />
   </Style>
   <Style Selector="ItemsControl#TraitListPanel > ContentPresenter:nth-child(2) > Border#TraitBorder">
-    <Setter Property="Background" Value="#4b5baa" />
+    <Setter Property="Background" Value="{DynamicResource OddAccentBackgroundBrush}" />
   </Style>
   <!-- Name -->
   <Style Selector="Border#CardNameBorder">
     <Setter Property="CornerRadius" Value="4" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="BorderBrush" Value="#22337d" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
   </Style>
   <Style Selector="Run.InlineSerial">
     <Setter Property="FontSize" Value="10" />
@@ -66,20 +74,20 @@
   </Style>
 
   <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter > Border.SearchQuery:pointerover">
-    <Setter Property="Background" Value="#5a238d" />
+    <Setter Property="Background" Value="{DynamicResource SelectedAccentBackgroundBrush}" />
   </Style>
   <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter > Border.SearchQuery:pointerover > StackPanel > TextBlock">
-    <Setter Property="Foreground" Value="#1ba0d0" />
+    <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
   </Style>
 
   <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+1) > Border.SearchQuery">
-    <Setter Property="Background" Value="#7988d8" />
+    <Setter Property="Background" Value="{DynamicResource EvenAccentBackgroundBrush}" />
   </Style>
   <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+1) > Border.SearchQuery > StackPanel > TextBlock">
-    <Setter Property="Foreground" Value="#0b0c0d" />
+    <Setter Property="Foreground" Value="{DynamicResource EvenAccentForegroundBrush}" />
   </Style>
   <Style Selector="ItemsControl.SearchQueryControl > ContentPresenter:nth-child(2n+2) > Border.SearchQuery">
-    <Setter Property="Background" Value="#4b5baa" />
+    <Setter Property="Background" Value="{DynamicResource OddAccentBackgroundBrush}" />
   </Style>
   <!-- Stats -->
   <Style Selector="Grid#CardStats > TextBlock">
@@ -90,10 +98,10 @@
     <Setter Property="Margin" Value="2" />
   </Style>
   <Style Selector="Grid#CardStats > Grid:nth-child(4n+1) > Border">
-    <Setter Property="Background" Value="#292e33" />
+    <Setter Property="Background" Value="{DynamicResource Row1AccentBackgroundBrush}" />
   </Style>
   <Style Selector="Grid#CardStats > Grid:nth-child(4n+1) > Border > TextBlock">
-    <Setter Property="Background" Value="#292e33" />
+    <Setter Property="Background" Value="{DynamicResource Row1AccentBackgroundBrush}" />
     <Setter Property="HorizontalAlignment" Value="Center" />
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
@@ -102,10 +110,14 @@
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
   <Style Selector="Grid#CardStats > TextBlock:nth-child(4n+2)">
-    <Setter Property="Background" Value="#404971" />
+    <Setter Property="Background" Value="{DynamicResource Row2AccentBackgroundBrush}" />
   </Style>
   <Style Selector="Grid#CardStats > TextBlock:nth-child(4n+1)">
-    <Setter Property="Background" Value="#292e33" />
+    <Setter Property="Background" Value="{DynamicResource Row1AccentBackgroundBrush}" />
+  </Style>
+  <!-- Splitter -->
+  <Style Selector="GridSplitter#DatabaseSpliter">
+    <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
   </Style>
   <!-- Ratio -->
   <Style Selector="Border#RatioBorder">

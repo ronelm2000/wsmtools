@@ -4,6 +4,7 @@ using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Impls.Inspectors.Deck;
@@ -12,9 +13,12 @@ using Montage.Weiss.Tools.Utilities;
 using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
-public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>, IFilter<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>
+
+public partial class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>, IFilter<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>
 {
     private readonly static ILogger Log = Serilog.Log.ForContext<DeckLogExporter>();
+
+    private readonly static Regex limitFlagRegex = NormalLimitReachedJapaneseRegex();
 
     private readonly Func<CardDatabaseContext> _db;
     private readonly Func<GlobalCookieJar> _cookieJar;
@@ -55,8 +59,13 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             info.Progress.Report(reportStatus with { ReportMessage = new() { EN = "Error: Cannot Custom Weiss Schwarz cards." } });
             return;
         }
+        var lang = languages.FirstOrEmpty();
+        if (lang is null)
+        {
+            info.Progress.Report(reportStatus with { ReportMessage = new() { EN = "Error: No cards and/or no languages." } });
+            return;
+        }
 
-        var lang = languages.First();
         var deckLog = (lang == CardLanguage.Japanese) ? DeckLogSettings.Japanese : DeckLogSettings.English;
         var cookieSession = _cookieJar()[deckLog.Authority];
         var deckCreationRequest = await GenerateDeckCreationRequest(deckLog, deck);
@@ -93,6 +102,7 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             .Concat(checkResult.Require)
             .Concat(checkResult.RecipeRequire)
             .Concat(checkResult.PopupRequire)
+            .Select(TranslateJapaneseText)
             .ToList();
 
         if (deckErrors.Count > 0)
@@ -149,6 +159,21 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         await _fileCommander().OpenURL(finalURL);
     }
 
+    private string TranslateJapaneseText(string rawString)
+    {
+        return rawString switch
+        {
+            _ when rawString.StartsWith("合計枚数が50枚ではありません。") => "The total number of cards must be 50.",
+            _ when rawString.StartsWith("クライマックスが8枚ではありません。") => "Your climaxes must be 8.",
+            _ when rawString.StartsWith("デッキ名は25文字以内で入力してください。") => "Your deck name cannot exceed 25 characters.",
+            _ when rawString.StartsWith("デッキ名を入力してください。") => "Please enter a deck name.",
+            _ when limitFlagRegex.Match(rawString) is Match m && m.Success && m.Groups.Count == 5 =>
+                $"Cards of JP name [{m.Groups[1].Value}] can only be included up to {m.Groups[2].Value} copies. ({m.Groups[3].Value} / {m.Groups[4].Value})",
+            // TODO: Add translation for violating the 4 choose 1 rule, if any.
+            _ => rawString
+        };
+    }
+
     private async Task<DeckLogDeckCheckQuery> GenerateDeckCreationRequest(DeckLogSettings deckLog, WeissSchwarzDeck deck)
     {
         var titleCodes = deck.Ratios.Keys
@@ -164,8 +189,6 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             .PostJsonAsync(new { Param = "" })
             .ReceiveJson<Dictionary<string, string>>();
 
-        Log.Information("Match: {@asaa}", cardParams.Values);
-
         var matchingNsCode = cardParams.Keys
                 .Select(s => (s, s.Split("##", StringSplitOptions.RemoveEmptyEntries)))
                 .Where(p => p.Item2.Intersect(titleCodes).Count() == titleCodes.Count)
@@ -173,7 +196,7 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
                 .FirstOrDefault();
 
         Log.Information("Matched Neo-Standard Specification: {nsCode}", matchingNsCode ?? "None");
-        
+
         if (matchingNsCode is null)
         {
             Log.Warning("No matching Neo-Standard Specification found. DeckLog may reject this deck during publication.");
@@ -189,6 +212,9 @@ public class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 
         return result;
     }
+
+    [GeneratedRegex(@"\[(.*)\] のカードは(\d*)枚までしか入れることが出来ません。\((\d*) / (\2)\)")]
+    private static partial Regex NormalLimitReachedJapaneseRegex();
 }
 
 public record DeckLogDeckCheckQuery
@@ -242,7 +268,7 @@ public record DeckLogDeckCheckQuery
         this.DeckParam2 = nsSearchTerm;
         this.Title = title;
     }
-    
+
 }
 
 public record DeckLogCheckResult
@@ -260,7 +286,7 @@ public record DeckLogCheckResult
     public List<string> Errors { get; init; } = new List<string>();
 
     [JsonPropertyName("warning")]
-    public List<string> Warnings { get; init; }  = new List<string>();
+    public List<string> Warnings { get; init; } = new List<string>();
 
     [JsonPropertyName("curr_deck_count")]
     public int CurrDeckCount { get; init; } = 0;

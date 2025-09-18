@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaXaml Remove="Assets\Colors\ApplicationColors.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Assets\Symbols\backup.png" />
     <None Remove="Assets\Symbols\cx_combo.png" />
     <None Remove="Assets\Symbols\link.png" />

@@ -1,7 +1,9 @@
 ﻿using AngleSharp.Dom;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using DynamicData;
 using Montage.Weiss.Tools.GUI.ViewModels;
 using Montage.Weiss.Tools.GUI.ViewUserControls;
@@ -13,8 +15,9 @@ using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.Views;
 
-public partial class MainView : UserControl {
-    public static Func<ILogger?> Logger { get; set; } = () => Serilog.Log.ForContext<DatabaseCardViewPanel>();
+public partial class MainView : UserControl
+{
+    private static ILogger Log { get; } = Serilog.Log.ForContext<DatabaseCardViewPanel>();
 
     /*
     public MainView(MainViewModel mainViewModel)
@@ -30,6 +33,17 @@ public partial class MainView : UserControl {
     public MainView()
     {
         InitializeComponent();
+
+        DeckView.AddHandler(Gestures.PullGestureEvent, DeckView_PullGesture);
+        DeckView.AddHandler(Gestures.PointerTouchPadGestureSwipeEvent, DeckView_TouchPadSwiped);
+    }
+
+    private void DeckView_TouchPadSwiped(object? sender, PointerDeltaEventArgs e)
+    {
+        var a = e.Delta;
+        var timeStamp = e.Timestamp;
+
+        Log.Information("Delta: {d} / Timestamp: {e}", a, timeStamp);
     }
 
     private void UserControl_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -41,9 +55,9 @@ public partial class MainView : UserControl {
 
         Task.Run(viewModel.Load).ContinueWith(t =>
         {
-           if (t.IsFaulted)
+            if (t.IsFaulted)
             {
-                Logger()?.Error(t.Exception, "Error Loading the App.");
+                Log.Error(t.Exception, "Error Loading the App.");
                 throw t.Exception;
             }
         });
@@ -106,5 +120,13 @@ public partial class MainView : UserControl {
         if (dcp.DataContext is not CardSearchQueryViewModel cardSearchQueryViewModel)
             return;
         viewModel.SearchQueries.Remove(cardSearchQueryViewModel);
+    }
+
+    private void DeckView_PullGesture(object? sender, PullGestureEventArgs e)
+    {
+        Log.Information("Swiped");
+        if (DataContext is MainWindowViewModel viewModel)
+            viewModel.IsDatabaseOpen = true;
+        e.Handled = true;
     }
 }

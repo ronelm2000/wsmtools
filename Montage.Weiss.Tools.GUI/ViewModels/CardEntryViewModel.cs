@@ -17,9 +17,9 @@ using Serilog;
 using System.Reactive;
 using Montage.Weiss.Tools.GUI.ViewModels.Query;
 using Avalonia.Threading;
-using JasperFx.Core;
-using Montage.Card.API.Entities;
 using System.Diagnostics.CodeAnalysis;
+using Montage.Weiss.Tools.CLI;
+using Montage.Card.API.Services;
 
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
@@ -27,7 +27,7 @@ namespace Montage.Weiss.Tools.GUI.ViewModels;
 public partial class CardEntryViewModel : ViewModelBase
 {
     private static ILogger Log = Serilog.Log.ForContext<CardEntryViewModel>();
-
+    public static Bitmap LoadingImage { get; } = new Bitmap(AssetLoader.Open(new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg")));
     public static CardEntryViewModel Sample { get; } = new(
         new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg"),
         new MultiLanguageString { EN = "Sample 1", JP = "Sample 1 But JP" },
@@ -71,9 +71,6 @@ public partial class CardEntryViewModel : ViewModelBase
     private List<Bitmap> _effectMarkers;
 
     [ObservableProperty]
-    private Task<Bitmap?> _image;
-
-    [ObservableProperty]
     private List<string> _effects;
 
     public MainWindowViewModel? Parent { get; init; } = null;
@@ -84,6 +81,10 @@ public partial class CardEntryViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> FindClimaxCombosCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> FindTraitsCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> FindNamesCommand { get; private set; }
+
+    public Task<Bitmap?> Image => FindImageAsync();
+
+    private Task<Bitmap?>? _cachedImageTask;
 
     public CardEntryViewModel(Uri imageUri, MultiLanguageString name, List<MultiLanguageString> traits)
     {
@@ -99,11 +100,12 @@ public partial class CardEntryViewModel : ViewModelBase
         Soul = 1;
         CardType = CardType.Character;
         EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri("avares://wsm-gui/Assets/Symbols/cx_combo.png")), 12) };
-        Image = imageUri.Load();
         Effects = ["[AUTO] Aaaaaaaaa"];
+
+        _cachedImageTask = imageUri.Load();
     }
 
-    public CardEntryViewModel(WeissSchwarzCard card)
+    public CardEntryViewModel(WeissSchwarzCard card, MainWindowViewModel parent)
     {
         DeclareObservables();
 
@@ -120,8 +122,26 @@ public partial class CardEntryViewModel : ViewModelBase
             .Distinct()
             .Select(u => Bitmap.DecodeToHeight(AssetLoader.Open(u), 12))
             .ToList();
-        Image = Task.Run(() => card.LoadImage());
+        Parent = parent;
         Effects = card.Effect.ToList();
+    }
+
+    private async Task<Bitmap?> FindImageAsync()
+    {
+        if (_cachedImageTask is not null)
+            return await _cachedImageTask;
+        else
+            return await (_cachedImageTask = LoadCardAsync(Card));
+    }
+
+    private async Task<Avalonia.Media.Imaging.Bitmap?> LoadCardAsync(WeissSchwarzCard card)
+    {
+        var ioc = Parent!.Container!;
+        var cachedImagePath = card.GetCachedImagePath();
+        if (cachedImagePath is null && card.EnglishSetType != EnglishSetType.Custom)
+            await new CacheVerb { }.Cache(ioc, NoOpProgress<CommandProgressReport>.Instance, card);
+
+        return await card.LoadImage();
     }
 
     [MemberNotNull(
@@ -209,8 +229,9 @@ public partial class CardEntryViewModel : ViewModelBase
             .Distinct()
             .Select(u => Bitmap.DecodeToHeight(AssetLoader.Open(u), 12))
             .ToList();
-        Image = card.LoadImage();
         Effects = card.Effect.ToList();
+
+        _cachedImageTask = null;
     }
 
 

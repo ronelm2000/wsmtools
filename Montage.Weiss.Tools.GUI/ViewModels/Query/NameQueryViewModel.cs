@@ -1,4 +1,5 @@
-﻿using Montage.Card.API.Utilities;
+﻿using AngleSharp.Text;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Utilities;
 using System;
@@ -37,7 +38,7 @@ internal partial class NameQueryViewModel : CardSearchQueryViewModel
 
     public override Func<WeissSchwarzCard, bool> ToPredicate()
     {
-        return c => _names.Any(n => (c.Name.EN?.Contains(n) ?? false) || (c.Name.JP?.Contains(n) ?? false));
+        return c => _names.Any(n => (c.Name.EN?.Contains(n, StringComparison.OrdinalIgnoreCase) ?? false) || (c.Name.JP?.Contains(n, StringComparison.OrdinalIgnoreCase) ?? false));
     }
 
     [GeneratedRegex(@"([""])((?:(?=(?:\\)*)\\.|.)*?)(\((.*)\))?\1")]

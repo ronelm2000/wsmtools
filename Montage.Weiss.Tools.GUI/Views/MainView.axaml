@@ -48,6 +48,12 @@
         <Separator/>
         <MenuItem Header="_EncoreDecks" IsEnabled="False" />
       </MenuItem>
+      <MenuItem Header="_View">
+        <MenuItem Header="_Database" Command="{Binding ToggleDatabaseViewCommand}" />
+        <MenuItem Header="_Toggle Light/Dark"
+                  Command="{Binding ToggleRequestedThemeCommand}"
+                  />
+      </MenuItem>
     </Menu>
     <TextBlock/>
     
@@ -55,11 +61,16 @@
       <TextBlock Classes="Status" Text="{Binding Status}" Padding="0,0,30,0"/>
     </Border>
     
+    <SplitView  IsPaneOpen="{Binding IsDatabaseOpen, Mode=TwoWay}"
+                PanePlacement="Right"
+                DisplayMode="Inline"
+                OpenPaneLength="300"
+                >
     <Grid Name="Main">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="75*"></ColumnDefinition>
-        <ColumnDefinition Width="4"></ColumnDefinition>
-        <ColumnDefinition Width="25*"></ColumnDefinition>
+        <!-- <ColumnDefinition Width="4"></ColumnDefinition> -->
+        <!-- <ColumnDefinition Width="25*"></ColumnDefinition> -->
       </Grid.ColumnDefinitions>
 
       <DockPanel>
@@ -72,6 +83,7 @@
                    Margin="2"
                    Grid.Row="0"
                    Grid.Column="0"
+                   Name="DeckNameTB"
                    />
           <TextBlock Text="{Binding DeckStats}" 
                      VerticalAlignment="Center"
@@ -92,7 +104,13 @@
                 Padding="10"
                 Grid.Column="0"
                 Grid.Row="1"
+                Name="DeckView"
+                Gestures.IsHoldWithMouseEnabled="True"
                 >
+          <Border.GestureRecognizers>
+            <PullGestureRecognizer PullDirection="RightToLeft"/>
+          </Border.GestureRecognizers>
+          
           <ItemsControl ItemsSource="{Binding DeckRatioList}">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
@@ -111,15 +129,33 @@
       
       </DockPanel>
 
-      <GridSplitter Grid.Column="1" Background="Black" ResizeDirection="Columns"/>
+      <!-- Inline Dialogs -->
+      <v:ImportSetDialog Name="ImportSetDialog" 
+                         DataContext="{Binding ImportSetDC}"
+                         />
+      <v:ImportDeckDialog Name="ImportDeckDialog"
+                          DataContext="{Binding ImportDeckDC}"
+                          />
+      <v:ImportCustomTranslationsDialog Name="ImportCustomTranslationsDialog"
+                                        DataContext="{Binding ImportTranslationsDC}"
+                                        />
+      <v:NoTranslationsWarningDialog Name="NoTranslationsWarningDialog"
+                                     DataContext="{Binding NoTranslationsWarningDC}"
+                                     />
+      
+      <!-- Invisible Buttons -->
+      <Button IsDefault="{Binding #SearchTB.IsFocused}"
+              IsVisible="True"
+              ZIndex="-4"
+              Command="{Binding InjectSearchQueryCommand}"
+              />
+    </Grid>
 
+    <SplitView.Pane>
       <Border Name="DatabaseView"
               BorderThickness="0"
-              Grid.Column="2"
-              Grid.Row="1"
               MinWidth="200"
               >
-
         <Grid RowDefinitions="Auto,Auto,*">
           <Border Margin="6,5,2,0" Grid.Row="0" >
             <!-- Search Terms Go Here -->
@@ -212,33 +248,12 @@
                 
               </ItemsControl>
            </ScrollViewer>
-        </Border>
-          
+          </Border>
         </Grid>
       </Border>
+    </SplitView.Pane>
 
-      <!-- Inline Dialogs -->
-      <v:ImportSetDialog Name="ImportSetDialog" 
-                         DataContext="{Binding ImportSetDC}"
-                         />
-      <v:ImportDeckDialog Name="ImportDeckDialog"
-                          DataContext="{Binding ImportDeckDC}"
-                          />
-      <v:ImportCustomTranslationsDialog Name="ImportCustomTranslationsDialog"
-                                        DataContext="{Binding ImportTranslationsDC}"
-                                        />
-      <v:NoTranslationsWarningDialog Name="NoTranslationsWarningDialog"
-                                     DataContext="{Binding NoTranslationsWarningDC}"
-                                     />
-      
-      <!-- Invisible Buttons -->
-      <Button IsDefault="{Binding #SearchTB.IsFocused}"
-              IsVisible="True"
-              ZIndex="-4"
-              Command="{Binding InjectSearchQueryCommand}"
-              />
-    </Grid>
-
+    </SplitView>
   </DockPanel>
 
 </UserControl>

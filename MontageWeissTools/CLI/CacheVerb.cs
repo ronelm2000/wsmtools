@@ -69,6 +69,22 @@ public class CacheVerb : IVerbCommand
         }
     }
 
+    public async Task Cache(IContainer container, IProgress<CommandProgressReport> progress, WeissSchwarzCard card, CancellationToken cancellationToken = default)
+    {
+        Func<Flurl.Url, CookieSession> _cookieSession = (url) => container.GetInstance<GlobalCookieJar>()[url.Root];
+        var report = new CommandProgressReport
+            {
+                MessageType = MessageType.InProgress,
+                ReportMessage = new Card.API.Entities.Impls.MultiLanguageString
+                {
+                    EN = $"Caching [{card.Serial}]..."
+                },
+                Percentage = 50
+            };
+        progress.Report(report);
+        await AddCachedImageAsync(card, _cookieSession, cancellationToken);
+    }
+
     private IAsyncEnumerable<WeissSchwarzCard> GenerateQuery(CardDatabaseContext db, CardLanguage? language)
     {
         if (language == null)

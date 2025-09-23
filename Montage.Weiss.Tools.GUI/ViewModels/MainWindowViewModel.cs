@@ -3,8 +3,8 @@ using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DynamicData;
-using DynamicData.Binding;
 using Fluent.IO;
 using JasperFx.Core;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +25,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
@@ -39,8 +40,8 @@ namespace Montage.Weiss.Tools.GUI.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     private static readonly Regex searchRegex = ScryfallStyleRegex();
+    private static readonly ILogger Log = Serilog.Log.ForContext<MainWindowViewModel>();
 
-    private ILogger log;
     private bool _isBootstrapped = false;
     private SourceList<CardEntryViewModel> _databaseViewSourceList;
     private ReadOnlyObservableCollection<CardEntryViewModel> _databaseViewList;
@@ -53,21 +54,6 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<CardRatioViewModel> DeckRatioList { get; set; } = [];
 
     public ObservableCollection<CardSearchQueryViewModel> SearchQueries { get; set; } = [];
-
-    public ReactiveCommand<Unit, Unit> ImportSetCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> ImportDeckCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> OpenLocalSetCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> SaveDeckCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> OpenDeckCommand { get; init; }
-    public ReactiveCommand<Unit, bool> UpdateDatabaseViewCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> ExportDeckToTabletopCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> ExportToProxyDocumentCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> ExportToTranslationDocumentCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> ExportToDeckLogCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> InjectSearchQueryCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> ToggleOverrideRatioLimitsCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> ToggleRequestedThemeCommand { get; init; }
-    public ReactiveCommand<Unit, Unit> ToggleDatabaseViewCommand { get; init; }
 
     [ObservableProperty]
     private string _status;
@@ -157,44 +143,47 @@ public partial class MainWindowViewModel : ViewModelBase
             NoTranslationsWarningDC = new NoTranslationsWarningViewModel { IsVisible = false, Parent = () => this };
         }
 
-        log = Serilog.Log.Logger.ForContext<MainWindowViewModel>();
-
         _databaseViewSourceList.Connect()
             .Bind(out _databaseViewList)
             .Subscribe();
 
-        ImportSetCommand = ReactiveCommand.CreateFromTask(ImportSet);
-        ImportDeckCommand = ReactiveCommand.CreateFromTask(ImportDeck);
-        OpenLocalSetCommand = ReactiveCommand.CreateFromTask(OpenLocalSet);
-        SaveDeckCommand = ReactiveCommand.CreateFromTask(SaveDeck);
-        OpenDeckCommand = ReactiveCommand.CreateFromTask(OpenDeck);
-        UpdateDatabaseViewCommand = ReactiveCommand.CreateFromTask<Unit, bool>((_, t) => UpdateDatabaseView(t));
-        ExportDeckToTabletopCommand = ReactiveCommand.CreateFromTask(ExportDeckToTabletop);
-        ExportToProxyDocumentCommand = ReactiveCommand.CreateFromTask(ExportToProxyDocument);
-        ExportToTranslationDocumentCommand = ReactiveCommand.CreateFromTask(ExportToTranslationDocument);
-        ExportToDeckLogCommand = ReactiveCommand.CreateFromTask(ExportToDeckLog);
-        InjectSearchQueryCommand = ReactiveCommand.CreateFromTask(InjectSearchQuery);
-        ToggleOverrideRatioLimitsCommand = ReactiveCommand.Create(() => { OverrideRatioLimits = !OverrideRatioLimits; });
-        ToggleRequestedThemeCommand = ReactiveCommand.Create(() => { Parent!().RequestedThemeVariant = (Parent!().ActualThemeVariant == ThemeVariant.Dark) ? ThemeVariant.Light : ThemeVariant.Dark; });
-        ToggleDatabaseViewCommand = ReactiveCommand.Create(() => { IsDatabaseOpen = !IsDatabaseOpen; });
+        SearchQueries.CollectionChanged += (s, e) =>
+        {
+            if (e.Action != System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+                return;
+            OnSearchBarTextChanged(SearchBarText);
+        };
 
-        this.WhenAnyValue(r => r.SearchBarText)
-            .Merge(SearchQueries.ToObservableChangeSet(x => x).Select(changes => "bruh"))
-            .ObserveOn(RxApp.TaskpoolScheduler)
-            .Select(sender => Unit.Default)
-            .Throttle(TimeSpan.FromSeconds(1), RxApp.TaskpoolScheduler)
-            .SubscribeOn(RxApp.TaskpoolScheduler)
-            .InvokeCommand(UpdateDatabaseViewCommand);
-
-        OpenLocalSetCommand.ThrownExceptions.Subscribe(ReportException);
-        UpdateDatabaseViewCommand.ThrownExceptions.Subscribe(ReportException);
-        ExportDeckToTabletopCommand.ThrownExceptions.Subscribe(ReportException);
-        ExportToDeckLogCommand.ThrownExceptions.Subscribe(ReportException);
-        ExportToProxyDocumentCommand.ThrownExceptions.Subscribe(ReportException);
-        ExportToTranslationDocumentCommand.ThrownExceptions.Subscribe(ReportException);
+        InjectSearchQueryCommand.PropertyChanged += LogCommandException;
+        ExportToDeckLogCommand.PropertyChanged += LogCommandException;
+        ExportToProxyDocumentCommand.PropertyChanged += LogCommandException;
+        ExportDeckToTabletopCommand.PropertyChanged += LogCommandException;
+        SaveDeckCommand.PropertyChanged += LogCommandException;
+        OpenLocalSetCommand.PropertyChanged += LogCommandException;
+        UpdateDatabaseViewCommand.PropertyChanged += LogCommandException;
     }
 
-    private async Task InjectSearchQuery()
+    private void LogCommandException(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(AsyncRelayCommand.ExecutionTask) &&
+            ((AsyncRelayCommand)sender!).ExecutionTask is Task task &&
+            task.Exception is AggregateException exception)
+        {
+            ReportException(exception.Flatten().InnerException!);
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleOverrideRatioLimits() => OverrideRatioLimits = !OverrideRatioLimits;
+
+    [RelayCommand]
+    private void ToggleRequestedTheme() => Parent!().RequestedThemeVariant = (Parent!().ActualThemeVariant == ThemeVariant.Dark) ? ThemeVariant.Light : ThemeVariant.Dark;
+
+    [RelayCommand]
+    private void ToggleDatabaseView() => IsDatabaseOpen = !IsDatabaseOpen;
+
+    [RelayCommand]
+    private async Task InjectSearchQuery(CancellationToken token)
     {
         var aaaa = SearchBarText;
         var searchRegexResults = searchRegex.Matches(SearchBarText);
@@ -206,11 +195,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Log.Information("Injecting {count} search queries.", searchTerms.Count);
 
-        await Observable.Start(() =>
+        await Dispatcher.UIThread.InvokeAsync(() =>
         {
             SearchQueries.AddRange(searchTerms, 0);
             SearchBarText = "";
-        }, RxApp.MainThreadScheduler);
+        });
 
         IEnumerable<CardSearchQueryViewModel> TranslateMatch(Match searchRegexMatch)
         {
@@ -239,9 +228,10 @@ public partial class MainWindowViewModel : ViewModelBase
         Status = exception.Message;
     }
 
+    [RelayCommand(IncludeCancelCommand = true)]
     private async Task ExportDeckToTabletop(CancellationToken token)
     {
-        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var progressReporter = new ProgressReporter(Log, message => Status = message);
         var deck = new WeissSchwarzDeck
         {
             Name = DeckName,
@@ -261,6 +251,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await command.Run(Container!, deck);
     }
 
+    [RelayCommand(IncludeCancelCommand = true)]
     private async Task ExportToProxyDocument(CancellationToken token)
     {
         var storage = Parent!().StorageProvider;
@@ -276,7 +267,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var progressReporter = new ProgressReporter(Log, message => Status = message);
         var deck = new WeissSchwarzDeck
         {
             Name = DeckName,
@@ -295,9 +286,10 @@ public partial class MainWindowViewModel : ViewModelBase
         await command.Run(Container!, deck);
     }
 
-    private async Task ExportToDeckLog()
+    [RelayCommand(IncludeCancelCommand = true)]
+    private async Task ExportToDeckLog(CancellationToken token)
     {
-        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var progressReporter = new ProgressReporter(Log, message => Status = message);
         var deck = new WeissSchwarzDeck
         {
             Name = DeckName,
@@ -312,9 +304,10 @@ public partial class MainWindowViewModel : ViewModelBase
             Destination = $"{AppDomain.CurrentDomain.BaseDirectory}/Export/",
             Progress = progressReporter
         };
-        await command.Run(Container!, deck);
+        await command.Run(Container!, deck, token);
     }
 
+    [RelayCommand(IncludeCancelCommand = true)]
     private async Task ExportToTranslationDocument(CancellationToken token)
     {
         var storage = Parent!().StorageProvider;
@@ -330,7 +323,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var progressReporter = new ProgressReporter(Log, message => Status = message);
         var deck = new WeissSchwarzDeck
         {
             Name = DeckName,
@@ -346,12 +339,13 @@ public partial class MainWindowViewModel : ViewModelBase
             Flags = ["nowarn"],
             Progress = progressReporter
         };
-        await command.Run(Container!, deck);
+        await command.Run(Container!, deck, token);
     }
 
+    [RelayCommand(IncludeCancelCommand = true)]
     private async Task SaveDeck(CancellationToken token)
     {
-        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var progressReporter = new ProgressReporter(Log, message => Status = message);
         var storage = Parent!().StorageProvider;
         var savePath = await storage.SaveFilePickerAsync(new FilePickerSaveOptions()
         {
@@ -376,9 +370,10 @@ public partial class MainWindowViewModel : ViewModelBase
         await localDeckExporter.Export(deck, progressReporter, finalPath, token);
     }
 
+    [RelayCommand(IncludeCancelCommand = true)]
     private async Task OpenDeck(CancellationToken token)
     {
-        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var progressReporter = new ProgressReporter(Log, message => Status = message);
         var storage = Parent!().StorageProvider;
         var loadPaths = await storage.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
@@ -403,34 +398,25 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateDeckStats();
     }
 
-    private async Task<bool> UpdateDatabaseView(string sender, CancellationToken token)
+    partial void OnSearchBarTextChanged(string value)
     {
-        if (string.IsNullOrWhiteSpace(SearchBarText) && SearchQueries.Count == 0)
-            return false;
-        if (token.IsCancellationRequested)
-            return false;
-        return await UpdateDatabaseView(token);
+        if (UpdateDatabaseViewCommand.IsRunning)
+            UpdateDatabaseViewCommand.Cancel();
+        Task.Run(() => UpdateDatabaseViewCommand.Execute(null));
     }
 
-    private async Task<bool> UpdateDatabaseView(IReadOnlyCollection<CardSearchQueryViewModel> changedModels, CancellationToken token)
-    {
-        if (string.IsNullOrWhiteSpace(SearchBarText) && SearchQueries.Count == 0)
-            return false;
-        if (token.IsCancellationRequested)
-            return false;
-        return await UpdateDatabaseView(token);
-    }
-
-    private async Task<bool> UpdateDatabaseView(CancellationToken token)
+    [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]
+    private async Task UpdateDatabaseViewAsync(CancellationToken token)
     {
         if (Container is null)
-            return false;
+            return;
         if (!_isBootstrapped)
-            return false;
+            return;
 
-        Log.Information("Executing on: {name}", Thread.CurrentThread.Name);
+        Log.Debug("Executing on: {name}", Thread.CurrentThread.Name);
+        await Task.Delay(1000, token);
 
-        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var progressReporter = new ProgressReporter(Log, message => Status = message);
         var searchTerms = searchRegex.Matches(SearchBarText)
             .Select(x => TranslateMatch(x))
             .ToList();
@@ -455,10 +441,10 @@ public partial class MainWindowViewModel : ViewModelBase
         await Dispatcher.UIThread.InvokeAsync(() => Status = "Caching when applicable...", DispatcherPriority.ApplicationIdle);
 
         if (token.IsCancellationRequested)
-            return false;
+            return;
 
         Log.Information("Refreshing Card List...");
-        log.Information("All Cards: {ser}", searchCardList?.Count ?? 0);
+        Log.Information("All Cards: {ser}", searchCardList?.Count ?? 0);
 
         if ((searchCardList?.Count ?? 0) > 0)
         {
@@ -482,14 +468,14 @@ public partial class MainWindowViewModel : ViewModelBase
                 DispatcherPriority.ApplicationIdle
                 );
             }
-                
-            log.Information("All Serials: {ser}", _databaseViewSourceList.Items.Select(v => v.Card.Serial).Distinct().Count());
-            log.Information("All Cards: {ser}", _databaseViewSourceList.Count);
+
+            Log.Information("All Serials: {ser}", _databaseViewSourceList.Items.Select(v => v.Card.Serial).Distinct().Count());
+            Log.Information("All Cards: {ser}", _databaseViewSourceList.Count);
         }
 
         Status = $"Done (Cards Found: {searchCardList?.Count ?? 0})";
 
-        return (searchCardList?.Count ?? 0) > 0;
+        //return (searchCardList?.Count ?? 0) > 0;
 
         Func<WeissSchwarzCard, bool> TranslateMatch(Match scryfallMatch)
         {
@@ -571,9 +557,10 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
     private async Task OpenLocalSet()
     {
-        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var progressReporter = new ProgressReporter(Log, message => Status = message);
         var storage = Parent!().StorageProvider;
         var localPaths = await storage.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
@@ -592,9 +579,9 @@ public partial class MainWindowViewModel : ViewModelBase
             if (!imagePath.Exists)
                 imagePath.CreateDirectory();
 
-            log.Information("Copying all files");
-            log.Information("From: {path}", filesFolderPath.FullPath);
-            log.Information("To: {newPath}", imagePath.FullPath);
+            Log.Information("Copying all files");
+            Log.Information("From: {path}", filesFolderPath.FullPath);
+            Log.Information("To: {newPath}", imagePath.FullPath);
 
             await Task.Run(() => filesFolderPath.AllFiles().Copy(imagePath, Overwrite.Always));
         }
@@ -604,8 +591,6 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (Container is null)
             return;
-
-        log ??= Serilog.Log.ForContext<MainWindowViewModel>();
 
         var updater = Container.GetRequiredService<WeissSchwarzDatabaseUpdater>();
         updater.OnStarting += Updater_OnStarting;
@@ -661,7 +646,7 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         };
 
-        var progressReporter = new ProgressReporter(log, message => Status = message);
+        var progressReporter = new ProgressReporter(Log, message => Status = message);
         await Container.GetInstance<UpdateVerb>().Run(Container, progressReporter);
 
         await LoadDatabase(progressReporter);
@@ -695,18 +680,19 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task Updater_OnEnding(WeissSchwarzDatabaseUpdater sender, Card.API.Services.UpdateEventArgs args)
     {
-        log.Information(args.Status);
+        Log.Information(args.Status);
         Status = args.Status;
         await ValueTask.CompletedTask;
     }
 
     private async Task Updater_OnStarting(WeissSchwarzDatabaseUpdater sender, Card.API.Services.UpdateEventArgs args)
     {
-        log.Information(args.Status);
+        Log.Information(args.Status);
         Status = args.Status;
         await ValueTask.CompletedTask;
     }
 
+    [RelayCommand]
     internal async Task ImportSet()
     {
         await Dispatcher.UIThread.InvokeAsync(() =>
@@ -715,6 +701,7 @@ public partial class MainWindowViewModel : ViewModelBase
         });
     }
 
+    [RelayCommand]
     internal async Task ImportDeck()
     {
         await Dispatcher.UIThread.InvokeAsync(() =>

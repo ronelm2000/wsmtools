@@ -81,7 +81,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
         return deck;
     }
 
-    public async Task<WeissSchwarzDeck> Run(IContainer ioc, WeissSchwarzDeck deck)
+    public async Task<WeissSchwarzDeck> Run(IContainer ioc, WeissSchwarzDeck deck, CancellationToken token = default)
     {
         var inspectionOptions = new InspectionOptions()
         {
@@ -102,7 +102,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
             .AggregateAwaitAsync(deck, async (d, inspector) => await inspector.Inspect(d, inspectionOptions));
 
         if (deck != WeissSchwarzDeck.Empty)
-            await exporter.Export(deck, this);
+            await exporter.Export(deck, this, token);
         return deck;
     }
 

@@ -105,7 +105,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         }
     }
 
-    public async Task<System.IO.Stream> GetImageStreamAsync(CookieSession? cookieSession, CancellationToken ct)
+    public async Task<System.IO.Stream> GetImageStreamAsync(CookieJar? cookieSession, CancellationToken ct)
     {
         if (!String.IsNullOrWhiteSpace(CachedImagePath) && !CachedImagePath.Contains(".."))
             try
@@ -134,7 +134,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         return await builder.GetAsync(cancellationToken: ct).ReceiveStream();
     }
 
-    public async Task<bool> IsImagePresentAsync(CookieSession? cookieSession, CancellationToken ct)
+    public async Task<bool> IsImagePresentAsync(CookieJar? cookieSession, CancellationToken ct)
     {
         if (!String.IsNullOrWhiteSpace(CachedImagePath) && !CachedImagePath.Contains(".."))
             try

@@ -133,7 +133,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
         var uri = new Uri(urlOrLocalFile);
         using (var cs = new CookieSession("https://en.ws-tcg.com/"))
         {
-            await _WS_SEARCH_PAGE.BeforeCall(this.Debug)
+            await _WS_SEARCH_PAGE
                 .WithHTMLHeaders()
                 .WithCookies(cs)
                 .GetAsync(cancellationToken: cancellationToken); // To get some initial cookies.

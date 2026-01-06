@@ -13,6 +13,7 @@ using Montage.Weiss.Tools.Utilities;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -26,7 +27,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     private readonly Func<GlobalCookieJar> _cookieJar;
     private readonly Func<ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>> _cacheSrvc;
 
-    private string? currentVersion;
+    private string currentVersion;
 
     private bool isOutdated = false;
 
@@ -60,7 +61,20 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
 
     public async Task<string> GetLatestVersion(DeckLogSettings settings)
     {
-        return currentVersion ?? (currentVersion = await settings.VersionURL.WithCookies(_cookieJar()[settings.Referrer]).GetStringAsync());
+        var cookieJar = await _cookieJar().FindOrCreate(settings.Referrer);
+        currentVersion ??= await settings.VersionURL
+            .WithRESTHeaders()
+            .WithCookies(cookieJar)
+            .AfterCall(c =>
+            {
+                if (c.Response.Headers.TryGetFirst("Content-Encoding", out var encoding))
+                {
+                    Log.Information("Response is encoded with {encoding}.", encoding);
+                }
+            })
+            .GetStringAsync();
+
+        return currentVersion;
     }
 
     public async Task<bool> IsIncluded(IParseInfo info)
@@ -173,6 +187,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             .ToDictionary(c => c.Key, c => c.Value);
         var cacheValues = cacheResults.SelectMany(c => c.Value).ToList();
         var serialMapper = cardData.ToDictionary(c => c.Serial, c => c.TitleCode);
+        var cookieJar = await _cookieJar().FindOrCreate(settings.Referrer);
 
         foreach (var kvp in cacheValues)
             results.Add(kvp.Key, kvp.Value);
@@ -184,12 +199,24 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             return results;
 
         List<DLCardEntry> temporaryResults = null!;
+
         var cardParams = await settings.SuggestURL
-            .WithRESTHeaders()
             .WithReferrer(settings.Referrer)
-            .WithCookies(_cookieJar()[settings.Referrer])
+            .WithRESTHeaders()
+            .WithHeader("Accept-Encoding", null)
+            .BeforeCall(c =>
+            {
+                Log.Debug("Request: {url} || {headers}", c.Request.Url, c.Request.Headers.Select(e => $"[{e.Name}, {e.Value}]").ConcatAsString(" "));
+                Log.Debug("Body: {body}", c.RequestBody);
+            })
+            .AfterCall(async c =>
+            {
+                var rawContent = await c.Response.ResponseMessage.Content.ReadAsStringAsync();
+                Log.Debug("Response Content-Encoding: {encoding}", c.Response.Headers.TryGetFirst("Content-Encoding", out var encoding) ? encoding : "none");
+                Log.Debug("Response: {response}", rawContent);
+            })
             .PostJsonAsync(new { Param = "" })
-            .ReceiveJson<Dictionary<string,string>>();
+            .ReceiveJson<Dictionary<string, string>>();
 
         IEnumerable<DLCardQuery> queries = GetCardQueries(cardData, cardParams, titleCodes);
         foreach (var queryData in queries)
@@ -199,9 +226,10 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             do
             {
                 Log.Information("Extracting Page {pagenumber}...", page);
-                temporaryResults = await settings.SearchURL.WithRESTHeaders()
+                temporaryResults = await settings.SearchURL
                     .WithReferrer(settings.Referrer)
-                    .WithCookies(_cookieJar()[settings.Referrer])
+                    .WithRESTHeaders()
+                    .WithCookies(_cookieJar().FindOrCreate(settings.Referrer))
                     .PostJsonAsync(new
                     {
                         param = queryData,

@@ -27,7 +27,14 @@ public class PollyHttpClientFactoryConfigurer
         using var db = cardDatabaseContext;
         db.Database.Migrate();
         int maxRetries = FindRetries() ?? 10;
+        
         FlurlHttp.Clients.WithDefaults(builder => builder
+            .ConfigureInnerHandler(hc => new HttpClientHandler
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
+                UseCookies = true,
+                CookieContainer = new CookieContainer()
+            })
             .AddMiddleware(() => new PolicyHandler(maxRetries)
             {
                 InnerHandler = new TimeoutHandler()

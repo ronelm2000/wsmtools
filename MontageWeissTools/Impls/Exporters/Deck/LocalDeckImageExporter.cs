@@ -27,14 +27,14 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
     private ILogger Log = Serilog.Log.ForContext<LocalDeckImageExporter>();
     private (IImageEncoder, IImageFormat) _pngEncoder = (new PngEncoder(), PngFormat.Instance);
     private (IImageEncoder, IImageFormat) _jpegEncoder = (new JpegEncoder(), JpegFormat.Instance);
-    private readonly Func<Flurl.Url, CookieSession> _cookieSession;
+    private readonly Func<Flurl.Url, Task<CookieJar>> _cookieSession;
     private readonly Func<string, string, CancellationToken, Task> _processOutCommand;
     private readonly IFileOutCommandProcessor _fileProcessor;
     private readonly Regex limitFlagRegex = new Regex(@"limit-width\((\d+)\)");
 
     public LocalDeckImageExporter(IContainer ioc)
     {
-        _cookieSession = (url) => ioc.GetInstance<GlobalCookieJar>()[url.Root];
+        _cookieSession = (url) => ioc.GetInstance<GlobalCookieJar>().FindOrCreate(url.Root);
         _processOutCommand = ioc.GetInstance<IFileOutCommandProcessor>().Process;
         _fileProcessor = ioc.GetInstance<IFileOutCommandProcessor>();
     }
@@ -65,7 +65,7 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
             })
             .SelectAwaitWithCancellation(async (wsc, ct) => 
             (   card: wsc, 
-                stream: await wsc.GetImageStreamAsync(_cookieSession(wsc.Images.Last()), ct))
+                stream: await wsc.GetImageStreamAsync(await _cookieSession(wsc.Images.Last()), ct))
             )
             .ToDictionaryAwaitWithCancellationAsync(
                 async (p, ct) => await ValueTask.FromResult(p.card),

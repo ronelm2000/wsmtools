@@ -52,7 +52,7 @@ public class CacheVerb : IVerbCommand
 
     public async Task Cache(IContainer container, IProgress<CommandProgressReport> progress, IAsyncEnumerable<WeissSchwarzCard> list, CancellationToken cancellationToken = default)
     {
-        Func<Flurl.Url, CookieSession> _cookieSession = (url) => container.GetInstance<GlobalCookieJar>()[url.Root];
+        Func<Flurl.Url, Task<CookieJar>> _cookieSession = (url) => container.GetInstance<GlobalCookieJar>().FindOrCreate(url.Root);
         await foreach (var card in list.WithCancellation(cancellationToken))
         {
             var report = new CommandProgressReport
@@ -71,7 +71,7 @@ public class CacheVerb : IVerbCommand
 
     public async Task Cache(IContainer container, IProgress<CommandProgressReport> progress, WeissSchwarzCard card, CancellationToken cancellationToken = default)
     {
-        Func<Flurl.Url, CookieSession> _cookieSession = (url) => container.GetInstance<GlobalCookieJar>()[url.Root];
+        Func<Flurl.Url, Task<CookieJar>> _cookieSession = (url) => container.GetInstance<GlobalCookieJar>().FindOrCreate(url.Root);
         var report = new CommandProgressReport
             {
                 MessageType = MessageType.InProgress,
@@ -114,7 +114,7 @@ public class CacheVerb : IVerbCommand
         }
     }
 
-    private async Task AddCachedImageAsync(WeissSchwarzCard card, Func<Flurl.Url, CookieSession> _cookieSession, CancellationToken ct = default)
+    private async Task AddCachedImageAsync(WeissSchwarzCard card, Func<Flurl.Url, Task<CookieJar>> _cookieSession, CancellationToken ct = default)
     {
         try
         {
@@ -132,7 +132,7 @@ public class CacheVerb : IVerbCommand
             var imgURL = card.Images.Last();
             Log.Information("Caching: {imgURL}", imgURL);
             var session = _cookieSession(imgURL);
-            using (System.IO.Stream netStream = await card.GetImageStreamAsync(session, ct))
+            using (System.IO.Stream netStream = await card.GetImageStreamAsync(await session, ct))
             using (Image img = Image.Load(netStream))
             {
                 var imageDirectoryPath = Path.Get(_IMAGE_CACHE_PATH);

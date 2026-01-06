@@ -69,7 +69,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
             .WhereAwaitWithCancellation(async (card, ct) =>
             {
                 var host = card.Images.LastOrDefault()?.Host;
-                var cookieSession = (host is null) ? null : _globalCookieJar[host];
+                var cookieSession = (host is null) ? null : await _globalCookieJar.FindOrCreate(host);
                 return !(await card.IsImagePresentAsync(cookieSession, ct));
             });
 

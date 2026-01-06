@@ -143,6 +143,10 @@
     "Export Deck (IMAS - Translations)": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/v-u3CVjp_ --exporter trans-doc"
+    },
+    "Export Deck (KinMoza)": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/cBQWxgyt5 --exporter bws"
     }
   }
 }

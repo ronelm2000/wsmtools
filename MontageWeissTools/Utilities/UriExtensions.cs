@@ -12,7 +12,8 @@ public static class UriExtensions
     static readonly HttpClient client = new HttpClient();
     static readonly IFlurlClient customizedClient = new FlurlClient(new HttpClient(new HttpClientHandler()
             {
-                ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) => LogErrorButContinue(msg,cert,chain,errors)
+                ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) => LogErrorButContinue(msg,cert,chain,errors),
+                AutomaticDecompression = System.Net.DecompressionMethods.GZip
             }
             )
         );
@@ -87,10 +88,14 @@ public static class UriExtensions
     public static IFlurlRequest WithRESTHeaders(this IFlurlRequest request)
     {
         request.Client = customizedClient;
-        return request  .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
+        var finalRequest = request.WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36")
                         .WithHeader("Accept", "*/*")
                         .WithHeader("Accept-Encoding", "gzip, deflate, br")
-                        .WithHeader("Referer", request.Url.Authority);
+                        ;
+        if (request.Headers.Any(c => c.Name == "Referer"))
+            return request;
+        else
+            return request.WithHeader("Referer", request.Url.Authority);
     }
     public static IFlurlRequest WithRESTHeaders(this string urlString) => new FlurlRequest(urlString).WithRESTHeaders();
     public static IFlurlRequest WithRESTHeaders(this Uri url) => new FlurlRequest(url).WithRESTHeaders();

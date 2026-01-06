@@ -67,7 +67,7 @@ public partial class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchw
         }
 
         var deckLog = (lang == CardLanguage.Japanese) ? DeckLogSettings.Japanese : DeckLogSettings.English;
-        var cookieSession = _cookieJar()[deckLog.Authority];
+        var cookieSession = _cookieJar().FindOrCreate(deckLog.Authority);
         var deckCreationRequest = await GenerateDeckCreationRequest(deckLog, deck);
 
         if (string.IsNullOrEmpty(deckCreationRequest.DeckParam2))
@@ -185,7 +185,7 @@ public partial class DeckLogExporter : IDeckExporter<WeissSchwarzDeck, WeissSchw
         var cardParams = await deckLog.SuggestURL
             .WithRESTHeaders()
             .WithReferrer(deckLog.Referrer)
-            .WithCookies(_cookieJar()[deckLog.Referrer])
+            .WithCookies(_cookieJar().FindOrCreate(deckLog.Referrer))
             .PostJsonAsync(new { Param = "" })
             .ReceiveJson<Dictionary<string, string>>();
 

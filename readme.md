@@ -175,7 +175,7 @@ registering on GitHub.
 
 ### Building from Source
 1. Install Visual Studio 2022 17.4.1.
-2. Install .NET 7.0 SDK
+2. Install .NET 9.0 SDK
 3. Go to `Tools` > `Options`, then go to `Environment` > `Preview Features".
 4. Check `Use Previews ot the .NET SDK`, then restart VS 2022. 
 5. Open the `.sln` file.

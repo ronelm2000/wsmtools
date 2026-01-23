@@ -91,7 +91,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         result.Traits = TranslateTraits(attributes).ToList();
         result.Effect = enOptional?.Ability?.ToArray() ?? jpOptional?.Ability?.ToArray() ?? Array.Empty<string>();
         result.Rarity = setCard.Rarity!;
-        result.Side = TranslateSide(setCard.Side);
+        result.Side = TranslateSide(setCard.Side, setCard.Game);
         result.Level = setCard.Level;
         result.Cost = setCard.Cost;
         result.Power = setCard.Power;
@@ -104,7 +104,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
 
         // TODO: Delete all methods related with generating serial.
         // TODO: Switch once LLDX checkbox is checked properly. See: https://trello.com/c/WCT94Sk0/2-card-code-needs-to-be-stored-seperatly-from-side-release
-        result.Serial = WeissSchwarzCard.GetSerial(setCard.Set!, setCard.Side!, setCard.Lang!, setCard.Release!, setCard.SID!);
+        result.Serial = WeissSchwarzCard.GetSerial(setCard.Set!, result.Side!, setCard.Lang!, setCard.Release!, setCard.SID!);
 
         result.Type = TranslateType(setCard.CardType!);
         result.Color = TranslateColor(setCard.Colour!);
@@ -180,12 +180,14 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         };
     }
 
-    private CardSide TranslateSide(string? side)
+    private CardSide TranslateSide(string? side, string? game)
     {
         return side switch
         {
             "W" => CardSide.Weiss,
             "S" => CardSide.Schwarz,
+            "WS" => CardSide.Both,
+            ("" or null) when game == "ROSE" => CardSide.Rose,
             _ => CardSide.Both //TODO: This should be changed to the proper value for both, and the rest of the values will display an error.
         };
     }
@@ -283,6 +285,7 @@ internal record EncoreDeckCard
     public required LocaleRecords Locale { get; init; }
     
     public string? Rarity { get; init; }
+    public string? Game { get; init; }
     public string? Side { get; init; }
     public int? Level { get; init; }
     public int? Cost { get; init; }

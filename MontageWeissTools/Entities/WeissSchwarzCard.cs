@@ -199,7 +199,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         else if (serial.Contains("/EN-")) return CardLanguage.English;
         else if (serial.Contains("/BSF")) return CardLanguage.English; // BSF is the English version of WCS for Spring
         else if (serial.Contains("/BCS")) return CardLanguage.English; // BCS is the English version of WCS for Winter
-        else return CardLanguage.Japanese;
+        else return CardLanguage.Japanese; // includes "/R"
     }
 
     /// <summary>
@@ -262,19 +262,20 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         return span.Slice(0, span.Slice(endAdjustment).IndexOf('-') + endAdjustment).ToString();
     }
 
-    public static string GetSerial(string subset, string side, string lang, string releaseID, string setID)
+    public static string GetSerial(string subset, CardSide side, string lang, string releaseID, string setID)
     {
         string fullSetID = subset;
-        var setFormatter = GetExceptionalSetFormat(lang, side + releaseID);
+        string sideKey = side.AsSideKey();
+        var setFormatter = GetExceptionalSetFormat(lang, sideKey + releaseID);
         var cardFormatter = GetExceptionalCardFormat(lang, releaseID, setID);
         if (setFormatter is not null)
-            return setFormatter((subset, side, lang, releaseID, setID));
+            return setFormatter((subset, sideKey, lang, releaseID, setID));
         else if (cardFormatter is not null)
-            return cardFormatter((subset, side, lang, releaseID, setID));
+            return cardFormatter((subset, sideKey, lang, releaseID, setID));
         else if (lang == "EN" && !setID.Contains("E") && !releaseID.StartsWith("X"))
-            return $"{subset}/EN-{side}{releaseID}-{setID}"; // This is a DX set serial adjustment.
+            return $"{subset}/EN-{sideKey}{releaseID}-{setID}"; // This is a DX set serial adjustment.
         else
-            return $"{subset}/{side}{releaseID}-{setID}";
+            return $"{subset}/{sideKey}{releaseID}-{setID}";
     }
 
     private static Func<(string subset, string side, string lang, string releaseID, string setID), string>? GetExceptionalSetFormat(string lang, string fullReleaseID)
@@ -402,6 +403,16 @@ public static class CardEnumExtensions
         var str => throw new Exception($"Cannot parse {typeof(CardType).Name} from {str}")
     };
 
+    public static string AsSideKey(this CardSide cardSide) => cardSide switch
+    {
+        CardSide.Weiss => "W",
+        CardSide.Schwarz => "S",
+        CardSide.Both => "WS",
+        CardSide.Rose => "",
+        CardSide.Blau => "",
+        var str => throw new Exception($"Cannot parse {typeof(CardSide).Name} from {str}")
+    };
+
     public static int GetSortKey(this CardType cardType) => cardType switch
     {
         CardType.Character => 0,
@@ -436,7 +447,6 @@ public enum CardType
     Climax
 }
 
-
 public enum CardColor
 {
     Yellow,
@@ -457,14 +467,18 @@ public enum Trigger
     Door,
     Standby,
     Book,
-    Gate
+    Gate,
+    Discover,
+    Chance
 }
 
 public enum CardSide
 {
     Weiss,
     Schwarz,
-    Both
+    Both, // or WeissSchwarz
+    Rose,
+    Blau
 }
 
 public enum CardLanguage

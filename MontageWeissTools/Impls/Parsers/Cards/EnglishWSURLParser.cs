@@ -200,7 +200,6 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
                     })
                     .SelectMany(html => html.QuerySelectorAll(_CARD_UNIT_SELECTOR).ToAsyncEnumerable())
                     .Concat(divsToProcess);
-                    
 
             progressReport = progressReport with
             {

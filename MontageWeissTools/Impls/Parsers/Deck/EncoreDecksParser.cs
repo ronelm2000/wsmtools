@@ -162,15 +162,24 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 
     private record EncoreDecksDeckRatio
     {
+        private static Dictionary<string, CardSide> SideMap = new()
+        {
+            { "W", CardSide.Weiss },
+            { "S", CardSide.Schwarz },
+            { "ROSE", CardSide.Rose },
+            { "WS", CardSide.Both }
+        };
         required public String Set { get; init; }
         required public String Side { get; init; }
+        required public String Game { get; init; }
         required public String Lang { get; init; }
         required public String Release { get; init; }
         required public String Sid { get; init; }
         required public String Series { get; init; }
         public String toSerial()
         {
-            return WeissSchwarzCard.GetSerial(Set, Side, Lang, Release, Sid);
+            var sideKey = SideMap[string.IsNullOrEmpty(Side) ? Game : Side];
+            return WeissSchwarzCard.GetSerial(Set, sideKey, Lang, Release, Sid);
         }
     }
 }

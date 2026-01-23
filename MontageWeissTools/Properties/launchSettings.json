@@ -147,6 +147,10 @@
     "Export Deck (KinMoza)": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/cBQWxgyt5 --exporter bws"
+    },
+    "Export Deck (YuzuSoft)": {
+      "commandName": "Project",
+      "commandLineArgs": "export https://www.encoredecks.com/deck/XKA-C7RIe"
     }
   }
 }

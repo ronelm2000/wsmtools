@@ -1,7 +1,6 @@
 ﻿using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Impls.PostProcessors;
-using static Montage.Weiss.Tools.Impls.PostProcessors.DeckLogPostProcessor;
+using Montage.Weiss.Tools.Entities.External.DeckLog;
 
 namespace Montage.Weiss.Tools.Impls.Services;
 

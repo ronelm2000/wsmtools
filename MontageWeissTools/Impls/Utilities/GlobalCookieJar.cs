@@ -16,10 +16,18 @@ public class GlobalCookieJar
         sessions = new Dictionary<string, CookieJar>();
     }
 
-    //public CookieJar this[string url] => (sessions.TryGetValue(url, out var res)) ?  res : sessions.Add<string,CookieJar>(url, new CookieJar()) ?? new CookieJar();
-
     public async Task<CookieJar> FindOrCreate(string url, CancellationToken cancel = default)
     {
+        if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+        {
+            Log.Debug("Detected malformed URL: {url}, try to use prepend https:// instead.", url);
+            var fixedUrl = $"https://{url}";
+            if (Uri.IsWellFormedUriString(fixedUrl, UriKind.Absolute))
+                url = fixedUrl;
+            else
+                throw new ArgumentException($"The URL '{url}' is not well-formed.");
+        }
+
         if (sessions.TryGetValue(url, out var existing))
             return existing;
 
@@ -29,5 +37,4 @@ public class GlobalCookieJar
         else
             return new CookieJar();
     }
-
 }

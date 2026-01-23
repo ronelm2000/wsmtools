@@ -68,7 +68,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
         var brokenLinkKeyCards = deck.Ratios.Keys.ToAsyncEnumerable()
             .WhereAwaitWithCancellation(async (card, ct) =>
             {
-                var host = card.Images.LastOrDefault()?.Host;
+                var host = $"https://{card.Images.LastOrDefault()?.Host}";
                 var cookieSession = (host is null) ? null : await _globalCookieJar.FindOrCreate(host);
                 return !(await card.IsImagePresentAsync(cookieSession, ct));
             });

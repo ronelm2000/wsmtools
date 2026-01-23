@@ -165,11 +165,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void LogCommandException(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(AsyncRelayCommand.ExecutionTask) &&
-            ((AsyncRelayCommand)sender!).ExecutionTask is Task task &&
-            task.Exception is AggregateException exception)
+        if (e.PropertyName == nameof(AsyncRelayCommand.ExecutionTask))
         {
-            ReportException(exception.Flatten().InnerException!);
+            var task = ((AsyncRelayCommand)sender!).ExecutionTask;
+            if (task is null || !task.IsFaulted)
+                return;
+            if (task.Exception is AggregateException exception)
+            {
+                ReportException(exception.Flatten().InnerException!);
+            }
         }
     }
 

@@ -393,6 +393,10 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         Log.Debug("All Groups: {@groups}", match.Groups.OfType<Group>().Select(g => g.Value).ToArray());
         if (result["jp"] == "特徴なし") // No Traits
             return null;
+        if (result["jp"] == "―") // No Traits from konosuba.html
+            return null;
+        if (result["en"] == "None") // No Traits from konosuba.html
+            return null;
         else
             return result;
     }

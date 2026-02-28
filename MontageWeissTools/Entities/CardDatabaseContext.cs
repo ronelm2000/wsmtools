@@ -39,6 +39,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
         Log.Debug("Loading Database: {databasePath}", databasePath);
         options.UseSqlite($"Data Source={databasePath}")
             .LogTo(Log.ForContext<CardDatabaseContext>().Warning, Microsoft.Extensions.Logging.LogLevel.Warning)
+            .EnableSensitiveDataLogging()
             .ConfigureWarnings(w => w.Log(RelationalEventId.PendingModelChangesWarning))
             .UseSeeding(SeedLogs)
             .UseAsyncSeeding(SeedLogsAsync);

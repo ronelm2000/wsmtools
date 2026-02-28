@@ -76,16 +76,39 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         };
         progress.Report(progressReport);
 
+        var headerCount = 0;
+        var footerCount = 1;
+
+
         if (Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.IsWellFormedOriginalString())
         {
             var html = await new Uri(url).DownloadHTML(cancellationToken);
             var preSelector = "td > pre";
             textToProcess = html.QuerySelector(preSelector)?.TextContent;
+            if (textToProcess is null)
+            {
+                Log.Information("Detected v2 of HOTC page, trying new selector.");
+                preSelector = "pre";
+                textToProcess = html.QuerySelector(preSelector)?.TextContent;
+                headerCount = 0;
+                footerCount = 1;
+            } else
+            {
+                Log.Information("Detected v1 of HOTC page.");
+                headerCount = 1;
+                footerCount = 1;
+            }
         }
         else
         {
             var path = Path.Get(url);
             textToProcess = await path.ReadStringAsync(cancellationToken);
+        }
+
+        if (textToProcess is null)
+        {
+            Log.Error("Detected no text for HOTC to parse; please file a bug on GitHub!");
+            throw new SetParsingException(new UnsupportedPreconditionCode("No HOTC Text"));
         }
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -95,7 +118,6 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
             Percentage = 10
         };
         progress.Report(progressReport);
-
         var majorSeparator = "================================================================================";
         var textSplits = textToProcess?.Split(majorSeparator) ?? Array.Empty<string>();
         var rows = textSplits.Length - 2;

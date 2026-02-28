@@ -45,3 +45,13 @@ public record CannotBeParsedCode : ParserCode
         Arguments = arguments;
     }
 }
+
+public record UnsupportedPreconditionCode : ParserCode
+{
+    public override int Code { get; init; } = 2;
+    public override string Translate() => $"Precondition \"{Arguments[0]}\" is not supported.";
+    public UnsupportedPreconditionCode(params string[] arguments)
+    {
+        Arguments = arguments;
+    }
+}

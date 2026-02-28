@@ -136,10 +136,6 @@
       "commandName": "Project",
       "commandLineArgs": "parse \"R:\\Pictures\\Sets\\kirara_fantasia_vol_2.ws-set\""
     },
-    "Parse Nanoha 20th": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=6862dbb3abea99e627d998b4"
-    },
     "Export Deck (IMAS - Translations)": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/v-u3CVjp_ --exporter trans-doc"
@@ -151,6 +147,10 @@
     "Export Deck (YuzuSoft)": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/XKA-C7RIe"
+    },
+    "Parse Oshi no Ko": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.heartofthecards.com/translations/oshi_no_ko_booster_pack.html"
     }
   }
 }

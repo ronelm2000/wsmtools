@@ -3,8 +3,8 @@ using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Services;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Impls.PostProcessors;
 using Montage.Weiss.Tools.Entities.External.DeckLog;
+using Montage.Weiss.Tools.Impls.PostProcessors;
 using Montage.Weiss.Tools.Test.Commons;
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace Montage.Weiss.Tools.Test.DeckLog;
 
@@ -65,7 +66,7 @@ public class PostProcessorTests
 
         Assert.IsTrue(resultCards["BD/EN-W03-001"]
             .Images
-            .Contains(new Uri("https://en.ws-tcg.com/wp/wp-content/images/cardimages/b/bd_en_w03/BD_EN_W03_001.png")),
+            .Contains(new Uri("https://en.ws-tcg.com/wordpress/wp-content/images/cardimages/b/bd_en_w03/BD_EN_W03_001.png")),
             "The expected URI is missing."
             );
     }

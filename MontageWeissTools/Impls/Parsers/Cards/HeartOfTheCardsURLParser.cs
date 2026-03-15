@@ -122,8 +122,8 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         var textSplits = textToProcess?.Split(majorSeparator) ?? Array.Empty<string>();
         var rows = textSplits.Length - 2;
         var results = textSplits.AsEnumerable()
-            .Skip(1)
-            .SkipLast(1)
+            .Skip(headerCount)
+            .SkipLast(footerCount)
             .Select( (section, index) => (index, card: ParseHOTCText(section)))
             ;
 

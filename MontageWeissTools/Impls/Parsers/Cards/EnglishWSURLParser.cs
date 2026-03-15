@@ -7,9 +7,12 @@ using Montage.Card.API.Exceptions;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Web;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Cards;
 
@@ -21,14 +24,9 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
 {
     ILogger Log = Serilog.Log.ForContext<EnglishWSURLParser>();
 
-    private static readonly string _CARD_NO_QUERY = "?cardno=";
-    private static readonly string _WS_SEARCH_PAGE = "https://en.ws-tcg.com/cardlist/cardsearch/";
-    private static readonly string _WS_SEARCH_PAGE_EXEC = "https://en.ws-tcg.com/cardlist/cardsearch/exec";
-    private static readonly string _WS_CARD_PAGE = "https://en.ws-tcg.com/cardlist/list/?cardno=";
-    private static readonly string _CARD_UNIT_SELECTOR = "table#searchResult-table td";
-    private static readonly string _CARD_NAME_SELECTOR = "#searchResult-table > tbody > tr > td > h4 > a > span:nth-child(1)";
-    private static readonly string _CARD_EFFECT_SELECTOR = "span:last-child";
-    private static readonly Regex _UNIT_MATCHER = new Regex(@"([\[])([^\]]+)([\]]):(.+)");
+
+    private static readonly string _WS_CARD_SEARCH_EX_FORMAT = "https://en.ws-tcg.com/cardlist/cardsearch_ex?expansion={0}&view=text&page={1}";
+    
     private static readonly Regex _SOUL_MATCHER = new Regex(@"partimages/soul\.gif");
 
     /// <summary>
@@ -38,6 +36,31 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
     {
         "W08", "W31", "EN-W01"
     };
+
+    // Selectors used when querying document nodes
+    private static readonly string _LIST_ITEM_SELECTOR = "li";
+    private static readonly string _ANCHOR_SELECTOR = "a";
+    private static readonly string _IMG_SELECTOR = "img";
+
+    private static readonly string _EXPANSION_LINKS_SELECTOR = "ul.p-cards__cardset-link a";
+    private static readonly string _EXPANSION_LIST_ITEM_SELECTOR = ".cardlist-Result_List > li";
+
+    private static readonly string _SERIAL_SELECTOR = ".p-cards__detail-textarea > .number";
+    private static readonly string _DETAIL_NAME_SELECTOR = ".p-cards__detail-textarea > p.ttl";
+    private static readonly string _TRAITS_SELECTOR = ".p-cards__detail-type > dl:nth-child(2) > dd";
+    private static readonly string _TYPE_SELECTOR = ".p-cards__detail-type > dl:nth-child(3) > dd";
+    private static readonly string _RARITY_SELECTOR = ".p-cards__detail-type > dl:nth-child(4) > dd";
+    private static readonly string _SIDE_SELECTOR = ".p-cards__detail-type > dl:nth-child(5) > dd";
+    private static readonly string _COLOR_SELECTOR = ".p-cards__detail-type > dl:nth-child(6) > dd";
+
+    private static readonly string _LEVEL_SELECTOR = ".p-cards__detail-status dl:nth-child(1) > dd";
+    private static readonly string _COST_SELECTOR = ".p-cards__detail-status dl:nth-child(2) > dd";
+    private static readonly string _POWER_SELECTOR = ".p-cards__detail-status dl:nth-child(3) > dd";
+    private static readonly string _TRIGGERS_SELECTOR = ".p-cards__detail-status dl:nth-child(4) > dd";
+    private static readonly string _SOUL_SELECTOR = ".p-cards__detail-status dl:nth-child(5) > dd";
+
+    private static readonly string _EFFECT_PARAGRAPHS_SELECTOR = ".p-cards__detail.u-mt-22 p";
+    private static readonly string _FLAVOR_SELECTOR = ".p-cards__detail-serif.u-mt-22";
 
     private static (string LookupString, CardColor Color)[] _COLOR_MAP = new[]
         {
@@ -73,10 +96,29 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
         // https://en.ws-tcg.com/cardlist/list/?cardno=FS/S36-E008 and https://en.ws-tcg.com/cardlist/list/?cardno=BD/W63-E003
         ("<img src=\"../partimages/soul.gif\">", "【SOUL】"),
         // https://en.ws-tcg.com/cardlist/list/?cardno=SY/W08-E086
-        ("Draw@", "【DRAW】"),                 
+        ("Draw@", "【DRAW】"),
         // https://en.ws-tcg.com/cardlist/list/?cardno=SY/W08-E004
-        ("<img src=\"../partimages/bounce.gif\">", "【BOUNCE】") 
+        ("<br>", "\n"),
+        ("<img src=\"/wordpress/wp-content/images/partimages/bounce.gif\">", "【BOUNCE】"),
+        ("<img src=\"/wordpress/wp-content/images/partimages/shot.gif\">", "【SHOT】"),
+        ("<img src=\"/wordpress/wp-content/images/partimages/choice.gif\">", "【CHOICE】"),
+        ("<img src=\"/wordpress/wp-content/images/partimages/treasure.gif\">", "【GOLD】"),
+        ("<img src=\"/wordpress/wp-content/images/partimages/stock.gif\">", "【BAG】"),
+        ("<img src=\"/wordpress/wp-content/images/partimages/standby.gif\">", "【STANDBY】"),
+        ("<img src=\"/wordpress/wp-content/images/partimages/comeback.gif\">", "【DOOR】"),
+        ("<img src=\"/wordpress/wp-content/images/partimages/gate.gif\">", "【GATE】"),
+        ("<img src=\"/wordpress/wp-content/images/partimages/draw.gif\">", "【BOOK】"),
+        
+        ("<strong>", ""),
+        ("</strong>", "")
     };
+
+    private GlobalCookieJar cookieJar;
+
+    public EnglishWSURLParser(GlobalCookieJar cookieJar)
+    {
+        this.cookieJar = cookieJar;
+    }
 
     public async Task<bool> IsCompatible(IParseInfo parseInfo)
     {
@@ -131,99 +173,65 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
         progress.Report(progressReport);
 
         var uri = new Uri(urlOrLocalFile);
-        using (var cs = new CookieSession("https://en.ws-tcg.com/"))
+
+        Log.Information("Loading the page...");
+
+        var cookies = await cookieJar.FindOrCreate(uri.AbsoluteUri, cancellationToken);
+        if (cookies.Count == 0) {
+            cookies.AddOrReplace("CookieConsent", """
+            {stamp:'C88lsVhKsZTmlWfRS4nPyaJlCJHtwki7LoERTcJyFHgUzKNw8RgRNQ==',necessary:true,preferences:true,statistics:true,marketing:true,method:'explicit',ver:1,utc:1772352864544,region:'ph'}")
+            """, urlOrLocalFile);
+            cookies.AddOrReplace("cardlist_search_sort", "new", urlOrLocalFile);
+            cookies.AddOrReplace("cardlist_view", "text", urlOrLocalFile);
+        }
+
+        var initialDocument = await uri.WithCookies(cookies)
+            .WithHTMLHeaders()
+            .GetHTMLAsync(cancellationToken);
+        var expansionLink = initialDocument.QuerySelectorAll<IHtmlAnchorElement>(_EXPANSION_LINKS_SELECTOR).FirstOrEmpty()!.Href;
+
+        Log.Information("Found Expansion Link: {expansionLink}", expansionLink);
+
+        var expansionInitialDocument = await expansionLink
+            .WithHTMLHeaders()
+            .WithCookies(cookies)
+            .GetHTMLAsync(cancellationToken);
+        var list = expansionInitialDocument.QuerySelectorAll<IHtmlListItemElement>(_EXPANSION_LIST_ITEM_SELECTOR);
+
+
+        var expansion = HttpUtility.ParseQueryString(new Uri(expansionLink).Query)["expansion"];
+        var page = 2;
+        var isRedirected = false;
+
+        while (!isRedirected)
         {
-            await _WS_SEARCH_PAGE
-                .WithHTMLHeaders()
-                .WithCookies(cs)
-                .GetAsync(cancellationToken: cancellationToken); // To get some initial cookies.
-
-            var serial = uri.Query.Substring(_CARD_NO_QUERY.Length);
-            var serialID = WeissSchwarzCard.ParseSerial(serial);
-
-            Log.Debug("Cookie: {@c}", cs.Cookies.ToDictionary(k => k.GetKey(), k=> k.Value));
-
-            var wsSearchPage = await cs
-                .Request(_WS_SEARCH_PAGE_EXEC)
-                .WithHTMLHeaders()
-                .WithHeader("Referer", _WS_SEARCH_PAGE)
-                .PostUrlEncodedAsync(new Dictionary<string,object>{
-                    ["cmd"] = "search",
-                    ["keyword"] = serialID.ReleaseID,
-                    ["keyword_or"] = "",
-                    ["keyword_not"] = "",
-                    ["keyword_cardname"] = new[] { "0", "1" },
-                    ["keyword_feature"] = new[] { "0", "1" },
-                    ["keyword_text"] = new[] { "0", "1" },
-                    ["keyword_cardnumber"] = new[] { "0", "1" },
-                    ["expansion"] = "",
-                    ["card_kind"] = "",
-                    ["level_s"] = "",
-                    ["level_e"] = "",
-                    ["color"] = "",
-                    ["soul_s"] = "",
-                    ["soul_e"] = "",
-                    ["cost_s"] = "",
-                    ["cost_e"] = "",
-                    ["trigger"] = "",
-                    ["option_counter"] = "0",
-                    ["option_clock"] = "0",
-                    ["show_page_count"] = "500",
-                    ["show_small"] = "0",
-                    ["button"] = "search"
-                })
-                .RecieveHTML();
-
-            var divsToProcess = wsSearchPage.QuerySelectorAll(_CARD_UNIT_SELECTOR).ToAsyncEnumerable();
-            var pageResultDiv = wsSearchPage.QuerySelector<IHtmlAnchorElement>(".pageLink :nth-last-child(2)")?.InnerHtml ?? null;
-            var resultCountString = wsSearchPage.QuerySelector("#exFilterForm ~ p")!.Text();
-
-            Func<int,ValueTask<IDocument>> followupDivs = async p => await cs
-                .Request(_WS_SEARCH_PAGE_EXEC)
-                .SetQueryParams(new
-                {
-                    page = p
-                })
-                .WithHTMLHeaders()
-                .WithHeader("Referer", _WS_SEARCH_PAGE_EXEC)
-                .WithHeader("Cache-Control", "no-cache")
-                .WithHeader("Sec-Fetch-Site", "same-origin")
-                .WithHeader("Sec-Fetch-User", "?1")
-                .GetHTMLAsync(cancellationToken);
-
-            if (pageResultDiv is not null && int.TryParse(pageResultDiv, out int lastPage))
-                divsToProcess = Enumerable.Range(2, lastPage - 1)
-                    .ToAsyncEnumerable()
-                    .SelectAwait(followupDivs)
-                    .Do(idoc => {
-                        Log.Debug("Cookie: {@c}", cs.Cookies.ToDictionary(k => k.GetKey(), k => k.Value));
-                    })
-                    .SelectMany(html => html.QuerySelectorAll(_CARD_UNIT_SELECTOR).ToAsyncEnumerable())
-                    .Concat(divsToProcess);
-
-            progressReport = progressReport with
+            try
             {
-                ReportMessage = new MultiLanguageString { EN = $"Got {resultCountString}" },
-                Percentage = 10
-            };
-            progress.Report(progressReport);
+                var nextLink = await String.Format(_WS_CARD_SEARCH_EX_FORMAT, expansion, page)
+                    .WithHTMLHeaders()
+                    .WithCookies(cookies)
+                    .WithAutoRedirect(false)
+                    .GetAsync(cancellationToken: cancellationToken);
+                Log.Information("Trying to access {url}... Status: {statusCode}", nextLink.ResponseMessage?.RequestMessage?.RequestUri, ((int?)nextLink.ResponseMessage?.StatusCode));
+                isRedirected = (!nextLink.ResponseMessage?.IsSuccessStatusCode ?? true);
+                page++;
 
-            await foreach (var cardUnitTD in divsToProcess.WithCancellation(cancellationToken))
+                var content = await nextLink.RecieveHTML(cancellationToken);
+                list = list.Concat(content.QuerySelectorAll<IHtmlListItemElement>(_LIST_ITEM_SELECTOR).ToArray());
+            }
+            catch (FlurlHttpException e)
             {
-                var result = await ParseCardAsync(cardUnitTD);
-                /*
-                progressReport = progressReport with
-                {
-                    ReportMessage = new MultiLanguageString { EN = $"Parsed [{result.Serial}]." },
-                    Percentage = 10 + (int)((progressReport.CardsParsed + 1f) * 90 / divsToProcess.Length),
-                    CardsParsed = progressReport.CardsParsed + 1
-                };
-                progress.Report(progressReport);
-                */
-                yield return result;
+                Log.Information("Trying to access {url}... Failed with exception: {message}", String.Format(_WS_CARD_SEARCH_EX_FORMAT, expansion, page), e.Message);
+                isRedirected = true;
             }
 
-            //Log.Information("Debug: {content}", wsSearchPage.DocumentElement.OuterHtml);
+        }
+
+        foreach (var li in list)
+        {
+            var cardLink = li.QuerySelector<IHtmlAnchorElement>(_ANCHOR_SELECTOR)?.Href;
+            if (cardLink is not null)
+                yield return await ParseSingleCard(cardLink!, cookies, cancellationToken);
         }
 
         Log.Information("Ending...");
@@ -236,75 +244,47 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
         yield break;
     }
 
-    private async Task<WeissSchwarzCard> ParseCardAsync(IElement cardUnitTD)
+    private async Task<WeissSchwarzCard> ParseSingleCard(string cardLink, CookieJar cookies, CancellationToken cancellationToken)
     {
+        Log.Debug("Parsing card page: {cardLink}", cardLink);
+
+        var document = await cardLink.WithCookies(cookies)
+            .WithHTMLHeaders()
+            .GetHTMLAsync(cancellationToken);
+
         WeissSchwarzCard res = new WeissSchwarzCard();
-        var href = cardUnitTD.QuerySelector<IHtmlAnchorElement>("h4 a")?.Href ?? throw new DeckParsingException("Cannot find anchor element in unit ID");
-        var name = cardUnitTD.QuerySelector(_CARD_NAME_SELECTOR)?.InnerHtml ?? throw new DeckParsingException("cannot find name element in unit ID.");
-        Log.Debug("HREF: {href}", href);
-        res.Serial = href.Substring(_WS_CARD_PAGE.Length);
-        res.Name = new MultiLanguageString() { EN = name, JP = "" };
-        res.Effect = CleanupEffect(cardUnitTD);
-        foreach (var span in cardUnitTD.QuerySelectorAll(".unit"))
-            await AssignUnitAsync(res, span);
-        res.Remarks = $"Extractor: {this.GetType().Name}";
-        return res;
-    }
 
-    private async Task AssignUnitAsync(WeissSchwarzCard card, IElement span)
-    {
-        var innerHTML = span.InnerHtml;
-        var groups = _UNIT_MATCHER.Match(innerHTML).Groups;
-        var key = groups[2].Value.ToLower();
-        var value = groups[4].Value;
-        Log.Debug("Key: {k} / Value: {v}", key, value);
-        switch (key)
-        {
-            case "side":
-                card.Side = TranslateToSide(value);//  <img src=\"../partimages/s.gif\">"
-                break;
-            case "card type":
-                card.Type = value.Trim().ToEnum<CardType>() ?? throw new SetParsingException(new CannotBeParsedCode("CardType"));
-                break;
-            case "level":
-                card.Level = value.Trim().AsParsed<int>(int.TryParse);
-                break;
-            case "color":
-                card.Color = TranslateToColor(value); //  <img src=\"../partimages/blue.gif\">
-                break;
-            case "power":
-                card.Power = value.Trim().AsParsed<int>(int.TryParse);
-                break;
-            case "soul":
-                card.Soul = CountSouls(value);
-                break;
-            case "cost":
-                card.Cost = value.Trim().AsParsed<int>(int.TryParse);
-                break;
-            case "rarity":
-                card.Rarity = value.Trim();
-                break;
-            case "trigger":
-                card.Triggers = await TranslateToTriggers(value);
-                break;
-            case "special attribute":
-                card.Traits = await TranslateToTraitsAsync(value);
-                break;
-            case "flavor text":
-                card.Flavor = await CleanupFlavorText(value);
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-    }
+        res.Serial = document.QuerySelector(_SERIAL_SELECTOR)!.InnerHtml;
+        res.Name = new MultiLanguageString() { EN = document.QuerySelector(_DETAIL_NAME_SELECTOR)!.InnerHtml, JP = "" };
+        res.Traits = document.QuerySelector(_TRAITS_SELECTOR)!.InnerHtml
+            .Split("・")
+            .Select(s => new WeissSchwarzTrait() { EN = s, JP = "" })
+            .ToList();
+        res.Type = document.QuerySelector(_TYPE_SELECTOR)!.InnerHtml
+            .Trim()
+            .ToEnum<CardType>() ?? throw new SetParsingException(new CannotBeParsedCode("CardType"));
+        res.Rarity = document.QuerySelector(_RARITY_SELECTOR)!.InnerHtml.Trim();
+        res.Side = TranslateToSide(document.QuerySelector(_SIDE_SELECTOR)!.InnerHtml);
+        res.Color =TranslateToColor(document.QuerySelector(_COLOR_SELECTOR)!.InnerHtml);
 
-    private string[] CleanupEffect(IElement cardUnitTD)
-    {
-        return cardUnitTD.QuerySelectorAll(_CARD_EFFECT_SELECTOR).Last().InnerHtml
-            .Split(new string[] { "<br>", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+        res.Level = document.QuerySelector(_LEVEL_SELECTOR)!.InnerHtml.Trim().AsParsed<int>(int.TryParse);
+        res.Cost = document.QuerySelector(_COST_SELECTOR)!.InnerHtml.Trim().AsParsed<int>(int.TryParse);
+        res.Power = document.QuerySelector(_POWER_SELECTOR)!.InnerHtml.Trim().AsParsed<int>(int.TryParse);
+        res.Triggers = await TranslateToTriggers(document.QuerySelector(_TRIGGERS_SELECTOR)!.InnerHtml);
+        res.Soul = CountSouls(document.QuerySelector(_SOUL_SELECTOR)!.InnerHtml);
+
+        res.Effect = document.QuerySelectorAll(_EFFECT_PARAGRAPHS_SELECTOR)!
+            .Select(x => x.InnerHtml)
+            .SelectMany(x =>x.Split(new string[] { "<br>", "\n", "<p>", "</p>" }, StringSplitOptions.RemoveEmptyEntries))
             .Select(e => CleanupEffect(e))
             .ToArray();
+        
+        res.Flavor = document.QuerySelector(_FLAVOR_SELECTOR)!.TextContent?.Trim() ?? string.Empty;
+
+        res.Remarks = $"Extractor: {this.GetType().Name}";
+
+        Log.Information("Parsed card: {serial} [{name}]", res.Serial, res.Name.EN);
+        return res;
     }
 
     private string CleanupEffect(string effectText)
@@ -315,22 +295,10 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
         return res;
     }
 
-    private async Task<string?> CleanupFlavorText(string value)
-    {
-        var doc = await value.ParseHTML();
-        return doc.Body?.Children[0]?.Text();//.InnerHtml;
-    }
-
-    private async Task<List<WeissSchwarzTrait>> TranslateToTraitsAsync(string value)
-    {
-        var traitInnerHTML = (await value.ParseHTML()).Body?.Children[0].InnerHtml;
-        return traitInnerHTML?.Split("・").Select(s => new WeissSchwarzTrait() { EN = s, JP = "" }).ToList() ?? new List<WeissSchwarzTrait>();
-    }
-
     private async Task<Trigger[]> TranslateToTriggers(string value)
     {
         var doc = await value.ParseHTML();
-        return doc.QuerySelectorAll<IHtmlImageElement>("img")
+        return doc.QuerySelectorAll<IHtmlImageElement>(_IMG_SELECTOR)
             .SelectMany(e => _TRIGGER_MAP.Where(t => e.Source?.Contains(t.LookupString) ?? false))
             .Select(t => t.CardTrigger)
             .ToArray();
@@ -364,10 +332,5 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
             return CardSide.Schwarz;
         else
             throw new NotImplementedException("Current value is invalid: " + value);
-    }
-
-    private void Debug(FlurlCall call)
-    {
-        //Log.Debug(call.RequestBody);
     }
 }

@@ -147,9 +147,29 @@ public static class UriExtensions
     public static async Task<IDocument> GetHTMLAsync(this IFlurlRequest flurlReq, CancellationToken cancel = default)
     {
         //var content = wc.DownloadString(uri);
+        if (!flurlReq.Url.IsSecureScheme)
+        {
+            Log.Warning("Forcing URL to use HTTPS: {url}", flurlReq.Url);
+            flurlReq.Url = new Flurl.Url(flurlReq.Url.ToString().Replace("http://", "https://"));
+        }
+
+        flurlReq = flurlReq.WithAutoRedirect(false); // We will handle redirects manually to ensure that we can maintain headers and body content (thanks Flurl for somehow flushing them)
+
         var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
-        var stream = await flurlReq.GetStreamAsync(cancellationToken: cancel);
+        var response = await flurlReq.GetAsync(cancellationToken: cancel);
+        var retries = 0;
+        while (response.StatusCode / 100 == 3 && retries < 10)
+        {
+            var newLocation = response.Headers.First(x => x.Name == "Location")!.Value;
+            Log.Warning("Received a redirect response ({statusCode}) from {oldUrl} to {url}. Attempting to follow redirect.", response.StatusCode, flurlReq.Url, newLocation);
+            flurlReq.Url = newLocation;
+            response = await flurlReq.GetAsync(cancellationToken: cancel);
+            retries++;
+        }
+
+        var stream = await response.GetStreamAsync();
+        //var stream = await flurlReq.GetStreamAsync(cancellationToken: cancel);
         return await context.OpenAsync(req =>
         {
             req.Address(flurlReq.Url.ToString());
@@ -158,12 +178,14 @@ public static class UriExtensions
     }
 
     public static async Task<IDocument> RecieveHTML(this Task<IFlurlResponse> flurlResponse, CancellationToken cancel = default)
-    {
+        => await RecieveHTML(await flurlResponse, cancel);
+
+    public static async Task<IDocument> RecieveHTML(this IFlurlResponse flurlResponse, CancellationToken cancel = default)
+    {        
         var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
-        var response = await flurlResponse;
-        var url = response.ResponseMessage?.RequestMessage?.RequestUri?.AbsoluteUri;
-        var stream = await response.GetStreamAsync();
+        var url = flurlResponse.ResponseMessage?.RequestMessage?.RequestUri?.AbsoluteUri;
+        var stream = await flurlResponse.GetStreamAsync();
         return await context.OpenAsync(req =>
         {
             req.Address(url);

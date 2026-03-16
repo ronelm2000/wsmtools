@@ -16,7 +16,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
 {
     private static ILogger Log = Serilog.Log.ForContext<WeissSchwarzCard>();
 
-    private static string[] foilRarities = new[] { "SR", "SSR", "RRR", "SPM", "SPa", "SPb", "SP", "SSP", "SEC", "XR", "BDR" };
+    private static string[] foilRarities = new[] { "SR", "SSR", "RRR", "SPM", "SPa", "SPb", "SP", "SSP", "SEC", "XR", "BDR", "RRR+", "SEC", "SEC+" };
     private static string[] englishEditedPrefixes = new[] { "EN-", "S25", "W30" };
     private static string[] englishOriginalPrefixes = new[] { "Wx", "SX", "BSF", "BCS" };
     private static string[] customPrefixes = new[] { "WC", "SC", "WSC" };

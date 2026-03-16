@@ -77,6 +77,7 @@ public partial class CardEntryViewModel : ViewModelBase
 
     public IObservable<bool> IsCharacter { get; private set; }
     public IObservable<bool> IsCharacterOrEvent { get; private set; }
+    public IObservable<bool> IsImageTooltipView { get; private set; }
 
     public ReactiveCommand<Unit, Unit> FindClimaxCombosCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> FindTraitsCommand { get; private set; }
@@ -84,7 +85,10 @@ public partial class CardEntryViewModel : ViewModelBase
 
     public Task<Bitmap?> Image => FindImageAsync();
 
+    public Task<Bitmap?> TooltipImage => FindFullImageAsync();
+
     private Task<Bitmap?>? _cachedImageTask;
+    private Task<Bitmap?>? _cachedTooltipImageTask;
 
     public CardEntryViewModel(Uri imageUri, MultiLanguageString name, List<MultiLanguageString> traits)
     {
@@ -103,6 +107,7 @@ public partial class CardEntryViewModel : ViewModelBase
         Effects = ["[AUTO] Aaaaaaaaa"];
 
         _cachedImageTask = imageUri.Load();
+        _cachedTooltipImageTask = _cachedImageTask;
     }
 
     public CardEntryViewModel(WeissSchwarzCard card, MainWindowViewModel parent)
@@ -134,6 +139,14 @@ public partial class CardEntryViewModel : ViewModelBase
             return await (_cachedImageTask = LoadCardAsync(Card));
     }
 
+    private async Task<Bitmap?> FindFullImageAsync()
+    {
+        if (_cachedTooltipImageTask is not null)
+            return await _cachedTooltipImageTask;
+        else
+            return await (_cachedTooltipImageTask = LoadFullCardAsync(Card));
+    }
+
     private async Task<Avalonia.Media.Imaging.Bitmap?> LoadCardAsync(WeissSchwarzCard card)
     {
         var ioc = Parent!.Container!;
@@ -142,6 +155,16 @@ public partial class CardEntryViewModel : ViewModelBase
             await new CacheVerb { }.Cache(ioc, NoOpProgress<CommandProgressReport>.Instance, card);
 
         return await card.LoadImage();
+    }
+
+    private async Task<Avalonia.Media.Imaging.Bitmap?> LoadFullCardAsync(WeissSchwarzCard card)
+    {
+        var ioc = Parent!.Container!;
+        var cachedImagePath = card.GetCachedImagePath();
+        if (cachedImagePath is null && card.EnglishSetType != EnglishSetType.Custom)
+            await new CacheVerb { }.Cache(ioc, NoOpProgress<CommandProgressReport>.Instance, card);
+
+        return await card.LoadFullImage();
     }
 
     [MemberNotNull(
@@ -160,6 +183,10 @@ public partial class CardEntryViewModel : ViewModelBase
 
         IsCharacterOrEvent = this.WhenPropertyChanged(c => c.CardType)
             .Select(t => t.Value == CardType.Character || t.Value == CardType.Event)
+            .AsObservable();
+
+        IsImageTooltipView = this.WhenPropertyChanged(c => c.Parent!.IsShiftPressed)
+            .Select(t => t.Value)
             .AsObservable();
 
         FindClimaxCombosCommand = ReactiveCommand.CreateFromTask(FindClimaxCombos);

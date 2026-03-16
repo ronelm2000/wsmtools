@@ -129,4 +129,15 @@ public partial class MainView : UserControl
             viewModel.IsDatabaseOpen = true;
         e.Handled = true;
     }
+
+    private void UserControl_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift || e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+            {
+                viewModel.IsShiftPressed = !viewModel.IsShiftPressed;
+            }
+        }
+    }
 }

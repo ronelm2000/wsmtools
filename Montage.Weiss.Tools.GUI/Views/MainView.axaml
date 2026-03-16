@@ -10,6 +10,7 @@
              x:Class="Montage.Weiss.Tools.GUI.Views.MainView"
              x:DataType="vm:MainWindowViewModel"
              Loaded="UserControl_Loaded"
+             KeyDown="UserControl_KeyDown"
              >
   <Design.DataContext>
     <!-- This only sets the DataContext for the previewer in an IDE,
@@ -192,7 +193,7 @@
             <StackPanel>
               <TextBox Name="SearchTB"
                        Watermark="Search..." 
-                       Text="{Binding SearchBarText}" 
+                       Text="{Binding SearchBarText}"
                        />
             </StackPanel>
           </Border>

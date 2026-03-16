@@ -91,6 +91,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isDatabaseOpen;
 
+    [ObservableProperty]
+    private bool _isShiftPressed;
+
     public MainWindowViewModel()
     {
         Status = "";
@@ -100,6 +103,7 @@ public partial class MainWindowViewModel : ViewModelBase
         DeckStats = "[ 0 / 0 / 0 / 0 ]";
         OverrideRatioLimits = false;
         IsDatabaseOpen = false;
+        IsShiftPressed = false;
 
         if (Design.IsDesignMode)
         {

@@ -16,4 +16,14 @@ public static class CardExtensions
         return Bitmap.DecodeToWidth(stream, 200, BitmapInterpolationMode.LowQuality);
     }
 
+    public static async Task<Bitmap?> LoadFullImage(this WeissSchwarzCard card)
+    {
+        var cachedPath = card.GetCachedImagePath();
+        if (cachedPath is null)
+            return null;
+
+        await using var stream = cachedPath.GetStream();
+        return Bitmap.DecodeToWidth(stream, 800, BitmapInterpolationMode.HighQuality);
+    }
+
 }

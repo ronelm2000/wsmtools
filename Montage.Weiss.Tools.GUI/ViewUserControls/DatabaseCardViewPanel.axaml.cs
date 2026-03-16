@@ -1,9 +1,12 @@
-using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
+using Avalonia.LogicalTree;
+using Montage.Card.API.Utilities;
+using Montage.Weiss.Tools.GUI.Views;
 using Serilog;
 using System;
+using System.Linq;
 
 namespace Montage.Weiss.Tools.GUI.ViewUserControls;
 
@@ -38,5 +41,24 @@ public partial class DatabaseCardViewPanel : UserControl
         var args = new RoutedEventArgs(ClickEvent, this);
         Logger()?.Information("Raised (Generic_PointerReleased): {args}", args.ToString());
         RaiseEvent(args);
+    }
+
+    private void UserControl_PointerEntered(object? sender, PointerEventArgs e)
+    {
+        var parents = this.GetLogicalAncestors().OfType<MainWindow>().FirstOrEmpty();
+        if (!this.IsFocused && !(parents?.IsFocused ?? false))
+        {
+            Logger()?.Debug("Focusing unfocused control so that Shift works.");
+            var searchTB = parents.FindLogicalDescendantOfType<TextBox>();
+            searchTB?.Focus();
+        }
+    }
+
+    private void UserControl_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.LeftShift || e.Key == Key.RightShift || e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+        {
+            // viewModel.IsShiftPressed = !viewModel.IsShiftPressed;
+        }
     }
 }

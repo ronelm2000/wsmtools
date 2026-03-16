@@ -4,9 +4,11 @@ using Flurl.Http;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Exceptions;
+using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Impls.PostProcessors;
 using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
 using System;
@@ -20,10 +22,9 @@ namespace Montage.Weiss.Tools.Impls.Parsers.Cards;
 /// Parses results from the English site. This is done using an exploit on cardsearch that allows more than 100 cards as a single query.
 /// This being an exploit means that at some time in the future this won't work.
 /// </summary>
-public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
+public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICardPostProcessor<WeissSchwarzCard>>
 {
     ILogger Log = Serilog.Log.ForContext<EnglishWSURLParser>();
-
 
     private static readonly string _WS_CARD_SEARCH_EX_FORMAT = "https://en.ws-tcg.com/cardlist/cardsearch_ex?expansion={0}&view=text&page={1}";
     
@@ -61,6 +62,8 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
 
     private static readonly string _EFFECT_PARAGRAPHS_SELECTOR = ".p-cards__detail.u-mt-22 p";
     private static readonly string _FLAVOR_SELECTOR = ".p-cards__detail-serif.u-mt-22";
+    private static readonly string _CARD_IMAGE_SELECTOR = ".p-cards__detail-wrapper-inner > .image > img";
+
 
     private static (string LookupString, CardColor Color)[] _COLOR_MAP = new[]
         {
@@ -137,7 +140,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
                 Log.Debug("The site is not EN WSTCG website. Failed compatibility check.");
                 return false;
             }
-            else if (uri.AbsolutePath != "/cardlist/list/")
+            else if (uri.AbsolutePath != "/cardlist/")
             {
                 Log.Debug("The site is not based on the cardlist. Failed compatibility check.");
                 return false;
@@ -157,6 +160,18 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
             Log.Debug("Unspecified Error during compatibility checking.");
             Log.Debug(e.Message);
             return false;
+        }
+    }
+
+    public bool IsIncluded(ICardPostProcessor<WeissSchwarzCard> item)
+    {
+        if (item is DeckLogPostProcessor)
+        {
+            Log.Information("DeckLog is excluded as all of its data is already parsed by this parser.");
+            return false;
+        } else
+        {
+            return true;
         }
     }
 
@@ -224,14 +239,21 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
                 Log.Information("Trying to access {url}... Failed with exception: {message}", String.Format(_WS_CARD_SEARCH_EX_FORMAT, expansion, page), e.Message);
                 isRedirected = true;
             }
-
         }
 
         foreach (var li in list)
         {
             var cardLink = li.QuerySelector<IHtmlAnchorElement>(_ANCHOR_SELECTOR)?.Href;
             if (cardLink is not null)
-                yield return await ParseSingleCard(cardLink!, cookies, cancellationToken);
+            {
+                var card = await ParseSingleCard(cardLink!, cookies, cancellationToken);
+                progress.Report(progressReport = progressReport with
+                {
+                    ReportMessage = new MultiLanguageString { EN = $"Found card: {card.Serial} [{card.Name.EN}]" },
+                    Percentage = 50
+                });
+                yield return card;
+            }
         }
 
         Log.Information("Ending...");
@@ -280,6 +302,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>
             .ToArray();
         
         res.Flavor = document.QuerySelector(_FLAVOR_SELECTOR)!.TextContent?.Trim() ?? string.Empty;
+        res.Images.Add(new Uri(document.QuerySelector<IHtmlImageElement>(_CARD_IMAGE_SELECTOR)!.Source!));
 
         res.Remarks = $"Extractor: {this.GetType().Name}";
 

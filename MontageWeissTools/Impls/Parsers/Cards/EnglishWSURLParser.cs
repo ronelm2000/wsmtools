@@ -11,9 +11,7 @@ using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.PostProcessors;
 using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
-using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Web;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Cards;
@@ -280,6 +278,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
         res.Name = new MultiLanguageString() { EN = document.QuerySelector(_DETAIL_NAME_SELECTOR)!.InnerHtml, JP = "" };
         res.Traits = document.QuerySelector(_TRAITS_SELECTOR)!.InnerHtml
             .Split("・")
+            .Where(s => !string.IsNullOrWhiteSpace(s))
             .Select(s => new WeissSchwarzTrait() { EN = s, JP = "" })
             .ToList();
         res.Type = document.QuerySelector(_TYPE_SELECTOR)!.InnerHtml

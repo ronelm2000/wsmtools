@@ -170,6 +170,7 @@ public partial class CardEntryViewModel : ViewModelBase
     [MemberNotNull(
         nameof(IsCharacter), 
         nameof(IsCharacterOrEvent), 
+        nameof(IsImageTooltipView),
         nameof(FindClimaxCombosCommand), 
         nameof(FindClimaxCombosCommand), 
         nameof(FindTraitsCommand),

@@ -15,7 +15,7 @@ public partial class ClimaxComboQueryViewModel : CardSearchQueryViewModel
     public ClimaxComboQueryViewModel(WeissSchwarzCard card) : base()
     {
         if (card.Type == CardType.Climax)
-            _climaxesToSearch = [card.Name.EN];
+            _climaxesToSearch = card.Name.ToEnumerable().ToList();
         else
             _climaxesToSearch = card.Effect.SelectMany(e => climaxRegex.Matches(e))
                 .Select(m => m.Groups[1].Value)

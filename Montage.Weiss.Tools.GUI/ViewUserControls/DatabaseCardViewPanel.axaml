@@ -8,7 +8,6 @@
 			 x:Class="Montage.Weiss.Tools.GUI.ViewUserControls.DatabaseCardViewPanel"
 			 x:DataType="dd:CardEntryViewModel"
 			 PointerEntered="UserControl_PointerEntered"
-			 KeyDown="UserControl_KeyDown"
 			 >
 	<Grid Name="CardGrid"
 		  RowDefinitions="Auto,Auto"

@@ -40,6 +40,17 @@ public record MultiLanguageString
     */
 
     /// <summary>
+    /// Returns an enumerable collection of non-empty string values contained in the resource set.
+    /// </summary>
+    /// <remarks>This method is used for non-language specific keyword searching when the string in all languages is required.</remarks>
+    /// <returns>An enumerable sequence of strings representing the non-empty values from the resource collection. The sequence
+    /// may be empty if no values are present.</returns>
+    public IEnumerable<string> ToEnumerable()
+    {
+        return resources.Values.Select(s => s ?? String.Empty).SkipWhile(string.IsNullOrEmpty);
+    }
+
+    /// <summary>
     /// Attempts to resolve this object into a string as much as it can.
     /// </summary>
     /// <returns></returns>

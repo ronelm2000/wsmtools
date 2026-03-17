@@ -130,14 +130,16 @@ public partial class MainView : UserControl
         e.Handled = true;
     }
 
-    private void UserControl_KeyDown(object? sender, KeyEventArgs e)
+    internal void WindowOnKeyDown(object? sender, KeyEventArgs e)
     {
-        if (DataContext is MainWindowViewModel viewModel)
+        if (DataContext is not MainWindowViewModel viewModel)
+            return;
+        
+        if (e.Key == Key.LeftShift || e.Key == Key.RightShift || e.KeyModifiers.HasFlag(KeyModifiers.Shift))
         {
-            if (e.Key == Key.LeftShift || e.Key == Key.RightShift || e.KeyModifiers.HasFlag(KeyModifiers.Shift))
-            {
-                viewModel.IsShiftPressed = !viewModel.IsShiftPressed;
-            }
+            viewModel.IsShiftPressed = !viewModel.IsShiftPressed;
+            Log.Information("KeyDown: {key} (Modifiers: {modifiers}) | IsShiftPressed: {status}", e.Key, e.KeyModifiers, viewModel.IsShiftPressed);
+
         }
     }
 }

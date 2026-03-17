@@ -8,6 +8,7 @@
         x:Class="Montage.Weiss.Tools.GUI.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Montage Deck Builder"
+        Loaded="Window_Loaded"
         >
         <views:MainView />
 </Window>

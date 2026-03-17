@@ -14,7 +14,7 @@ public partial class DatabaseCardViewPanel : UserControl
 {
     public static readonly RoutedEvent<RoutedEventArgs> ClickEvent = RoutedEvent.Register<DatabaseCardViewPanel, RoutedEventArgs>(nameof(Click), RoutingStrategies.Bubble | RoutingStrategies.Direct);
 
-    public static Func<ILogger?> Logger { get; set; } = () => Serilog.Log.ForContext<DatabaseCardViewPanel>();
+    public static Func<ILogger> Logger { get; set; } = () => Serilog.Log.ForContext<DatabaseCardViewPanel>();
 
     public static void AddClickHandler(Interactive element, EventHandler<RoutedEventArgs> handler) =>
          element.AddHandler(ClickEvent, handler);
@@ -36,6 +36,14 @@ public partial class DatabaseCardViewPanel : UserControl
         InitializeComponent();
     }
 
+    private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.LeftShift || e.Key == Key.RightShift || e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+        {
+            Logger().Information("Shift key state changed: {key} (Modifiers: {modifiers})", e.Key, e.KeyModifiers);
+        }
+    }
+
     private void Generic_PointerReleased(object? sender, Avalonia.Input.PointerReleasedEventArgs e)
     {
         var args = new RoutedEventArgs(ClickEvent, this);
@@ -48,17 +56,12 @@ public partial class DatabaseCardViewPanel : UserControl
         var parents = this.GetLogicalAncestors().OfType<MainWindow>().FirstOrEmpty();
         if (!this.IsFocused && !(parents?.IsFocused ?? false))
         {
-            Logger()?.Debug("Focusing unfocused control so that Shift works.");
-            var searchTB = parents.FindLogicalDescendantOfType<TextBox>();
-            searchTB?.Focus();
-        }
-    }
+            // I'll re-add this probably later as the idea of auto-focusing the control to the search textbox might be a good idea.
+            // Need more user feedback on this though as it could be annoying if the user just wanted to hover over the card and steal focus from the deck name or notes.
 
-    private void UserControl_KeyDown(object? sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.LeftShift || e.Key == Key.RightShift || e.KeyModifiers.HasFlag(KeyModifiers.Shift))
-        {
-            // viewModel.IsShiftPressed = !viewModel.IsShiftPressed;
+            //Logger()?.Debug("Focusing unfocused control so that Shift works.");
+            //var searchTB = parents.FindLogicalDescendantOfType<TextBox>();
+            //searchTB?.Focus();
         }
     }
 }

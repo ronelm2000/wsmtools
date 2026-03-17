@@ -191,6 +191,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ToggleDatabaseView() => IsDatabaseOpen = !IsDatabaseOpen;
 
     [RelayCommand]
+    private void ToggleCardImages() => IsShiftPressed = !IsShiftPressed;
+
+    [RelayCommand]
     private async Task InjectSearchQuery(CancellationToken token)
     {
         var aaaa = SearchBarText;

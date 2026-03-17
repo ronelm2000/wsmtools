@@ -10,7 +10,6 @@
              x:Class="Montage.Weiss.Tools.GUI.Views.MainView"
              x:DataType="vm:MainWindowViewModel"
              Loaded="UserControl_Loaded"
-             KeyDown="UserControl_KeyDown"
              >
   <Design.DataContext>
     <!-- This only sets the DataContext for the previewer in an IDE,
@@ -51,9 +50,16 @@
       </MenuItem>
       <MenuItem Header="_View">
         <MenuItem Header="_Database" Command="{Binding ToggleDatabaseViewCommand}" />
-        <MenuItem Header="_Toggle Light/Dark"
+        <MenuItem Header="Toggle _Light/Dark"
                   Command="{Binding ToggleRequestedThemeCommand}"
                   />
+        <MenuItem Header="Toggle Card _Images"
+                  Command="{Binding ToggleCardImagesCommand}"
+                  >
+            <ToolTip.Tip>
+                <TextBlock Text="Toggles whether card images are shown in the database entry tooltips. This is also invoked using Shift button." />
+            </ToolTip.Tip>
+        </MenuItem>
       </MenuItem>
     </Menu>
     <TextBlock/>

@@ -469,7 +469,8 @@ public enum Trigger
     Book,
     Gate,
     Discover,
-    Chance
+    Chance,
+    Focus
 }
 
 public enum CardSide

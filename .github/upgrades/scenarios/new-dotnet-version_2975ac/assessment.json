@@ -1,0 +1,2010 @@
+{
+  "settings": {
+    "components": {
+      "code": true,
+      "binaries": false
+    },
+    "targetId": "net10.0",
+    "targetDisplayName": ".NETCoreApp,Version=v10.0"
+  },
+  "analysisStartTime": "2026-03-19T13:25:56.9460903Z",
+  "analysisEndTime": "2026-03-19T13:26:08.0176355Z",
+  "privacyModeHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2270980",
+  "stats": {
+    "summary": {
+      "projects": 4,
+      "issues": 7,
+      "incidents": 67,
+      "effort": 67
+    },
+    "charts": {
+      "severity": {
+        "Mandatory": 5,
+        "Optional": 1,
+        "Potential": 61,
+        "Information": 0
+      },
+      "category": {
+        "NuGet": 7,
+        "Project": 3,
+        "Api": 57
+      }
+    }
+  },
+  "projects": [
+    {
+      "path": "Montage.Card.API\\Montage.Card.API.csproj",
+      "startingProject": true,
+      "issues": 5,
+      "storyPoints": 9,
+      "properties": {
+        "appName": "Montage.Card.API",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net9.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 44,
+        "numberOfCodeFiles": 44,
+        "linesTotal": 1404,
+        "linesOfCode": 1404,
+        "totalApiScanned": 1025,
+        "minLinesOfCodeToChange": 3,
+        "maxLinesOfCodeToChange": 3
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "4b0ee675-ab4b-4225-b4bf-a87a916814d8",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Montage.Card.API\\Montage.Card.API.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore, and replace with new package Microsoft.EntityFrameworkCore 10.0.5",
+              "protected": "Microsoft.EntityFrameworkCore, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore, and replace with new package Microsoft.EntityFrameworkCore 10.0.5"
+            },
+            "kind": "File",
+            "path": "Montage.Card.API\\Montage.Card.API.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore, and replace with new package Microsoft.EntityFrameworkCore 10.0.5",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore, and replace with new package Microsoft.EntityFrameworkCore 10.0.5",
+            "label": "Microsoft.EntityFrameworkCore 9.0.9",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore",
+              "PackageVersion": "9.0.9",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "fdf672ea-9587-4237-bf03-6345cb5a240d",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Montage.Card.API\\Montage.Card.API.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore.Relational, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Relational, and replace with new package Microsoft.EntityFrameworkCore.Relational 10.0.5",
+              "protected": "Microsoft.EntityFrameworkCore.Relational, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Relational, and replace with new package Microsoft.EntityFrameworkCore.Relational 10.0.5"
+            },
+            "kind": "File",
+            "path": "Montage.Card.API\\Montage.Card.API.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore.Relational, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Relational, and replace with new package Microsoft.EntityFrameworkCore.Relational 10.0.5",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore.Relational, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Relational, and replace with new package Microsoft.EntityFrameworkCore.Relational 10.0.5",
+            "label": "Microsoft.EntityFrameworkCore.Relational 9.0.9",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore.Relational",
+              "PackageVersion": "9.0.9",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "d418edbf-317b-4898-a1a3-2fbbb950c952",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Montage.Card.API\\Montage.Card.API.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Extensions.Caching.Memory, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.Extensions.Caching.Memory, and replace with new package Microsoft.Extensions.Caching.Memory 10.0.5",
+              "protected": "Microsoft.Extensions.Caching.Memory, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.Extensions.Caching.Memory, and replace with new package Microsoft.Extensions.Caching.Memory 10.0.5"
+            },
+            "kind": "File",
+            "path": "Montage.Card.API\\Montage.Card.API.csproj",
+            "snippet": "Microsoft.Extensions.Caching.Memory, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.Extensions.Caching.Memory, and replace with new package Microsoft.Extensions.Caching.Memory 10.0.5",
+            "protectedSnippet": "Microsoft.Extensions.Caching.Memory, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.Extensions.Caching.Memory, and replace with new package Microsoft.Extensions.Caching.Memory 10.0.5",
+            "label": "Microsoft.Extensions.Caching.Memory 9.0.9",
+            "properties": {
+              "PackageId": "Microsoft.Extensions.Caching.Memory",
+              "PackageVersion": "9.0.9",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "f84d36be-2bdb-4bf7-ba93-f204ac4376b4",
+          "ruleId": "NuGet.0003",
+          "projectPath": "Montage.Card.API\\Montage.Card.API.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Win32.Registry, 5.0.0\n\nRecommendation:\n\nPackage functionality included with new framework reference",
+              "protected": "Microsoft.Win32.Registry, 5.0.0\n\nRecommendation:\n\nPackage functionality included with new framework reference"
+            },
+            "kind": "File",
+            "path": "Montage.Card.API\\Montage.Card.API.csproj",
+            "snippet": "Microsoft.Win32.Registry, 5.0.0\n\nRecommendation:\n\nPackage functionality included with new framework reference",
+            "protectedSnippet": "Microsoft.Win32.Registry, 5.0.0\n\nRecommendation:\n\nPackage functionality included with new framework reference",
+            "label": "Microsoft.Win32.Registry 5.0.0",
+            "properties": {
+              "PackageId": "Microsoft.Win32.Registry",
+              "PackageVersion": "5.0.0",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "3439051f-cff1-40cc-9450-7df1d19f80ce",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Montage.Card.API\\Montage.Card.API.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "System.Text.Json, 9.0.9\n\nRecommendation:\n\nRemove System.Text.Json, and replace with new package System.Text.Json 10.0.5",
+              "protected": "System.Text.Json, 9.0.9\n\nRecommendation:\n\nRemove System.Text.Json, and replace with new package System.Text.Json 10.0.5"
+            },
+            "kind": "File",
+            "path": "Montage.Card.API\\Montage.Card.API.csproj",
+            "snippet": "System.Text.Json, 9.0.9\n\nRecommendation:\n\nRemove System.Text.Json, and replace with new package System.Text.Json 10.0.5",
+            "protectedSnippet": "System.Text.Json, 9.0.9\n\nRecommendation:\n\nRemove System.Text.Json, and replace with new package System.Text.Json 10.0.5",
+            "label": "System.Text.Json 9.0.9",
+            "properties": {
+              "PackageId": "System.Text.Json",
+              "PackageVersion": "9.0.9",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "b9a52ae8-e74d-48cc-bf89-9c606d35c142",
+          "ruleId": "Project.0002",
+          "projectPath": "Montage.Card.API\\Montage.Card.API.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net9.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net9.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "Montage.Card.API\\Montage.Card.API.csproj",
+            "snippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net9.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "1ad31cf0-89f9-459b-8ae6-c862a44cf971",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: Default \u0060Equals()\u0060 and \u0060GetHashCode()\u0060 throw for types marked with \u0060InlineArrayAttribute\u0060 ",
+          "projectPath": "Montage.Card.API\\Montage.Card.API.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var existingEntities = entities.Where(e =\u003E !e.Id.Equals(T.Empty));",
+              "protected": "M:System.ValueType.Equals(System.Object)"
+            },
+            "kind": "File",
+            "path": "Montage.Card.API\\Utilities\\DatabaseExtensions.cs",
+            "snippet": "var existingEntities = entities.Where(e =\u003E !e.Id.Equals(T.Empty));",
+            "protectedSnippet": "M:System.ValueType.Equals(System.Object)",
+            "label": "M:System.ValueType.Equals(System.Object)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/inlinearrayattribute.md",
+                "isCustom": false
+              }
+            ],
+            "line": 13,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "fb2b963d-68ee-4ce6-8169-42d9a344beda",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: MacCatalyst version normalization ",
+          "projectPath": "Montage.Card.API\\Montage.Card.API.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "if (Environment.OSVersion.Platform == PlatformID.Win32NT \u0026\u0026 fullOutCommand.ToLower() == \u0022sharex\u0022)\r\n            fullOutCommand = InstalledApplications.GetApplicationInstallPath(\u0022ShareX\u0022) \u002B @\u0022ShareX.exe\u0022;",
+              "protected": "P:System.Environment.OSVersion"
+            },
+            "kind": "File",
+            "path": "Montage.Card.API\\Services\\FileProcessor.cs",
+            "snippet": "if (Environment.OSVersion.Platform == PlatformID.Win32NT \u0026\u0026 fullOutCommand.ToLower() == \u0022sharex\u0022)\r\n            fullOutCommand = InstalledApplications.GetApplicationInstallPath(\u0022ShareX\u0022) \u002B @\u0022ShareX.exe\u0022;",
+            "protectedSnippet": "P:System.Environment.OSVersion",
+            "label": "P:System.Environment.OSVersion",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/10.0/maccatalyst-version-normalization.md",
+                "isCustom": false
+              }
+            ],
+            "line": 17,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "b3a1340e-43bd-4224-9d87-67dbbbe460a3",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "Montage.Card.API\\Montage.Card.API.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var activityLog = await database.MigrationLog.AsQueryable()\r\n            .Where(log =\u003E !log.IsDone)\r\n            .OrderBy(log =\u003E log.DateAdded) \r\n            .AsAsyncEnumerable()\r\n            .ToArrayAsync()\r\n            ;",
+              "protected": "T:System.Linq.AsyncEnumerable"
+            },
+            "kind": "File",
+            "path": "Montage.Card.API\\Services\\DatabaseUpdater.cs",
+            "snippet": "var activityLog = await database.MigrationLog.AsQueryable()\r\n            .Where(log =\u003E !log.IsDone)\r\n            .OrderBy(log =\u003E log.DateAdded) \r\n            .AsAsyncEnumerable()\r\n            .ToArrayAsync()\r\n            ;",
+            "protectedSnippet": "T:System.Linq.AsyncEnumerable",
+            "label": "T:System.Linq.AsyncEnumerable",
+            "line": 16,
+            "column": 8
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "MontageWeissTools\\Montage.Weiss.Tools.csproj",
+      "startingProject": true,
+      "issues": 0,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "Montage.Weiss.Tools",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 110,
+        "numberOfCodeFiles": 107,
+        "linesTotal": 13305,
+        "linesOfCode": 12979,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [],
+      "features": []
+    },
+    {
+      "path": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+      "startingProject": true,
+      "issues": 4,
+      "storyPoints": 46,
+      "properties": {
+        "appName": "Montage.Weiss.Tools.GUI",
+        "projectKind": "WinForms",
+        "frameworks": [
+          "net9.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 37,
+        "numberOfCodeFiles": 37,
+        "linesTotal": 2782,
+        "linesOfCode": 2782,
+        "totalApiScanned": 9212,
+        "minLinesOfCodeToChange": 44,
+        "maxLinesOfCodeToChange": 44
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "ce634af5-f0b4-4349-abfa-494c1f7b0f01",
+          "ruleId": "NuGet.0005",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Avalonia.ReactiveUI, 11.3.6\n\nRecommendation:\n\nNow maintained by ReactiveUI team as ReactiveUI.Avalonia package\nRemove Avalonia.ReactiveUI, and replace with new package Avalonia.ReactiveUI, 11.3.8",
+              "protected": "Avalonia.ReactiveUI, 11.3.6\n\nRecommendation:\n\nNow maintained by ReactiveUI team as ReactiveUI.Avalonia package\nRemove Avalonia.ReactiveUI, and replace with new package Avalonia.ReactiveUI, 11.3.8"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+            "snippet": "Avalonia.ReactiveUI, 11.3.6\n\nRecommendation:\n\nNow maintained by ReactiveUI team as ReactiveUI.Avalonia package\nRemove Avalonia.ReactiveUI, and replace with new package Avalonia.ReactiveUI, 11.3.8",
+            "protectedSnippet": "Avalonia.ReactiveUI, 11.3.6\n\nRecommendation:\n\nNow maintained by ReactiveUI team as ReactiveUI.Avalonia package\nRemove Avalonia.ReactiveUI, and replace with new package Avalonia.ReactiveUI, 11.3.8",
+            "label": "Avalonia.ReactiveUI 11.3.6",
+            "properties": {
+              "PackageId": "Avalonia.ReactiveUI",
+              "PackageVersion": "11.3.6",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "3d742449-3942-41ef-a24a-6fabfa5c8399",
+          "ruleId": "Project.0002",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net9.0\nRecommended target framework: net10.0-windows",
+              "protected": "Current target framework: net9.0\nRecommended target framework: net10.0-windows"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+            "snippet": "Current target framework: net9.0\nRecommended target framework: net10.0-windows",
+            "protectedSnippet": "Current target framework: net9.0\nRecommended target framework: net10.0-windows",
+            "properties": {
+              "CurrentTargetFramework": "net9.0",
+              "RecommendedTargetFramework": "net10.0-windows"
+            }
+          }
+        },
+        {
+          "incidentId": "f7025689-cc62-4950-8f2a-204aa6274203",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "public static async Task\u003CBitmap?\u003E Load(Uri url)",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\Models\\CardModel.cs",
+            "snippet": "public static async Task\u003CBitmap?\u003E Load(Uri url)",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 26,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "93a9282e-58fc-469e-bc3d-d68db180f05f",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var data = await response.Content.ReadAsByteArrayAsync();",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\Models\\CardModel.cs",
+            "snippet": "var data = await response.Content.ReadAsByteArrayAsync();",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 36,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "28d1cdb0-df37-4900-ad3f-0fe0e87eeb44",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "public CardModel(Uri imagePath)\r\n    {\r\n        Image = Load(imagePath);\r\n        Name ??= new();\r\n        Traits ??= new(){ };\r\n    }",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\Models\\CardModel.cs",
+            "snippet": "public CardModel(Uri imagePath)\r\n    {\r\n        Image = Load(imagePath);\r\n        Name ??= new();\r\n        Traits ??= new(){ };\r\n    }",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 19,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "6d6ab995-bac8-4a74-b1a2-5cbb252ed91a",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: Ambiguous overload resolution affecting StringValues implicit operators ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "string.Join(\u0022 - \u0022, a.EN, b.EN)",
+              "protected": "M:System.String.Join(System.String,System.ReadOnlySpan{System.String})"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\Models\\CardModel.cs",
+            "snippet": "string.Join(\u0022 - \u0022, a.EN, b.EN)",
+            "protectedSnippet": "M:System.String.Join(System.String,System.ReadOnlySpan{System.String})",
+            "label": "M:System.String.Join(System.String,System.ReadOnlySpan{System.String})",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/ambiguous-overload.md",
+                "isCustom": false
+              }
+            ],
+            "line": 17,
+            "column": 139
+          }
+        },
+        {
+          "incidentId": "511ce23e-3b67-4ecd-addb-4c383f02a69d",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: Ambiguous overload resolution affecting StringValues implicit operators ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "string.Join(\u0022 - \u0022, a.EN, b.EN)",
+              "protected": "M:System.String.Join(System.String,System.ReadOnlySpan{System.String})"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\Models\\CardModel.cs",
+            "snippet": "string.Join(\u0022 - \u0022, a.EN, b.EN)",
+            "protectedSnippet": "M:System.String.Join(System.String,System.ReadOnlySpan{System.String})",
+            "label": "M:System.String.Join(System.String,System.ReadOnlySpan{System.String})",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/ambiguous-overload.md",
+                "isCustom": false
+              }
+            ],
+            "line": 17,
+            "column": 102
+          }
+        },
+        {
+          "incidentId": "0b1dc07a-9374-4e1c-b57e-1b0d8ea89db9",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "public CardModel(Uri imagePath)\r\n    {\r\n        Image = Load(imagePath);\r\n        Name ??= new();\r\n        Traits ??= new(){ };\r\n    }",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\Models\\CardModel.cs",
+            "snippet": "public CardModel(Uri imagePath)\r\n    {\r\n        Image = Load(imagePath);\r\n        Name ??= new();\r\n        Traits ??= new(){ };\r\n    }",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 19,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "8ed34611-0f01-4bb5-9ed3-7b41bd471c25",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "public static async Task\u003CBitmap?\u003E Load(this Uri url)",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\Extensions\\UriExtensions.cs",
+            "snippet": "public static async Task\u003CBitmap?\u003E Load(this Uri url)",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 13,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "21b669ae-293a-4d85-ae9d-c42633bfa926",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var data = await response.Content.ReadAsByteArrayAsync();",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\Extensions\\UriExtensions.cs",
+            "snippet": "var data = await response.Content.ReadAsByteArrayAsync();",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 23,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "11e33442-e74d-4c2a-b1c0-4c72020975d5",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var counter = new Uri(\u0022avares://wsm-gui/Assets/Symbols/backup.png\u0022);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardEntryViewModel.cs",
+            "snippet": "var counter = new Uri(\u0022avares://wsm-gui/Assets/Symbols/backup.png\u0022);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 231,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "da5736b9-dea3-432e-a27e-41ebd82bd041",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var counter = new Uri(\u0022avares://wsm-gui/Assets/Symbols/backup.png\u0022);",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardEntryViewModel.cs",
+            "snippet": "var counter = new Uri(\u0022avares://wsm-gui/Assets/Symbols/backup.png\u0022);",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 231,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "a10bb85f-1186-46fd-b3f5-6e99225937d4",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var cxcSymbol = new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardEntryViewModel.cs",
+            "snippet": "var cxcSymbol = new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 230,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "c3747988-c5a1-4eb7-bcb8-768d6365e4db",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var cxcSymbol = new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022);",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardEntryViewModel.cs",
+            "snippet": "var cxcSymbol = new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022);",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 230,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "d89c210e-5065-498a-860d-e938a738ef90",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "public CardEntryViewModel(Uri imageUri, MultiLanguageString name, List\u003CMultiLanguageString\u003E traits)\r\n    {\r\n        DeclareObservables();\r\n\r\n        Card = new WeissSchwarzCard();\r\n        Name = name.AsNonEmptyString();\r\n        Traits = traits;\r\n        Serial = \u0022XXX/WS01-100\u0022;\r\n        Level = 1;\r\n        Cost = 0;\r\n        Power = 5000;\r\n        Soul = 1;\r\n        CardType = CardType.Character;\r\n        EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };\r\n        Effects = [\u0022[AUTO] Aaaaaaaaa\u0022];\r\n\r\n        _cachedImageTask = imageUri.Load();\r\n        _cachedTooltipImageTask = _cachedImageTask;\r\n    }",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardEntryViewModel.cs",
+            "snippet": "public CardEntryViewModel(Uri imageUri, MultiLanguageString name, List\u003CMultiLanguageString\u003E traits)\r\n    {\r\n        DeclareObservables();\r\n\r\n        Card = new WeissSchwarzCard();\r\n        Name = name.AsNonEmptyString();\r\n        Traits = traits;\r\n        Serial = \u0022XXX/WS01-100\u0022;\r\n        Level = 1;\r\n        Cost = 0;\r\n        Power = 5000;\r\n        Soul = 1;\r\n        CardType = CardType.Character;\r\n        EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };\r\n        Effects = [\u0022[AUTO] Aaaaaaaaa\u0022];\r\n\r\n        _cachedImageTask = imageUri.Load();\r\n        _cachedTooltipImageTask = _cachedImageTask;\r\n    }",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 92,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "5e55d2a4-a6a1-42c2-8e34-4b076e11f4e1",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardEntryViewModel.cs",
+            "snippet": "EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 105,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "17c9c7a4-5110-4469-9384-cebf9194431e",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardEntryViewModel.cs",
+            "snippet": "EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 105,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "77509e3d-5579-4727-9d1f-0dcccc41e95e",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "public CardEntryViewModel(Uri imageUri, MultiLanguageString name, List\u003CMultiLanguageString\u003E traits)\r\n    {\r\n        DeclareObservables();\r\n\r\n        Card = new WeissSchwarzCard();\r\n        Name = name.AsNonEmptyString();\r\n        Traits = traits;\r\n        Serial = \u0022XXX/WS01-100\u0022;\r\n        Level = 1;\r\n        Cost = 0;\r\n        Power = 5000;\r\n        Soul = 1;\r\n        CardType = CardType.Character;\r\n        EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };\r\n        Effects = [\u0022[AUTO] Aaaaaaaaa\u0022];\r\n\r\n        _cachedImageTask = imageUri.Load();\r\n        _cachedTooltipImageTask = _cachedImageTask;\r\n    }",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardEntryViewModel.cs",
+            "snippet": "public CardEntryViewModel(Uri imageUri, MultiLanguageString name, List\u003CMultiLanguageString\u003E traits)\r\n    {\r\n        DeclareObservables();\r\n\r\n        Card = new WeissSchwarzCard();\r\n        Name = name.AsNonEmptyString();\r\n        Traits = traits;\r\n        Serial = \u0022XXX/WS01-100\u0022;\r\n        Level = 1;\r\n        Cost = 0;\r\n        Power = 5000;\r\n        Soul = 1;\r\n        CardType = CardType.Character;\r\n        EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };\r\n        Effects = [\u0022[AUTO] Aaaaaaaaa\u0022];\r\n\r\n        _cachedImageTask = imageUri.Load();\r\n        _cachedTooltipImageTask = _cachedImageTask;\r\n    }",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 92,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "7eccabe6-d452-4c4f-8295-22e94d076aed",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardEntryViewModel.cs",
+            "snippet": "EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 105,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "394f8737-d60a-45a7-8565-78150dbbe99b",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardEntryViewModel.cs",
+            "snippet": "EffectMarkers = new() { Bitmap.DecodeToHeight(AssetLoader.Open(new Uri(\u0022avares://wsm-gui/Assets/Symbols/cx_combo.png\u0022)), 12) };",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 105,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "7dc71869-87e9-4301-add4-1cc473b95f17",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Image ??= new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load();",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardRatioViewModel.cs",
+            "snippet": "Image ??= new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load();",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 47,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "367babff-c2ef-46f0-b2db-8624e71be004",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Image ??= new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load();",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardRatioViewModel.cs",
+            "snippet": "Image ??= new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load();",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 47,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "414cd988-d2c0-41a3-b84c-9b7c557fcbb5",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Image ??= new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load();",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardRatioViewModel.cs",
+            "snippet": "Image ??= new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load();",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 47,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "545804cc-a6d0-49ad-88c4-13f4c5f326f7",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Image ??= new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load();",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\CardRatioViewModel.cs",
+            "snippet": "Image ??= new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load();",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 47,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "537f00f0-1485-43ec-869f-ad027a90df5d",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "await Parent!().Launcher.LaunchUriAsync(new Uri(url));",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "await Parent!().Launcher.LaunchUriAsync(new Uri(url));",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 651,
+            "column": 16
+          }
+        },
+        {
+          "incidentId": "5b224b09-2e36-4ae4-af9a-8d2111d3d5bd",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "await Parent!().Launcher.LaunchUriAsync(new Uri(url));",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "await Parent!().Launcher.LaunchUriAsync(new Uri(url));",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 651,
+            "column": 16
+          }
+        },
+        {
+          "incidentId": "69ff0a78-5a7a-4bd3-b6af-fb47aa77feca",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var filesFolderPath = Path.Get(path.Path.LocalPath).Up().Combine(path.Name[0..^7] \u002B \u0022-files\u0022);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "var filesFolderPath = Path.Get(path.Path.LocalPath).Up().Combine(path.Name[0..^7] \u002B \u0022-files\u0022);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 584,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "c278bae6-43dd-41c8-85d0-1aca11e205dd",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var deck = await localDeckParser.Parse(firstPath.Path.AbsolutePath, progressReporter, token);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "var deck = await localDeckParser.Parse(firstPath.Path.AbsolutePath, progressReporter, token);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 398,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "212882ed-535c-4fa8-9646-6b14512e41e4",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var deck = await localDeckParser.Parse(firstPath.Path.AbsolutePath, progressReporter, token);",
+              "protected": "P:System.Uri.AbsolutePath"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "var deck = await localDeckParser.Parse(firstPath.Path.AbsolutePath, progressReporter, token);",
+            "protectedSnippet": "P:System.Uri.AbsolutePath",
+            "label": "P:System.Uri.AbsolutePath",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 398,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "0a9bcb3d-b64f-4632-a43c-83866b3ffed0",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var finalPath = Path.Get(savePath.Path.LocalPath);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "var finalPath = Path.Get(savePath.Path.LocalPath);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 377,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "ebde2eaf-9211-4829-9fde-a7b60807326a",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load() });",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load() });",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 134,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "bcb83015-41cb-4a23-b1e5-3259c856de80",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load() });",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load() });",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 134,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "2c66cebe-1122-49e6-93f1-c70b7d65eb22",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "0f0986f2-6df3-4974-b943-1d0c96fd347f",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "785cd6c2-5edb-4619-9b01-b6d34aef4fbe",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "0bd1bca8-ba11-43fa-9676-71bf520f77d1",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "711ed4e2-996a-468a-b95b-007f10b4dd56",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "6dd5d19e-b9b3-4c14-9864-3799979a7ed7",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "5d47db80-2810-4314-bc49-07f01ab571f4",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load() });",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load() });",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 134,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "406a5366-f967-4efc-9828-2d2e4a465bfe",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load() });",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "DeckRatioList.Add(new CardRatioViewModel() { Image = new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022).Load() });",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 134,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "d5013e0e-8586-4082-95d5-6b57e471d9b8",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "954a9d50-8e38-4821-b495-4761b47929ca",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "c71100aa-4710-4d04-8226-c94a04bebe47",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "f6a7c1b6-7f07-4169-9845-af35cf4c158a",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "2518f064-6a4e-4f5c-8b39-5d027e72a371",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "fa3671de-6add-426e-bef6-7dfc0428d67d",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.GUI\\Montage.Weiss.Tools.GUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.GUI\\ViewModels\\MainWindowViewModel.cs",
+            "snippet": "_databaseViewSourceList.AddRange(\r\n                [\r\n                    new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 1\u0022, JP = \u0022Sample 1 But JP\u0022 },\r\n                    [\r\n                        new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 },\r\n                        new MultiLanguageString { EN = \u0022BBBB\u0022, JP = \u0022BBBB JP\u0022 }\r\n                    ]\r\n                 ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 2\u0022, JP = \u0022Sample 2 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this },\r\n                new CardEntryViewModel(\r\n                    new Uri(\u0022avares://wsm-gui/Assets/Samples/sample_card.jpg\u0022),\r\n                    new MultiLanguageString { EN = \u0022Sample 3\u0022, JP = \u0022Sample 3 But JP\u0022 },\r\n                    [ new MultiLanguageString { EN = \u0022AAAA\u0022, JP = \u0022AAAA JP\u0022 } ]\r\n                ) { Parent = this }\r\n                ]\r\n            );",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 110,
+            "column": 12
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+      "startingProject": true,
+      "issues": 3,
+      "storyPoints": 12,
+      "properties": {
+        "appName": "Montage.Weiss.Tools.Test",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net9.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 15,
+        "numberOfCodeFiles": 13,
+        "linesTotal": 2740,
+        "linesOfCode": 945,
+        "totalApiScanned": 773,
+        "minLinesOfCodeToChange": 10,
+        "maxLinesOfCodeToChange": 10
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "bfd6b648-cc5a-4c56-8e66-76195450d366",
+          "ruleId": "NuGet.0002",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.Extensions.DependencyInjection.Abstractions, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection.Abstractions, and replace with new package Microsoft.Extensions.DependencyInjection.Abstractions 10.0.5",
+              "protected": "Microsoft.Extensions.DependencyInjection.Abstractions, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection.Abstractions, and replace with new package Microsoft.Extensions.DependencyInjection.Abstractions 10.0.5"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+            "snippet": "Microsoft.Extensions.DependencyInjection.Abstractions, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection.Abstractions, and replace with new package Microsoft.Extensions.DependencyInjection.Abstractions 10.0.5",
+            "protectedSnippet": "Microsoft.Extensions.DependencyInjection.Abstractions, 9.0.9\n\nRecommendation:\n\nRemove Microsoft.Extensions.DependencyInjection.Abstractions, and replace with new package Microsoft.Extensions.DependencyInjection.Abstractions 10.0.5",
+            "label": "Microsoft.Extensions.DependencyInjection.Abstractions 9.0.9",
+            "properties": {
+              "PackageId": "Microsoft.Extensions.DependencyInjection.Abstractions",
+              "PackageVersion": "9.0.9",
+              "PackageNewVersion": "10.0.5",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "8abcaf9c-bb3d-4435-82b4-978fdb946acf",
+          "ruleId": "Project.0002",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net9.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net9.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+            "snippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net9.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net9.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "106a1956-b9c0-4384-b1c7-f96084015ccf",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var url = new Uri(\u0022https://www.encoredecks.com/images/JP/W69/039.gif\u0022);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\Internal\\CardTests.cs",
+            "snippet": "var url = new Uri(\u0022https://www.encoredecks.com/images/JP/W69/039.gif\u0022);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 118,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "fc1dcc31-0b03-4197-9d3b-d9e99abaa9f7",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var url = new Uri(\u0022https://www.encoredecks.com/images/JP/W69/039.gif\u0022);",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\Internal\\CardTests.cs",
+            "snippet": "var url = new Uri(\u0022https://www.encoredecks.com/images/JP/W69/039.gif\u0022);",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 118,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "a6cf84dd-3b07-47ef-832b-e591014b3799",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Assert.IsTrue(resultCards[\u0022NTA/WE48-25\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/n/nta_we48/nta_we48_25.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\DeckLog\\PostProcessorTests.cs",
+            "snippet": "Assert.IsTrue(resultCards[\u0022NTA/WE48-25\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/n/nta_we48/nta_we48_25.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 153,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "5359693e-dff8-4780-9abe-23e4d8bcfa46",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Assert.IsTrue(resultCards[\u0022NTA/WE48-25\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/n/nta_we48/nta_we48_25.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\DeckLog\\PostProcessorTests.cs",
+            "snippet": "Assert.IsTrue(resultCards[\u0022NTA/WE48-25\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/n/nta_we48/nta_we48_25.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 153,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "90650820-4c7f-4235-a005-69346af80c98",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Assert.IsTrue(resultCards[\u0022Kcl/W102-021S\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/k/key_w102/kcl_w102_021s.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\DeckLog\\PostProcessorTests.cs",
+            "snippet": "Assert.IsTrue(resultCards[\u0022Kcl/W102-021S\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/k/key_w102/kcl_w102_021s.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 124,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "f1de158f-daae-412e-8c92-d4ad6315c6ed",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Assert.IsTrue(resultCards[\u0022Kcl/W102-021S\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/k/key_w102/kcl_w102_021s.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\DeckLog\\PostProcessorTests.cs",
+            "snippet": "Assert.IsTrue(resultCards[\u0022Kcl/W102-021S\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/k/key_w102/kcl_w102_021s.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 124,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "2d45316a-82ec-4875-b9b4-ff4ac0fcf2b1",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Assert.IsTrue(resultCards[\u0022BD/W54-008\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/b/bd_w54/bd_w54_008.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\DeckLog\\PostProcessorTests.cs",
+            "snippet": "Assert.IsTrue(resultCards[\u0022BD/W54-008\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/b/bd_w54/bd_w54_008.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 95,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "2653a4ae-ae11-4fe3-b8fa-7eb97c6632e4",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Assert.IsTrue(resultCards[\u0022BD/W54-008\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/b/bd_w54/bd_w54_008.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\DeckLog\\PostProcessorTests.cs",
+            "snippet": "Assert.IsTrue(resultCards[\u0022BD/W54-008\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://ws-tcg.com/wordpress/wp-content/images/cardlist/b/bd_w54/bd_w54_008.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 95,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "eda5224f-ff86-47be-ac02-530133b80f06",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Assert.IsTrue(resultCards[\u0022BD/EN-W03-001\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://en.ws-tcg.com/wordpress/wp-content/images/cardimages/b/bd_en_w03/BD_EN_W03_001.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\DeckLog\\PostProcessorTests.cs",
+            "snippet": "Assert.IsTrue(resultCards[\u0022BD/EN-W03-001\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://en.ws-tcg.com/wordpress/wp-content/images/cardimages/b/bd_en_w03/BD_EN_W03_001.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 66,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "f143decd-e28b-4cfe-acb2-f183863a24a1",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "Montage.Weiss.Tools.Test\\Montage.Weiss.Tools.Test.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Assert.IsTrue(resultCards[\u0022BD/EN-W03-001\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://en.ws-tcg.com/wordpress/wp-content/images/cardimages/b/bd_en_w03/BD_EN_W03_001.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "Montage.Weiss.Tools.Test\\DeckLog\\PostProcessorTests.cs",
+            "snippet": "Assert.IsTrue(resultCards[\u0022BD/EN-W03-001\u0022]\r\n            .Images\r\n            .Contains(new Uri(\u0022https://en.ws-tcg.com/wordpress/wp-content/images/cardimages/b/bd_en_w03/BD_EN_W03_001.png\u0022)),\r\n            \u0022The expected URI is missing.\u0022\r\n            );",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 66,
+            "column": 8
+          }
+        }
+      ],
+      "features": []
+    }
+  ],
+  "rules": {
+    "NuGet.0002": {
+      "id": "NuGet.0002",
+      "isFeature": false,
+      "description": "NuGet package upgrade is recommended for selected target framework.\n\nStandard .NET packages are recommended to have versions matching version of .NET that project targets.\n\nSome other packages also are known to work better for selected target frameworks.",
+      "label": "NuGet package upgrade is recommended",
+      "severity": "Potential",
+      "effort": 1,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262530",
+          "isCustom": false
+        }
+      ]
+    },
+    "NuGet.0003": {
+      "id": "NuGet.0003",
+      "isFeature": false,
+      "description": "NuGet package functionality is included with framework reference.\n\nPackage needs to be removed.",
+      "label": "NuGet package functionality is included with framework reference",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262609",
+          "isCustom": false
+        }
+      ]
+    },
+    "Project.0002": {
+      "id": "Project.0002",
+      "isFeature": false,
+      "description": "Project\u0027s target framework(s) needs to be changed to the new target framework that you selected for this upgrade.\n\nDuring upgrade target framework will be adjusted to corresponding platform when applicable. In some cases project would result in multiple target frameworks after the upgrade if it was using features that now have their own platforms in modern .NET frameworks (windows, iOS, Android etc).",
+      "label": "Project\u0027s target framework(s) needs to be changed",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Overview of porting from .NET Framework to .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265227",
+          "isCustom": false
+        },
+        {
+          "title": ".NET project SDKs",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265226",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0003": {
+      "id": "Api.0003",
+      "isFeature": false,
+      "description": "API has a behavioral change in selected .NET version: code and binaries may behave differently at runtime without needing recompilation, but the new behavior might be undesirable and require updates.",
+      "label": "Behavioral change in selected .NET version",
+      "severity": "Potential",
+      "effort": 1
+    },
+    "Api.0001": {
+      "id": "Api.0001",
+      "isFeature": false,
+      "description": "API is binary incompatible for selected .NET version: affects existing binaries, often requiring recompilation, because the API has changed in a way that prevents older binaries from loading or executing.",
+      "label": "Binary incompatible for selected .NET version",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Breaking changes in .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262679",
+          "isCustom": false
+        }
+      ]
+    },
+    "NuGet.0005": {
+      "id": "NuGet.0005",
+      "isFeature": false,
+      "description": "NuGet package is deprecated.\n\nGo to its documentation and if there is a guidance for replacement of functionality provided by this package.",
+      "label": "NuGet package is deprecated",
+      "severity": "Optional",
+      "effort": 1,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262531",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0002": {
+      "id": "Api.0002",
+      "isFeature": false,
+      "description": "API is source incompatible for selected .NET version: requires code changes to compile successfully when targeting a new version, such as removing obsolete APIs or changing method signatures.",
+      "label": "Source incompatible for selected .NET version",
+      "severity": "Potential",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Breaking changes in .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262679",
+          "isCustom": false
+        }
+      ]
+    }
+  }
+}

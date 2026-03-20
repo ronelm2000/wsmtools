@@ -74,7 +74,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
     {
         var parser = await ioc.GetAllInstances<IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>>()
             .ToAsyncEnumerable()
-            .WhereAwait(async parser => await parser.IsCompatible(Source))
+            .Where(async (parser, ct) => await parser.IsCompatible(Source))
             .OrderByDescending(parser => parser.Priority)
             .FirstAsync(cancellationToken);
         var deck = await parser.Parse(Source, deckParserProgress, cancellationToken);
@@ -99,7 +99,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
 
         deck = await inspectors.OrderByDescending(inspector => inspector.Priority)
             .ToAsyncEnumerable()
-            .AggregateAwaitAsync(deck, async (d, inspector) => await inspector.Inspect(d, inspectionOptions));
+            .AggregateAsync(deck, async (d, inspector, ct) => await inspector.Inspect(d, inspectionOptions));
 
         if (deck != WeissSchwarzDeck.Empty)
             await exporter.Export(deck, this, token);

@@ -32,6 +32,7 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         {
             var parser = container.GetInstance<ParseVerb>();
             parser.URI = url;
+            parser.ParserHints = ["skip:databaseupdate"];
             await parser.Run(container, p, ct);
         };
     }
@@ -95,7 +96,7 @@ public class EncoreDecksParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 
         using (var db = _database())
         {
-            await db.Database.MigrateAsync(cancellationToken);
+            //await db.Database.MigrateAsync(cancellationToken);
 
             foreach (var card in deckJSON.Cards)
             {

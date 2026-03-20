@@ -1,6 +1,7 @@
 ﻿using Fluent.IO;
 using Flurl.Http;
 using Lamar;
+using Montage.Card.API.Compat;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Utilities;
@@ -75,14 +76,14 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
                 progress.Report(report);
                 return p;
             })
-            .SelectAwaitWithCancellation(async (wsc, ct) =>
+            .Select(async (wsc, ct) =>
             (   card: wsc,
                 stream: await wsc.GetImageStreamAsync(await _cookieSession(wsc.Images.LastOrDefault(defaultURI)), ct))
             )
-            .ToDictionaryAwaitWithCancellationAsync(
+            .ToDictionaryAsync(
                 async (p, ct) => await ValueTask.FromResult(p.card),
                 async (p, ct) => PreProcess(await Image.LoadAsync(p.stream, ct)),
-                cancellationToken
+                cancellationToken: cancellationToken
                 );
 
         var (encoder, format) = info.Flags.Any(s => s.ToLower() == "png") == true ? _pngEncoder : _jpegEncoder;

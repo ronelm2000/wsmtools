@@ -440,7 +440,7 @@ public partial class MainWindowViewModel : ViewModelBase
             .AsNoTracking()
             .ToAsyncEnumerable()
             .Where(c => searchTerms.All(st => st.Invoke(c)) && SearchQueries.All(sq => sq.ToPredicate().Invoke(c)))
-            .Distinct(c => c.Serial)
+            .DistinctBy(c => c.Serial)
             .OrderBy(c =>
             {
                 var serial = WeissSchwarzCard.ParseSerial(c.Serial);

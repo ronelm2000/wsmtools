@@ -10,8 +10,8 @@ namespace Montage.Weiss.Tools.Entities.External.DeckLog;
 #pragma warning disable CS8424 // The EnumeratorCancellationAttribute will have no effect. The attribute is only effective on a parameter of type CancellationToken in an async-iterator method returning IAsyncEnumerable
 internal interface IDeckLogClient
 {
-    Task<bool> IsCompatible(WeissSchwarzCard card);
-    Task<bool> IsCompatible(CardLanguage language, CardSide side);
+    Task<bool> IsCompatible(WeissSchwarzCard card, CancellationToken cancellationToken = default);
+    Task<bool> IsCompatible(CardLanguage language, CardSide side, CancellationToken cancellationToken = default);
     IAsyncEnumerable<DLCardEntry> FindCardEntries(
         DeckLogContext context,
         string nsCodes, 

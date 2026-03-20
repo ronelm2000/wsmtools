@@ -102,7 +102,7 @@ public class CacheVerb : IVerbCommand
             var query = from card in db.WeissSchwarzCards.AsQueryable()
                         where card.Serial.ToLower() == ReleaseIDorFullSerialID.ToLower()
                         select card;
-            return query.ToAsyncEnumerable().Take(1);
+            return query.AsAsyncEnumerable().Take(1);
         }
         else
         {
@@ -110,7 +110,7 @@ public class CacheVerb : IVerbCommand
             var query = from card in db.WeissSchwarzCards.AsQueryable()
                         where EF.Functions.Like(card.Serial.ToLower(), $"%/{releaseID}%")
                         select card;
-            return query.ToAsyncEnumerable().Where(c => c.Language == language.Value);
+            return query.AsAsyncEnumerable().Where(async (c, _) => c.Language == language.Value);
         }
     }
 

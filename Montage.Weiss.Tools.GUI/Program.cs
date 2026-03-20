@@ -1,7 +1,10 @@
 ﻿using Avalonia;
 using Montage.Weiss.Tools.GUI.Extensions;
 using System;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia; // UseReactiveUI, RegisterReactiveUIViews* (core)
+using ReactiveUI.Avalonia;
+using Splat;
+using ReactiveUI.Avalonia.Splat; // Autofac, DryIoc, Ninject, Microsoft.Extensions.DependencyInjection integrations
 
 namespace Montage.Weiss.Tools.GUI;
 
@@ -19,7 +22,15 @@ internal sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .UseReactiveUI()
+            .UseReactiveUIWithMicrosoftDependencyResolver(
+                services =>
+                {
+                },
+                withResolver: sp =>
+                {
+
+                }
+            )
             .WithInterFont()
             .LogToTrace();
 }

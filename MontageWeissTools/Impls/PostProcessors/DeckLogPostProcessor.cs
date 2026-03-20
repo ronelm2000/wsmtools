@@ -1,7 +1,6 @@
 ﻿using AngleSharp.Dom;
 using Flurl.Http;
 using Lamar;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
@@ -11,12 +10,7 @@ using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors;
 
@@ -50,7 +44,8 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
     {
         var firstCard = cards[0];
-        var deckLogClient = await deckLogClients.ToAsyncEnumerable().FirstOrDefaultAwaitAsync(async c => await c.IsCompatible(firstCard));
+        var deckLogClient = await deckLogClients.ToAsyncEnumerable()
+            .FirstAsync( async (c, ct) => await c.IsCompatible(firstCard, ct), CancellationToken.None);
         if (deckLogClient is null)
             return false;
 
@@ -208,7 +203,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             return results;
 
         var firstCard = cardData[0];
-        var deckLogClient = await deckLogClients.ToAsyncEnumerable().FirstOrDefaultAwaitAsync(async c => await c.IsCompatible(firstCard), cancellationToken);
+        var deckLogClient = await deckLogClients.ToAsyncEnumerable().FirstAsync(async (c, ct) => await c.IsCompatible(firstCard, ct), cancellationToken);
 
         foreach (var titleCode in titleCodes)
         {

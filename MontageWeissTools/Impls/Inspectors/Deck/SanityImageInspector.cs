@@ -66,7 +66,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
     {
         Log.Information("Detecting broken image links...");
         var brokenLinkKeyCards = deck.Ratios.Keys.ToAsyncEnumerable()
-            .WhereAwaitWithCancellation(async (card, ct) =>
+            .Where(async (card, ct) =>
             {
                 var host = $"https://{card.Images.LastOrDefault()?.Host}";
                 var cookieSession = (host is null) ? null : await _globalCookieJar.FindOrCreate(host);
@@ -78,7 +78,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
             var nonBrokenLink = await card.Images.Reverse<Uri>()
                 .Concat(_db.FindFoils(card).SelectMany(c => c.Images))
                 .ToAsyncEnumerable()
-                .FirstAwaitWithCancellationAsync(async (u, ct) => await IsImagePresent(u, ct), options.CancellationToken);
+                .FirstAsync(async (u, ct) => await IsImagePresent(u, ct), options.CancellationToken);
 
             var modifiedCard = card.Clone();
             modifiedCard.Images.Add(nonBrokenLink);

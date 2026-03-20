@@ -38,14 +38,14 @@ public class ActivityLogTranslator : IActivityLogTranslator
         if (!string.IsNullOrWhiteSpace(deleteArgs.Language))
         {
             CardLanguage? lang = TranslateLanguage(deleteArgs.Language);
-            if (lang is not null) query = query.Where(card => card.Language == lang);
+            if (lang is not null) query = query.Where(async (card, _) => card.Language == lang);
         }
         if (!string.IsNullOrWhiteSpace(deleteArgs.Language))
         {
             var version = new Version(deleteArgs.VersionLessThan);
-            query = query.Where(card => Version.Parse(card.VersionTimestamp.Replace(new Regex(@"(-[\w\d]+)?(\+[\w\d]+)?"), ""))  < version);
+            query = query.Where(async (card, ct) => Version.Parse(card.VersionTimestamp.Replace(new Regex(@"(-[\w\d]+)?(\+[\w\d]+)?"), ""))  < version);
         }
-        db.RemoveRange(query.ToEnumerable());
+        db.RemoveRange(query.ToBlockingEnumerable(ct));
         await db.SaveChangesAsync(ct);
     }
 

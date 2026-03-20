@@ -30,7 +30,7 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 
     private ILogger Log = Serilog.Log.ForContext<DeckLogParser>();
     private readonly Func<CardDatabaseContext> _database;
-    private readonly Func<string, IProgress<CommandProgressReport>, CancellationToken, Task> _parse;
+    private readonly Func<string, IProgress<CommandProgressReport>, CancellationToken, Task<bool>> _parse;
 
     public string[] Alias => new[] { "decklog" };
 
@@ -44,6 +44,7 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
             var parser = ioc.GetInstance<ParseVerb>();
             parser.URI = $"https://www.encoredecks.com/api/series/{setGUID}/cards";
             await parser.Run(ioc, progress, cancel);
+            return true;
         };
     }
 
@@ -92,9 +93,9 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 
         var missingSets = await items.Select(ratio => ratio.CardNumber.Replace('＋', '+'))
                 .ToAsyncEnumerable()
-                .WhereAwaitWithCancellation(async (serial, ct) =>  (await db.WeissSchwarzCards.FindAsync(new[] { serial }, ct)) == null
-                                                                && (await db.WeissSchwarzCards.FindAsync(new[] { WeissSchwarzCard.RemoveFoil(serial) }, ct)) == null
-                                            )
+                .Where(async (serial, ct) =>  (await db.WeissSchwarzCards.FindAsync(new[] { serial }, ct)) == null
+                                           && (await db.WeissSchwarzCards.FindAsync(new[] { WeissSchwarzCard.RemoveFoil(serial) }, ct)) == null
+                                           )
                 .Select(serial => WeissSchwarzCard.ParseSerial(serial).ReleaseID)
                 .Distinct()
                 .ToListAsync(cancellationToken);
@@ -112,7 +113,8 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
                 .Where(set => missingSets.Contains($"{set.Side}{set.Release}"))
                 .Select(set => set.Id)
                 .ToAsyncEnumerable()
-                .ForEachAwaitWithCancellationAsync((set, ct) => _parse(set, aggregator, ct), cancellationToken);
+                .SelectParallelAsync(set => _parse(set, aggregator, cancellationToken))
+                .AggregateAsync( (a, b) => a && b, cancellationToken);
         }
 
         cancellationToken.ThrowIfCancellationRequested();

@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
+using Montage.Card.API.Compat;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
@@ -28,7 +29,7 @@ public class ParseVerb : IVerbCommand, IParseInfo
         var Log = Serilog.Log.ForContext<ParseVerb>();
         var parser = await container.GetAllInstances<ICardSetParser<WeissSchwarzCard>>()
             .ToAsyncEnumerable()
-            .WhereAwait(async parser => await parser.IsCompatible(this))
+            .Where(async (parser, ct) => await parser.IsCompatible(this))
             .FirstAsync(ct);
 
         var redirector = new CommandProgressAggregator(progress);
@@ -37,10 +38,10 @@ public class ParseVerb : IVerbCommand, IParseInfo
 
         var postProcessors = await container.GetAllInstances<ICardPostProcessor<WeissSchwarzCard>>()
             .ToAsyncEnumerable()
-            .WhereAwait(async processor => await processor.IsCompatible(cardList))
+            .Where(async (processor, ct) => await processor.IsCompatible(cardList))
             .Where(processor => (parser is IFilter<ICardPostProcessor<WeissSchwarzCard>> filter) ? filter.IsIncluded(processor) : true)
-            .WhereAwait(async processor => (processor is ISkippable<IParseInfo> skippable) ? await skippable.IsIncluded(this) : true)
-            .WhereAwait(async processor => (processor is ISkippable<ICardSetParser<WeissSchwarzCard>> skippable) ? await skippable.IsIncluded(parser) : true)
+            .Where(async (processor, ct) => (processor is ISkippable<IParseInfo> skippable) ? await skippable.IsIncluded(this) : true)
+            .Where(async (processor, ct) => (processor is ISkippable<ICardSetParser<WeissSchwarzCard>> skippable) ? await skippable.IsIncluded(parser) : true)
             .OrderByDescending(processor => processor.Priority)
             .ToArrayAsync(ct)
             ;
@@ -48,18 +49,21 @@ public class ParseVerb : IVerbCommand, IParseInfo
         redirector.PostProcessorCount = postProcessors.Length;
         cards = postProcessors.Aggregate(cards, (pp, cs) => cs.Process(pp, redirector, ct));
 
-        await container.UpdateCardDatabase(redirector, ct);
+        Log.Information("Parser {parser}, Post-Processors: {pps}", parser.GetType().Name, redirector.PostProcessorCount);
+
+        if (!ParserHints.Contains("skip:databaseupdate"))
+            await container.UpdateCardDatabase(redirector, ct);
 
         await using (var db = container.GetInstance<CardDatabaseContext>())
         {
             var allCards = await cards
-                .Select(c =>
+                .Select( (WeissSchwarzCard c) => 
                 {
                     c.VersionTimestamp = Program.AppVersion;
                     return c;
                 })
-                .Distinct(c => c.Serial)
-                .ToDictionaryAsync(c => c.Serial, ct);
+                .DistinctBy(c => c.Serial)
+                .ToDictionaryAsync(c => c.Serial, cancellationToken: ct);
 
             progress.Report(new CommandProgressReport
             {

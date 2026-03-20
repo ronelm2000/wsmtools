@@ -4,6 +4,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Fluent.IO;
 using Flurl.Http;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Montage.Card.API.Compat;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
@@ -59,14 +60,14 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
                 progress.Report(report);
                 return p;
             })
-            .SelectAwaitWithCancellation(async (wsc, ct) =>
-            (   card: wsc,
-                stream: await wsc.GetImageStreamAsync( (wsc.Images.Count > 0) ? await _gcj.FindOrCreate(wsc.Images.Last().Authority) : null, ct))
-            )
-            .ToDictionaryAwaitWithCancellationAsync(
+            .Select(async (wsc, ct) =>
+            (card: wsc,
+                stream: await wsc.GetImageStreamAsync((wsc.Images.Count > 0) ? await _gcj.FindOrCreate(wsc.Images.Last().Authority) : null, ct)
+            ))
+            .ToDictionaryAsync(
                 async (p, ct) => await ValueTask.FromResult(p.card),
                 async (p, ct) => PreProcess(await Image.LoadAsync(p.stream, ct)),
-                cancellationToken
+                cancellationToken: cancellationToken
             );
 
         var resultingDocFilePath = resultFolder.Combine($"proxy_{fileNameFriendlyDeckName}.docx");

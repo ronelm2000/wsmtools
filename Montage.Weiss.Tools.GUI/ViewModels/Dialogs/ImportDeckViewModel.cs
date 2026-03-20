@@ -7,6 +7,7 @@ using Montage.Weiss.Tools.GUI.Utilities;
 using Serilog;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Dialogs;
@@ -34,7 +35,7 @@ public partial class ImportDeckViewModel : ViewModelBase
         DeckUrl = string.Empty;
     }
 
-    internal async Task ImportDeck()
+    internal async Task ImportDeck(CancellationToken cancellationToken)
     {
         if (Parent() is not MainWindowViewModel parentModel)
             return;
@@ -47,7 +48,7 @@ public partial class ImportDeckViewModel : ViewModelBase
         {
             var progressReporter = new ProgressReporter(Log, message => parentModel.Status = message);
             var command = new ExportVerb { Source = DeckUrl, NonInteractive = true, NoWarning = true };
-            var deck = await command.Parse(container, progressReporter);
+            var deck = await command.Parse(container, progressReporter, cancellationToken);
 
             parentModel.DeckName = deck.Name;
             parentModel.DeckRemarks = deck.Remarks;

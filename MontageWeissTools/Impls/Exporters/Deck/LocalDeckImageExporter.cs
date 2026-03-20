@@ -1,6 +1,7 @@
 ﻿using Fluent.IO;
 using Flurl.Http;
 using Lamar;
+using Montage.Card.API.Compat;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
@@ -63,16 +64,15 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
                 progress.Report(report);
                 return p;
             })
-            .SelectAwaitWithCancellation(async (wsc, ct) => 
+            .Select(async (wsc, ct) => 
             (   card: wsc, 
                 stream: await wsc.GetImageStreamAsync(await _cookieSession(wsc.Images.Last()), ct))
             )
-            .ToDictionaryAwaitWithCancellationAsync(
+            .ToDictionaryAsync(
                 async (p, ct) => await ValueTask.FromResult(p.card),
                 async (p, ct) => PreProcess(await Image.LoadAsync(p.stream, ct)),
-                cancellationToken
+                cancellationToken: cancellationToken
                 );
-            //.ToDictionaryAsync(p => p.card, p => PreProcess(Image.LoadAsync(p.stream)));
 
         var (encoder, format) = info.Flags.Any(s => s.ToLower() == "png") == true ? _pngEncoder : _jpegEncoder;
         var newImageFilename = $"deck_{fileNameFriendlyDeckName.ToLower()}.{format.FileExtensions.First()}";

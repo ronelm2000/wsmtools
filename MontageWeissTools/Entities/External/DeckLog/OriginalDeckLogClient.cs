@@ -16,12 +16,12 @@ internal class OriginalDeckLogClient : IDeckLogClient
 
     private static Dictionary<CardLanguage, Dictionary<string, string>> cachedNeoStandardList = new();
 
-    public async Task<bool> IsCompatible(WeissSchwarzCard card)
+    public async Task<bool> IsCompatible(WeissSchwarzCard card, CancellationToken cancellationToken = default)
     {
-        return await IsCompatible(card.Language, card.Side);
+        return await IsCompatible(card.Language, card.Side, cancellationToken);
     }
 
-    public async Task<bool> IsCompatible(CardLanguage language, CardSide side)
+    public async Task<bool> IsCompatible(CardLanguage language, CardSide side, CancellationToken cancellationToken = default)
     {
         return side switch
         {

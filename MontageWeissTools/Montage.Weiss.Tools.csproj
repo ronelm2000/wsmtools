@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
 	<TargetFramework>net10.0</TargetFramework>
-	<LangVersion>11.0</LangVersion>
+	<LangVersion>12.0</LangVersion>
 	<AssemblyName>wstools</AssemblyName>
     <RootNamespace>Montage.Weiss.Tools</RootNamespace>
     <Product>Weiss Schwarz Montage Tools (wsmtools)</Product>
@@ -91,7 +91,6 @@
     <PackageReference Include="Serilog.Sinks.Trace" />
     <PackageReference Include="SixLabors.ImageSharp" />
     <PackageReference Include="System.Interactive.Async" />
-    <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="System.Net.Http.Json" />
     <PackageReference Include="System.Text.Json" />
     <PackageReference Include="YamlDotNet" />

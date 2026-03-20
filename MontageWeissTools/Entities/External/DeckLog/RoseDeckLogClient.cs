@@ -13,12 +13,12 @@ namespace Montage.Weiss.Tools.Entities.External.DeckLog;
 
 internal class RoseDeckLogClient : IDeckLogClient
 {
-    public async Task<bool> IsCompatible(WeissSchwarzCard card)
+    public async Task<bool> IsCompatible(WeissSchwarzCard card, CancellationToken cancellationToken = default)
     {
-        return await IsCompatible(card.Language, card.Side);
+        return await IsCompatible(card.Language, card.Side, cancellationToken);
     }
 
-    public async Task<bool> IsCompatible(CardLanguage language, CardSide side)
+    public async Task<bool> IsCompatible(CardLanguage language, CardSide side, CancellationToken cancellationToken = default)
     {
         if (side == CardSide.Rose && language == CardLanguage.Japanese)
         {

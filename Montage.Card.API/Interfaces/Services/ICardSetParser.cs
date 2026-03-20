@@ -11,7 +11,7 @@ public interface ICardSetParser<C> where C : ICard
     /// </summary>
     /// <param name="parseInfo"></param>
     /// <returns></returns>
-    Task<bool> IsCompatible(IParseInfo parseInfo);
+    Task<bool> IsCompatible(IParseInfo parseInfo); // TODO: Implement ContinuationToken support for this method.
 
     /// <summary>
     /// Given the URL/Local File, parses it and obtains a list of cards that must first be processed.

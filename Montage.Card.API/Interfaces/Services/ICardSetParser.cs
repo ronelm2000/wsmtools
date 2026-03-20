@@ -21,13 +21,4 @@ public interface ICardSetParser<C> where C : ICard
     /// <param name="ct">A cancellation token that allows this task to be cancelled as needed.</param>
     /// <returns>Returns an async stream of the non-processed cards.</returns>
     IAsyncEnumerable<C> Parse(string urlOrLocalFile, IProgress<SetParserProgressReport> progress, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Given the URL/Local File, parses it and obtains a list of cards that must first be processed.
-    /// </summary>
-    /// <param name="urlOrLocalFile"></param>
-    /// <returns></returns>
-    [Obsolete]
-    IAsyncEnumerable<C> Parse(string urlOrLocalFile)
-        => Parse(urlOrLocalFile, NoOpProgress<SetParserProgressReport>.Instance);
 }

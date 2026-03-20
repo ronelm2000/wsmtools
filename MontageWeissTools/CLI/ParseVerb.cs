@@ -1,7 +1,6 @@
 ﻿using CommandLine;
 using Lamar;
 using Microsoft.EntityFrameworkCore;
-using Montage.Card.API.Compat;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;

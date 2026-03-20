@@ -1,21 +1,18 @@
 ﻿using Fluent.IO;
 using Flurl.Http;
 using Lamar;
-using Montage.Card.API.Compat;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
-using Montage.Weiss.Tools.Utilities;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using SQLitePCL;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
 

@@ -1,21 +1,15 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Wordprocessing;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Fluent.IO;
-using Flurl.Http;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using Montage.Card.API.Compat;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
-using Montage.Weiss.Tools.Utilities;
 using OfficeIMO.Word;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using System.Runtime.InteropServices;
 using Color = SixLabors.ImageSharp.Color;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;

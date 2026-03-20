@@ -1,21 +1,15 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Drawing.Wordprocessing;
-using DocumentFormat.OpenXml.Wordprocessing;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
 using Fluent.IO;
-using Flurl.Http;
-using Montage.Card.API.Compat;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
-using Montage.Weiss.Tools.Utilities;
 using OfficeIMO.Word;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
-using System.Runtime.InteropServices;
 using Color = SixLabors.ImageSharp.Color;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
@@ -62,7 +56,7 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
             .Select(async (wsc, ct) =>
                 (   card: wsc,
                     stream: await wsc.GetImageStreamAsync( (wsc.Images.Count > 0) ? await _gcj.FindOrCreate(wsc.Images.Last().Authority, ct) : null, ct)
-                ), cancellationToken)
+                ))
             .ToDictionaryAsync(
                 async (p, ct) => await ValueTask.FromResult(p.card),
                 async (p, ct) => PreProcess(await Image.LoadAsync(p.stream, ct)),

@@ -1,10 +1,7 @@
 ﻿using Avalonia;
 using Montage.Weiss.Tools.GUI.Extensions;
 using System;
-using ReactiveUI.Avalonia; // UseReactiveUI, RegisterReactiveUIViews* (core)
-using ReactiveUI.Avalonia;
-using Splat;
-using ReactiveUI.Avalonia.Splat; // Autofac, DryIoc, Ninject, Microsoft.Extensions.DependencyInjection integrations
+using ReactiveUI.Avalonia.Splat;
 
 namespace Montage.Weiss.Tools.GUI;
 
@@ -28,7 +25,6 @@ internal sealed class Program
                 },
                 withResolver: sp =>
                 {
-
                 }
             )
             .WithInterFont()

@@ -7,19 +7,16 @@ using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Impls.PostProcessors;
 using Montage.Weiss.Tools.Test.Commons;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace Montage.Weiss.Tools.Test.DeckLog;
 
 [TestClass]
 public class PostProcessorTests
 {
-    [TestMethod("DeckLog API Version Test (JP)")]
+    [TestMethod(DisplayName = "DeckLog API Version Test (JP)")]
     public async Task EnsureLatestVersionJP()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
@@ -31,7 +28,7 @@ public class PostProcessorTests
         Assert.IsTrue(latestVersion == settings.Version, $"DeckLog API (JP) version is outdated; latest version is {latestVersion} need to check for compatibility.");
     }
 
-    [TestMethod("DeckLog API Version Test (EN)")]
+    [TestMethod(DisplayName = "DeckLog API Version Test (EN)")]
     public async Task EnsureLatestVersionEN()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
@@ -43,7 +40,7 @@ public class PostProcessorTests
         Assert.IsTrue(latestVersion == settings.Version, $"DeckLog API (EN) version is outdated; latest version is {latestVersion} need to check for compatibility.");
     }
 
-    [TestMethod("DeckLog API Set List Test (EN)")]
+    [TestMethod(DisplayName = "DeckLog API Set List Test (EN)")]
     [TestCategory("Manual")]
     public async Task TestPostProcessor()
     {
@@ -71,7 +68,7 @@ public class PostProcessorTests
             );
     }
 
-    [TestMethod("DeckLog API Set List Test - Reported Bug for HHW")]
+    [TestMethod(DisplayName = "DeckLog API Set List Test - Reported Bug for HHW")]
     [TestCategory("Manual")]
     public async Task TestPostProcessor2()
     {
@@ -90,7 +87,7 @@ public class PostProcessorTests
             .Parse("https://www.encoredecks.com/?page=1&set=5c6763677cd9b718cdb87eca", progress1, ct);
 
         var resultCards = await deckLogPP.Process(cards, progress2, ct)
-            .Distinct(c => c.Serial)
+            .DistinctBy(c => c.Serial)
             .ToDictionaryAsync(c => c.Serial);
 
         Assert.IsTrue(resultCards["BD/W54-008"]
@@ -100,7 +97,7 @@ public class PostProcessorTests
             );
     }
 
-    [TestMethod("DeckLog API Set List Test - Bug for Key All-Stars Clannad Only")]
+    [TestMethod(DisplayName = "DeckLog API Set List Test - Bug for Key All-Stars Clannad Only")]
     [TestCategory("Manual")]
     [DeploymentItem("Resources/key_all_stars_clannad.txt")]
     public async Task TestPostProcessor3()
@@ -119,7 +116,7 @@ public class PostProcessorTests
         var cards = new Tools.Impls.Parsers.Cards.HeartOfTheCardsURLParser()
             .Parse("./key_all_stars_clannad.txt", progress1, ct);
         var resultCards = await deckLogPP.Process(cards, progress2, ct)
-            .Distinct(c => c.Serial)
+            .DistinctBy(c => c.Serial)
             .ToDictionaryAsync(c => c.Serial);
 
         Assert.IsTrue(resultCards["Kcl/W102-021S"]
@@ -130,7 +127,7 @@ public class PostProcessorTests
     }
 
 
-    [TestMethod("DeckLog API Set List Test - Bug for Nanoha")]
+    [TestMethod(DisplayName = "DeckLog API Set List Test - Bug for Nanoha")]
     [TestCategory("Manual")]
     public async Task TestPostProcessor4()
     {
@@ -148,7 +145,7 @@ public class PostProcessorTests
         var cards = new Tools.Impls.Parsers.Cards.EncoreDecksParser()
             .Parse("https://www.encoredecks.com/?page=1&set=6862dbb3abea99e627d998b4", progress1, ct);
         var resultCards = await deckLogPP.Process(cards, progress2, ct)
-            .Distinct(c => c.Serial)
+            .DistinctBy(c => c.Serial)
             .ToDictionaryAsync(c => c.Serial);
 
         Assert.IsTrue(resultCards["NTA/WE48-25"]

@@ -1,7 +1,6 @@
 ﻿using Fluent.IO;
 using Flurl.Http;
 using Lamar;
-using Montage.Card.API.Compat;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Utilities;
@@ -13,9 +12,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Text.Json.Nodes;

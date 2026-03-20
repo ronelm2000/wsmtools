@@ -16,7 +16,7 @@ namespace Montage.Weiss.Tools.CLI;
 [Verb("cache", HelpText = "Downloads all related images and updates it into a file; also edits the image metadata to show proper attribution.")]
 public class CacheVerb : IVerbCommand
 {
-    private ILogger Log = Serilog.Log.ForContext<CacheVerb>();
+    private readonly ILogger Log = Serilog.Log.ForContext<CacheVerb>();
     private static readonly string _IMAGE_CACHE_PATH = $"{AppDomain.CurrentDomain.BaseDirectory}/Images/";
 
     [Value(0, HelpText = "Indicates either Release ID or a full Serial ID.")]
@@ -52,7 +52,7 @@ public class CacheVerb : IVerbCommand
 
     public async Task Cache(IContainer container, IProgress<CommandProgressReport> progress, IAsyncEnumerable<WeissSchwarzCard> list, CancellationToken cancellationToken = default)
     {
-        Func<Flurl.Url, Task<CookieJar>> _cookieSession = (url) => container.GetInstance<GlobalCookieJar>().FindOrCreate(url.Root);
+        Task<CookieJar> _cookieSession(Flurl.Url url) => container.GetInstance<GlobalCookieJar>().FindOrCreate(url.Root, cancellationToken);
         await foreach (var card in list.WithCancellation(cancellationToken))
         {
             var report = new CommandProgressReport
@@ -71,7 +71,7 @@ public class CacheVerb : IVerbCommand
 
     public async Task Cache(IContainer container, IProgress<CommandProgressReport> progress, WeissSchwarzCard card, CancellationToken cancellationToken = default)
     {
-        Func<Flurl.Url, Task<CookieJar>> _cookieSession = (url) => container.GetInstance<GlobalCookieJar>().FindOrCreate(url.Root);
+        Task<CookieJar> _cookieSession(Flurl.Url url) => container.GetInstance<GlobalCookieJar>().FindOrCreate(url.Root, cancellationToken);
         var report = new CommandProgressReport
             {
                 MessageType = MessageType.InProgress,
@@ -132,33 +132,32 @@ public class CacheVerb : IVerbCommand
             var imgURL = card.Images.Last();
             Log.Information("Caching: {imgURL}", imgURL);
             var session = _cookieSession(imgURL);
-            using (System.IO.Stream netStream = await card.GetImageStreamAsync(await session, ct))
-            using (Image img = Image.Load(netStream))
+            using var netStream = await card.GetImageStreamAsync(await session, ct);
+            using var img = Image.Load(netStream);
+
+            var imageDirectoryPath = Path.Get(_IMAGE_CACHE_PATH);
+            if (!imageDirectoryPath.Exists) imageDirectoryPath.CreateDirectory();
+            if (img.Height < img.Width)
             {
-                var imageDirectoryPath = Path.Get(_IMAGE_CACHE_PATH);
-                if (!imageDirectoryPath.Exists) imageDirectoryPath.CreateDirectory();
-                if (img.Height < img.Width)
-                {
-                    Log.Debug("Image is probably incorrectly oriented, rotating it 90 degs. clockwise to compensate.");
-                    img.Mutate(ipc => ipc.Rotate(90));
-                }
-                img.Metadata.ExifProfile ??= new ExifProfile();
-                img.Metadata.ExifProfile.SetValue(SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifTag.Copyright, card.Images.Last().Authority);
-                var savePath = Path.Get(_IMAGE_CACHE_PATH).Combine($"{card.Serial.Replace('-', '_').AsFileNameFriendly()}.jpg");
-                await img.SaveAsJpegAsync(savePath.FullPath, ct);
+                Log.Debug("Image is probably incorrectly oriented, rotating it 90 degs. clockwise to compensate.");
+                img.Mutate(ipc => ipc.Rotate(90));
             }
+            img.Metadata.ExifProfile ??= new ExifProfile();
+            img.Metadata.ExifProfile.SetValue(SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifTag.Copyright, card.Images.Last().Authority);
+            var savePath = Path.Get(_IMAGE_CACHE_PATH).Combine($"{card.Serial.Replace('-', '_').AsFileNameFriendly()}.jpg");
+            await img.SaveAsJpegAsync(savePath.FullPath, ct);
         } catch (InvalidOperationException e) when (e.Message == "Sequence contains no elements")
         {
             Log.Warning("Cannot be cached as no image URLs were found: {serial}", card.Serial);
         }
     }
 
-    private CardLanguage? InterpretLanguage(string language)
+    private static CardLanguage? InterpretLanguage(string language)
     {
         return language switch
         {
-            var l when (l.ToLower() == "en") => CardLanguage.English,
-            var l when (l.ToLower() == "jp") => CardLanguage.Japanese,
+            var l when (l.Equals("en", StringComparison.CurrentCultureIgnoreCase)) => CardLanguage.English,
+            var l when (l.Equals("jp", StringComparison.CurrentCultureIgnoreCase)) => CardLanguage.Japanese,
             _ => null // meaning any
         };
     }

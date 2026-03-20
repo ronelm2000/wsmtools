@@ -19,7 +19,7 @@ public class ParseVerb : IVerbCommand, IParseInfo
     public string URI { get; set; } = string.Empty;
 
     [Option("with", HelpText = "Provides a hint as to what parser should be used or if post-processors are skipped (if any).", Default = new string[] { })]
-    public IEnumerable<string> ParserHints { get; set; } = Array.Empty<string>();
+    public IEnumerable<string> ParserHints { get; set; } = [];
 
     public event EventHandler<string> SetParsed = (_,_) => { };
 
@@ -38,9 +38,9 @@ public class ParseVerb : IVerbCommand, IParseInfo
         var postProcessors = await container.GetAllInstances<ICardPostProcessor<WeissSchwarzCard>>()
             .ToAsyncEnumerable()
             .Where(async (processor, ct) => await processor.IsCompatible(cardList))
-            .Where(processor => (parser is IFilter<ICardPostProcessor<WeissSchwarzCard>> filter) ? filter.IsIncluded(processor) : true)
-            .Where(async (processor, ct) => (processor is ISkippable<IParseInfo> skippable) ? await skippable.IsIncluded(this) : true)
-            .Where(async (processor, ct) => (processor is ISkippable<ICardSetParser<WeissSchwarzCard>> skippable) ? await skippable.IsIncluded(parser) : true)
+            .Where(processor => parser is not IFilter<ICardPostProcessor<WeissSchwarzCard>> filter || filter.IsIncluded(processor))
+            .Where(async (processor, ct) => processor is not ISkippable<IParseInfo> skippable || await skippable.IsIncluded(this))
+            .Where(async (processor, ct) => processor is not ISkippable<ICardSetParser<WeissSchwarzCard>> skippable || await skippable.IsIncluded(parser))
             .OrderByDescending(processor => processor.Priority)
             .ToArrayAsync(ct)
             ;
@@ -56,7 +56,7 @@ public class ParseVerb : IVerbCommand, IParseInfo
         await using (var db = container.GetInstance<CardDatabaseContext>())
         {
             var allCards = await cards
-                .Select( (WeissSchwarzCard c) => 
+                .Select(c =>
                 {
                     c.VersionTimestamp = Program.AppVersion;
                     return c;
@@ -96,16 +96,11 @@ public class ParseVerb : IVerbCommand, IParseInfo
     }
 }
 
-internal class CommandProgressAggregator : IProgress<SetParserProgressReport>, IProgress<PostProcessorProgressReport>, IProgress<DatabaseUpdateReport>
+internal class CommandProgressAggregator(IProgress<CommandProgressReport> progress) : IProgress<SetParserProgressReport>, IProgress<PostProcessorProgressReport>, IProgress<DatabaseUpdateReport>
 {
     private CommandProgressReport _totalReport = new();
-    private IProgress<CommandProgressReport> _progress;
+    private readonly IProgress<CommandProgressReport> _progress = progress;
     public int PostProcessorCount { get; internal set; }
-
-    public CommandProgressAggregator(IProgress<CommandProgressReport> progress)
-    {
-        _progress = progress;
-    }
 
     public void Report(DatabaseUpdateReport value)
     {

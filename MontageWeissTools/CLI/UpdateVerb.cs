@@ -12,7 +12,7 @@ public class UpdateVerb : IVerbCommand
     public async Task Run(IContainer ioc, IProgress<CommandProgressReport> progress, CancellationToken cancellationToken = default)
     {
         var translator = ioc.GetInstance<IActivityLogTranslator>();
-        using (var db = ioc.GetInstance<CardDatabaseContext>())
-            await ioc.GetInstance<IDatabaseUpdater<CardDatabaseContext, WeissSchwarzCard>>().Update(db, translator, new DatabaseUpdateArgs { DisplayLogOverride = true });
+        using var db = ioc.GetInstance<CardDatabaseContext>();
+        await ioc.GetInstance<IDatabaseUpdater<CardDatabaseContext, WeissSchwarzCard>>().Update(db, translator, new DatabaseUpdateArgs { DisplayLogOverride = true });
     }
 }

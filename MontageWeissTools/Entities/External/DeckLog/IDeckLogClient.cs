@@ -53,22 +53,22 @@ internal class DLCardEntry
     public int CardType { get; set; }
 
     [JsonPropertyName("card_number")]
-    required public string Serial { get; set; }
+    public required string Serial { get; set; }
 
     [JsonPropertyName("name")]
-    required public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("rare")]
-    required public string Rarity { get; set; }
+    public required string Rarity { get; set; }
 
     [JsonPropertyName("img")]
-    required public string ImagePath { get; set; }
+    public required string ImagePath { get; set; }
 }
 
 internal class DLQueryParameters
 {
     [JsonPropertyName("title_number_select_for_search")]
-    public Dictionary<string, TitleSelection> TitleSelectionsForSearch { get; set; } = new();
+    public Dictionary<string, TitleSelection> TitleSelectionsForSearch { get; set; } = [];
 
     public IEnumerable<string[]> GetTitleSelectionKeys()
     {
@@ -90,7 +90,7 @@ internal class DLCardQuery
     [JsonPropertyName("keyword")]
     public string Keyword { get; set; } = "";
     [JsonPropertyName("keyword_type")]
-    public string[] KeywordQueryType { get; set; } = new string[] { "name", "text", "no", "feature" };
+    public string[] KeywordQueryType { get; set; } = ["name", "text", "no", "feature"];
     [JsonPropertyName("side")]
     public string Side { get; set; } = "";
     [JsonPropertyName("card_kind")]

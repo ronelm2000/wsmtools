@@ -7,3 +7,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>", Scope = "member", Target = "~M:Montage.Weiss.Tools.Utilities.InstalledApplications.ExistsInSubKey(Microsoft.Win32.RegistryKey,System.String,System.String,System.String)~System.String")]
 [assembly: SuppressMessage("Style", "IDE0161:Convert to file-scoped namespace", Justification = "<Pending>", Scope = "namespace", Target = "~N:Montage.Weiss.Tools.Migrations")]
+[assembly: SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "<Pending>", Scope = "member", Target = "~M:Montage.Weiss.Tools.CLI.CacheVerb.GenerateQuery(Montage.Weiss.Tools.Entities.CardDatabaseContext,System.Nullable{Montage.Weiss.Tools.Entities.CardLanguage})~System.Collections.Generic.IAsyncEnumerable{Montage.Weiss.Tools.Entities.WeissSchwarzCard}")]

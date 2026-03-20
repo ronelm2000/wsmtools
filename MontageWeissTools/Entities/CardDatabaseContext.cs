@@ -19,7 +19,11 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
     public DbSet<Setting> Settings { get; set; }
     public DbSet<ActivityLog> MigrationLog { get; set; }
     public DbSet<WeissSchwarzTrait> Traits { get; set; }
-    public DatabaseFacade GetDatabase() => Database;
+    public DatabaseFacade GetDatabase()
+    {
+        return Database;
+    }
+
     public CardDatabaseContext (AppConfig config) {
         Log.Debug("Instantiating with {@AppConfig}.", config);
 
@@ -47,10 +51,10 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
 
     internal async Task<WeissSchwarzCard?> FindNonFoil(WeissSchwarzCard card, CancellationToken ct = default)
     {
-        return await WeissSchwarzCards.FindAsync(new[] { WeissSchwarzCard.RemoveFoil(card.Serial) }, ct);
+        return await WeissSchwarzCards.FindAsync([WeissSchwarzCard.RemoveFoil(card.Serial)], ct);
     }
 
-    internal IEnumerable<WeissSchwarzCard> FindFoils(WeissSchwarzCard card, CancellationToken ct = default)
+    internal IEnumerable<WeissSchwarzCard> FindFoils(WeissSchwarzCard card)
     {
         var results = WeissSchwarzCards.Where(c => c.Serial.Contains(card.Serial) && c != card).ToList();
         Log.Information("Finding foils for: {card} || Found {amount} results.", card.Serial, results.Count);
@@ -65,7 +69,7 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
         {
             b.HasKey(c => c.Serial);
             b.Property(c => c.Triggers)
-                .HasConversion(arr => String.Join(',', arr.Select(t => t.ToString()))
+                .HasConversion(arr => string.Join(',', arr.Select(t => t.ToString()))
                             , str => str.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.ToEnum<Trigger>() ?? Trigger.Soul).ToArray()
                             , new ValueComparer<Trigger[]>(
                                 (c1, c2) => (c1 == null && c1 == c2) || c1!.SequenceEqual(c2!)
@@ -200,6 +204,6 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
         var activityLogs = context.Set<ActivityLog>();
         activityLogs.AddRange(seededLogs.Except(activityLogs, ActivityLog.EqualById));
 
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(token);
     }
 }

@@ -14,7 +14,7 @@ internal class OriginalDeckLogClient : IDeckLogClient
         DeckLogSettings.JapaneseInEN
     }.ToDictionary(c => (c.Authority, c.Language), c => c);
 
-    private static Dictionary<CardLanguage, Dictionary<string, string>> cachedNeoStandardList = new();
+    private static readonly Dictionary<CardLanguage, Dictionary<string, string>> cachedNeoStandardList = [];
 
     public async Task<bool> IsCompatible(WeissSchwarzCard card, CancellationToken cancellationToken = default)
     {
@@ -45,9 +45,9 @@ internal class OriginalDeckLogClient : IDeckLogClient
             yield return entry;
     }
 
-    private async IAsyncEnumerable<string> Expand(DeckLogSettings setting, string nsCode)
+    private static async IAsyncEnumerable<string> Expand(DeckLogSettings setting, string nsCode)
     {
-        var cardParams = (cachedNeoStandardList.ContainsKey(setting.Language)) ? cachedNeoStandardList[setting.Language] : await setting.SuggestURL
+        var cardParams = (cachedNeoStandardList.TryGetValue(setting.Language, out var value)) ? value : await setting.SuggestURL
             .WithReferrer(setting.Referrer)
             .WithRESTHeaders()
             .WithHeader("Accept-Encoding", null)
@@ -83,7 +83,7 @@ internal class OriginalDeckLogClient : IDeckLogClient
             };
     }
 
-    private async IAsyncEnumerable<DLCardEntry> ExecuteQuery(DeckLogSettings setting, DLCardQuery query)
+    private static async IAsyncEnumerable<DLCardEntry> ExecuteQuery(DeckLogSettings setting, DLCardQuery query)
     {
         int page = 1;
         Log.Information($"Accessing DeckLog API with the following query data: {JsonSerializer.Serialize(query, new JsonSerializerOptions { WriteIndented = true })}");

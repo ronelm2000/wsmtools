@@ -32,7 +32,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
     public string OutCommand { get; set; } = "";
 
     [Option("with", HelpText = "For some exporters, enables various flags. See each exporter for details.", Separator = ',', Default = new string[] { })]
-    public IEnumerable<string> Flags { get; set; } = new string[] { };
+    public IEnumerable<string> Flags { get; set; } = [];
 
     [Option("noninteractive", HelpText = "When set to true, there will be no prompts. Default options will be used.", Default = false)]
     public bool NonInteractive { get; set; } = false;
@@ -44,7 +44,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
 
     private readonly ILogger Log = Serilog.Log.ForContext<ExportVerb>();
 
-    private static readonly IEnumerable<string> Empty = new string[] { };
+    private static readonly IEnumerable<string> Empty = [];
 
     /// <summary>
     /// For the IOC
@@ -67,7 +67,8 @@ public class ExportVerb : IVerbCommand, IExportInfo
         Log.Information("Running...");
 
         var deck = await Parse(ioc, deckParserProgress, cancellationToken);
-        deck = await Run(ioc, deck);
+        
+        await Run(ioc, deck, cancellationToken);
     }
 
     public async Task<WeissSchwarzDeck> Parse(IContainer ioc, IProgress<DeckParserProgressReport> deckParserProgress, CancellationToken cancellationToken = default)
@@ -93,13 +94,13 @@ public class ExportVerb : IVerbCommand, IExportInfo
             .First();
 
         var inspectors = ioc.GetServices<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>()
-            .Where(i => !(i is IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>> filter) || filter.IsIncluded(exporter));
+            .Where(i => i is not IFilter<IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>> filter || filter.IsIncluded(exporter));
         if (exporter is IFilter<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>> filter)
             inspectors = inspectors.Where(filter.IsIncluded);
 
         deck = await inspectors.OrderByDescending(inspector => inspector.Priority)
             .ToAsyncEnumerable()
-            .AggregateAsync(deck, async (d, inspector, ct) => await inspector.Inspect(d, inspectionOptions));
+            .AggregateAsync(deck, async (d, inspector, ct) => await inspector.Inspect(d, inspectionOptions), cancellationToken: token);
 
         if (deck != WeissSchwarzDeck.Empty)
             await exporter.Export(deck, this, token);
@@ -108,8 +109,16 @@ public class ExportVerb : IVerbCommand, IExportInfo
 
     internal class CommandProgressAggregator
     {
-        private CommandProgressReport _totalReport = new CommandProgressReport();
-        private IProgress<CommandProgressReport> _progress;
+        private readonly CommandProgressReport _totalReport = new();
+        private readonly IProgress<CommandProgressReport> _progress;
+
+        private readonly Dictionary<Type, (int PercentageBase, float PercentageRatio)> aggregatePercentages = new()
+        {
+            [typeof(DatabaseUpdateReport)] = (00, 0.05f),
+            [typeof(DeckParserProgressReport)] = (05, 0.45f),
+            [typeof(DeckExportProgressReport)] = (50, 0.50f)
+        };
+
         public int PostProcessorCount { get; internal set; }
 
         internal CommandProgressAggregator(IProgress<CommandProgressReport> progress)
@@ -117,18 +126,13 @@ public class ExportVerb : IVerbCommand, IExportInfo
             _progress = progress;
         }
 
-        private Dictionary<Type, (int PercentageBase, float PercentageRatio)> aggregatePercentages = new()
-        {
-            [typeof(DatabaseUpdateReport)]      = (00, 0.05f),
-            [typeof(DeckParserProgressReport)]  = (05, 0.45f),
-            [typeof(DeckExportProgressReport)]  = (50, 0.50f)
-        };
-
         public IProgress<T> GetProgress<T>() where T : UpdateProgressReport
-            => _progress.From().Translate<T>(r =>
-            {
-                var ratio = aggregatePercentages[typeof(T)];
-                return r.AsRatio<T, CommandProgressReport>(ratio.PercentageBase, ratio.PercentageRatio);
-            });
+        {
+            return _progress.From().Translate<T>(r =>
+                    {
+                        var (PercentageBase, PercentageRatio) = aggregatePercentages[typeof(T)];
+                        return r.AsRatio<T, CommandProgressReport>(PercentageBase, PercentageRatio);
+                    });
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace Montage.Weiss.Tools.GUI.Views;
 
 public partial class ImportDeckDialog : UserControl
 {
-    private IDisposable currentlyPendingTask;
+    private IDisposable? currentlyPendingTask;
 
     public ImportDeckDialog()
     {

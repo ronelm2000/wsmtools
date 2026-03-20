@@ -14,7 +14,7 @@ namespace Montage.Weiss.Tools.Test.ENWS;
 [TestClass]
 public class ParserTests
 {
-    [TestMethod("EN WS Parser Test")]
+    [TestMethod(DisplayName = "EN WS Parser Test")]
     public async Task TestParser()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
@@ -27,14 +27,14 @@ public class ParserTests
             .ToDictionaryAsync(c => c.Serial, c => c);
         Log.Information("Cards Obtained: {length}", dict.Keys.Count);
 
-        AssertExistsInDictionary(dict, "FS/S36-PE02");
+        AssertExistsInDictionary(dict, "FS/S36-PE01");
         AssertExistsInDictionary(dict, "FS/S36-E012");
 
         // This is now only obtained from PR Cards [Schwarz Side]
-        // AssertExistsInDictionary(dict, "FS/S36-PE01");
+        // AssertExistsInDictionary(dict, "FS/S36-PE02");
     }
 
-    [TestMethod("EN WS Parser Test - CCS WX")]
+    [TestMethod(DisplayName = "EN WS Parser Test - CCS WX")]
     [TestCategory("Manual")]
     public async Task TestParserCCSWX()
     {

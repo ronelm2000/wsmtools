@@ -101,8 +101,11 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         }
         else
         {
+            Log.Information("File Detected! Using v1 HOTC page.");
             var path = Path.Get(url);
             textToProcess = await path.ReadStringAsync(cancellationToken);
+            headerCount = 1;
+            footerCount = 1;
         }
 
         if (textToProcess is null)

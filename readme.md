@@ -174,9 +174,7 @@ registering on GitHub.
 * There are alot of missing serials for BlakeWS, including cards that may already have an English card serial but not Japanese.
 
 ### Building from Source
-1. Install Visual Studio 2022 17.4.1.
-2. Install .NET 9.0 SDK
-3. Go to `Tools` > `Options`, then go to `Environment` > `Preview Features".
-4. Check `Use Previews ot the .NET SDK`, then restart VS 2022. 
-5. Open the `.sln` file.
-6. Build all projects as necessary. (The startup project is `Monatage.Weiss.Tools`.)
+1. Install Visual Studio 2026.
+2. Install .NET 10.0 SDK
+3. Open the `.sln` file.
+4. Build all projects as necessary. (The startup project is `Montage.Weiss.Tools` or `Montage.Weiss.Tools.GUI`.)

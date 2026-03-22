@@ -413,7 +413,10 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (UpdateDatabaseViewCommand.IsRunning)
             UpdateDatabaseViewCommand.Cancel();
-        Task.Run(() => UpdateDatabaseViewCommand.Execute(null));
+
+        UpdateDatabaseViewCommand.Execute(null);
+        //Observable.FromAsync( (UpdatD))
+        //Task.Run(() => UpdateDatabaseViewCommand.Execute(null));
     }
 
     [RelayCommand(IncludeCancelCommand = true, FlowExceptionsToTaskScheduler = true)]

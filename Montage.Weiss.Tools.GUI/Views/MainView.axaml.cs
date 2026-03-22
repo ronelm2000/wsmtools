@@ -11,6 +11,7 @@ using Montage.Weiss.Tools.Impls.Services;
 using Serilog;
 using System;
 using System.Diagnostics;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.Views;
@@ -53,13 +54,9 @@ public partial class MainView : UserControl
         if (viewModel.Container is null)
             return;
 
-        Task.Run(viewModel.Load).ContinueWith(t =>
+        Observable.FromAsync(viewModel.Load).Subscribe(_ => { }, ex =>
         {
-            if (t.IsFaulted)
-            {
-                Log.Error(t.Exception, "Error Loading the App.");
-                throw t.Exception;
-            }
+            Log.Error(ex, "Error Loading the App.");
         });
     }
 

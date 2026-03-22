@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Avalonia.Data.Core.Plugins;
+using Microsoft.EntityFrameworkCore;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Utilities;
 using Serilog;
 
 namespace Montage.Card.API.Services;
@@ -10,9 +12,14 @@ public abstract class DatabaseUpdater<ICDB, C> where ICDB : IDisposable, ICardDa
 {
     public async Task Update(ICDB database, IActivityLogTranslator translator, DatabaseUpdateArgs? args = default)
     {
-        if (args?.DisplayLogOverride ?? false || (await database.Database.GetPendingMigrationsAsync()).Count() > 0)
-            Log.Information("Migrating Database...");
-        await database.Database.MigrateAsync();
+        var ct = args?.CancellationToken ?? CancellationToken.None;
+        var pendingMigrations = await database.Database.GetPendingMigrationsAsync(ct).ToAsync().ToArrayAsync(ct);
+        if (pendingMigrations.Length > 0)
+        {
+            if (args?.DisplayLogOverride ?? false)
+                Log.Information("Migrating Database...");
+            await database.Database.MigrateAsync(ct);
+        }
         
         var activityLog = await database.MigrationLog.AsQueryable()
             .Where(log => !log.IsDone)

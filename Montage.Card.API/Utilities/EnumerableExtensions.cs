@@ -33,6 +33,13 @@ public static class EnumerableExtensions
     public static IEnumerable<T> TakeUntil<T>(this IEnumerable<T> ienum, Func<T, int, bool> predicateThatMustBeFalse)
         => ienum.TakeWhile((c,i) => !predicateThatMustBeFalse(c, i));
 
+    public static async IAsyncEnumerable<T> ToAsync<T>(this Task<IEnumerable<T>> task)
+    {
+        var ienumerable = await task.ConfigureAwait(false);
+        foreach (var item in ienumerable)
+            yield return item;
+    }
+
     /// <summary>
     /// Concatenates the entire string enumerable as a single contiguous string.
     /// </summary>

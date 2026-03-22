@@ -79,7 +79,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-    <PackageReference Include="Microsoft.Win32.Registry" />
     <PackageReference Include="Octokit" />
     <PackageReference Include="OfficeIMO.Word" />
     <PackageReference Include="Polly" />

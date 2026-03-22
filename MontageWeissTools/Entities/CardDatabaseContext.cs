@@ -19,10 +19,6 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
     public DbSet<Setting> Settings { get; set; }
     public DbSet<ActivityLog> MigrationLog { get; set; }
     public DbSet<WeissSchwarzTrait> Traits { get; set; }
-    public DatabaseFacade GetDatabase()
-    {
-        return Database;
-    }
 
     public CardDatabaseContext (AppConfig config) {
         Log.Debug("Instantiating with {@AppConfig}.", config);

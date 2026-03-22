@@ -6,7 +6,7 @@ namespace Montage.Weiss.Tools.GUI.ViewModels.Query;
 
 public class NameOrSerialQueryViewModel : CardSearchQueryViewModel
 {
-    private string _nameOrSerial;
+    private readonly string _nameOrSerial;
 
     public NameOrSerialQueryViewModel(string nameOrSerial) : base()
     {

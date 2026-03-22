@@ -1,16 +1,11 @@
-﻿using AngleSharp.Dom;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DynamicData;
 using Montage.Weiss.Tools.GUI.ViewModels;
 using Montage.Weiss.Tools.GUI.ViewUserControls;
-using Montage.Weiss.Tools.Impls.Services;
 using Serilog;
 using System;
-using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
@@ -20,13 +15,6 @@ public partial class MainView : UserControl
 {
     private static ILogger Log { get; } = Serilog.Log.ForContext<DatabaseCardViewPanel>();
 
-    /*
-    public MainView(MainViewModel mainViewModel)
-    {
-        DataContext = mainViewModel;
-        InitializeComponent();
-    }
-    */
 
     /// <summary>
     /// Note: Only used with the previewer

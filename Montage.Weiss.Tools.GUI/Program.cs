@@ -2,6 +2,8 @@
 using Montage.Weiss.Tools.GUI.Extensions;
 using System;
 using ReactiveUI.Avalonia.Splat;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace Montage.Weiss.Tools.GUI;
 
@@ -22,6 +24,10 @@ internal sealed class Program
             .UseReactiveUIWithMicrosoftDependencyResolver(
                 services =>
                 {
+                    services.AddLogging(config =>
+                    {
+                        config.AddSerilog();
+                    });
                 },
                 withResolver: sp =>
                 {

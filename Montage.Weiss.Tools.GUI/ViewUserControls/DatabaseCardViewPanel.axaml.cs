@@ -14,7 +14,7 @@ public partial class DatabaseCardViewPanel : UserControl
 {
     public static readonly RoutedEvent<RoutedEventArgs> ClickEvent = RoutedEvent.Register<DatabaseCardViewPanel, RoutedEventArgs>(nameof(Click), RoutingStrategies.Bubble | RoutingStrategies.Direct);
 
-    public static Func<ILogger> Logger { get; set; } = () => Serilog.Log.ForContext<DatabaseCardViewPanel>();
+    private static ILogger Log = Serilog.Log.ForContext<DatabaseCardViewPanel>();
 
     public static void AddClickHandler(Interactive element, EventHandler<RoutedEventArgs> handler) =>
          element.AddHandler(ClickEvent, handler);
@@ -36,18 +36,11 @@ public partial class DatabaseCardViewPanel : UserControl
         InitializeComponent();
     }
 
-    private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.LeftShift || e.Key == Key.RightShift || e.KeyModifiers.HasFlag(KeyModifiers.Shift))
-        {
-            Logger().Information("Shift key state changed: {key} (Modifiers: {modifiers})", e.Key, e.KeyModifiers);
-        }
-    }
-
     private void Generic_PointerReleased(object? sender, Avalonia.Input.PointerReleasedEventArgs e)
     {
         var args = new RoutedEventArgs(ClickEvent, this);
-        Logger()?.Information("Raised (Generic_PointerReleased): {args}", args.ToString());
+        if (Log.IsEnabled(Serilog.Events.LogEventLevel.Verbose))
+            Log.Verbose("Raised (Generic_PointerReleased): {@args}", args);
         RaiseEvent(args);
     }
 

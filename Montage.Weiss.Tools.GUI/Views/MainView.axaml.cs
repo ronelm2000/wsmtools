@@ -22,9 +22,6 @@ public partial class MainView : UserControl
     public MainView()
     {
         InitializeComponent();
-
-        DeckView.AddHandler(Gestures.PullGestureEvent, DeckView_PullGesture);
-        DeckView.AddHandler(Gestures.PointerTouchPadGestureSwipeEvent, DeckView_TouchPadSwiped);
     }
 
     private void DeckView_TouchPadSwiped(object? sender, PointerDeltaEventArgs e)
@@ -46,6 +43,9 @@ public partial class MainView : UserControl
         {
             Log.Error(ex, "Error Loading the App.");
         });
+
+        DeckView.AddHandler(Gestures.PullGestureEvent, DeckView_PullGesture);
+        DeckView.AddHandler(Gestures.PointerTouchPadGestureSwipeEvent, DeckView_TouchPadSwiped);
     }
 
     private void DatabaseCardViewPanel_Click(object? sender, RoutedEventArgs e)
@@ -123,7 +123,7 @@ public partial class MainView : UserControl
         if (e.Key == Key.LeftShift || e.Key == Key.RightShift || e.KeyModifiers.HasFlag(KeyModifiers.Shift))
         {
             viewModel.IsShiftPressed = !viewModel.IsShiftPressed;
-            Log.Information("KeyDown: {key} (Modifiers: {modifiers}) | IsShiftPressed: {status}", e.Key, e.KeyModifiers, viewModel.IsShiftPressed);
+            Log.Verbose("KeyDown: {key} (Modifiers: {modifiers}) | IsShiftPressed: {status}", e.Key, e.KeyModifiers, viewModel.IsShiftPressed);
 
         }
     }

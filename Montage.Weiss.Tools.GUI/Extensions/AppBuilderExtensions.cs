@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Logging;
 using Serilog;
+using Serilog.Templates;
 using Splat;
 using Splat.Serilog;
 using System;
@@ -10,9 +11,24 @@ public static class AppBuilderExtensions
 {
     public static AppBuilder LogToSerilog(this AppBuilder builder)
     {
+        var displayTemplate = new ExpressionTemplate(
+            "[{@t:yyyy/MM/dd HH:mm:ss}]" +
+            "[{@l:u3}]" +
+            "[{Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}]" +
+            "{#if LayoutArea is not null}[{LayoutArea}]{#end}" +
+            "{#if ThreadId is not null}[{ThreadId}]{#end}" +
+            " {@m}\n{@x}"
+            );
+
         Log.Logger = new LoggerConfiguration()
-            .WriteTo.Debug()
-            .WriteTo.File($"{AppDomain.CurrentDomain.BaseDirectory}/wsm-gui.log", Serilog.Events.LogEventLevel.Debug)
+            .WriteTo.Debug(displayTemplate)
+            .WriteTo.File(
+                displayTemplate, 
+                $"{AppDomain.CurrentDomain.BaseDirectory}/wsm-gui.log",
+                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug
+                )
+            .Enrich.WithThreadId()
+            .Enrich.WithThreadName()
             .CreateLogger();
 
         Locator.CurrentMutable.UseSerilogFullLogger();
@@ -35,12 +51,18 @@ internal class SerilogLogSink : ILogSink
 
     public void Log(LogEventLevel level, string area, object? source, string messageTemplate)
     {
-        Serilog.Log.Logger.ForContext(source?.GetType() ?? typeof(AppBuilder)).Write(ToSerilogLevel(level), $"[{area}] {messageTemplate}");
+        var _logger = Serilog.Log.Logger
+            .ForContext(source?.GetType() ?? typeof(AppBuilder))
+            .ForContext("LayoutArea", area);
+        _logger.Write(ToSerilogLevel(level), messageTemplate);
     }
 
     public void Log(LogEventLevel level, string area, object? source, string messageTemplate, params object?[] propertyValues)
     {
-        Serilog.Log.Logger.ForContext(source?.GetType() ?? typeof(AppBuilder)).Write(ToSerilogLevel(level), $"[{area}] {messageTemplate}", propertyValues);
+        var _logger = Serilog.Log.Logger
+            .ForContext(source?.GetType() ?? typeof(AppBuilder))
+            .ForContext("LayoutArea", area);
+        _logger.Write(ToSerilogLevel(level), messageTemplate, propertyValues);
     }
 
     private Serilog.Events.LogEventLevel ToSerilogLevel(LogEventLevel level) {

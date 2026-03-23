@@ -17,7 +17,7 @@ namespace Montage.Weiss.Tools.Test.Cockatrice;
 [TestClass]
 public class ExporterTests
 {
-    [TestMethod("Cockatrice Database Exporter Test (Full)")]
+    [TestMethod(DisplayName = "Cockatrice Database Exporter Test (Full)")]
     public async Task TestExporterForDatabase()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();

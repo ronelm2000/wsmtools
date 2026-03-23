@@ -60,6 +60,7 @@
     <Compile Remove="Migrations\20200328175703_SecondInitialSetup.Designer.cs" />
     <Compile Remove="Migrations\20200328183816_ThirdInitialSetup.cs" />
     <Compile Remove="Migrations\20200328183816_ThirdInitialSetup.Designer.cs" />
+    <Content Remove="C:\Users\ronelm2000\.nuget\packages\officeimo.word\1.0.38\contentFiles\any\net10.0\OfficeIMO.ico" />
     <TrimmerRootAssembly Include="System.Net.WebClient" />
     <TrimmerRootAssembly Include="System.Web.HttpUtility" />
   </ItemGroup>

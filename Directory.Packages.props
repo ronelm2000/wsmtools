@@ -29,6 +29,7 @@
     <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageVersion Include="MSTest.TestAdapter" Version="4.1.0" />
     <PackageVersion Include="MSTest.TestFramework" Version="4.1.0" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="Octokit" Version="14.0.0" />
     <PackageVersion Include="OfficeIMO.Word" Version="1.0.38" />
     <PackageVersion Include="Polly" Version="8.6.6" />

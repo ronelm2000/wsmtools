@@ -2,6 +2,7 @@
 using Lamar;
 using Lamar.Scanning.Conventions;
 using Microsoft.Extensions.DependencyInjection;
+using Montage.Card.API.Interfaces.Inputs;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
 using Montage.Weiss.Tools.API;
@@ -17,7 +18,13 @@ namespace Montage.Weiss.Tools;
 
 public class Program
 {
-//    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Options))]
+    /// <summary>
+    /// Should only be overriden in cases where the user is using a custom IConsole implementation, 
+    /// such as in the GUI version of the app, where the console is not actually a console but a wrapper around a text box.
+    /// </summary>
+    public static IConsole Console = Card.API.CLI.Instance;
+
+    //    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Options))]
     public static async Task Main(string[] args)
     {
         Serilog.Log.Logger = BootstrapLogging().CreateLogger();

@@ -10,6 +10,7 @@ using Montage.Weiss.Tools.Impls.Services;
 using Montage.Weiss.Tools.Impls.Utilities;
 using Octokit;
 using Serilog.Events;
+using Serilog.Templates;
 using System.Reflection;
 
 namespace Montage.Weiss.Tools;
@@ -82,23 +83,23 @@ public class Program
 
     public static LoggerConfiguration BootstrapLogging()
     {
-        var config = new LoggerConfiguration().MinimumLevel.Is(LogEventLevel.Debug)
-                        .WriteTo.Debug(
-                            restrictedToMinimumLevel: LogEventLevel.Debug,
-                            outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
-                        );
+        var displayTemplate = new ExpressionTemplate(
+            //"[{@t:HH:mm:ss}]" +
+            "[{@l:u3}]" +
+            "[{Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}]" +
+            //"{#if LayoutArea is not null}[{LayoutArea}]{#end}" +
+            //"{#if ThreadId is not null}[{ThreadId}]{#end}" +
+            " {@m}\n{@x}"
+            );
+
+        var config = new LoggerConfiguration()
+            .MinimumLevel.Is(LogEventLevel.Debug)
+            .WriteTo.Debug(displayTemplate, restrictedToMinimumLevel: LogEventLevel.Debug);
 
         if (!IsOutputRedirected)
-            config = config.WriteTo.Console(
-                            restrictedToMinimumLevel: LogEventLevel.Information,
-                            outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
-                            );
+            config = config.WriteTo.Console(displayTemplate, restrictedToMinimumLevel: LogEventLevel.Information);
         else
-            config = config.WriteTo.File(
-                    $"{AppDomain.CurrentDomain.BaseDirectory}/wstools.out.log",
-                    restrictedToMinimumLevel: LogEventLevel.Information,
-                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message}{NewLine}{Exception}"
-                    );
+            config = config.WriteTo.File(displayTemplate, $"{AppDomain.CurrentDomain.BaseDirectory}/wstools.out.log", restrictedToMinimumLevel: LogEventLevel.Information);
         return config;
     }
 

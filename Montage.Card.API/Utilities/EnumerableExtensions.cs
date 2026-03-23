@@ -72,7 +72,7 @@ public static class EnumerableExtensions
     {
         if (enumerable == null)
             return emptyValue;
-        if (enumerable.Count() == 0)
+        if (!enumerable.Any())
             return emptyValue;
         else
             return enumerable.First();
@@ -89,7 +89,7 @@ public static class EnumerableExtensions
     {
         if (enumerable == null)
             return null;
-        if (enumerable.Count() == 0)
+        if (!enumerable.Any())
             return null;
         else
             return enumerable.First();

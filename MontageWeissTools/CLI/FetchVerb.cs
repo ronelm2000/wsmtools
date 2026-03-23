@@ -35,7 +35,7 @@ public class FetchVerb : IVerbCommand, IFetchInfo
         var encoreDeckSrvc = ioc.GetInstance<EncoreDecksService>();
         var setList = await encoreDeckSrvc.GetSetListEntries(cancellationToken);
         List<EncoreDeckSetListEntry> setListResults;
-        if (RIDsOrSerials.Count() > 0)
+        if (RIDsOrSerials.Any())
         {
             setListResults = setList.Where(sle => searchTerms.Any(st => sle.HasMatch(st))).ToList();
             Log.Information("Found {res} result/s.", setListResults.Count);

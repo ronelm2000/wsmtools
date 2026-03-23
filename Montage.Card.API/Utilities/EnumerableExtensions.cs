@@ -154,6 +154,7 @@ public static class EnumerableExtensions
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

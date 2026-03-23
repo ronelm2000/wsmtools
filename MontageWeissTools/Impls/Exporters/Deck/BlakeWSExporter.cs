@@ -1,6 +1,7 @@
 ﻿using Fluent.IO;
 using Lamar;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Utilities;

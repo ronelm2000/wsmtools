@@ -1,4 +1,4 @@
-﻿namespace Montage.Card.API.Entities;
+﻿namespace Montage.Card.API.Entities.Impls;
 
 public record DeckExportProgressReport : UpdateProgressReport
 {
@@ -9,7 +9,7 @@ public record DeckExportProgressReport : UpdateProgressReport
         return new DeckExportProgressReport()
         {
             Percentage = 0,
-            ReportMessage = new Impls.MultiLanguageString
+            ReportMessage = new MultiLanguageString
             {
                 EN = $"Exporting [{deckName}] into [{exporterName}]"
             },
@@ -21,7 +21,7 @@ public record DeckExportProgressReport : UpdateProgressReport
      => new()
      {
          Percentage = 0,
-         ReportMessage = new Impls.MultiLanguageString
+         ReportMessage = new MultiLanguageString
          {
              EN = $"Cancelling [{exporterName}] Export for [{deckName}]: {reason}"
          }
@@ -30,7 +30,7 @@ public record DeckExportProgressReport : UpdateProgressReport
     public DeckExportProgressReport Done(string fullPath) => this with
     {
         Percentage = 100,
-        ReportMessage = new Impls.MultiLanguageString
+        ReportMessage = new MultiLanguageString
         {
             EN = $"Exported via [{Exporter}]: {fullPath}"
         }
@@ -39,7 +39,7 @@ public record DeckExportProgressReport : UpdateProgressReport
     public DeckExportProgressReport Done() => this with
     {
         Percentage = 100,
-        ReportMessage = new Impls.MultiLanguageString
+        ReportMessage = new MultiLanguageString
         {
             EN = $"Exported via [{Exporter}]"
         }
@@ -50,7 +50,7 @@ public record DeckExportProgressReport : UpdateProgressReport
     => this with
     {
         Percentage = 0 + (index * 75 / count),
-        ReportMessage = new Impls.MultiLanguageString
+        ReportMessage = new MultiLanguageString
         {
             EN = $"Loading Image from Serial [{serial}] [{index}/{count}]"
         }
@@ -60,7 +60,7 @@ public record DeckExportProgressReport : UpdateProgressReport
      => this with
      {
          Percentage = 76,
-         ReportMessage = new Impls.MultiLanguageString
+         ReportMessage = new MultiLanguageString
          {
              EN = $"Generating Deck Image..."
          }
@@ -70,7 +70,7 @@ public record DeckExportProgressReport : UpdateProgressReport
      => this with
      {
          Percentage = 78,
-         ReportMessage = new Impls.MultiLanguageString
+         ReportMessage = new MultiLanguageString
          {
              EN = $"{sizingVerb} Card Image Size to [{bounds.Width} x {bounds.Height}]..."
          }

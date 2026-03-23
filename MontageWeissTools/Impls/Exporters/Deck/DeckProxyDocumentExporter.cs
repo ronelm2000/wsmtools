@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Wordprocessing;
 using Fluent.IO;
 using Montage.Card.API.Entities;
+using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
 using Montage.Card.API.Utilities;

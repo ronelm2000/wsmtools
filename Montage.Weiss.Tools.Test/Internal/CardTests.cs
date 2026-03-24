@@ -114,15 +114,16 @@ public class CardTests
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
         var Log = Serilog.Log.Logger.ForContext<CardTests>();
         var url = new Uri("https://www.encoredecks.com/images/JP/W69/039.gif");
-        using (var img = Image.Load(await url.WithImageHeaders().GetStreamAsync()))
+        using (var img = Image.Load(await url.WithImageHeaders().GetStreamAsync(cancellationToken: TestContext.CancellationToken)))
         {
             Log.Information("Image Loaded: {img}", url);
         }
     }
 
     [TestMethod(DisplayName = "TTS Command Check")]
+    [TestCategory("Manual")]
     [Ignore]
-    public async Task TestTTSCommand(Task<string?> task)
+    public async Task TestTTSCommand()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
         var Log = Serilog.Log.Logger.ForContext<CardTests>();
@@ -141,8 +142,8 @@ public class CardTests
         var json = JsonConvert.SerializeObject(command);
         Log.Information($"Running: {json}");
         await writer.WriteAsync(json);
-        await writer.FlushAsync();
-        string response = await (reader?.ReadLineAsync(TestContext.CancellationToken) ?? ValueTask.FromResult<string?>(""))! ?? "";
+        await writer.FlushAsync(TestContext.CancellationToken);
+        var response = await (reader?.ReadLineAsync(TestContext.CancellationToken) ?? ValueTask.FromResult<string?>(""))! ?? "";
         Log.Information("Logging Response: {response}", response);
     }
 }

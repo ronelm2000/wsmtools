@@ -8,18 +8,17 @@ using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json;
 using SixLabors.ImageSharp;
 using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
-using Montage.Weiss.Tools.Test.Internal;
 
 namespace Montage.Weiss.Tools.Test.Internal;
 
 [TestClass]
 public class CardTests
 {
-    [TestMethod("Serial Parser Test")]
+    public TestContext TestContext { get; set; }
+
+    [TestMethod(DisplayName = "Serial Parser Test")]
     public async Task TestSerialParser()
     {
         var serials = new[] { 
@@ -28,17 +27,15 @@ public class CardTests
            "CCS/BSF2019-02",
            "RANDOM"
         };
-#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
-        var expectedOutput = new (string NeoStandardCode, string ReleaseID, string SetID)?[]
+        var expectedOutput = new (string? NeoStandardCode, string? ReleaseID, string? SetID)?[]
         {
             ("LSS", "W69", "054"),
             ("BD", "EN-W03", "026BDR"),
             ("CCS", "BSF2019", "02"),
             (null,null,null)
         };
-#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
 
-        for (int i = 0; i < serials.Length; i++)
+        for (var i = 0; i < serials.Length; i++)
         {
             var (NeoStandardCode, ReleaseID, SetID) = WeissSchwarzCard.ParseSerial(serials[i]);
             var tuple = (NeoStandardCode, ReleaseID, SetID);
@@ -48,7 +45,7 @@ public class CardTests
         await Task.CompletedTask;
     }
     
-    [TestMethod("Foil Removal Serial Test")]
+    [TestMethod(DisplayName = "Foil Removal Serial Test")]
     public async Task TestFoilRemovalSerial()
     {
         var serials = new[] {
@@ -72,7 +69,7 @@ public class CardTests
         await Task.CompletedTask;
     }
 
-    [TestMethod("English Set Test")]
+    [TestMethod(DisplayName = "English Set Test")]
     public async Task TestEnglishSetTypes()
     {
         var serials = new[] {
@@ -93,15 +90,15 @@ public class CardTests
             null
         };
 
-        for (int i = 0; i < serials.Length; i++)
+        for (var i = 0; i < serials.Length; i++)
         {
             var setType = WeissSchwarzCard.GetEnglishSetType(serials[i]);
-            Assert.IsTrue(expectedOutput[i] == setType);
+            Assert.AreEqual(setType, expectedOutput[i]);
         }
         await Task.CompletedTask;
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "ShareX Check")]
     [TestCategory("Manual")]
     public void TestShareX()
     {
@@ -110,7 +107,7 @@ public class CardTests
         Log.Information(InstalledApplications.GetApplicationInstallPath("ShareX"));
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "EncoreDecks Image Check")]
     [TestCategory("Manual")]
     public async Task TestEncoreDecksGifsAsync()
     {
@@ -119,11 +116,11 @@ public class CardTests
         var url = new Uri("https://www.encoredecks.com/images/JP/W69/039.gif");
         using (var img = Image.Load(await url.WithImageHeaders().GetStreamAsync()))
         {
-            Log.Information("Image Loaded.");
+            Log.Information("Image Loaded: {img}", url);
         }
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "TTS Command Check")]
     [Ignore]
     public async Task TestTTSCommand(Task<string?> task)
     {
@@ -133,22 +130,19 @@ public class CardTests
         var host = "localhost";
         var port = 39999;
 
-        //var command = new TTSExternalEditorCommand("-1", "spawnObject({ type = \"rpg_BEAR\" })");
         var command = new TTSExternalEditorCommand("-1", "spawnObject ({ type = \"rpg_BEAR\" })");
 
-
         Log.Information("Trying to connect to TTS via {ip}:{port}...", host, port);
-        using (var tcpClient = new TcpClient(host, port))
-        using (var stream = tcpClient.GetStream())
-        using (var writer = new System.IO.StreamWriter(stream))
-        using (var reader = new System.IO.StreamReader(stream))
-        {   
-            var json = JsonConvert.SerializeObject(command);
-            Log.Information($"Running: {json}");
-            await writer.WriteAsync(json);
-            await writer.FlushAsync();
-            string response = await (reader?.ReadLineAsync() ?? Task.FromResult<string?>(""))! ?? "";
-            Log.Information("Logging Response: {response}", response);
-        }
+        using var tcpClient = new TcpClient(host, port);
+        using var stream = tcpClient.GetStream();
+        using var writer = new System.IO.StreamWriter(stream);
+        using var reader = new System.IO.StreamReader(stream);
+        
+        var json = JsonConvert.SerializeObject(command);
+        Log.Information($"Running: {json}");
+        await writer.WriteAsync(json);
+        await writer.FlushAsync();
+        string response = await (reader?.ReadLineAsync(TestContext.CancellationToken) ?? ValueTask.FromResult<string?>(""))! ?? "";
+        Log.Information("Logging Response: {response}", response);
     }
 }

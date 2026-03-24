@@ -1,16 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Query.Internal;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Services;
-using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Exporters.Database.Cockatrice;
 using Montage.Weiss.Tools.Test.Commons;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test.Cockatrice;
@@ -18,33 +15,28 @@ namespace Montage.Weiss.Tools.Test.Cockatrice;
 [TestClass]
 public class ExporterTests
 {
-    [TestMethod(DisplayName = "Cockatrice Database Exporter Test (Full)")]
+    public TestContext TestContext { get; set; }
+
+    [TestMethod(DisplayName = "Database Exporter Test (Cockatrice)")]
     public async Task TestExporterForDatabase()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
+        var ioc = Program.Bootstrap();
         var progressReporter = NoOpProgress<object>.Instance;
-        using var db = ioc.GetInstance<CardDatabaseContext>();
-
-        /*
-        await new ParseVerb()
-        {
-            URI = "https://heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
-        }.Run(ioc);
-        */
 
         await new ParseVerb()
         {
             URI = "https://www.encoredecks.com/api/series/5d3232ec7cd9b718cd126e2e/cards"
-        }.Run(ioc, progressReporter);
+        }.Run(ioc, progressReporter, TestContext.CancellationToken);
 
         await new ParseVerb()
         {
             URI = "https://www.heartofthecards.com/translations/little_busters!_anime_booster_pack.html"
-        }.Run(ioc, progressReporter);
+        }.Run(ioc, progressReporter, TestContext.CancellationToken);
 
+        await using var db = ioc.GetInstance<CardDatabaseContext>();
         IDatabaseExportInfo info = new MockDatabaseExportInfo();
-        await new CockatriceExporter().Export(db, info, default);
+        await new CockatriceExporter().Export(db, info, TestContext.CancellationToken);
     }
 }
 

@@ -19,10 +19,16 @@ namespace Montage.Weiss.Tools;
 public class Program
 {
     /// <summary>
-    /// Should only be overriden in cases where the user is using a custom IConsole implementation, 
-    /// such as in the GUI version of the app, where the console is not actually a console but a wrapper around a text box.
+    /// Should only be overriden in cases where the user is using a custom IConsole implementation, which will usually only be 
+    /// in a test enviornment setting where IConsole can be mocked.
     /// </summary>
-    public static IConsole Console = Card.API.CLI.Instance;
+    public static IConsole Console { get; set; } = Card.API.CLI.Instance;
+
+    /// <summary>
+    /// Should only be used in testing, to provide a cancellation token that is cancelled when the test is cancelled, 
+    /// so that the cancellation is properly propagated to the code being tested.
+    /// </summary>
+    public static CancellationToken TestCancellationToken { get; set; } = default;
 
     //    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Options))]
     public static async Task Main(string[] args)
@@ -37,7 +43,9 @@ public class Program
         Log.Debug(container.WhatDoIHave(serviceType: typeof(ICardSetParser<WeissSchwarzCard>)));
 
         var progressReporter = new Progress<CommandProgressReport>();
-        var cts = new CancellationTokenSource();
+        using var cts = new CancellationTokenSource();
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, TestCancellationToken);
+
         progressReporter.ProgressChanged += ProgressReporter_ProgressChanged;
         Console.CancelKeyPress += (s, e) => cts.Cancel();
 
@@ -46,11 +54,10 @@ public class Program
         await result.MapResult<IVerbCommand, Task>(
             async (verb) => {
                 await CheckLatestVersion();
-                await verb.Run(container, progressReporter);
+                await verb.Run(container, progressReporter, linkedCts.Token);
             },
-            (errors) => Display(errors)
+            async (errors) => await Display(errors)
         );
-        await Task.CompletedTask;
     }
 
     private static void ProgressReporter_ProgressChanged(object? sender, CommandProgressReport e)
@@ -66,7 +73,7 @@ public class Program
             var github = new GitHubClient(new ProductHeaderValue("wsmtools"));
             //var user = await github.User.Get("ronelm2000");
             var wsmtoolsLatestRelease = await github.Repository.Release.GetLatest("ronelm2000", "wsmtools");
-            var versionLatestRelease = Version.Parse(wsmtoolsLatestRelease.TagName.Substring(1));
+            var versionLatestRelease = Version.Parse(wsmtoolsLatestRelease.TagName.AsSpan(1));
             var appVersion = AppVersion;
             if (wsmtoolsLatestRelease.CreatedAt.DateTime > AppReleaseDate)
             //if (wsmtoolsLatestRelease.TagName != $"v{Program.AppVersion}")
@@ -123,10 +130,10 @@ public class Program
         });
     }
 
-    private static Task Display(IEnumerable<Error> errors)
+    private static async Task Display(IEnumerable<Error> errors)
     {
         var makeCLIAppear = false;
-        foreach (Error error in errors)
+        foreach (var error in errors)
         {
             if (error is HelpVerbRequestedError || error is NoVerbSelectedError)
             {
@@ -137,7 +144,7 @@ public class Program
                 Log.Error("{@Error}", error);
         }
         if (makeCLIAppear) Console.ReadKey(false);
-        return Task.CompletedTask;
+        await ValueTask.CompletedTask;
     }
 
     public static string AppVersion =>

@@ -8,10 +8,7 @@ using Montage.Weiss.Tools.Test.Commons;
 using Montage.Weiss.Tools.Utilities;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,35 +17,32 @@ namespace Montage.Weiss.Tools.Test.BlakeWS;
 [TestClass]
 public class ServiceTests
 {
-    [TestMethod("Get Import Deck Test")]
+    public TestContext TestContext { get; set; }
+
+    [TestMethod(DisplayName = "Import Deck Test (Get)")]
     [TestCategory("Manual")]
+    [OSCondition(OperatingSystems.Windows)]
     public void GetTestImportDeck()
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            Assert.Inconclusive("Test was not run on Windows and is unsupported in other platforms.");
-
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
+        var ioc = Program.Bootstrap();
         var wsblakeSrvc = ioc.GetInstance<WeissSchwarzBlakeUnityService>();
         var data = wsblakeSrvc!.GetExportDeckData();
         Assert.IsNotNull(data);
     }
 
-    [TestMethod("Insert Import Deck Test (Regedit)")]
+    [TestMethod(DisplayName = "Import Deck Test (Insert)(Regedit)")]
     [TestCategory("Manual")]
     [DeploymentItem("Resources/deck_date_a_live.json")]
-
+    [OSCondition(OperatingSystems.Windows)]
     public void TestInsertImportDeckToBlakeWSS()
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            Assert.Inconclusive("Test was not run on Windows and is unsupported in other platforms.");
-
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
+        var ioc = Program.Bootstrap();
         var wsblakeSrvc = ioc.GetInstance<WeissSchwarzBlakeUnityService>();
 
-        string dataToImport = "P5/S45-E109|P5/S45-E109|P5/S45-E109|P5/S45-E009|P5/S45-E009|P5/S45-E003|P5/S45-E003|P5/S45-E003|P5/S45-E003|P5/S45-E008|P5/S45-E011|P5/S45-E011|P5/S45-E011|P5/S45-E011|P5/S45-E015|P5/S45-E033|P5/S45-E033|P5/S45-TE03|P5/S45-E017|P5/S45-E017|P5/S45-E017|P5/S45-E016|P5/S45-E016|P5/S45-E016|P5/S45-E016|P5/S45-E021|P5/S45-E021|P5/S45-E021|P5/S45-E006|P5/S45-E006|P5/S45-E006|P5/S45-E006|P5/S45-E101|P5/S45-E012|P5/S45-E012|P5/S45-E001|P5/S45-E001|P5/S45-E001|P5/S45-E001|P5/S45-E002|P5/S45-E002|P5/S45-E002|P5/S45-E024|P5/S45-E024|P5/S45-E024|P5/S45-E024|P5/S45-E023|P5/S45-E023|P5/S45-E023|P5/S45-E023|\0";
-        DateTime timeToImport = DateTime.Now;
+        var dataToImport = "P5/S45-E109|P5/S45-E109|P5/S45-E109|P5/S45-E009|P5/S45-E009|P5/S45-E003|P5/S45-E003|P5/S45-E003|P5/S45-E003|P5/S45-E008|P5/S45-E011|P5/S45-E011|P5/S45-E011|P5/S45-E011|P5/S45-E015|P5/S45-E033|P5/S45-E033|P5/S45-TE03|P5/S45-E017|P5/S45-E017|P5/S45-E017|P5/S45-E016|P5/S45-E016|P5/S45-E016|P5/S45-E016|P5/S45-E021|P5/S45-E021|P5/S45-E021|P5/S45-E006|P5/S45-E006|P5/S45-E006|P5/S45-E006|P5/S45-E101|P5/S45-E012|P5/S45-E012|P5/S45-E001|P5/S45-E001|P5/S45-E001|P5/S45-E001|P5/S45-E002|P5/S45-E002|P5/S45-E002|P5/S45-E024|P5/S45-E024|P5/S45-E024|P5/S45-E024|P5/S45-E023|P5/S45-E023|P5/S45-E023|P5/S45-E023|\0";
+        var timeToImport = DateTime.Now;
         timeToImport = new DateTime(timeToImport.Year, timeToImport.Month, timeToImport.Day, timeToImport.Hour, timeToImport.Minute, 0, timeToImport.Kind);
 
         wsblakeSrvc.ExportDeckData(dataToImport);
@@ -57,31 +51,31 @@ public class ServiceTests
         var importedData = wsblakeSrvc!.GetExportDeckData();
         DateTime? importedDateTime = wsblakeSrvc.GetExportDate();
 
-        Assert.IsTrue(importedData == dataToImport, "Data was not imported correctly.");
+        Assert.AreEqual(dataToImport, importedData, "Data was not imported correctly.");
         Assert.IsTrue(importedDateTime?.Equals(timeToImport) ?? false, "Timestamp was not imported correctly.");
     }
 
-    [TestMethod("Export Deck to Blake WS Format Test")]
+    [TestMethod(DisplayName = "Export Deck Test (Blake WS Format)")]
     [DeploymentItem("Resources/deck_Lucky_Happy_Smile_Yay_v3.json")]
     [DeploymentItem("Resources/test_deck_results.bws.txt")]
     [TestCategory("Manual")]
     public async Task TestExportToBlakeWSFormat()
     {
         Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
+        var ioc = Program.Bootstrap();
         await new FetchVerb
         {
             RIDsOrSerials = new[] { "W73", "W63", "W54" }
-        }.Run(ioc, NoOpProgress<CommandProgressReport>.Instance);
+        }.Run(ioc, NoOpProgress<CommandProgressReport>.Instance, TestContext.CancellationToken);
 
         await new ExportVerb
         {
             Source = "./deck_Lucky_Happy_Smile_Yay_v3.json",
             Exporter = "bws"
-        }.Run(ioc, NoOpProgress<CommandProgressReport>.Instance);
+        }.Run(ioc, NoOpProgress<CommandProgressReport>.Instance, TestContext.CancellationToken);
 
-        var resourceStream = await Path.Get("./test_deck_results.bws.txt").ReadBytesAsync();
-        var resultStream = await Path.Get("./Export/Lucky_Happy_Smile_Yay_v3.bws.txt").ReadBytesAsync();
+        var resourceStream = await Path.Get("./test_deck_results.bws.txt").ReadBytesAsync(TestContext.CancellationToken);
+        var resultStream = await Path.Get("./Export/Lucky_Happy_Smile_Yay_v3.bws.txt").ReadBytesAsync(TestContext.CancellationToken);
         var hasher = SHA512.Create();
         var resourceHash = hasher.ComputeHash(resourceStream);
         var resultHash = hasher.ComputeHash(resultStream);
@@ -94,5 +88,4 @@ public class ServiceTests
 
         Assert.IsTrue(resourceHash?.SequenceEqual(resultHash) ?? false);
     }
-
 }

@@ -5,11 +5,7 @@ using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Parsers.Cards;
 using Montage.Weiss.Tools.Test.Commons;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test.HOTC;
@@ -17,7 +13,9 @@ namespace Montage.Weiss.Tools.Test.HOTC;
 [TestClass]
 public class ParserTests
 {
-    [TestMethod("Full Integration Test (Local Text File) (HOTC) (Typical Use Case)")]
+    public TestContext TestContext { get; set; }
+
+    [TestMethod(DisplayName = "Full Integration (Local Text File) (HOTC)")]
     [DeploymentItem("Resources/shiyoko_prs_hotc.txt")]
     public async Task FullTestRun()
     {
@@ -27,16 +25,17 @@ public class ParserTests
         await new ParseVerb()
         {
             URI = "./shiyoko_prs_hotc.txt",
-            ParserHints = new string[] { "hotc" }
-        }.Run(ioc, progress);
+            ParserHints = ["hotc"]
+        }.Run(ioc, progress, TestContext.CancellationToken);
     }
 
-    [TestMethod("HOTC Parser Trait Test")]
+    [TestMethod(DisplayName = "HOTC Parser Trait Test")]
     public async Task TestTraitHandling()
     {
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
-        var lba = await new HeartOfTheCardsURLParser().Parse("https://www.heartofthecards.com/translations/little_busters!_anime_booster_pack.html", progress, CancellationToken.None) //
-            .ToDictionaryAsync(c => c.Serial);
+        var lba = await new HeartOfTheCardsURLParser()
+            .Parse("https://www.heartofthecards.com/translations/little_busters!_anime_booster_pack.html", progress, TestContext.CancellationToken) //
+            .ToDictionaryAsync(c => c.Serial, cancellationToken: TestContext.CancellationToken);
 
         Assert.IsTrue(lba["LB/W21-046"].Traits.Count == 1, $"LB/W21-046 has an invalid amount of traits: {lba["LB/W21-046"].Traits.Count}");
         Assert.IsTrue(lba["LB/W21-065"].Traits.Count == 0, $"LB/W21-065has an invalid amount of traits: {lba["LB/W21-065"].Traits.Count}");

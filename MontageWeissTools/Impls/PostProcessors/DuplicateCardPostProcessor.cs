@@ -28,7 +28,7 @@ public class DuplicateCardPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         _db = () => ioc.GetInstance<CardDatabaseContext>();
     }
 
-    public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
+    public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards, CancellationToken cancellationToken = default)
     {
         return await ValueTask.FromResult(true);
     }

@@ -37,7 +37,7 @@ public class ParseVerb : IVerbCommand, IParseInfo
 
         var postProcessors = await container.GetAllInstances<ICardPostProcessor<WeissSchwarzCard>>()
             .ToAsyncEnumerable()
-            .Where(async (processor, ct) => await processor.IsCompatible(cardList))
+            .Where(async (processor, ct) => await processor.IsCompatible(cardList, ct))
             .Where(processor => parser is not IFilter<ICardPostProcessor<WeissSchwarzCard>> filter || filter.IsIncluded(processor))
             .Where(async (processor, ct) => processor is not ISkippable<IParseInfo> skippable || await skippable.IsIncluded(this))
             .Where(async (processor, ct) => processor is not ISkippable<ICardSetParser<WeissSchwarzCard>> skippable || await skippable.IsIncluded(parser))

@@ -41,11 +41,11 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         _cacheSrvc = () => ioc.GetInstance<ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>>();
     }
 
-    public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
+    public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards, CancellationToken cancellationToken = default)
     {
         var firstCard = cards[0];
         var deckLogClient = await deckLogClients.ToAsyncEnumerable()
-            .FirstAsync( async (c, ct) => await c.IsCompatible(firstCard, ct), CancellationToken.None);
+            .FirstAsync(async (c, ct) => await c.IsCompatible(firstCard, ct), cancellationToken);
         if (deckLogClient is null)
             return false;
 
@@ -53,7 +53,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         if (settings is null)
             return false;
 
-        var latestVersion = await GetLatestVersion(settings);
+        var latestVersion = await GetLatestVersion(settings, cancellationToken);
         if (latestVersion != settings.Version)
         {
             Log.Warning("DeckLog's API has been updated from {version1} to {version2}.", settings.Version, latestVersion);
@@ -63,9 +63,9 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         return true;
     }
 
-    public async Task<string> GetLatestVersion(DeckLogSettings settings)
+    public async Task<string> GetLatestVersion(DeckLogSettings settings, CancellationToken cancellationToken)
     {
-        var cookieJar = await _cookieJar().FindOrCreate(settings.Referrer);
+        var cookieJar = await _cookieJar().FindOrCreate(settings.Referrer, cancellationToken);
         currentVersion ??= await settings.VersionURL
             .WithRESTHeaders()
             .WithCookies(cookieJar)
@@ -76,7 +76,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                     Log.Information("Response is encoded with {encoding}.", encoding);
                 }
             })
-            .GetStringAsync();
+            .GetStringAsync(cancellationToken: cancellationToken);
 
         return currentVersion;
     }
@@ -137,7 +137,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             await foreach (var card in prCards)
                 newPRCards = newPRCards.Concat(TryMutate(card, deckLogSearchResults, settings, cancellationToken));
 
-            var results = await db.SaveChangesAsync();
+            var results = await db.SaveChangesAsync(cancellationToken);
             Log.Information("Changed: {results} rows.", results);
         }
 
@@ -191,7 +191,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
             .ToDictionary(c => c.Key, c => c.Value);
         var cacheValues = cacheResults.SelectMany(c => c.Value).ToList();
         var serialMapper = cardData.ToDictionary(c => c.Serial, c => c.TitleCode);
-        var cookieJar = await _cookieJar().FindOrCreate(settings.Referrer);
+        var cookieJar = await _cookieJar().FindOrCreate(settings.Referrer, cancellationToken);
 
         foreach (var kvp in cacheValues)
             results.Add(kvp.Key, kvp.Value);

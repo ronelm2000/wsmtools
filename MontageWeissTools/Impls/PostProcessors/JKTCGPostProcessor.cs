@@ -43,7 +43,7 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
         }
     }
 
-    public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
+    public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards, CancellationToken cancellationToken = default)
     {
         await ValueTask.CompletedTask;
         if (cards.Count == 0)
@@ -73,7 +73,7 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
             return false;
         }
 
-        var setList = await GetSetListURI(firstCard);
+        var setList = await GetSetListURI(firstCard, cancellationToken);
         if (!setList.HasValue)
         {
             Log.Information("Unable to find info from JKTCG; likely a new set, will skip.");

@@ -23,7 +23,7 @@ public class PostProcessorTests
 
         var deckLogPP = ioc.GetInstance<DeckLogPostProcessor>();
         var settings = DeckLogSettings.Japanese;
-        var latestVersion = await deckLogPP.GetLatestVersion(settings);
+        var latestVersion = await deckLogPP.GetLatestVersion(settings, TestContext.CancellationToken);
         Assert.IsTrue(latestVersion == settings.Version, $"DeckLog API (JP) version is outdated; latest version is {latestVersion} need to check for compatibility.");
     }
 
@@ -35,7 +35,7 @@ public class PostProcessorTests
 
         var deckLogPP = ioc.GetInstance<DeckLogPostProcessor>();
         var settings = DeckLogSettings.English;
-        var latestVersion = await deckLogPP.GetLatestVersion(settings);
+        var latestVersion = await deckLogPP.GetLatestVersion(settings, TestContext.CancellationToken);
         Assert.IsTrue(latestVersion == settings.Version, $"DeckLog API (EN) version is outdated; latest version is {latestVersion} need to check for compatibility.");
     }
 

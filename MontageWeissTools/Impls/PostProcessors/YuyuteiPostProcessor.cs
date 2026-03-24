@@ -1,6 +1,5 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using Lamar;
 using Microsoft.EntityFrameworkCore;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
@@ -8,9 +7,7 @@ using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Card.API.Utilities;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using System.Web;
 using Montage.Weiss.Tools.Utilities;
 
@@ -19,9 +16,9 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors;
 /// <summary>
 /// Applies post-processing by searching in yuyutei for images of the cards and inserting them in.
 /// </summary>
-public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippable<IParseInfo>
+public class YuyuteiPostProcessor(Func<CardDatabaseContext> database) : ICardPostProcessor<WeissSchwarzCard>, ISkippable<IParseInfo>
 {
-    private readonly static ILogger Log = Serilog.Log.ForContext<YuyuteiPostProcessor>();
+    private static readonly ILogger Log = Serilog.Log.ForContext<YuyuteiPostProcessor>();
 
     public int Priority => 0;
 
@@ -36,14 +33,9 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
     private static string[] gfbException = new[] { "W33", "W38" };
 
     // Dependencies
-    private readonly Func<CardDatabaseContext> _database;
+    private readonly Func<CardDatabaseContext> database = database ?? throw new ArgumentNullException(nameof(database));
 
-    public YuyuteiPostProcessor(IContainer container)
-    {
-        _database = () => container.GetInstance<CardDatabaseContext>();
-    }
-
-    public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards)
+    public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards, CancellationToken cancellationToken = default)
     {
         await ValueTask.CompletedTask;
         if (cards.Count == 0)
@@ -64,7 +56,7 @@ public class YuyuteiPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkipp
             return true;
     }
 
-    private bool IsExceptional(List<string> releaseIDList)
+    private static bool IsExceptional(List<string> releaseIDList)
     {
         if (releaseIDList.OrderBy(s => s).SequenceEqual(gfbException))
         {

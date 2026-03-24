@@ -13,14 +13,14 @@ public interface ICardPostProcessor<C> where C : ICard
     /// <summary>
     /// Indicates the priority of the post-processor.
     /// </summary>
-    public int Priority { get; }
+    int Priority { get; }
 
     /// <summary>
     /// Indicates if the list of cards exported are compatible for this post-processor in the first place.
     /// </summary>
     /// <param name="cards"></param>
     /// <returns></returns>
-    public Task<bool> IsCompatible(List<C> cards);
+    Task<bool> IsCompatible(List<C> cards, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Applies post-processing on a card/s.
@@ -29,16 +29,5 @@ public interface ICardPostProcessor<C> where C : ICard
     /// <param name="progress">Allows this task to report progress as needed.</param>
     /// <param name="ct">A cancellation token that allows this task to be cancelled as needed. All implementations of this class should use EnumeratorCancellation attribute.</param>
     /// <returns>Returns an async stream of the processed cards.</returns>
-    public IAsyncEnumerable<C> Process(IAsyncEnumerable<C> originalCards, IProgress<PostProcessorProgressReport> progress, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Applies post-processing on a card/s.
-    /// </summary>
-    /// <param name="originalCards">The cards that will be obtained.</param>
-    /// <returns>Returns an async stream of the processed cards.</returns>
-    [Obsolete]
-    public IAsyncEnumerable<C> Process(IAsyncEnumerable<C> originalCards)
-    {
-        return Process(originalCards, NoOpProgress<PostProcessorProgressReport>.Instance, CancellationToken.None);
-    }
+    IAsyncEnumerable<C> Process(IAsyncEnumerable<C> originalCards, IProgress<PostProcessorProgressReport> progress, CancellationToken cancellationToken = default);
 }

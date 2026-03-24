@@ -21,6 +21,8 @@ namespace Montage.Weiss.Tools.Test;
 [TestClass]
 public class IntegrationTests
 {
+    public TestContext TestContext { get; set; }
+
     [TestMethod(DisplayName = "Full Integration Test (Typical Use Case)")]
     [TestCategory("Manual")]
     public async Task FullTestRun()
@@ -32,22 +34,22 @@ public class IntegrationTests
         await new ParseVerb()
         {
             URI = "https://heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
-        }.Run(ioc, progress);
+        }.Run(ioc, progress, TestContext.CancellationToken);
 
         await new ParseVerb()
         {
             URI = "https://heartofthecards.com/translations/love_live!_sunshine_vol._2_booster_pack.html"
-        }.Run(ioc, progress);
+        }.Run(ioc, progress, TestContext.CancellationToken);
 
-        var testSerial = await ioc.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync("LSS/W69-006");
-        Assert.IsTrue(testSerial is not null && testSerial.Images.Any());
+        var testSerial = await ioc.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync(["LSS/W69-006"], cancellationToken: TestContext.CancellationToken);
+        Assert.IsTrue(testSerial is not null && testSerial.Images.Count != 0);
 
         var parseCommand = new ExportVerb()
         {
             Source = "https://www.encoredecks.com/deck/wDdTKywNh",
             NonInteractive = true
         };
-        await parseCommand.Run(ioc, progress);
+        await parseCommand.Run(ioc, progress, TestContext.CancellationToken);
     }
 
     [TestMethod(DisplayName = "Exceptional Set Test (GFB vol. 2)")]
@@ -58,11 +60,11 @@ public class IntegrationTests
         var ioc = Program.Bootstrap();
         var progressReporter = NoOpProgress<object>.Instance;
 
-        await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html" }.Run(ioc, progressReporter);
-        await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html" }.Run(ioc, progressReporter);
+        await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html" }.Run(ioc, progressReporter, TestContext.CancellationToken);
+        await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html" }.Run(ioc, progressReporter, TestContext.CancellationToken);
 
-        var testSerial = await ioc.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync("GF/W38-020");
-        Assert.IsTrue(testSerial?.Images.Any());
+        var testSerial = await ioc.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync(["GF/W38-020"], cancellationToken: TestContext.CancellationToken);
+        Assert.AreNotEqual(0, testSerial?.Images.Count);
     }
 
     [TestMethod(DisplayName = "Help Test")]
@@ -72,7 +74,7 @@ public class IntegrationTests
         Program.Console.IsOutputRedirected.Returns(false);
         Program.Console.ReadKey(false).Returns(new ConsoleKeyInfo(' ', ConsoleKey.Spacebar, false, false, false));
 
-        var task = Program.Main(new[] { "--help" });
+        var task = Program.Main(["--help"]);
         await task;
 
         Program.Console.Received().ReadKey(false);
@@ -86,7 +88,7 @@ public class IntegrationTests
         Program.Console.IsOutputRedirected.Returns(false);
         Program.Console.ReadKey(false).Returns(new ConsoleKeyInfo(' ', ConsoleKey.Spacebar, false, false, false));
 
-        var task = Program.Main(new[] { "update" });
+        var task = Program.Main(["update"]);
         await task;
 
         Program.Console.DidNotReceive().ReadKey(false);

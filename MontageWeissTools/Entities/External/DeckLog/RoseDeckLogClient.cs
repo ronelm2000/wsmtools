@@ -69,7 +69,7 @@ internal class RoseDeckLogClient : IDeckLogClient
         Log.Information("Done Extracting. Total Pages: {pagenumber}", page);
     }
 
-    private int ToCardType(string cardTypeStr)
+    private static int ToCardType(string cardTypeStr)
     {
         return cardTypeStr switch
         {

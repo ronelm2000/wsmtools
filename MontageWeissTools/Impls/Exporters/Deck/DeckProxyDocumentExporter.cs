@@ -184,7 +184,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
         }
     }
 
-    private IEnumerable<WeissSchwarzCard> AsOrdered(IEnumerable<WeissSchwarzCard> cards)
+    private static IEnumerable<WeissSchwarzCard> AsOrdered(IEnumerable<WeissSchwarzCard> cards)
         => cards
             .OrderBy(card => card.Type.GetSortKey())
             .ThenByDescending(card => card.Level)
@@ -192,7 +192,7 @@ public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSc
             .ThenBy(card => card.Color.GetSortKey())
             .ThenBy(card => card.Serial);
 
-    private Image PreProcess(Image image)
+    private static Image PreProcess(Image image)
     {
         if (image.Height < image.Width)
         {

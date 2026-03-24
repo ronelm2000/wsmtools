@@ -15,21 +15,15 @@ using Color = SixLabors.ImageSharp.Color;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
 
-public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
+public class DeckTranslationDocumentExporter(GlobalCookieJar globalCookieJar, IFileOutCommandProcessor fileOutCommandProcessor) : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<DeckTranslationDocumentExporter>();
 //    private static readonly DecoderOptions _decoderOptions = new DecoderOptions { };
 
-    private readonly GlobalCookieJar _gcj;
-    private readonly IFileOutCommandProcessor _fileProcessor;
+    private readonly GlobalCookieJar _gcj = globalCookieJar ?? throw new ArgumentNullException(nameof(globalCookieJar));
+    private readonly IFileOutCommandProcessor _fileProcessor = fileOutCommandProcessor ?? throw new ArgumentNullException(nameof(fileOutCommandProcessor));
 
-    public string[] Alias => new[] { "trans-doc" };
-
-    public DeckTranslationDocumentExporter(GlobalCookieJar globalCookieJar, IFileOutCommandProcessor fileOutCommandProcessor)
-    {
-        _gcj = globalCookieJar ?? throw new ArgumentNullException(nameof(globalCookieJar));
-        _fileProcessor = fileOutCommandProcessor ?? throw new ArgumentNullException(nameof(fileOutCommandProcessor));
-    }
+    public string[] Alias => ["trans-doc"];
 
     public async Task Export(WeissSchwarzDeck deck, IExportInfo info, CancellationToken cancellationToken = default)
     {
@@ -66,7 +60,7 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
 
         var resultingDocFilePath = resultFolder.Combine($"translations_{fileNameFriendlyDeckName}.docx");
         
-        await using (WordDocument document = await WordDocument.CreateAsync(autoSave: false, cancellationToken: cancellationToken))
+        await using (var document = await WordDocument.CreateAsync(autoSave: false, cancellationToken: cancellationToken))
         {
             document.PageOrientation = PageOrientationValues.Portrait;
             document.PageSettings.PageSize = WordPageSize.A4;
@@ -86,12 +80,12 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
 
                 using var rawImageStream = new System.IO.MemoryStream();
                 rawImage.Save(rawImageStream, PngFormat.Instance);
-                rawImageStream.TryGetBuffer(out ArraySegment<byte> buffer);
+                rawImageStream.TryGetBuffer(out var buffer);
 
                 var row = table.AddRow();
 
                 row.Cells[0].Paragraphs[0].AddImageFromBase64(
-                    Convert.ToBase64String(buffer.Array ?? Array.Empty<byte>(), 0, (int)rawImageStream.Length),
+                    Convert.ToBase64String(buffer.Array ?? [], 0, (int)rawImageStream.Length),
                     card.Serial + ".png",
                     width: 143d,
                     height: 200d,
@@ -150,15 +144,17 @@ public class DeckTranslationDocumentExporter : IDeckExporter<WeissSchwarzDeck, W
         await _fileProcessor.OpenFile(info.Destination, resultingDocFilePath.FileName);
     }
 
-    private IEnumerable<WeissSchwarzCard> AsOrdered(IEnumerable<WeissSchwarzCard> cards)
-        => cards
-            .OrderBy(card => card.Type.GetSortKey())
-            .ThenByDescending(card => card.Level)
-            .ThenByDescending(card => card.Cost)
-            .ThenBy(card => card.Color.GetSortKey())
-            .ThenBy(card => card.Serial);
+    private static IEnumerable<WeissSchwarzCard> AsOrdered(IEnumerable<WeissSchwarzCard> cards)
+    {
+        return cards
+                .OrderBy(card => card.Type.GetSortKey())
+                .ThenByDescending(card => card.Level)
+                .ThenByDescending(card => card.Cost)
+                .ThenBy(card => card.Color.GetSortKey())
+                .ThenBy(card => card.Serial);
+    }
 
-    private Image PreProcess(Image image)
+    private static Image PreProcess(Image image)
     {
         if (image.Height < image.Width)
         {

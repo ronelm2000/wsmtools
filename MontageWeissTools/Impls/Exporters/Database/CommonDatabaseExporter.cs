@@ -15,7 +15,7 @@ public abstract class CommonDatabaseExporter : IDatabaseExporter<CardDatabaseCon
     public abstract string[] Alias { get; }
     public abstract Task Export(CardDatabaseContext database, IDatabaseExportInfo info, CancellationToken cancellationToken);
 
-    protected IQueryable<WeissSchwarzCard> CreateQuery(IQueryable<WeissSchwarzCard> query, IDatabaseExportInfo info)
+    protected static IQueryable<WeissSchwarzCard> CreateQuery(IQueryable<WeissSchwarzCard> query, IDatabaseExportInfo info)
     {
         var releaseIDLimitations = info.ReleaseIDs.ToList();
         var serialLimitations = info.Serials.ToList();

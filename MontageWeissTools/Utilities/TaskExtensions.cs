@@ -8,7 +8,7 @@ public static class TaskExtensions
 {
     public static async Task<T> WithRetries<T>(this Task<T> task, int retries)
     {
-        Exception temp = new Exception();
+        Exception? temp = null;
         for (int i = 0; i <= retries; i++)
             try
             {
@@ -23,10 +23,16 @@ public static class TaskExtensions
             {
                 if (i == retries) temp = e;
             }
-        throw temp;
+        throw temp ?? new Exception();
     }
 
-    public static async IAsyncEnumerable<R> SelectParallelAsync<T, R>(this IAsyncEnumerable<T> source, Func<T, Task<R>> body, [EnumeratorCancellation] CancellationToken cancellationToken = default!, int maxDegreeOfParallelism = DataflowBlockOptions.Unbounded, TaskScheduler? scheduler = null)
+    public static async IAsyncEnumerable<R> SelectParallelAsync<T, R>(
+        this IAsyncEnumerable<T> source, 
+        Func<T, Task<R>> body, 
+        int maxDegreeOfParallelism = DataflowBlockOptions.Unbounded, 
+        TaskScheduler? scheduler = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default!
+        )
     {
         var options = new ExecutionDataflowBlockOptions
         {

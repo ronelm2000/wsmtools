@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Utilities;
 public static class UriExtensions
 {
     static readonly HttpClient client = new HttpClient();
-    static readonly IFlurlClient customizedClient = new FlurlClient(new HttpClient(new HttpClientHandler()
+    static readonly FlurlClient customizedClient = new FlurlClient(new HttpClient(new HttpClientHandler()
             {
                 ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) => LogErrorButContinue(msg,cert,chain,errors),
                 AutomaticDecompression = System.Net.DecompressionMethods.GZip

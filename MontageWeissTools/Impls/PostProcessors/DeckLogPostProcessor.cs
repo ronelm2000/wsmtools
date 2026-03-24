@@ -16,7 +16,7 @@ namespace Montage.Weiss.Tools.Impls.PostProcessors;
 
 public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippable<IParseInfo>
 {
-    private ILogger Log = Serilog.Log.ForContext<DeckLogPostProcessor>();
+    private readonly ILogger Log = Serilog.Log.ForContext<DeckLogPostProcessor>();
 
     private readonly Func<CardDatabaseContext> _db;
     private readonly Func<GlobalCookieJar> _cookieJar;

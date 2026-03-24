@@ -1,32 +1,20 @@
-﻿using Lamar;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
-using Serilog;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors;
 
-public class DuplicateCardPostProcessor : ICardPostProcessor<WeissSchwarzCard>
+public class DuplicateCardPostProcessor(Func<CardDatabaseContext> database) : ICardPostProcessor<WeissSchwarzCard>
 {
-    private static ILogger Log = Serilog.Log.ForContext<DuplicateCardPostProcessor>();
-    private readonly Func<CardDatabaseContext> _db;
+    private static readonly ILogger Log = Serilog.Log.ForContext<DuplicateCardPostProcessor>();
+    private readonly Func<CardDatabaseContext> _db = database ?? throw new ArgumentNullException(nameof(database));
 
-    ConcurrentDictionary<string, WeissSchwarzTrait> traitMap = new();
+    readonly ConcurrentDictionary<string, WeissSchwarzTrait> traitMap = new();
 
     public int Priority => 2;
-
-    public DuplicateCardPostProcessor(IContainer ioc)
-    {
-        _db = () => ioc.GetInstance<CardDatabaseContext>();
-    }
 
     public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards, CancellationToken cancellationToken = default)
     {

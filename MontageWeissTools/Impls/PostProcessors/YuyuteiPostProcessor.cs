@@ -30,7 +30,7 @@ public class YuyuteiPostProcessor(Func<CardDatabaseContext> database) : ICardPos
     private static readonly string cardUnitSaleSelector = ".sale";
 
     // Exceptional Sets
-    private static string[] gfbException = new[] { "W33", "W38" };
+    private static readonly string[] gfbException = ["W33", "W38"];
 
     // Dependencies
     private readonly Func<CardDatabaseContext> database = database ?? throw new ArgumentNullException(nameof(database));

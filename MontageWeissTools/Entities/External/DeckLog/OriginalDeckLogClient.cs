@@ -8,6 +8,8 @@ namespace Montage.Weiss.Tools.Entities.External.DeckLog;
 
 internal class OriginalDeckLogClient : IDeckLogClient
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<OriginalDeckLogClient>();
+
     private static Dictionary<(string, CardLanguage), DeckLogSettings> Presets { get; } = new DeckLogSettings[] {
         DeckLogSettings.Japanese,
         DeckLogSettings.English,

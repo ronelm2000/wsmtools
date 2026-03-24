@@ -1,18 +1,14 @@
 ﻿using Flurl.Http;
-using Montage.Card.API.Entities.Impls;
 using Montage.Weiss.Tools.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Entities.External.DeckLog;
 
 internal class RoseDeckLogClient : IDeckLogClient
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<OriginalDeckLogClient>();
+
     public async Task<bool> IsCompatible(WeissSchwarzCard card, CancellationToken cancellationToken = default)
     {
         return await IsCompatible(card.Language, card.Side, cancellationToken);
@@ -37,10 +33,10 @@ internal class RoseDeckLogClient : IDeckLogClient
         {
             DeckConstruction = DeckConstructionType.Others,
             Keyword = $"{nsCode}/",
-            KeywordQueryType = new[] { "no" }
+            KeywordQueryType = ["no"]
         };
         var page = 1;
-        var cookieJar = await cookieJarSrvc.FindOrCreate(setting.Authority);
+        var cookieJar = await cookieJarSrvc.FindOrCreate(setting.Authority, cancellationToken);
         var cardEntryList = new List<DLCardEntryV2>();
         do
         {
@@ -54,7 +50,7 @@ internal class RoseDeckLogClient : IDeckLogClient
                 {
                     param = query,
                     page = page
-                })
+                }, cancellationToken: cancellationToken)
                 .ReceiveJson<List<DLCardEntryV2>>();
 
             foreach (var entry in cardEntryList)

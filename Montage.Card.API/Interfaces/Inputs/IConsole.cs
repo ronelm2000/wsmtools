@@ -11,6 +11,7 @@ public interface IConsole
 {
     int WindowWidth { get; set; }
     bool IsOutputRedirected { get; }
+    bool KeyAvailable { get; }
 
     event ConsoleCancelEventHandler? CancelKeyPress;
 

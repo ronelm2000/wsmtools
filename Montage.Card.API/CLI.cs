@@ -25,6 +25,7 @@ public class CLI : IConsole
     public void WriteLine(string? message) => Console.WriteLine(message);
     public ConsoleKeyInfo ReadKey(bool intercept) => Console.ReadKey(intercept);
     public bool IsOutputRedirected => Console.IsOutputRedirected;
+    public bool KeyAvailable => Console.KeyAvailable;
     public void Write(object? value) => Console.Write(value);
 }
 

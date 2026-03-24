@@ -33,7 +33,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
         foreach (var card in keyCards)
         {
             Log.Information("{serial} has no image URL nor a cached image. This deck cannot be exported without an image. Do you want to supply an image instead? [Y/N] (Default is N)", card.Serial);
-            if (ConsoleUtils.Prompted(options.IsNonInteractive, false))
+            if (await ConsoleUtils.IsPrompted(options.IsNonInteractive, false, Program.Console, options.CancellationToken))
             {
                 var newCard = await AddImageFromConsole(card, options);
                 if (newCard is not null && inspectedDeck.ReplaceCard(card, newCard))
@@ -92,7 +92,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
     {
         try
         {
-            using Image img = await Image.LoadAsync(await url.WithImageHeaders().GetStreamAsync(), ct);
+            using Image img = await Image.LoadAsync(await url.WithImageHeaders().GetStreamAsync(cancellationToken: ct), ct);
             return !IsBadQuality(img);
         }
         catch (Exception)
@@ -122,6 +122,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
 
     private async Task<WeissSchwarzCard?> AddImageFromConsole(WeissSchwarzCard card, InspectionOptions options)
     {
+        var ct = options.CancellationToken;
         var modifiedCard = card.Clone();
         Log.Information("Please enter a new image URL: ");
         var newURIString = Console.ReadLine() ?? string.Empty;
@@ -130,7 +131,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
             Log.Information("Validating URL...");
             var newURI = new Uri(newURIString);
             Log.Information("Looks good; validating image... (will not check if the image itself is correct!)");
-            using (Image img = Image.Load(await newURI.WithImageHeaders().GetStreamAsync()))
+            using (Image img = Image.Load(await newURI.WithImageHeaders().GetStreamAsync(cancellationToken: ct)))
             {
                 Log.Information("Image can be loaded. Is the ratio reasonable?");
                 var aspectRatio = (img.Width * 1.0d) / img.Height;
@@ -145,7 +146,7 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
                     if (img.Width < 400)
                     {
                         Log.Warning("The image is of low quality; this may not be good for exporting purposes. Continue? [Y/N] (Default is N)");
-                        if (!ConsoleUtils.Prompted(options.IsNonInteractive, options.NoWarning)) return null;
+                        if (!await ConsoleUtils.IsPrompted(options.IsNonInteractive, options.NoWarning, Program.Console, ct)) return null;
                     }
                     modifiedCard.Images.Add(newURI);
                     Log.Information("All preliminary tests passed. Modified {card}.", card.Serial);
@@ -164,14 +165,4 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
         }
         return modifiedCard;
     }
-
-    /*
-    private bool Prompted(bool isNonInteractive)
-    {
-        if (isNonInteractive) return false;
-        var result = Console.ReadKey(false).Key == ConsoleKey.Y;
-        Console.Write("\r");
-        return result;
-    }
-    */
 }

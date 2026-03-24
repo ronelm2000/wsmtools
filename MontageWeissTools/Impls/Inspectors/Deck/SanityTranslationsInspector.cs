@@ -11,7 +11,7 @@ public class SanityTranslationsInspector : IExportedDeckInspector<WeissSchwarzDe
 
     public int Priority => 0;
 
-    public Func<PrompterEventArgs, Task<bool>> Prompter { get; set; } = static async (options) => await ValueTask.FromResult(ConsoleUtils.Prompted(options.IsNonInteractive, options.NoWarning));
+    public Func<PrompterEventArgs, Task<bool>> Prompter { get; set; } = static async (options) => await ConsoleUtils.IsPrompted(options.IsNonInteractive, options.NoWarning, Program.Console, options.CancellationToken);
 
     public SanityTranslationsInspector(ILogger log)
     {

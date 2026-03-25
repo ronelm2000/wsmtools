@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace Montage.Weiss.Tools.Entities.External.DeckLog;
 
-internal class OriginalDeckLogClient : IDeckLogClient
+internal class OriginalDeckLogClient : IDeckLogClient, ICardQueryable
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<OriginalDeckLogClient>();
 
@@ -17,6 +17,8 @@ internal class OriginalDeckLogClient : IDeckLogClient
     }.ToDictionary(c => (c.Authority, c.Language), c => c);
 
     private static readonly Dictionary<CardLanguage, Dictionary<string, string>> cachedNeoStandardList = [];
+    private static readonly JsonSerializerOptions identedOptions = new() { WriteIndented = true };
+
 
     public async Task<bool> IsCompatible(WeissSchwarzCard card, CancellationToken cancellationToken = default)
     {
@@ -87,9 +89,9 @@ internal class OriginalDeckLogClient : IDeckLogClient
 
     private static async IAsyncEnumerable<DLCardEntry> ExecuteQuery(DeckLogSettings setting, DLCardQuery query)
     {
-        int page = 1;
-        Log.Information($"Accessing DeckLog API with the following query data: {JsonSerializer.Serialize(query, new JsonSerializerOptions { WriteIndented = true })}");
-        var cardEntryList = new List<DLCardEntry>();
+        var page = 1;
+        Log.Information($"Accessing DeckLog API with the following query data: {JsonSerializer.Serialize(query, identedOptions)}");
+        List<DLCardEntry> cardEntryList;
         do
         {
             Log.Information("Extracting Page {pagenumber}...", page);

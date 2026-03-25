@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Entities.External.DeckLog;
 
-internal class RoseDeckLogClient : IDeckLogClient
+internal class RoseDeckLogClient : IDeckLogClient, ICardQueryable
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<OriginalDeckLogClient>();
 
@@ -37,7 +37,8 @@ internal class RoseDeckLogClient : IDeckLogClient
         };
         var page = 1;
         var cookieJar = await cookieJarSrvc.FindOrCreate(setting.Authority, cancellationToken);
-        var cardEntryList = new List<DLCardEntryV2>();
+
+        List<DLCardEntryV2> cardEntryList;
         do
         {
             Log.Information("Extracting Page {pagenumber}...", page);

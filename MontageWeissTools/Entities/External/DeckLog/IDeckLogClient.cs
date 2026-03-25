@@ -7,18 +7,33 @@ using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Entities.External.DeckLog;
 
-#pragma warning disable CS8424 // The EnumeratorCancellationAttribute will have no effect. The attribute is only effective on a parameter of type CancellationToken in an async-iterator method returning IAsyncEnumerable
 internal interface IDeckLogClient
 {
     Task<bool> IsCompatible(WeissSchwarzCard card, CancellationToken cancellationToken = default);
     Task<bool> IsCompatible(CardLanguage language, CardSide side, CancellationToken cancellationToken = default);
+
+    async IAsyncEnumerable<DLCardEntry> FindCardEntries(
+        DeckLogContext context,
+        string nsCodes,
+        [EnumeratorCancellation]
+        CancellationToken cancellationToken = default
+        )
+    {
+        if (this is not ICardQueryable queryable)
+            yield break;
+        await foreach (var card in queryable.FindCardEntries(context, nsCodes, cancellationToken))
+            yield return card;
+    }
+}
+
+internal interface ICardQueryable
+{
     IAsyncEnumerable<DLCardEntry> FindCardEntries(
         DeckLogContext context,
-        string nsCodes, 
-        [EnumeratorCancellation] CancellationToken cancellationToken = default
+        string nsCodes,
+        CancellationToken cancellationToken
         );
 }
-#pragma warning restore CS8424
 
 internal record DeckLogContext
 {

@@ -449,7 +449,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 var serial = WeissSchwarzCard.ParseSerial(c.Serial);
                 return (serial.ReleaseID, serial.SetID, !c.IsFoil, c.Rarity);
             })
-            .Take(5000)
+            .Take(251)
             .ToListAsync(token);
 
         await Dispatcher.UIThread.InvokeAsync(() => Status = "Caching when applicable...", DispatcherPriority.ApplicationIdle);
@@ -457,8 +457,9 @@ public partial class MainWindowViewModel : ViewModelBase
         if (token.IsCancellationRequested)
             return;
 
-        Log.Information("Refreshing Card List...");
-        Log.Information("All Cards: {ser}", searchCardList?.Count ?? 0);
+        var plusSymbol = (searchCardList?.Count == 251) ? "+" : string.Empty;
+        Log.Information("Refreshing Card List..."); 
+        Log.Information("All Cards: {ser}{plus}", Math.Max(250, searchCardList?.Count ?? 0), plusSymbol);
 
         if ((searchCardList?.Count ?? 0) > 0)
         {
@@ -487,7 +488,7 @@ public partial class MainWindowViewModel : ViewModelBase
             Log.Information("All Cards: {ser}", _databaseViewSourceList.Count);
         }
 
-        Status = $"Done (Cards Found: {searchCardList?.Count ?? 0})";
+        Status = $"Done (Cards Found: {Math.Max(250, searchCardList?.Count ?? 0)}{plusSymbol})";
 
         //return (searchCardList?.Count ?? 0) > 0;
 

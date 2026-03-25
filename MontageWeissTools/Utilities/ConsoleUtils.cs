@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace Montage.Weiss.Tools.Utilities;
 
-static class ConsoleUtils
+public static class ConsoleUtils
 {
     private static readonly ILogger Log = Serilog.Log.ForContext(typeof(ConsoleUtils));
 
@@ -43,10 +43,12 @@ static class ConsoleUtils
 
         var cmd = $"{path} {parameters.ConcatAsString()}";
         Log.Information("Executing {command}", cmd);
-        System.Diagnostics.Process process = new System.Diagnostics.Process();
-        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-        startInfo.FileName = path;
-        startInfo.Arguments = parameters.ConcatAsString(); // $"\"{deckImagePath.FullPath.EscapeQuotes()}\"";
+        var process = new System.Diagnostics.Process();
+        var startInfo = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = path,
+            Arguments = parameters.ConcatAsString() // $"\"{deckImagePath.FullPath.EscapeQuotes()}\"";
+        };
         process.StartInfo = startInfo;
 
         try

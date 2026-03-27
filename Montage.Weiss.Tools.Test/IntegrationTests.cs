@@ -1,17 +1,9 @@
-using Lamar;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Interfaces.Inputs;
-using Montage.Card.API.Services;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Test.Commons;
 using NSubstitute;
-using Serilog;
-using Serilog.Events;
 using System;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test;
@@ -27,21 +19,17 @@ public class IntegrationTests
     [TestCategory("Manual")]
     public async Task FullTestRun()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        var ioc = Program.Bootstrap();
-        var progress = NoOpProgress<CommandProgressReport>.Instance;
-
         await new ParseVerb()
         {
             URI = "https://heartofthecards.com/translations/love_live!_sunshine_school_idol_festival_6th_anniversary_booster_pack.html"
-        }.Run(ioc, progress, TestContext.CancellationToken);
+        }.Run(Global.Container, Global.MockProgress, TestContext.CancellationToken);
 
         await new ParseVerb()
         {
             URI = "https://heartofthecards.com/translations/love_live!_sunshine_vol._2_booster_pack.html"
-        }.Run(ioc, progress, TestContext.CancellationToken);
+        }.Run(Global.Container, Global.MockProgress, TestContext.CancellationToken);
 
-        var testSerial = await ioc.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync(["LSS/W69-006"], cancellationToken: TestContext.CancellationToken);
+        var testSerial = await Global.Container.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync(["LSS/W69-006"], cancellationToken: TestContext.CancellationToken);
         Assert.IsTrue(testSerial is not null && testSerial.Images.Count != 0);
 
         var parseCommand = new ExportVerb()
@@ -49,21 +37,17 @@ public class IntegrationTests
             Source = "https://www.encoredecks.com/deck/wDdTKywNh",
             NonInteractive = true
         };
-        await parseCommand.Run(ioc, progress, TestContext.CancellationToken);
+        await parseCommand.Run(Global.Container, Global.MockProgress, TestContext.CancellationToken);
     }
 
     [TestMethod(DisplayName = "Exceptional Set Test (GFB vol. 2)")]
     [TestCategory("Manual")]
     public async Task GFBTestRun()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        var ioc = Program.Bootstrap();
-        var progressReporter = NoOpProgress<object>.Instance;
+        await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html" }.Run(Global.Container, Global.MockProgress, TestContext.CancellationToken);
+        await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html" }.Run(Global.Container, Global.MockProgress, TestContext.CancellationToken);
 
-        await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_booster_pack.html" }.Run(ioc, progressReporter, TestContext.CancellationToken);
-        await new ParseVerb() { URI = "https://heartofthecards.com/translations/girl_friend_beta_vol.2_booster_pack.html" }.Run(ioc, progressReporter, TestContext.CancellationToken);
-
-        var testSerial = await ioc.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync(["GF/W38-020"], cancellationToken: TestContext.CancellationToken);
+        var testSerial = await Global.Container.GetInstance<CardDatabaseContext>().WeissSchwarzCards.FindAsync(["GF/W38-020"], cancellationToken: TestContext.CancellationToken);
         Assert.AreNotEqual(0, testSerial?.Images.Count);
     }
 

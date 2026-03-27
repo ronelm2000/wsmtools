@@ -3,7 +3,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
-using Montage.Weiss.Tools.Test.Commons;
 using Montage.Weiss.Tools.Utilities;
 using Newtonsoft.Json;
 using SixLabors.ImageSharp;
@@ -21,7 +20,7 @@ public class CardTests
     [TestMethod(DisplayName = "Serial Parser Test")]
     public async Task TestSerialParser()
     {
-        var serials = new[] { 
+        var serials = new[] {
            "LSS/W69-054",
            "BD/EN-W03-026BDR",
            "CCS/BSF2019-02",
@@ -44,7 +43,7 @@ public class CardTests
 
         await Task.CompletedTask;
     }
-    
+
     [TestMethod(DisplayName = "Foil Removal Serial Test")]
     public async Task TestFoilRemovalSerial()
     {
@@ -102,7 +101,6 @@ public class CardTests
     [TestCategory("Manual")]
     public void TestShareX()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
         var Log = Serilog.Log.Logger.ForContext<CardTests>();
         Log.Information(InstalledApplications.GetApplicationInstallPath("ShareX"));
     }
@@ -111,8 +109,8 @@ public class CardTests
     [TestCategory("Manual")]
     public async Task TestEncoreDecksGifsAsync()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
         var Log = Serilog.Log.Logger.ForContext<CardTests>();
+
         var url = new Uri("https://www.encoredecks.com/images/JP/W69/039.gif");
         using (var img = Image.Load(await url.WithImageHeaders().GetStreamAsync(cancellationToken: TestContext.CancellationToken)))
         {
@@ -125,7 +123,6 @@ public class CardTests
     [Ignore]
     public async Task TestTTSCommand()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
         var Log = Serilog.Log.Logger.ForContext<CardTests>();
 
         var host = "localhost";
@@ -138,7 +135,7 @@ public class CardTests
         using var stream = tcpClient.GetStream();
         using var writer = new System.IO.StreamWriter(stream);
         using var reader = new System.IO.StreamReader(stream);
-        
+
         var json = JsonConvert.SerializeObject(command);
         Log.Information($"Running: {json}");
         await writer.WriteAsync(json);

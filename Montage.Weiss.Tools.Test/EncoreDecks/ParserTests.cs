@@ -2,11 +2,9 @@
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Services;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Test.Commons;
 using Serilog;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test.EncoreDecks;
@@ -19,8 +17,6 @@ public class ParserTests
     [TestMethod(DisplayName = "Parse Test (Batman Ninja / BDML / LB Anime)")]
     public async Task FullTestRun()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
 
         var batmanNinja = new Tools.Impls.Parsers.Cards.EncoreDecksParser()
@@ -41,8 +37,6 @@ public class ParserTests
     [TestMethod(DisplayName = "Batman Ninja Trait Test")]
     public async Task TraitTestRun()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
 
         var batmanNinja = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
@@ -57,14 +51,12 @@ public class ParserTests
     [TestMethod(DisplayName = "Climax Trigger Test (BDML)")]
     public async Task TestClimaxTriggers()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
 
         var bdml = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
             .Parse("https://www.encoredecks.com/?page=1&set=5cf701347cd9b718cdf21469", progress, TestContext.CancellationToken)
             .ToDictionaryAsync(c => c.Serial, cancellationToken: TestContext.CancellationToken);
-        
+
         Assert.AreEqual(2, bdml["BD/EN-W03-125"].Triggers.Length);
         Assert.IsTrue(bdml["BD/EN-W03-125"].Triggers.Contains(Trigger.Gate));
         Assert.IsTrue(bdml["BD/EN-W03-126"].Triggers.Contains(Trigger.Book));
@@ -73,8 +65,6 @@ public class ParserTests
     [TestMethod(DisplayName = "Serial Test (Prisma Illya)")]
     public async Task TestPISerials()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
 
         var prismaIllyaEN = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
@@ -87,8 +77,6 @@ public class ParserTests
     [TestMethod(DisplayName = "Akiba Test (Prisma Illya)")]
     public async Task TestPIAkiba()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
 
         var prismaIllyaHertz = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
@@ -101,8 +89,6 @@ public class ParserTests
     [TestMethod(DisplayName = "Trait Test (Akiba)")]
     public async Task TestAkibaNullTraits()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
 
         var set = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
@@ -121,8 +107,6 @@ public class ParserTests
     [TestMethod(DisplayName = "Color Test (Akiba)(Edge Case)")]
     public async Task TestAkibaColors()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
 
         var set = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()
@@ -135,8 +119,6 @@ public class ParserTests
     [TestMethod(DisplayName = "Trait Test (Yosuke Bias)")]
     public async Task TestYosukeBiasTraits()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        Lamar.Container ioc = Program.Bootstrap();
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
 
         var set = await new Tools.Impls.Parsers.Cards.EncoreDecksParser()

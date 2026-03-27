@@ -1,7 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Montage.Card.API.Services;
 using Montage.Weiss.Tools.Impls.Parsers.Cards;
-using Montage.Weiss.Tools.Test.Commons;
 using Serilog;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,12 +15,9 @@ public class ParserTests
     [DeploymentItem("Resources")]
     public async Task TestParser()
     {
-        Serilog.Log.Logger = TestUtils.BootstrapLogging().CreateLogger();
-        var progressReporter = NoOpProgress<object>.Instance;
-
         var filePath = "./machikado_mazoku.ws-set";
         var dict = await new InternalSetParser()
-            .Parse(filePath, progressReporter, TestContext.CancellationToken)
+            .Parse(filePath, Global.MockProgress, TestContext.CancellationToken)
             .ToDictionaryAsync(c => c.Serial, c => c, cancellationToken: TestContext.CancellationToken);
 
         Log.Information("Cards Obtained: {length}", dict.Count);

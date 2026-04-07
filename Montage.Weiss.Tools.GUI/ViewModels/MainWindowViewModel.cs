@@ -94,6 +94,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isShiftPressed;
 
+    public MainWindowViewModel(Lamar.IContainer container, Func<Window> window) : this()
+    {
+        this.Container = container;
+        this.Parent = window;
+    }
+
     public MainWindowViewModel()
     {
         Status = "";

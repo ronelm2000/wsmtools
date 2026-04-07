@@ -22,7 +22,7 @@
   </Interaction.Behaviors>
   
   <DockPanel>
-    <Menu DockPanel.Dock="Top">
+    <Menu Name="MainMenu" DockPanel.Dock="Top">
       <MenuItem Header="_File">
         <MenuItem Header="_Open Deck..." Command="{Binding OpenDeckCommand}" />
         <MenuItem Header="O_pen Local Set..." Command="{Binding OpenLocalSetCommand}" />

@@ -29,7 +29,7 @@
     
     <StackPanel>
       <TextBlock Text="Importing Set From URL..." Margin="5,5,5,10" />
-      <TextBox Watermark="Set URL..." 
+      <TextBox PlaceholderText="Set URL..." 
                Text="{Binding SetUrl}"
                MinWidth="400"
                />

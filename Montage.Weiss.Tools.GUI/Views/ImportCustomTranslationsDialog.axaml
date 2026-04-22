@@ -29,11 +29,11 @@
     
     <StackPanel>
       <TextBlock Text="{Binding InsertTranslationsText}" Margin="5,5,5,10" />
-      <TextBox Watermark="Translated Card Name"
+      <TextBox PlaceholderText="Translated Card Name"
                Text="{Binding CustomEnglishName}"
                MinWidth="400"
                />
-      <TextBox Watermark="[AUTO] When this card is translated..." 
+      <TextBox PlaceholderText="[AUTO] When this card is translated..." 
                Text="{Binding CustomTranslation}"
                MinWidth="400"
                TextWrapping="WrapWithOverflow"

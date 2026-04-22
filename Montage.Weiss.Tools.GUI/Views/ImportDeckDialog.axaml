@@ -29,7 +29,7 @@
 
     <StackPanel>
       <TextBlock Text="Importing Deck from URL..." Margin="5,5,5,10" />
-      <TextBox Watermark="Deck URL..."
+      <TextBox PlaceholderText="Deck URL..."
                Text="{Binding DeckUrl}"
                MinWidth="400"
                />

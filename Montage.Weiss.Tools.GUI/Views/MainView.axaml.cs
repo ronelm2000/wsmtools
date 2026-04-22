@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -43,9 +43,6 @@ public partial class MainView : UserControl
         {
             Log.Error(ex, "Error Loading the App.");
         });
-
-        DeckView.AddHandler(Gestures.PullGestureEvent, DeckView_PullGesture);
-        DeckView.AddHandler(Gestures.PointerTouchPadGestureSwipeEvent, DeckView_TouchPadSwiped);
     }
 
     private void DatabaseCardViewPanel_Click(object? sender, RoutedEventArgs e)

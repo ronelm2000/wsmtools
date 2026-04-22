@@ -86,7 +86,7 @@
               RowDefinitions="*,*"
               >
           <TextBox Text="{Binding DeckName}" 
-                   Watermark="Deck Name"
+                   PlaceholderText="Deck Name"
                    Margin="2"
                    Grid.Row="0"
                    Grid.Column="0"
@@ -99,7 +99,7 @@
                      Grid.Column="1"
                      />
           <TextBox Text="{Binding DeckRemarks}"
-                   Watermark="Deck Remarks"
+                   PlaceholderText="Deck Remarks"
                    Margin="2"
                    Grid.Row="1"
                    Grid.ColumnSpan="2"
@@ -112,7 +112,6 @@
                 Grid.Column="0"
                 Grid.Row="1"
                 Name="DeckView"
-                Gestures.IsHoldWithMouseEnabled="True"
                 >
           <Border.GestureRecognizers>
             <PullGestureRecognizer PullDirection="RightToLeft"/>
@@ -198,7 +197,7 @@
           <Border Margin="6,5,5,0" Grid.Row="1" >
             <StackPanel>
               <TextBox Name="SearchTB"
-                       Watermark="Search..." 
+                       PlaceholderText="Search..." 
                        Text="{Binding SearchBarText}"
                        />
             </StackPanel>

@@ -8,29 +8,13 @@
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/OkU82A_7E --exporter cockatrice"
     },
-    "Export Aobuta DeckLog": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://decklog.bushiroad.com/view/FHL4 --with upscaling"
-    },
     "Parse Weiss Promos": {
       "commandName": "Project",
       "commandLineArgs": "parse https://heartofthecards.com/translations/weib_promos.html"
     },
-    "Parse Kadokawa Bunko": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/kadokawa_sneaker_bunko_booster_pack.html --with skip:yyt"
-    },
-    "Parse Key 20th Anniv.": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://heartofthecards.com/translations/key_20th_anniversary_booster_pack.html"
-    },
     "Cache DAL": {
       "commandName": "Project",
       "commandLineArgs": "cache w79 jp"
-    },
-    "Export Batman Ninja": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/tW9n7wRGE --with sendtcp,upscaling --out sharex"
     },
     "Prase Batman Ninja (ED)": {
       "commandName": "Project",
@@ -84,10 +68,6 @@
       "commandName": "Project",
       "commandLineArgs": "export \"C:/Users/ronelm2000/Desktop/wstools/deck_test_shamimomo_2.json\" --with sendtcp,upscaling --out sharex"
     },
-    "Export #61 Locally": {
-      "commandName": "Project",
-      "commandLineArgs": "export https://www.encoredecks.com/deck/GeQlVbQHV --exporter decklog"
-    },
     "Export EN-S01": {
       "commandName": "Project",
       "commandLineArgs": "fetch EN-S01"
@@ -95,10 +75,6 @@
     "Export Broken HOL Deck": {
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/CW5ThLgZ7 --exporter decklog"
-    },
-    "Parse HOL vol. 2": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.encoredecks.com/?page=1&set=64cd60a83401020c9a024858"
     },
     "Export Set (Frieren)": {
       "commandName": "Project",
@@ -144,13 +120,9 @@
       "commandName": "Project",
       "commandLineArgs": "export https://www.encoredecks.com/deck/XKA-C7RIe"
     },
-    "Parse Oshi no Ko": {
+    "Parse SMP (JP Only)": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://www.heartofthecards.com/translations/oshi_no_ko_booster_pack.html"
-    },
-    "Parse KonoSuba": {
-      "commandName": "Project",
-      "commandLineArgs": "parse https://www.heartofthecards.com/translations/konosuba_legend_of_crimson_booster_pack.html"
+      "commandLineArgs": "parse https://ws-tcg.com/cardlist/search/?expansion=548"
     }
   }
 }

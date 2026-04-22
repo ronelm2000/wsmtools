@@ -65,6 +65,7 @@ registering on GitHub.
 * HOTC
 * Encore Decks (through their API)
 * [English Weiss Schwarz Official Website](https://en.ws-tcg.com/)
+* [Japanese Weiss Schwarz Official Website](https://ws-tcg.com/)
 * Local (via `.ws-set` format)
 
 ---------

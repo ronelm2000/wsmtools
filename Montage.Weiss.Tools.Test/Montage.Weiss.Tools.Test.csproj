@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MontageWeissTools\Montage.Weiss.Tools.csproj" />
+    <ProjectReference Include="..\Montage.Weiss.Tools\Montage.Weiss.Tools.csproj" />
   </ItemGroup>
 
   <ItemGroup>

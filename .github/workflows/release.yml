@@ -22,8 +22,8 @@ jobs:
       run: dotnet restore
     - name: Publish
       run: |
-        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
-        dotnet publish ./MontageWeissTools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
+        dotnet publish ./Montage.Weiss.Tools/Montage.Weiss.Tools.csproj -c Release -r win-x64 -o publish -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
+        dotnet publish ./Montage.Weiss.Tools/Montage.Weiss.Tools.csproj -c Release -r linux-x64 -o publish -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
         dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Release -f net10.0-windows -r win-x64 -o publish -p:PublishSingleFile=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
         dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Release -f net10.0 -r linux-x64 -o publish -p:PublishSingleFile=true  -p:PublishTrimmed=false  --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
         cd ./publish

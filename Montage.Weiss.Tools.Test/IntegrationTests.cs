@@ -1,9 +1,11 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Interfaces.Inputs;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
 using NSubstitute;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Test;
@@ -77,5 +79,32 @@ public class IntegrationTests
 
         Program.Console.DidNotReceive().ReadKey(false);
         Assert.IsTrue(task.IsCompletedSuccessfully);
+    }
+
+    [TestMethod(DisplayName = "EncoreDecks Parse + Yuyutei Update Test (S48)")]
+    [TestCategory("Manual")]
+    public async Task EncoreDecksParseAndYuyuteiUpdateTest()
+    {
+        // Step 1: Parse the EncoreDecks URL
+        await new ParseVerb()
+        {
+            URI = "https://www.encoredecks.com/?cards=5e2c8834959adf655bdca150&page=1&set=5e2c87b1202372df5ea953bb"
+        }.Run(Global.Container, Global.MockProgress, TestContext.CancellationToken);
+
+        // Verify S48 cards were parsed - ReleaseID is computed, so materialize first
+        var db = Global.Container.GetInstance<CardDatabaseContext>();
+        var s48Cards = db.WeissSchwarzCards.ToList().Where(c => c.ReleaseID == "S48").ToList();
+        Assert.IsTrue(s48Cards.Count > 0, "S48 cards should have been parsed from EncoreDecks");
+
+        // Step 2: Run update with Yuyutei post-processor
+        await new UpdateVerb()
+        {
+            ReleaseIDs = "S48",
+            PostProcessorAliases = "yyt"
+        }.Run(Global.Container, Global.MockProgress, TestContext.CancellationToken);
+
+        // Verify update completed by checking that cards still exist
+        var updatedCards = db.WeissSchwarzCards.ToList().Where(c => c.ReleaseID == "S48").ToList();
+        Assert.IsTrue(updatedCards.Count > 0, "S48 cards should still exist after update");
     }
 }

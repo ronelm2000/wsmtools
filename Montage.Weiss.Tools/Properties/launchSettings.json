@@ -48,10 +48,6 @@
       "commandName": "Project",
       "commandLineArgs": "export-db --rids W95,S82 --exporter json"
     },
-    "Fetch W95": {
-      "commandName": "Project",
-      "commandLineArgs": "fetch W95"
-    },
     "Help": {
       "commandName": "Project",
       "commandLineArgs": "help"
@@ -123,6 +119,14 @@
     "Parse SMP (JP Only)": {
       "commandName": "Project",
       "commandLineArgs": "parse https://ws-tcg.com/cardlist/search/?expansion=548"
+    },
+    "Export Chain Chronicles (JP)": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://www.encoredecks.com/?cards=5e2c8834959adf655bdca150&page=1&set=5e2c87b1202372df5ea953bb"
+    },
+    "Update Chain Chronicles w/ YYT": {
+      "commandName": "Project",
+      "commandLineArgs": "update S48 yyt"
     }
   }
 }

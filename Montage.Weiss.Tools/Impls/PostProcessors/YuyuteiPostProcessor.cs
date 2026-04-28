@@ -94,7 +94,7 @@ public class YuyuteiPostProcessor(Func<CardDatabaseContext> database) : ICardPos
 
     public async IAsyncEnumerable<WeissSchwarzCard> Process(IAsyncEnumerable<WeissSchwarzCard> originalCards, IProgress<PostProcessorProgressReport> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var yuyuteiSellPage = "https://yuyu-tei.jp/game_ws/sell/sell_price.php?name=";
+        var yuyuteiSellPage = "https://yuyu-tei.jp/sell/ws/s/search?search_word=";
 
         //var cards = await originalCards.ToArrayAsync(cancellationToken);
         //.Skip(Math.Min(cards.Length - 1, 10)).First(); 

@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Lamar;
+using Microsoft.EntityFrameworkCore;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.API;
@@ -40,7 +41,7 @@ public class UpdateVerb : IVerbCommand
         using (var db = ioc.GetInstance<CardDatabaseContext>())
         {
             var cards = db.WeissSchwarzCards
-                .Where(c => releaseIds.Contains(c.ReleaseID))
+                .Where(c => releaseIds.Any(rid => EF.Functions.Like(c.Serial, "%/" + rid + "-%")))
                 .ToList();
 
             if (cards.Count == 0)

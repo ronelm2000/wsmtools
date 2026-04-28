@@ -25,7 +25,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
     ILogger Log = Serilog.Log.ForContext<EnglishWSURLParser>();
 
     private static readonly string _WS_CARD_SEARCH_EX_FORMAT = "https://en.ws-tcg.com/cardlist/cardsearch_ex?expansion={0}&view=text&page={1}";
-    
+
     private static readonly Regex _SOUL_MATCHER = new Regex(@"partimages/soul\.gif");
 
     /// <summary>
@@ -75,7 +75,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
     private static Dictionary<string, CardColor> _COLOR_EXCEPTION_MAP = new Dictionary<string, CardColor>
     {
         // https://en.ws-tcg.com/cardlist/list/?cardno=FS/S36-PE02
-        ["赤"] = CardColor.Red 
+        ["赤"] = CardColor.Red
     };
 
     private static (string LookupString, Trigger CardTrigger)[] _TRIGGER_MAP = new[]
@@ -109,7 +109,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
         ("<img src=\"/wordpress/wp-content/images/partimages/comeback.gif\">", "【DOOR】"),
         ("<img src=\"/wordpress/wp-content/images/partimages/gate.gif\">", "【GATE】"),
         ("<img src=\"/wordpress/wp-content/images/partimages/draw.gif\">", "【BOOK】"),
-        
+
         ("<strong>", ""),
         ("</strong>", "")
     };
@@ -138,19 +138,18 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
                 Log.Debug("The site is not EN WSTCG website. Failed compatibility check.");
                 return false;
             }
-            else if (uri.AbsolutePath != "/cardlist/")
+            else if (uri.AbsolutePath == "/cardlist/" && uri.Query.StartsWith("?cardno="))
             {
-                Log.Debug("The site is not based on the cardlist. Failed compatibility check.");
-                return false;
+                return true;
             }
-            else if (!uri.Query.StartsWith("?cardno="))
+            else if (uri.AbsolutePath == "/cardlist/searchresults/" && IsValidSearchResultsQuery(uri.Query))
             {
-                Log.Debug("The site is not based on the cardlist (not having a compatible query). Failed compatibility check.");
-                return false;
+                return true;
             }
             else
             {
-                return true;
+                Log.Debug("The site is not based on the cardlist. Failed compatibility check.");
+                return false;
             }
         }
         catch (Exception e)
@@ -161,13 +160,25 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
         }
     }
 
+    private static bool IsValidSearchResultsQuery(string query)
+    {
+        if (string.IsNullOrEmpty(query) || !query.StartsWith("?"))
+            return false;
+
+        var parameters = HttpUtility.ParseQueryString(query);
+        var expansion = parameters["expansion"];
+
+        return !string.IsNullOrWhiteSpace(expansion);
+    }
+
     public bool IsIncluded(ICardPostProcessor<WeissSchwarzCard> item)
     {
         if (item is DeckLogPostProcessor)
         {
             Log.Information("DeckLog is excluded as all of its data is already parsed by this parser.");
             return false;
-        } else
+        }
+        else
         {
             return true;
         }
@@ -190,7 +201,8 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
         Log.Information("Loading the page...");
 
         var cookies = await cookieJar.FindOrCreate(uri.AbsoluteUri, cancellationToken);
-        if (cookies.Count == 0) {
+        if (cookies.Count == 0)
+        {
             cookies.AddOrReplace("CookieConsent", """
             {stamp:'C88lsVhKsZTmlWfRS4nPyaJlCJHtwki7LoERTcJyFHgUzKNw8RgRNQ==',necessary:true,preferences:true,statistics:true,marketing:true,method:'explicit',ver:1,utc:1772352864544,region:'ph'}")
             """, urlOrLocalFile);
@@ -198,21 +210,37 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
             cookies.AddOrReplace("cardlist_view", "text", urlOrLocalFile);
         }
 
-        var initialDocument = await uri.WithCookies(cookies)
-            .WithHTMLHeaders()
-            .GetHTMLAsync(cancellationToken);
-        var expansionLink = initialDocument.QuerySelectorAll<IHtmlAnchorElement>(_EXPANSION_LINKS_SELECTOR).FirstOrEmpty()!.Href;
+        string expansion;
+        IHtmlListItemElement[] list;
 
-        Log.Information("Found Expansion Link: {expansionLink}", expansionLink);
+        if (IsSearchResultsUrl(uri))
+        {
+            expansion = ExtractExpansionFromSearchResults(uri);
+            Log.Information("Extracted expansion {expansion} from searchresults URL", expansion);
 
-        var expansionInitialDocument = await expansionLink
-            .WithHTMLHeaders()
-            .WithCookies(cookies)
-            .GetHTMLAsync(cancellationToken);
-        var list = expansionInitialDocument.QuerySelectorAll<IHtmlListItemElement>(_EXPANSION_LIST_ITEM_SELECTOR);
+            var initialDocument = await uri.WithCookies(cookies)
+                .WithHTMLHeaders()
+                .GetHTMLAsync(cancellationToken);
+            list = initialDocument.QuerySelectorAll<IHtmlListItemElement>(_EXPANSION_LIST_ITEM_SELECTOR).ToArray();
+        }
+        else
+        {
+            var initialDocument = await uri.WithCookies(cookies)
+                .WithHTMLHeaders()
+                .GetHTMLAsync(cancellationToken);
+            var expansionLink = initialDocument.QuerySelectorAll<IHtmlAnchorElement>(_EXPANSION_LINKS_SELECTOR).FirstOrEmpty()!.Href;
 
+            Log.Information("Found Expansion Link: {expansionLink}", expansionLink);
 
-        var expansion = HttpUtility.ParseQueryString(new Uri(expansionLink).Query)["expansion"];
+            var expansionInitialDocument = await expansionLink
+                .WithHTMLHeaders()
+                .WithCookies(cookies)
+                .GetHTMLAsync(cancellationToken);
+            list = expansionInitialDocument.QuerySelectorAll<IHtmlListItemElement>(_EXPANSION_LIST_ITEM_SELECTOR).ToArray();
+
+            expansion = HttpUtility.ParseQueryString(new Uri(expansionLink).Query)["expansion"]!;
+        }
+
         var page = 2;
         var isRedirected = false;
 
@@ -230,7 +258,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
                 page++;
 
                 var content = await nextLink.RecieveHTML(cancellationToken);
-                list = list.Concat(content.QuerySelectorAll<IHtmlListItemElement>(_LIST_ITEM_SELECTOR).ToArray());
+                list = list.Concat(content.QuerySelectorAll<IHtmlListItemElement>(_LIST_ITEM_SELECTOR).ToArray()).ToArray();
             }
             catch (FlurlHttpException e)
             {
@@ -264,6 +292,19 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
         yield break;
     }
 
+    private static bool IsSearchResultsUrl(Uri uri)
+    {
+        return uri.AbsolutePath == "/cardlist/searchresults/";
+    }
+
+    private static string ExtractExpansionFromSearchResults(Uri uri)
+    {
+        var expansion = HttpUtility.ParseQueryString(uri.Query)["expansion"];
+        if (string.IsNullOrWhiteSpace(expansion))
+            throw new SetParsingException(new CannotBeParsedCode("expansion query parameter"));
+        return expansion;
+    }
+
     private async Task<WeissSchwarzCard> ParseSingleCard(string cardLink, CookieJar cookies, CancellationToken cancellationToken)
     {
         Log.Debug("Parsing card page: {cardLink}", cardLink);
@@ -286,7 +327,7 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
             .ToEnum<CardType>() ?? throw new SetParsingException(new CannotBeParsedCode("CardType"));
         res.Rarity = document.QuerySelector(_RARITY_SELECTOR)!.InnerHtml.Trim();
         res.Side = TranslateToSide(document.QuerySelector(_SIDE_SELECTOR)!.InnerHtml);
-        res.Color =TranslateToColor(document.QuerySelector(_COLOR_SELECTOR)!.InnerHtml);
+        res.Color = TranslateToColor(document.QuerySelector(_COLOR_SELECTOR)!.InnerHtml);
 
         res.Level = document.QuerySelector(_LEVEL_SELECTOR)!.InnerHtml.Trim().AsParsed<int>(int.TryParse);
         res.Cost = document.QuerySelector(_COST_SELECTOR)!.InnerHtml.Trim().AsParsed<int>(int.TryParse);
@@ -296,10 +337,10 @@ public class EnglishWSURLParser : ICardSetParser<WeissSchwarzCard>, IFilter<ICar
 
         res.Effect = document.QuerySelectorAll(_EFFECT_PARAGRAPHS_SELECTOR)!
             .Select(x => x.InnerHtml)
-            .SelectMany(x =>x.Split(new string[] { "<br>", "\n", "<p>", "</p>" }, StringSplitOptions.RemoveEmptyEntries))
+            .SelectMany(x => x.Split(new string[] { "<br>", "\n", "<p>", "</p>" }, StringSplitOptions.RemoveEmptyEntries))
             .Select(e => CleanupEffect(e))
             .ToArray();
-        
+
         res.Flavor = document.QuerySelector(_FLAVOR_SELECTOR)!.TextContent?.Trim() ?? string.Empty;
         res.Images.Add(new Uri(document.QuerySelector<IHtmlImageElement>(_CARD_IMAGE_SELECTOR)!.Source!));
 

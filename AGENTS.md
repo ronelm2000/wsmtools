@@ -106,3 +106,29 @@ Pattern: `Montage.Weiss.Tools/Impls/<VerbNoun>/<Input>/<OriginPlatform><Input><V
 Large exporters (1000+ LoC OR 5+ inner classes): use nested package `<OriginPlatform>/<OriginPlatform><Input><VerbNoun>.cs` instead and expand all inner classes into separate files on the same package.
 
 Example: `Montage.Weiss.Tools/Impls/Exporter/Deck/TTS/TTSDeckExporter.cs`
+
+## HOTC Parsing Corrections
+
+When Heart of the Cards (HOTC) has incorrect data, add manual overrides in `Montage.Weiss.Tools/Impls/Parsers/Cards/HeartOfTheCardsURLParser.cs`.
+
+Available correction methods:
+- `HandleColorCorrections()` - Fix incorrect color parsing (line ~337)
+- `HandleRarityCorrections()` - Fix incorrect rarity parsing (line ~347)
+- `HandleCorrections()` - Fix incorrect side/type parsing (line ~362)
+
+Pattern: Add a new case to the switch expression with the card serial and correct value.
+
+```csharp
+private CardColor HandleColorCorrections(string serial, Exception innerException)
+{
+    return serial switch
+    {
+        "SG/W70-106" => CardColor.Blue,
+        "VA/WE30-55" => CardColor.Red,
+        "CC/S48-056" => CardColor.Red,  // Example: HOTC error, manually set to Red
+        _ => throw new NotImplementedException($"Unsupported color correction for {serial}.", innerException)
+    };
+}
+```
+
+After adding a correction, verify with `dotnet build` and `dotnet test --filter TestCategory!=Manual`.

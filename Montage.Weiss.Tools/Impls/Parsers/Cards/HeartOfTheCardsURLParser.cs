@@ -340,6 +340,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         {
             "SG/W70-106" => CardColor.Blue,
             "VA/WE30-55" => CardColor.Red,
+            "CC/S48-056" => CardColor.Red,
             _ => throw new NotImplementedException($"Unsupported color correction for {serial}.", innerException)
         };
     }

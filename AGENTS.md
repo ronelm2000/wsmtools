@@ -40,7 +40,7 @@ dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Relea
 Use `Co-Authored-By` trailer for AI attribution:
 
 ```
-Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: OpenCode <noreply@opencode.ai>
 Co-Authored-By: Copilot <noreply@github.com>
 ```
 
@@ -49,7 +49,7 @@ Example:
 Refactor deck exporter pipeline
 
 Extracted common export logic into base class.
-Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: OpenCode <noreply@opencode.ai>
 ```
 
 ## Package Management

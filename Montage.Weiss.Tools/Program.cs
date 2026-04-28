@@ -62,7 +62,8 @@ public class Program
 
     private static void ProgressReporter_ProgressChanged(object? sender, CommandProgressReport e)
     {
-        Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
+        if (!Console.IsOutputRedirected)
+            Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
         Console.Write($"{e.ReportMessage.EN} [{e.Percentage}%]\r");
     }
 

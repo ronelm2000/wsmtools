@@ -8,10 +8,10 @@ public class CLI : IConsole
 
     public int WindowWidth
     {
-        get => Console.WindowWidth;
+        get => !IsOutputRedirected ? Console.WindowWidth : 0;
         set
         {
-            if (OperatingSystem.IsWindows())
+            if (OperatingSystem.IsWindows() && !IsOutputRedirected)
                 Console.WindowWidth = value;
         }
     }

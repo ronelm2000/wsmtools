@@ -11,6 +11,11 @@ namespace Montage.Card.API.Interfaces.Services;
 public interface ICardPostProcessor<C> where C : ICard
 {
     /// <summary>
+    /// Aliases used to reference this post-processor from the CLI.
+    /// </summary>
+    string[] Alias { get; }
+
+    /// <summary>
     /// Indicates the priority of the post-processor.
     /// </summary>
     int Priority { get; }

@@ -14,6 +14,8 @@ public class DuplicateCardPostProcessor(Func<CardDatabaseContext> database) : IC
 
     readonly ConcurrentDictionary<string, WeissSchwarzTrait> traitMap = new();
 
+    public string[] Alias => new[] { "duplicate" };
+
     public int Priority => 2;
 
     public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards, CancellationToken cancellationToken = default)

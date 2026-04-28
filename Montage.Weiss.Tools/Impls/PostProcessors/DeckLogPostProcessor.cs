@@ -32,6 +32,8 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
 
     private bool isOutdated = false;
 
+    public string[] Alias => new[] { "decklog" };
+
     public int Priority => 1;
 
     public DeckLogPostProcessor(IContainer ioc)

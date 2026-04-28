@@ -20,6 +20,8 @@ public class YuyuteiPostProcessor(Func<CardDatabaseContext> database) : ICardPos
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<YuyuteiPostProcessor>();
 
+    public string[] Alias => new[] { "yyt", "yuyutei" };
+
     public int Priority => 0;
 
     private static readonly string rarityClassPrefix = "rarity_";

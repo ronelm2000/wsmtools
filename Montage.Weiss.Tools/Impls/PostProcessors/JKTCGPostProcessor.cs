@@ -19,6 +19,8 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
     private readonly Regex LinkMatcher = new Regex(@"(http:\/\/jktcg.com\/)(EN-.+-)(.+)");
     private readonly string[] globalReleasePrefixes = { "BSF", "BCS" };
 
+    public string[] Alias => new[] { "jktcg" };
+
     public int Priority => 0;
 
     // Dependencies

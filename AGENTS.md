@@ -37,20 +37,39 @@ dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Relea
 
 ## Commit Messages
 
-Use `Co-Authored-By` trailer for AI attribution:
+Use `Co-Authored-By` trailer for AI attribution. Format:
 
 ```
-Co-Authored-By: OpenCode <noreply@opencode.ai>
-Co-Authored-By: Copilot <noreply@github.com>
+Co-Authored-By: <AI Tool Name> <email>
 ```
 
-Example:
+Examples for different AI tools:
+
+**OpenCode:**
 ```
 Refactor deck exporter pipeline
 
 Extracted common export logic into base class.
 Co-Authored-By: OpenCode <noreply@opencode.ai>
 ```
+
+**Claude:**
+```
+Refactor deck exporter pipeline
+
+Extracted common export logic into base class.
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+**Copilot:**
+```
+Refactor deck exporter pipeline
+
+Extracted common export logic into base class.
+Co-Authored-By: Copilot <noreply@github.com>
+```
+
+Use the appropriate `Co-Authored-By` line based on which AI tool assisted with the changes.
 
 ## Package Management
 

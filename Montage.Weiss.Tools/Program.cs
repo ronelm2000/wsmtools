@@ -144,7 +144,7 @@ public class Program
             else if (!(error is HelpVerbRequestedError || error is VersionRequestedError || error is BadVerbSelectedError))
                 Log.Error("{@Error}", error);
         }
-        if (makeCLIAppear) Console.ReadKey(false);
+        if (makeCLIAppear && !Console.IsOutputRedirected) Console.ReadKey(false);
         await ValueTask.CompletedTask;
     }
 

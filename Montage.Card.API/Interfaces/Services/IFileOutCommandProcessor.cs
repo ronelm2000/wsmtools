@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Montage.Card.API.Services;
+﻿namespace Montage.Card.API.Services;
 
 public interface IFileOutCommandProcessor
 {

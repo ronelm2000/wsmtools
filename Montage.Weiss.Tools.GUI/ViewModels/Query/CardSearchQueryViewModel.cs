@@ -4,6 +4,7 @@ using System;
 using System.Text.RegularExpressions;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
+
 public abstract partial class CardSearchQueryViewModel : ViewModelBase
 {
     [ObservableProperty]

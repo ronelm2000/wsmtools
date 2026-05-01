@@ -11,16 +11,16 @@ public static class StringExtensions
     public delegate int ReadOnlySpanCursor(ReadOnlySpan<char> original);
     public delegate T SpanFunction<T>(ReadOnlySpan<char> original);
     public delegate bool SpanOptionalFunction<T>(ReadOnlySpan<char> original, out T outvar);
-    public delegate R FuncOut<I,T,R>(I original, out T outvar);
+    public delegate R FuncOut<I, T, R>(I original, out T outvar);
 
     public static string EscapeQuotes(this string str)
     {
-        return str  .Replace("\\", "\\\\")
+        return str.Replace("\\", "\\\\")
                     .Replace("\"", "\\\"")
                     .Replace("\b", "\\b")
                     .Replace("\n", "\\n")
                     .Replace("\t", "\\t")
-                    .Replace("\r", "\\r");                
+                    .Replace("\r", "\\r");
     }
 
     public static string Replace(this string str, Regex regex, string replacementString)
@@ -71,7 +71,7 @@ public static class StringExtensions
         var res = str;
         foreach (var c in System.IO.Path.GetInvalidFileNameChars())
             res = res.Replace(c, replacement);
-        res = res   .Replace('\\', replacement)
+        res = res.Replace('\\', replacement)
                     .Replace('/', replacement)
                     .Replace(' ', replacement)
                     .Replace(')', replacement)
@@ -118,7 +118,7 @@ public static class StringExtensions
             return null;
     }
 
-    public static T? AsParsed<T>(this string original, FuncOut<string,T,bool> stringFunction) where T : struct
+    public static T? AsParsed<T>(this string original, FuncOut<string, T, bool> stringFunction) where T : struct
     {
         if (stringFunction(original, out T outVar))
             return outVar;
@@ -188,7 +188,7 @@ public static class StringExtensions
             {
                 _cursor = previousCursor;
                 _isLastLine = true;
-            //    _lineNumber = 1;
+                //    _lineNumber = 1;
             }
             Log.Debug("Next Cursor: {_cursor}", _cursor);
             return previousCursor < _cursor;

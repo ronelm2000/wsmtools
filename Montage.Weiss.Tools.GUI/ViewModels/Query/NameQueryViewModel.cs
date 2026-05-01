@@ -1,15 +1,12 @@
-﻿using AngleSharp.Text;
-using Montage.Card.API.Utilities;
+﻿using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Query;
+
 internal partial class NameQueryViewModel : CardSearchQueryViewModel
 {
     private List<string> _names;

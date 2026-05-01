@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Interfaces.Inputs;
 using Montage.Weiss.Tools.CLI;

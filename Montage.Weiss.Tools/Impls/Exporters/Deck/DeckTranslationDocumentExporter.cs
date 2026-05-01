@@ -18,7 +18,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
 public class DeckTranslationDocumentExporter(GlobalCookieJar globalCookieJar, IFileOutCommandProcessor fileOutCommandProcessor) : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<DeckTranslationDocumentExporter>();
-//    private static readonly DecoderOptions _decoderOptions = new DecoderOptions { };
+    //    private static readonly DecoderOptions _decoderOptions = new DecoderOptions { };
 
     private readonly GlobalCookieJar _gcj = globalCookieJar ?? throw new ArgumentNullException(nameof(globalCookieJar));
     private readonly IFileOutCommandProcessor _fileProcessor = fileOutCommandProcessor ?? throw new ArgumentNullException(nameof(fileOutCommandProcessor));
@@ -49,8 +49,8 @@ public class DeckTranslationDocumentExporter(GlobalCookieJar globalCookieJar, IF
                 return p;
             })
             .Select(async (wsc, ct) =>
-                (   card: wsc,
-                    stream: await wsc.GetImageStreamAsync( (wsc.Images.Count > 0) ? await _gcj.FindOrCreate(wsc.Images.Last().Authority, ct) : null, ct)
+                (card: wsc,
+                    stream: await wsc.GetImageStreamAsync((wsc.Images.Count > 0) ? await _gcj.FindOrCreate(wsc.Images.Last().Authority, ct) : null, ct)
                 ))
             .ToDictionaryAsync(
                 async (p, ct) => await ValueTask.FromResult(p.card),
@@ -59,7 +59,7 @@ public class DeckTranslationDocumentExporter(GlobalCookieJar globalCookieJar, IF
             );
 
         var resultingDocFilePath = resultFolder.Combine($"translations_{fileNameFriendlyDeckName}.docx");
-        
+
         await using (var document = await WordDocument.CreateAsync(autoSave: false, cancellationToken: cancellationToken))
         {
             document.PageOrientation = PageOrientationValues.Portrait;

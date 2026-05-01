@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Montage.Weiss.Tools.Entities.Effect;
+﻿namespace Montage.Weiss.Tools.Entities.Effect;
 
 internal record CardEffectTree
 {

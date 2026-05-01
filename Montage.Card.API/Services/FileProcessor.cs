@@ -6,7 +6,7 @@ namespace Montage.Card.API.Services;
 public abstract class FileOutCommandProcessor : IFileOutCommandProcessor
 {
     public abstract ILogger Log { get; }
-    
+
     public abstract IFileOutCommandProcessor.SaveStreamSupplier CreateFileStream { get; set; }
 
     public abstract IFileOutCommandProcessor.OpenFileSupplier OpenFile { get; set; }

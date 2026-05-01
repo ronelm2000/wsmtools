@@ -1,11 +1,6 @@
 ﻿using Flurl.Http;
 using Montage.Weiss.Tools.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Services;
 
@@ -30,7 +25,8 @@ public class EncoreDeckAPI
     public string SetList => "https://www.encoredecks.com/api/serieslist";
 }
 
-public readonly record struct EncoreDeckSetListEntry {
+public readonly record struct EncoreDeckSetListEntry
+{
     public EncoreDeckSetListEntry()
     {
     }
@@ -48,6 +44,6 @@ public readonly record struct EncoreDeckSetListEntry {
     internal bool HasMatch(string searchTerm)
     {
         return $"{Side}{Release}".Contains(searchTerm) || Set.Contains(searchTerm)
-            || searchTerm.Contains($"{Side}{Release}"); 
+            || searchTerm.Contains($"{Side}{Release}");
     }
 }

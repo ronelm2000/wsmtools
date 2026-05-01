@@ -1,10 +1,7 @@
 ﻿using Fluent.IO;
 using Montage.Card.API.Entities;
-using Montage.Card.API.Entities.Impls;
-using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Utilities;
 using System.Xml.Serialization;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Database.Cockatrice;
@@ -30,7 +27,7 @@ public class CockatriceExporter : CommonDatabaseExporter
     }
 }
 
-[XmlRootAttribute(  "cockatrice_carddatabase",
+[XmlRootAttribute("cockatrice_carddatabase",
                     IsNullable = false
                     )]
 public class CockatriceCardDatabase
@@ -49,7 +46,7 @@ public class CockatriceCardDatabase
     internal static async Task<CockatriceCardDatabase> CreateFromDatabase(IAsyncEnumerable<WeissSchwarzCard> query, CancellationToken cancellationToken)
     {
         var result = new CockatriceCardDatabase();
-        var tempSetList = new Dictionary<string,CockatriceSet>();
+        var tempSetList = new Dictionary<string, CockatriceSet>();
         var tempCardList = new List<CockatriceCard>();
 
         await foreach (var card in query.WithCancellation(cancellationToken))
@@ -74,7 +71,8 @@ public class CockatriceCardDatabase
                 newCckCard.Props.Triggers = card.Triggers?.Select(t => t.ToString()).ConcatAsString(" - ") ?? "";
                 newCckCard.Text = FormatText(card);
                 tempCardList.Add(newCckCard);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Log.Warning("Could not add [{card}] Reason: {message}", card.Serial, e.Message);
             }

@@ -53,7 +53,7 @@ public class DatabaseExportVerb : IVerbCommand, IDatabaseExportInfo
     /// For the IOC
     /// </summary>
     public DatabaseExportVerb()
-    { 
+    {
     }
 
     public async Task Run(IContainer ioc, IProgress<CommandProgressReport> progress, CancellationToken cancellationToken = default)

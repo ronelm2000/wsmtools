@@ -1,11 +1,11 @@
 ﻿using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Query;
+
 public partial class ColorQueryViewModel : CardSearchQueryViewModel
 {
     private List<CardColor> _colors;
@@ -18,7 +18,7 @@ public partial class ColorQueryViewModel : CardSearchQueryViewModel
 
         Type = QueryType.Color;
         DisplayText = colorsToSearchString.Limit(10);
-        ToolTip = $"Finds any cards with any of the following colors: {colorsToSearchString}"; 
+        ToolTip = $"Finds any cards with any of the following colors: {colorsToSearchString}";
     }
 
     private CardColor TranslateColor(string rawColorString) => rawColorString.ToLower() switch

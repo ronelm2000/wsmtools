@@ -5,9 +5,9 @@ namespace Montage.Card.API.Utilities;
 
 public static class EnumerableExtensions
 {
-    public static IDisposable GetDisposer<K,V>(this IDictionary<K,V> originalDictionary) where V : IDisposable
+    public static IDisposable GetDisposer<K, V>(this IDictionary<K, V> originalDictionary) where V : IDisposable
     {
-        return new DictionaryDisposer<K,V>(originalDictionary);
+        return new DictionaryDisposer<K, V>(originalDictionary);
     }
 
     public static IAsyncDisposable GetAsyncDisposer<K, V>(this IDictionary<K, V> originalDictionary) where V : IAsyncDisposable
@@ -15,7 +15,7 @@ public static class EnumerableExtensions
         return new AsyncDictionaryDisposer<K, V>(originalDictionary);
     }
 
-    public static V? Add<K,V>(this IDictionary<K,V> dictionary, K key, V valueToAdd)
+    public static V? Add<K, V>(this IDictionary<K, V> dictionary, K key, V valueToAdd)
     {
         if (dictionary.TryAdd(key, valueToAdd))
             return valueToAdd;
@@ -26,7 +26,7 @@ public static class EnumerableExtensions
     public static IEnumerable<T> TakeUntil<T>(this IEnumerable<T> ienum, Predicate<T> predicateThatMustBeFalse)
         => ienum.TakeWhile(c => !predicateThatMustBeFalse(c));
     public static IEnumerable<T> TakeUntil<T>(this IEnumerable<T> ienum, Func<T, int, bool> predicateThatMustBeFalse)
-        => ienum.TakeWhile((c,i) => !predicateThatMustBeFalse(c, i));
+        => ienum.TakeWhile((c, i) => !predicateThatMustBeFalse(c, i));
 
     public static async IAsyncEnumerable<T> ToAsync<T>(this Task<IEnumerable<T>> task)
     {
@@ -124,7 +124,7 @@ public static class EnumerableExtensions
         }
     }
 
-    public class DictionaryDisposer<K,V> : IDisposable where V : IDisposable
+    public class DictionaryDisposer<K, V> : IDisposable where V : IDisposable
     {
         IDictionary<K, V> _original;
 
@@ -196,7 +196,7 @@ public static class EnumerableExtensions
         {
             if (_original is not null)
             {
-                await Task  .WhenAll(_original.Values.Select(async v => await v.DisposeAsync().ConfigureAwait(false)))
+                await Task.WhenAll(_original.Values.Select(async v => await v.DisposeAsync().ConfigureAwait(false)))
                             .ConfigureAwait(false);
             }
         }

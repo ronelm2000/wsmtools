@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Montage.Weiss.Tools.Impls.Services;
+﻿namespace Montage.Weiss.Tools.Impls.Services;
 
 [Serializable]
 public class ActivityLogExecutionException : Exception

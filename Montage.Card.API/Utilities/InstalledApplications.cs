@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Montage.Card.API.Utilities;
+﻿namespace Montage.Card.API.Utilities;
 
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
@@ -18,7 +14,7 @@ public static class InstalledApplications
 
             // search in: CurrentUser
             keyName = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-            installedPath = ExistsInSubKey(Registry.CurrentUser, keyName, "DisplayName", nameOfAppToFind) ;
+            installedPath = ExistsInSubKey(Registry.CurrentUser, keyName, "DisplayName", nameOfAppToFind);
             if (!string.IsNullOrEmpty(installedPath))
             {
                 return installedPath;

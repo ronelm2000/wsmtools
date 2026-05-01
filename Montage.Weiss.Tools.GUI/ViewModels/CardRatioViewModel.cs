@@ -3,18 +3,17 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicData.Binding;
-using ImTools;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.GUI.Extensions;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
+
 public partial class CardRatioViewModel : ViewModelBase
 {
     [ObservableProperty]
@@ -47,7 +46,8 @@ public partial class CardRatioViewModel : ViewModelBase
             Ratio = 4;
             Image ??= new Uri("avares://wsm-gui/Assets/Samples/sample_card.jpg").Load();
             Effects ??= ["[AUTO] aaaaaaaaaaaaaaa"];
-        } else
+        }
+        else
         {
             Effects = [];
             Image = Task.FromException<Bitmap?>(new Exception());
@@ -86,7 +86,7 @@ public partial class CardRatioViewModel : ViewModelBase
             .ToList())
         .AsObservable();
         RatioWidth = this.WhenPropertyChanged(r => r.Ratio)
-            .Select(r => Card.Type == CardType.Climax ? (170 + r.Value * 10) : ( (170 * 2 / 3) + r.Value * 10))
+            .Select(r => Card.Type == CardType.Climax ? (170 + r.Value * 10) : ((170 * 2 / 3) + r.Value * 10))
             .AsObservable();
     }
 

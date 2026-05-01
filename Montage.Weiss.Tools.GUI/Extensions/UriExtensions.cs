@@ -1,14 +1,12 @@
 ﻿using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.Extensions;
+
 public static class UriExtensions
 {
     public static async Task<Bitmap?> Load(this Uri url)

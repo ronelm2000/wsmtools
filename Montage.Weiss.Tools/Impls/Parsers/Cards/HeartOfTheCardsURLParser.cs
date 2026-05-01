@@ -1,13 +1,12 @@
-﻿using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Utilities;
-using Fluent.IO;
-using Montage.Card.API.Interfaces.Services;
+﻿using Fluent.IO;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
-using Montage.Card.API.Utilities;
-using System.Threading;
-using System.Runtime.CompilerServices;
 using Montage.Card.API.Exceptions;
+using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Utilities;
+using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Utilities;
+using System.Runtime.CompilerServices;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Cards;
 
@@ -92,7 +91,8 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
                 textToProcess = html.QuerySelector(preSelector)?.TextContent;
                 headerCount = 0;
                 footerCount = 1;
-            } else
+            }
+            else
             {
                 Log.Information("Detected v1 of HOTC page.");
                 headerCount = 1;
@@ -127,7 +127,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
         var results = textSplits.AsEnumerable()
             .Skip(headerCount)
             .SkipLast(footerCount)
-            .Select( (section, index) => (index, card: ParseHOTCText(section)))
+            .Select((section, index) => (index, card: ParseHOTCText(section)))
             ;
 
         foreach (var cardPair in results)
@@ -227,7 +227,8 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
                             )
                             .Trim()
                             .ToEnum<CardType>() ?? throw new SetParsingException(new CannotBeParsedCode("CardType"));
-        } catch (Exception)
+        }
+        catch (Exception)
         {
             (res.Side, res.Type) = HandleCorrections(res.Serial);
         }
@@ -332,7 +333,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
 
         Log.Information("Extracted: {serial}", res.Serial);
         return res;
-        }
+    }
 
     private CardColor HandleColorCorrections(string serial, Exception innerException)
     {
@@ -360,7 +361,7 @@ public class HeartOfTheCardsURLParser : ICardSetParser<WeissSchwarzCard>
     /// </summary>
     /// <param name="serial"></param>
     /// <returns></returns>
-    private (CardSide, CardType)  HandleCorrections(string serial)
+    private (CardSide, CardType) HandleCorrections(string serial)
     {
         return serial switch
         {

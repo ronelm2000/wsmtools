@@ -1,14 +1,12 @@
 ﻿using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.GUI.Utilities;
-using Montage.Weiss.Tools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Query;
+
 internal class LevelQueryViewModel : CardSearchQueryViewModel
 {
     private List<int> _levels;
@@ -25,7 +23,7 @@ internal class LevelQueryViewModel : CardSearchQueryViewModel
     {
         _levels = levels.Distinct().ToList();
         if (_levels.Count == 0)
-            _levels = [0, 1, 2, 3];   
+            _levels = [0, 1, 2, 3];
         var levelStringArray = _levels.Select(i => i.ToString()).ToArray();
         var levelString = levelStringArray.AsReadOnlyMemory().ConcatAsString(",", "or");
 

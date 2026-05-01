@@ -1,11 +1,11 @@
 ﻿using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Query;
+
 internal class NeoStandardCodeQueryViewModel : CardSearchQueryViewModel
 {
     private List<string> _nsCodesToSearch;

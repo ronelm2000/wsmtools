@@ -58,8 +58,9 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
         progress.Report(progressReport);
         var setCards = await urlOrLocalFile.WithRESTHeaders().GetJsonAsync<List<EncoreDeckCard>>(cancellationToken: cancellationToken);
 
-        progressReport = progressReport with {
-            ReportMessage = new MultiLanguageString { EN = $"Obtained [{setCards.Count}] cards." }, 
+        progressReport = progressReport with
+        {
+            ReportMessage = new MultiLanguageString { EN = $"Obtained [{setCards.Count}] cards." },
             Percentage = 10
         };
         progress.Report(progressReport);
@@ -167,7 +168,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             "色：3" => CardColor.Blue,
             _ => throw new Exception($"Cannot parse {typeof(CardColor).Name} from {color}")
         };
-     }
+    }
 
     private CardType TranslateType(string cardtype)
     {
@@ -262,7 +263,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
     {
         return originalCard switch
         {
-            { Serial: "P4/EN-S01-T06" } => originalCard.WithTrait(new [] {
+            { Serial: "P4/EN-S01-T06" } => originalCard.WithTrait(new[] {
                 new WeissSchwarzTrait() { EN = "Junes", JP = "Junes" },
                 new WeissSchwarzTrait() { EN = "Magic", JP = "Magic" }
             }),
@@ -270,7 +271,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             {
                 new WeissSchwarzTrait() { EN = "Junes", JP = "Junes" },
                 new WeissSchwarzTrait() { EN = "Magic", JP = "Magic" }
-            } ),
+            }),
             _ => originalCard
         };
     }
@@ -283,7 +284,7 @@ internal record EncoreDeckCard
 
     [JsonPropertyName("locale")]
     public required LocaleRecords Locale { get; init; }
-    
+
     public string? Rarity { get; init; }
     public string? Game { get; init; }
     public string? Side { get; init; }

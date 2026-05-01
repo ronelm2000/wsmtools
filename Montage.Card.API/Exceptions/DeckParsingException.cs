@@ -1,7 +1,4 @@
-﻿using System;
-using System.Runtime.Serialization;
-
-namespace Montage.Card.API.Exceptions;
+﻿namespace Montage.Card.API.Exceptions;
 
 [Serializable]
 public class DeckParsingException : Exception

@@ -1,12 +1,9 @@
 ﻿using Flurl.Http;
-using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Utilities;
 using Montage.Weiss.Tools.Utilities;
 using SixLabors.ImageSharp;
-using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace Montage.Weiss.Tools.Impls.Inspectors.Deck;
 
@@ -51,7 +48,8 @@ public class SanityImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
         try
         {
             await DetectBrokenImageLinks(deck, options);
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             Log.Error("Cannot Find a Non-Broken Link on the local card database. Try to parse the set again, or delete cards.db.");
             Log.Verbose("Details", ex);

@@ -7,13 +7,13 @@ using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.EncoreDeck;
 using Montage.Weiss.Tools.Impls.Parsers.Cards;
-using Montage.Weiss.Tools.Utilities;
 using Serilog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Dialogs;
+
 public partial class ImportTranslationsViewModel : ViewModelBase
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<ImportTranslationsViewModel>();
@@ -52,7 +52,7 @@ public partial class ImportTranslationsViewModel : ViewModelBase
     public async Task ApplyTarget(WeissSchwarzCard card)
     {
         _targetCard = card;
-        
+
         InsertTranslationsText = string.Format("Insert Translations For {0} [{1}]", card.Name.AsNonEmptyString(), card.Serial);
         CustomTranslation = (card.Effect ?? []).ConcatAsString(Environment.NewLine);
         CustomEnglishName = card.Name.EN ?? string.Empty;
@@ -76,7 +76,8 @@ public partial class ImportTranslationsViewModel : ViewModelBase
         var card = await database.WeissSchwarzCards
             .FirstOrDefaultAsync(c => c.Serial == _targetCard.Serial);
 
-        if (card is not null) {
+        if (card is not null)
+        {
             card.Name = card.Name with { EN = CustomEnglishName };
             card.Effect = CustomTranslation.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToArray();
             Log.Information("Applied translations: {Card}", _targetCard.Serial);

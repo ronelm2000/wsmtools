@@ -1,6 +1,4 @@
 ﻿using Flurl.Http;
-using Flurl.Http.Configuration;
-using Lamar;
 using Microsoft.EntityFrameworkCore;
 using Montage.Weiss.Tools.Entities;
 using Polly;
@@ -27,7 +25,7 @@ public class PollyHttpClientFactoryConfigurer
         using var db = cardDatabaseContext;
         db.Database.Migrate();
         int maxRetries = FindRetries() ?? 10;
-        
+
         FlurlHttp.Clients.WithDefaults(builder => builder
             .ConfigureInnerHandler(hc => new HttpClientHandler
             {
@@ -129,12 +127,12 @@ public static class Policies
     }
 
     internal static AsyncRetryPolicy<HttpResponseMessage> GenerateRetryPolicy(int maxRetries)
-    {   
+    {
         return Policy
                 .HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
                 .Or<TimeoutException>()
                 .Or<SocketException>(e => e.SocketErrorCode == SocketError.TimedOut)
-                .Or<SocketException>(e => e.SocketErrorCode == SocketError.OperationAborted)                    
+                .Or<SocketException>(e => e.SocketErrorCode == SocketError.OperationAborted)
                 .WaitAndRetryAsync(
                     Enumerable.Range(0, maxRetries).Select(i => TimeSpan.FromSeconds(Math.Pow(2, i))),
                     (delegateResult, retryCount, context) =>

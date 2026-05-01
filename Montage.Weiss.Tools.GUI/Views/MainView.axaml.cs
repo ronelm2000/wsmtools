@@ -116,7 +116,7 @@ public partial class MainView : UserControl
     {
         if (DataContext is not MainWindowViewModel viewModel)
             return;
-        
+
         if (e.Key == Key.LeftShift || e.Key == Key.RightShift || e.KeyModifiers.HasFlag(KeyModifiers.Shift))
         {
             viewModel.IsShiftPressed = !viewModel.IsShiftPressed;

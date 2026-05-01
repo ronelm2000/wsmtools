@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Impls.Services;
 /// This also allows related services to be referenced among that list, for example, if you need to change its properties.
 /// This is only really relevant for GUI usage.
 /// </summary>
-public class LocatorService : ILocatorService 
+public class LocatorService : ILocatorService
 {
     private readonly List<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>> exportedDeckInspectors;
 
@@ -19,7 +19,7 @@ public class LocatorService : ILocatorService
         exportedDeckInspectors = inspectors.ToList();
     }
 
-    public T FindInspector<T>() where T : class,IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>
+    public T FindInspector<T>() where T : class, IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>
     {
         return exportedDeckInspectors
             .Where(inspector => inspector is T)
@@ -36,5 +36,5 @@ public class LocatorService : ILocatorService
 public interface ILocatorService
 {
     public IAsyncEnumerable<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>> GetExportedDeckInspectorsAsync();
-    public T FindInspector<T>() where T : class,IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>;
+    public T FindInspector<T>() where T : class, IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>;
 }

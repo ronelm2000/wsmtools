@@ -4,7 +4,7 @@ using Montage.Weiss.Tools.Entities.External.DeckLog;
 
 namespace Montage.Weiss.Tools.Impls.Services;
 
-internal class DeckLogCacheService : ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>
+internal class DeckLogCacheService : ICachedMapService<(CardLanguage, string), Dictionary<string, DLCardEntry>>
 {
     private Dictionary<(CardLanguage, string), Dictionary<string, DLCardEntry>> _cache = new();
 
@@ -16,7 +16,7 @@ internal class DeckLogCacheService : ICachedMapService<(CardLanguage,string), Di
 
     public IDictionary<(CardLanguage, string), Dictionary<string, DLCardEntry>> GetValues(IEnumerable<(CardLanguage, string)> keys)
     {
-        return keys.Select(key => (Key: key, Value: this[key]) )
+        return keys.Select(key => (Key: key, Value: this[key]))
                    .Where(p => p.Value is not null)
                    .ToDictionary(prop => prop.Key, prop => prop.Value);
     }

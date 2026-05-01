@@ -1,13 +1,7 @@
 ﻿using Montage.Card.API.Entities;
-using Montage.Card.API.Entities.Impls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Resources;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Entities;
+
 public class WeissSchwarzTrait : IExactCloneable<WeissSchwarzTrait>, IIdentifiable<Guid>
 {
     public Guid TraitID { get; set; }

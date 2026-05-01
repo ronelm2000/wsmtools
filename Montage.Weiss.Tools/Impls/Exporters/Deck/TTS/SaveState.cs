@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
+﻿namespace Montage.Weiss.Tools.Impls.Exporters.Deck.TTS;
 
 public record SaveState //Holds a state of the game
 {

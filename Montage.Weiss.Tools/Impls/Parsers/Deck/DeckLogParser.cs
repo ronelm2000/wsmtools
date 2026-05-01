@@ -1,16 +1,15 @@
 ﻿using Flurl.Http;
 using Lamar;
+using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Exceptions;
 using Montage.Card.API.Interfaces.Services;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.CLI;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Entities.External.DeckLog;
 using Montage.Weiss.Tools.Utilities;
-using Montage.Card.API.Entities.Impls;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using Montage.Card.API.Utilities;
 
 namespace Montage.Weiss.Tools.Impls.Parsers.Deck;
 
@@ -54,8 +53,9 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
         if (Uri.TryCreate(urlOrFile, UriKind.Absolute, out _))
         {
             return _settings.Any(s => s.Value.DeckURLMatcher.IsMatch(urlOrFile));
-//                return urlMatcher.IsMatch(urlOrFile);
-        }else
+            //                return urlMatcher.IsMatch(urlOrFile);
+        }
+        else
         {
             return false;
         }
@@ -87,13 +87,13 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
 
         List<DeckLogCardRatio> items = new List<DeckLogCardRatio>();
         items.AddRange(json.MainList);
-        items.AddRange(json.SubList                                                                                                                                                                     );
+        items.AddRange(json.SubList);
 
         using var db = _database();
 
         var missingSets = await items.Select(ratio => ratio.CardNumber.Replace('＋', '+'))
                 .ToAsyncEnumerable()
-                .Where(async (serial, ct) =>  (await db.WeissSchwarzCards.FindAsync(new[] { serial }, ct)) == null
+                .Where(async (serial, ct) => (await db.WeissSchwarzCards.FindAsync(new[] { serial }, ct)) == null
                                            && (await db.WeissSchwarzCards.FindAsync(new[] { WeissSchwarzCard.RemoveFoil(serial) }, ct)) == null
                                            )
                 .Select(serial => WeissSchwarzCard.ParseSerial(serial).ReleaseID)
@@ -114,7 +114,7 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
                 .Select(set => set.Id)
                 .ToAsyncEnumerable()
                 .SelectParallelAsync(set => _parse(set, aggregator, cancellationToken))
-                .AggregateAsync( (a, b) => a && b, cancellationToken);
+                .AggregateAsync((a, b) => a && b, cancellationToken);
         }
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -124,7 +124,7 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
             string? serial = cardJSON.CardNumber;
             serial = serial?.Replace('＋', '+');
             serial = serial ?? throw new ArgumentException("serial is null for some reason!");
-            var card = await db.WeissSchwarzCards.FindAsync(new[] { serial }, cancellationToken) 
+            var card = await db.WeissSchwarzCards.FindAsync(new[] { serial }, cancellationToken)
                 ?? await WarnAndFindNonFoil(db, serial, cancellationToken);
             int quantity = cardJSON.Num;
             if (card != null)
@@ -142,7 +142,7 @@ public class DeckLogParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>
                 Log.Debug("Serial has been effectively skipped because it's not found on the local db: [{serial}]", serial);
             }
         }
-        
+
         if (missingSerials.Count > 0)
             throw new DeckParsingException($"The following serials are missing from the DB:\n{missingSerials.ConcatAsString("\n")}");
         else

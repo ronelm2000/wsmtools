@@ -31,7 +31,8 @@ public class WeissSchwarzCardOptionalInfo : IExactCloneable<WeissSchwarzCardOpti
         try
         {
             return JsonSerializer.Deserialize<T>(ValueJSON ?? string.Empty);
-        } catch (JsonException)
+        }
+        catch (JsonException)
         {
             return default;
         }

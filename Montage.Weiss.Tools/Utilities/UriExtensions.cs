@@ -11,10 +11,10 @@ public static class UriExtensions
 {
     static readonly HttpClient client = new HttpClient();
     static readonly FlurlClient customizedClient = new FlurlClient(new HttpClient(new HttpClientHandler()
-            {
-                ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) => LogErrorButContinue(msg,cert,chain,errors),
-                AutomaticDecompression = System.Net.DecompressionMethods.GZip
-            }
+    {
+        ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) => LogErrorButContinue(msg, cert, chain, errors),
+        AutomaticDecompression = System.Net.DecompressionMethods.GZip
+    }
             )
         );
 
@@ -25,7 +25,8 @@ public static class UriExtensions
             {
                 Log.Warning("There is an known error certifcate error with www.encoredecks.com. This is ignored temporarily as I contact the developer.");
                 return true;
-            } else
+            }
+            else
             {
                 return false;
             }
@@ -38,7 +39,7 @@ public static class UriExtensions
 
     public static async Task<IDocument> DownloadHTML(this Uri uri, CancellationToken cancellationToken = default)
     {
-        
+
         var content = await customizedClient.Request(uri)
             .WithHeaders(new
             {
@@ -55,7 +56,7 @@ public static class UriExtensions
         {
             req.Content(content);
             req.Address(uri);
-        }, cancellationToken);        
+        }, cancellationToken);
     }
 
     public static async Task<IDocument> DownloadHTML(this Uri uri, CancellationToken cancel, params (string Key, string Value)[] keyValuePairs)
@@ -79,7 +80,7 @@ public static class UriExtensions
             {
                 req.Content(content);
                 req.Address(uri);
-            }, cancel: cancel);   
+            }, cancel: cancel);
     }
 
     public static IFlurlRequest WithReferrer(this IFlurlRequest request, string referrerUrl) => request.WithHeader("Referer", referrerUrl);
@@ -127,7 +128,7 @@ public static class UriExtensions
             .WithHeader("Accept-Encoding", "gzip, deflate, br, ztsd") //
                                                                       // .WithHeader("Postman-Token", System.Guid.NewGuid().ToString()) //
             .WithHeader("Cache-Control", "nocache")
-            
+
             .OnRedirect(call =>
             {
                 var log = Log.ForContext<Uri>();
@@ -181,7 +182,7 @@ public static class UriExtensions
         => await RecieveHTML(await flurlResponse, cancel);
 
     public static async Task<IDocument> RecieveHTML(this IFlurlResponse flurlResponse, CancellationToken cancel = default)
-    {        
+    {
         var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
         var url = flurlResponse.ResponseMessage?.RequestMessage?.RequestUri?.AbsoluteUri;

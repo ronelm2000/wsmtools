@@ -1,14 +1,12 @@
 ﻿using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Query;
+
 public partial class TraitQueryViewModel : CardSearchQueryViewModel
 {
     private List<string> _traits;
@@ -41,7 +39,7 @@ public partial class TraitQueryViewModel : CardSearchQueryViewModel
 
     public override Func<WeissSchwarzCard, bool> ToPredicate()
     {
-        return c => c.Traits.Any(t => (t.EN is not null && _traits.Contains(t.EN)) || (t.JP is not null && _traits.Contains(t.JP)));   
+        return c => c.Traits.Any(t => (t.EN is not null && _traits.Contains(t.EN)) || (t.JP is not null && _traits.Contains(t.JP)));
     }
 
     [GeneratedRegex(@"(?:\:\:|«|<<|<)(.*?)(?:::|»|>>|>)")]

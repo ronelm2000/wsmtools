@@ -39,7 +39,8 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
         {
             Log.Information("Skipping due to parser hint [skip:external].");
             return false;
-        } else
+        }
+        else
         {
             return true;
         }
@@ -92,7 +93,8 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
         var cardData = await originalCards.ToListAsync(cancellationToken);
         var firstCard = cardData.First();
         var lang = firstCard.Language;
-        var stream = (lang == CardLanguage.Japanese) ? originalCards : Process(firstCard, new PostProcessorInfo {
+        var stream = (lang == CardLanguage.Japanese) ? originalCards : Process(firstCard, new PostProcessorInfo
+        {
             CancellationToken = cancellationToken,
             Progress = progress,
             OriginalCards = cardData.ToAsyncEnumerable(),
@@ -187,11 +189,11 @@ public class JKTCGPostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISkippab
                                     .Where(ele => releaseIDs.Any(s => ele.Href.Contains(s)))
                                     .FirstOrDefault();
         if (setLink == null)
-        //{
-        //    Log.Error("Cannot find a link that matches {SID} using this list of links: {@items}", ogReleaseID, menu.Links.Cast<IHtmlAnchorElement>().Select(ele => ele.Href).ToList());
+            //{
+            //    Log.Error("Cannot find a link that matches {SID} using this list of links: {@items}", ogReleaseID, menu.Links.Cast<IHtmlAnchorElement>().Select(ele => ele.Href).ToList());
             return null;
         //}
-        
+
         var enPreString = "EN-";
         var setLinkWithUnderscores = setLink.Href.AsSpan()
             .Slice(x => x.IndexOf(enPreString))

@@ -6,7 +6,6 @@ using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Utilities;
 using System.Text.Json;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
@@ -51,10 +50,10 @@ public class LocalDeckJSONExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwar
     }
 
     private async Task Export(
-        WeissSchwarzDeck deck, 
-        DeckExportProgressReport report, 
+        WeissSchwarzDeck deck,
+        DeckExportProgressReport report,
         IProgress<DeckExportProgressReport> progress,
-        string? outCommand, 
+        string? outCommand,
         Path jsonPath,
         CancellationToken cancellationToken
         )

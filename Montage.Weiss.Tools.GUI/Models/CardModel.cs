@@ -1,15 +1,15 @@
-﻿using Avalonia.Controls;
-using Avalonia.Media.Imaging;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System;
+﻿using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Montage.Card.API.Entities.Impls;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.Models;
+
 public class CardModel
 {
     public Task<Bitmap?> Image { get; init; }
@@ -21,7 +21,7 @@ public class CardModel
     {
         Image = Load(imagePath);
         Name ??= new();
-        Traits ??= new(){ };
+        Traits ??= new() { };
     }
 
     public static async Task<Bitmap?> Load(Uri url)

@@ -57,7 +57,7 @@ public class DuplicateCardPostProcessor(Func<CardDatabaseContext> database) : IC
 
             yield return card;
         }
-        
+
         await db.SaveChangesAsync(cancellationToken);
     }
 }

@@ -1,12 +1,12 @@
 ﻿using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
-using Montage.Weiss.Tools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Query;
+
 public partial class ClimaxComboQueryViewModel : CardSearchQueryViewModel
 {
     private static readonly Regex climaxRegex = ClimaxNameRegex();
@@ -25,7 +25,7 @@ public partial class ClimaxComboQueryViewModel : CardSearchQueryViewModel
 
         Type = QueryType.ClimaxCombo;
         DisplayText = climaxesToSearchString.Limit(10);
-        ToolTip = $"Finds any cards with names or abilities referring to any of the following: {climaxesToSearchString}"; 
+        ToolTip = $"Finds any cards with names or abilities referring to any of the following: {climaxesToSearchString}";
     }
 
     public ClimaxComboQueryViewModel(string climaxName) : base()

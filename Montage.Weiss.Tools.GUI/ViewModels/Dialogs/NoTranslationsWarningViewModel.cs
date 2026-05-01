@@ -1,6 +1,5 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
-using DocumentFormat.OpenXml.Vml.Spreadsheet;
 using DynamicData;
 using Montage.Weiss.Tools.Entities;
 using Serilog;
@@ -8,11 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Dialogs;
-public partial class NoTranslationsWarningViewModel: ViewModelBase
+
+public partial class NoTranslationsWarningViewModel : ViewModelBase
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<NoTranslationsWarningViewModel>();
 

@@ -69,7 +69,7 @@ public class ObjectState //Moveable objects
     {
         if (obj == null)
             return false;
-        
+
         if (obj is not ObjectState os)
             return false;
 
@@ -399,7 +399,7 @@ public class CustomDeckState
 
 public class CustomImageState
 {
-   // [Tag(TagType.URL)]
+    // [Tag(TagType.URL)]
     public string ImageURL = "";
     //[Tag(TagType.URL)]
     public string ImageSecondaryURL = "";
@@ -519,7 +519,7 @@ public class Mp3PlayerState
     public bool isPlaying = false;
     public bool loopOne = false;
     public string menuTitle = "GENRES";
-//       public Menus menu = Menus.GENRES;
+    //       public Menus menu = Menus.GENRES;
 }
 
 public class CalculatorState

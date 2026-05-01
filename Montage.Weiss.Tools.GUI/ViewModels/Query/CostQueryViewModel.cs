@@ -1,14 +1,12 @@
 ﻿using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.GUI.Utilities;
-using Montage.Weiss.Tools.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Query;
+
 internal class CostQueryViewModel : CardSearchQueryViewModel
 {
     private List<int> _costs;
@@ -25,7 +23,7 @@ internal class CostQueryViewModel : CardSearchQueryViewModel
     {
         _costs = costs.Distinct().ToList();
         if (_costs.Count == 0)
-            _costs = [0, 1, 2, 3];   
+            _costs = [0, 1, 2, 3];
         var levelStringArray = _costs.Select(i => i.ToString()).ToArray();
         var levelString = levelStringArray.AsReadOnlyMemory().ConcatAsString(",", "or");
 

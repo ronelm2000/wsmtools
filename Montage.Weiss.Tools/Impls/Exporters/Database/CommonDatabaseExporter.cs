@@ -2,11 +2,6 @@
 using Montage.Card.API.Entities;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Database;
 

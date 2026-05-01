@@ -4,6 +4,7 @@ using Montage.Weiss.Tools.Utilities;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.Extensions;
+
 public static class CardExtensions
 {
     public static async Task<Bitmap?> LoadImage(this WeissSchwarzCard card)

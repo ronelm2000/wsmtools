@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Weiss.Tools.Impls.PostProcessors;
-using System.Linq;
 using System;
+using System.Linq;
 
 namespace Montage.Weiss.Tools.Test.Internal;
 

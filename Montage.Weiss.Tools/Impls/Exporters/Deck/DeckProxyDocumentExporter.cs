@@ -18,7 +18,7 @@ namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
 public class DeckProxyDocumentExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<DeckProxyDocumentExporter>();
-//    private static readonly DecoderOptions _decoderOptions = new DecoderOptions { };
+    //    private static readonly DecoderOptions _decoderOptions = new DecoderOptions { };
 
     private readonly GlobalCookieJar _gcj;
     private readonly IFileOutCommandProcessor _fileProcessor;

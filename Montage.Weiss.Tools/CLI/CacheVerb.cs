@@ -73,14 +73,14 @@ public class CacheVerb : IVerbCommand
     {
         Task<CookieJar> _cookieSession(Flurl.Url url) => container.GetInstance<GlobalCookieJar>().FindOrCreate(url.Root, cancellationToken);
         var report = new CommandProgressReport
+        {
+            MessageType = MessageType.InProgress,
+            ReportMessage = new Card.API.Entities.Impls.MultiLanguageString
             {
-                MessageType = MessageType.InProgress,
-                ReportMessage = new Card.API.Entities.Impls.MultiLanguageString
-                {
-                    EN = $"Caching [{card.Serial}]..."
-                },
-                Percentage = 50
-            };
+                EN = $"Caching [{card.Serial}]..."
+            },
+            Percentage = 50
+        };
         progress.Report(report);
         await AddCachedImageAsync(card, _cookieSession, cancellationToken);
     }
@@ -146,7 +146,8 @@ public class CacheVerb : IVerbCommand
             img.Metadata.ExifProfile.SetValue(SixLabors.ImageSharp.Metadata.Profiles.Exif.ExifTag.Copyright, card.Images.Last().Authority);
             var savePath = Path.Get(_IMAGE_CACHE_PATH).Combine($"{card.Serial.Replace('-', '_').AsFileNameFriendly()}.jpg");
             await img.SaveAsJpegAsync(savePath.FullPath, ct);
-        } catch (InvalidOperationException e) when (e.Message == "Sequence contains no elements")
+        }
+        catch (InvalidOperationException e) when (e.Message == "Sequence contains no elements")
         {
             Log.Warning("Cannot be cached as no image URLs were found: {serial}", card.Serial);
         }

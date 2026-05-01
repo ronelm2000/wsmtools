@@ -1,5 +1,5 @@
-﻿using Avalonia.Controls;
-using Avalonia;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Xaml.Interactivity;
 
 namespace Montage.Weiss.Tools.GUI.Interactions;

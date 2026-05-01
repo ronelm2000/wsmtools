@@ -11,7 +11,7 @@ public class TTSExternalEditorCommand
     public string? GUID { get; set; } = null;
     [JsonPropertyName("script")]
     public string? Script { get; set; } = null;
-   
+
     [JsonPropertyName("scriptStates")]
     public List<ObjectState>? ObjectStates { get; set; } = null;
 
@@ -35,5 +35,5 @@ public enum CommandType
     GetLuaScripts = 0,
     SaveAndPlay = 1,
     SendCustomMessage = 2,
-    ExecuteLua =  3
+    ExecuteLua = 3
 }

@@ -43,19 +43,19 @@ public class ActivityLogTranslator : IActivityLogTranslator
         if (!string.IsNullOrWhiteSpace(deleteArgs.Language))
         {
             var version = new Version(deleteArgs.VersionLessThan);
-            query = query.Where(async (card, ct) => Version.Parse(card.VersionTimestamp.Replace(new Regex(@"(-[\w\d]+)?(\+[\w\d]+)?"), ""))  < version);
+            query = query.Where(async (card, ct) => Version.Parse(card.VersionTimestamp.Replace(new Regex(@"(-[\w\d]+)?(\+[\w\d]+)?"), "")) < version);
         }
         db.RemoveRange(query.ToBlockingEnumerable(ct));
         await db.SaveChangesAsync(ct);
     }
 
     private CardLanguage? TranslateLanguage(string language) => language.ToLower() switch
-     {
-         "en" => CardLanguage.English,
-         "jp" => CardLanguage.Japanese,
-         "all" => null,
-         _ => throw new ActivityLogExecutionException($"Cannot translate {language} into CardLanguage")
-     };
+    {
+        "en" => CardLanguage.English,
+        "jp" => CardLanguage.Japanese,
+        "all" => null,
+        _ => throw new ActivityLogExecutionException($"Cannot translate {language} into CardLanguage")
+    };
 }
 
 struct DeleteArgs

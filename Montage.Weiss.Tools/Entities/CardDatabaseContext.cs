@@ -19,7 +19,8 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
     public DbSet<ActivityLog> MigrationLog { get; set; }
     public DbSet<WeissSchwarzTrait> Traits { get; set; }
 
-    public CardDatabaseContext (AppConfig config) {
+    public CardDatabaseContext(AppConfig config)
+    {
         Log.Debug("Instantiating with {@AppConfig}.", config);
 
         _config = config;
@@ -83,9 +84,9 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                             );
 
             b.Property(c => c.Images)
-                .HasConversion( arr => JsonSerializer.Serialize(arr.Select(uri => uri.ToString()).ToArray(), options)
-                            ,   str => (JsonSerializer.Deserialize<string[]>(str, options) ?? Array.Empty<string>()).Select(s => new Uri(s)).ToList()
-                            ,   new ValueComparer<List<Uri>>(
+                .HasConversion(arr => JsonSerializer.Serialize(arr.Select(uri => uri.ToString()).ToArray(), options)
+                            , str => (JsonSerializer.Deserialize<string[]>(str, options) ?? Array.Empty<string>()).Select(s => new Uri(s)).ToList()
+                            , new ValueComparer<List<Uri>>(
                                 (c1, c2) => (c1 == null && c1 == c2) || c1!.SequenceEqual(c2!)
                                 , c => c.Aggregate(0, (a1, v1) => HashCode.Combine(a1, v1.GetHashCode()))
                                 , c => c.ToList()
@@ -113,14 +114,14 @@ public class CardDatabaseContext : DbContext, ICardDatabase<WeissSchwarzCard>
                 bb.Property<string>("JP").IsRequired(false);
             });
 
-            b   .HasMany(c => c.AdditionalInfo)
+            b.HasMany(c => c.AdditionalInfo)
                 .WithOne(i => i.Card)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<WeissSchwarzCardOptionalInfo>(b =>
         {
-            b   .HasOne(i => i.Card)
+            b.HasOne(i => i.Card)
                 .WithMany(c => c.AdditionalInfo)
                 .HasForeignKey(i => i.Serial)
                 .HasPrincipalKey(c => c.Serial);

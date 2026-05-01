@@ -31,7 +31,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
 
     private readonly Uri defaultURI = new Uri("https://www.google.com/");
 
-    public string[] Alias => new [] { "tts", "tabletopsim" };
+    public string[] Alias => new[] { "tts", "tabletopsim" };
 
     public TTSDeckExporter(IContainer ioc)
     {
@@ -75,7 +75,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
                 return p;
             })
             .Select(async (wsc, ct) =>
-            (   card: wsc,
+            (card: wsc,
                 stream: await wsc.GetImageStreamAsync(await _cookieSession(wsc.Images.LastOrDefault(defaultURI)), ct))
             )
             .ToDictionaryAsync(
@@ -92,7 +92,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         await _localDeckImageExporter().GenerateDeckImage(info, new(rows, serialList, imageDictionary, encoder, deckImagePath, progress.From().Translate<DeckExportProgressReport>(r => r.AsRatio<DeckExportProgressReport, DeckExportProgressReport>(10, 0.40f)), report, cancellationToken));
 
         Log.Information("Generating the Custom Object for TTS...");
-        report = report with { Exporter = "TTS", Percentage = 55, ReportMessage = new() { EN = "Generating Tabletop Simulator Custom Object..."}};
+        report = report with { Exporter = "TTS", Percentage = 55, ReportMessage = new() { EN = "Generating Tabletop Simulator Custom Object..." } };
         progress.Report(report);
 
         var serialDictionary = deck.Ratios.Keys
@@ -176,7 +176,7 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
         }
 
         if (info.Flags?.Contains("sendtcp", StringComparer.CurrentCultureIgnoreCase) ?? false)
-           await SendDeckGeneratorJSON("localhost", 39999, saveState);
+            await SendDeckGeneratorJSON("localhost", 39999, saveState);
 
         static string FormatDescription(WeissSchwarzCard card)
         {
@@ -194,10 +194,10 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
     {
         Log.Information("Generating a TTS command...");
         var serializedObject = JsonSerializer.Serialize(
-            saveState.ObjectStates[0], 
+            saveState.ObjectStates[0],
             new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }
             ).EscapeQuotes();
-        var command = new TTSExternalEditorCommand("-1", 
+        var command = new TTSExternalEditorCommand("-1",
             $"spawnObjectJSON({{ json = \"{serializedObject}\" }})\n" +
             $"return true"
             );
@@ -216,9 +216,10 @@ public class TTSDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             await endSignal;
         }
         catch (Exception) when (!Log.IsEnabled(Serilog.Events.LogEventLevel.Debug))
-        {                       
+        {
             Log.Warning("Unable to send the Deck Generator directly to TTS; please load the object manually.");
-        } finally
+        }
+        finally
         {
             if (tcpServer?.Pending() ?? false)
                 tcpServer.Stop();

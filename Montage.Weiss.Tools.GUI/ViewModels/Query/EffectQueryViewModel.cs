@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Query;
+
 public partial class EffectQueryViewModel : CardSearchQueryViewModel
 {
     private string _effectQuery;

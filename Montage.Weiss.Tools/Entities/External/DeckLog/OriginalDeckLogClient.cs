@@ -74,17 +74,18 @@ internal class OriginalDeckLogClient : IDeckLogClient, ICardQueryable
             .Where(p => p.Item2.Contains(nsCode))
             .Select(p => p.s)
             .ToArray();
-        
+
         foreach (var titleCode in titleCodes)
             yield return titleCode;
     }
 
-    private DLCardQuery ToQuery(string nsKey) {
+    private DLCardQuery ToQuery(string nsKey)
+    {
         return new DLCardQuery
-            {
-                DeckConstruction = DeckConstructionType.NeoStandard,
-                DeckConstructionParameter = nsKey
-            };
+        {
+            DeckConstruction = DeckConstructionType.NeoStandard,
+            DeckConstructionParameter = nsKey
+        };
     }
 
     private static async IAsyncEnumerable<DLCardEntry> ExecuteQuery(DeckLogSettings setting, DLCardQuery query)

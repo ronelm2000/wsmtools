@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Montage.Card.API.Interfaces.Inputs;
+﻿namespace Montage.Card.API.Interfaces.Inputs;
 
 /// <summary>
 /// An an abstraction over the console, mostly used for testing and code coverage.

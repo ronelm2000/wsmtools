@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks.Dataflow;
 
 namespace Montage.Weiss.Tools.Utilities;
@@ -27,9 +26,9 @@ public static class TaskExtensions
     }
 
     public static async IAsyncEnumerable<R> SelectParallelAsync<T, R>(
-        this IAsyncEnumerable<T> source, 
-        Func<T, Task<R>> body, 
-        int maxDegreeOfParallelism = DataflowBlockOptions.Unbounded, 
+        this IAsyncEnumerable<T> source,
+        Func<T, Task<R>> body,
+        int maxDegreeOfParallelism = DataflowBlockOptions.Unbounded,
         TaskScheduler? scheduler = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default!
         )

@@ -8,7 +8,7 @@ public static class ConsoleUtils
 {
     private static readonly ILogger Log = Serilog.Log.ForContext(typeof(ConsoleUtils));
 
-    public static Task<bool> IsPrompted(bool isNonInteractive, bool defeaultResult, CancellationToken cancellationToken = default) 
+    public static Task<bool> IsPrompted(bool isNonInteractive, bool defeaultResult, CancellationToken cancellationToken = default)
         => IsPrompted(isNonInteractive, defeaultResult, Card.API.CLI.Instance, cancellationToken);
 
     /// <summary>
@@ -67,7 +67,7 @@ public static class ConsoleUtils
     {
         return possibleShortcutExec.ToLower() switch
         {
-            "sharex" when (Environment.OSVersion.Platform == PlatformID.Win32NT) 
+            "sharex" when (Environment.OSVersion.Platform == PlatformID.Win32NT)
                 => InstalledApplications.GetApplicationInstallPath("ShareX") + @"ShareX.exe",
             _ => possibleShortcutExec
         };

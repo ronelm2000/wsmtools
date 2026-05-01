@@ -52,7 +52,8 @@ public class Program
         var verbs = container.GetAllInstances<IVerbCommand>().Select(a => a.GetType()).ToArray();
         var result = CommandLine.Parser.Default.ParseArguments(args, verbs); //
         await result.MapResult<IVerbCommand, Task>(
-            async (verb) => {
+            async (verb) =>
+            {
                 await CheckLatestVersion();
                 await verb.Run(container, progressReporter, linkedCts.Token);
             },
@@ -88,7 +89,8 @@ public class Program
                 Log.Information("The latest version is: {version}", AppVersion);
                 Log.Information("The latest version on repository: {version}", wsmtoolsLatestRelease.Name);
             }
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             Log.Warning("Unable to check the latest version (likely due to internet connection issues).");
             Log.Warning("If it is, some features of wsmtools may be unusable due to the need of an internet connection.");
@@ -157,7 +159,8 @@ public class Program
         System.IO.File.GetLastWriteTime(AppFilePath);
 }
 
-public static class LamarContainerExtensions {
+public static class LamarContainerExtensions
+{
     public static ServiceRegistry BootstrapDefaultServices(this ServiceRegistry registry)
     {
         registry.AddLogging(l => l.AddSerilog(Serilog.Log.Logger, dispose: true));

@@ -1,25 +1,24 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using DynamicData;
+using DynamicData.Binding;
 using Montage.Card.API.Entities.Impls;
+using Montage.Card.API.Services;
+using Montage.Weiss.Tools.CLI;
+using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.GUI.Extensions;
+using Montage.Weiss.Tools.GUI.ViewModels.Query;
+using ReactiveUI;
+using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
-using Montage.Weiss.Tools.GUI.Extensions;
-using Montage.Weiss.Tools.Entities;
-using System.Linq;
-using Montage.Weiss.Tools.Utilities;
-using DynamicData.Binding;
-using ReactiveUI;
-using System.Reactive.Linq;
-using DynamicData;
-using Avalonia.Platform;
-using Serilog;
-using System.Reactive;
-using Montage.Weiss.Tools.GUI.ViewModels.Query;
-using Avalonia.Threading;
 using System.Diagnostics.CodeAnalysis;
-using Montage.Weiss.Tools.CLI;
-using Montage.Card.API.Services;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 
 namespace Montage.Weiss.Tools.GUI.ViewModels;
@@ -116,7 +115,7 @@ public partial class CardEntryViewModel : ViewModelBase
 
         Card = card;
         Name = card.Name.AsNonEmptyString();
-        Traits = card.Traits.Select(t => new MultiLanguageString {  EN = t.EN, JP = t.JP }).ToList();
+        Traits = card.Traits.Select(t => new MultiLanguageString { EN = t.EN, JP = t.JP }).ToList();
         Serial = card.Serial;
         CardType = card.Type;
         Level = card.Level;
@@ -168,11 +167,11 @@ public partial class CardEntryViewModel : ViewModelBase
     }
 
     [MemberNotNull(
-        nameof(IsCharacter), 
-        nameof(IsCharacterOrEvent), 
+        nameof(IsCharacter),
+        nameof(IsCharacterOrEvent),
         nameof(IsImageTooltipView),
-        nameof(FindClimaxCombosCommand), 
-        nameof(FindClimaxCombosCommand), 
+        nameof(FindClimaxCombosCommand),
+        nameof(FindClimaxCombosCommand),
         nameof(FindTraitsCommand),
         nameof(FindNamesCommand)
         )]

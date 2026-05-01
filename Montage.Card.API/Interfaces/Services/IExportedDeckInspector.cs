@@ -2,7 +2,7 @@
 
 namespace Montage.Card.API.Interfaces.Services;
 
-public interface IExportedDeckInspector<D,C> where D : IDeck<C> where C : ICard
+public interface IExportedDeckInspector<D, C> where D : IDeck<C> where C : ICard
 {
     /// <summary>
     /// Gets the Priority of a particular issue.
@@ -44,9 +44,10 @@ public class InspectionOptions
     /// </summary>
     public CancellationToken CancellationToken { get; set; } = default;
 
-    public static implicit operator InspectionOptions((bool IsNonInteractive, bool NoWarning) tuple) 
-        => new InspectionOptions() { 
-            IsNonInteractive = tuple.IsNonInteractive, 
-            NoWarning = tuple.NoWarning 
+    public static implicit operator InspectionOptions((bool IsNonInteractive, bool NoWarning) tuple)
+        => new InspectionOptions()
+        {
+            IsNonInteractive = tuple.IsNonInteractive,
+            NoWarning = tuple.NoWarning
         };
 }

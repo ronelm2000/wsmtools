@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Montage.Weiss.Tools.Entities.External.DeckLog;
+﻿namespace Montage.Weiss.Tools.Entities.External.DeckLog;
 
 public class DeckLogSettings
 {

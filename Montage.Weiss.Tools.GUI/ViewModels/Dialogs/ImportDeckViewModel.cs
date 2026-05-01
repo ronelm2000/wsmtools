@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Montage.Weiss.Tools.GUI.ViewModels.Dialogs;
+
 public partial class ImportDeckViewModel : ViewModelBase
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<ImportDeckViewModel>();
@@ -71,7 +72,8 @@ public partial class ImportDeckViewModel : ViewModelBase
         {
             Log.Error("Error occurred", ex);
             parentModel.Status = ex.Message;
-        } finally
+        }
+        finally
         {
 
             IsVisible = false;

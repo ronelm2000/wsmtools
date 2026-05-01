@@ -2,35 +2,34 @@
 
 #nullable disable
 
-namespace Montage.Weiss.Tools.Migrations
+namespace Montage.Weiss.Tools.Migrations;
+
+/// <inheritdoc />
+public partial class FixNullChecking : Migration
 {
     /// <inheritdoc />
-    public partial class FixNullChecking : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AlterColumn<string>(
-                name: "ValueJSON",
-                table: "WeissSchwarzCardOptionalInfo",
-                type: "TEXT",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "TEXT");
-        }
+        migrationBuilder.AlterColumn<string>(
+            name: "ValueJSON",
+            table: "WeissSchwarzCardOptionalInfo",
+            type: "TEXT",
+            nullable: true,
+            oldClrType: typeof(string),
+            oldType: "TEXT");
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AlterColumn<string>(
-                name: "ValueJSON",
-                table: "WeissSchwarzCardOptionalInfo",
-                type: "TEXT",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "TEXT",
-                oldNullable: true);
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.AlterColumn<string>(
+            name: "ValueJSON",
+            table: "WeissSchwarzCardOptionalInfo",
+            type: "TEXT",
+            nullable: false,
+            defaultValue: "",
+            oldClrType: typeof(string),
+            oldType: "TEXT",
+            oldNullable: true);
     }
 }

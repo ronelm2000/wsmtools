@@ -20,7 +20,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
 
     private readonly Func<CardDatabaseContext> _db;
     private readonly Func<GlobalCookieJar> _cookieJar;
-    private readonly Func<ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>> _cacheSrvc;
+    private readonly Func<ICachedMapService<(CardLanguage, string), Dictionary<string, DLCardEntry>>> _cacheSrvc;
 
     private static readonly IDeckLogClient[] deckLogClients = new IDeckLogClient[]
     {
@@ -40,7 +40,7 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
     {
         _db = () => ioc.GetInstance<CardDatabaseContext>();
         _cookieJar = () => ioc.GetInstance<GlobalCookieJar>();
-        _cacheSrvc = () => ioc.GetInstance<ICachedMapService<(CardLanguage,string), Dictionary<string, DLCardEntry>>>();
+        _cacheSrvc = () => ioc.GetInstance<ICachedMapService<(CardLanguage, string), Dictionary<string, DLCardEntry>>>();
     }
 
     public async Task<bool> IsCompatible(List<WeissSchwarzCard> cards, CancellationToken cancellationToken = default)

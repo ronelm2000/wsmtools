@@ -22,7 +22,7 @@ public class EnglishDeckInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
         var japaneseImportCards = deck.Ratios.Keys.Where(card => card.EnglishSetType == EnglishSetType.JapaneseImport);
         if (await HeededWarningOnJapaneseImports(japaneseImportCards, options))
             return WeissSchwarzDeck.Empty;
-        
+
         return await ValueTask.FromResult(deck);
     }
 

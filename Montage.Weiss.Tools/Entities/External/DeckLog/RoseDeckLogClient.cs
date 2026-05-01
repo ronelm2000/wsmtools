@@ -19,7 +19,8 @@ internal class RoseDeckLogClient : IDeckLogClient, ICardQueryable
         if (side == CardSide.Rose && language == CardLanguage.Japanese)
         {
             return await ValueTask.FromResult(true);
-        } else
+        }
+        else
         {
             return false;
         }

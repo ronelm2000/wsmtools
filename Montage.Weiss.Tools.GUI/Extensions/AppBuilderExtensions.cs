@@ -7,6 +7,7 @@ using Splat.Serilog;
 using System;
 
 namespace Montage.Weiss.Tools.GUI.Extensions;
+
 public static class AppBuilderExtensions
 {
     public static AppBuilder LogToSerilog(this AppBuilder builder)
@@ -23,7 +24,7 @@ public static class AppBuilderExtensions
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Debug(displayTemplate)
             .WriteTo.File(
-                displayTemplate, 
+                displayTemplate,
                 $"{AppDomain.CurrentDomain.BaseDirectory}/wsm-gui.log",
                 restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug
                 )
@@ -65,7 +66,8 @@ internal class SerilogLogSink : ILogSink
         _logger.Write(ToSerilogLevel(level), messageTemplate, propertyValues);
     }
 
-    private Serilog.Events.LogEventLevel ToSerilogLevel(LogEventLevel level) {
+    private Serilog.Events.LogEventLevel ToSerilogLevel(LogEventLevel level)
+    {
         return level switch
         {
             LogEventLevel.Fatal => Serilog.Events.LogEventLevel.Fatal,

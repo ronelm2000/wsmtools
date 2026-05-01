@@ -35,12 +35,14 @@ public class CachedImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
                         Log.Information($"Using cached image: {serialImage}");
                         card.CachedImagePath = serialImage.FullPath;
                     }
-                } catch (InvalidOperationException)
+                }
+                catch (InvalidOperationException)
                 {
                     // Do nothing.
                 }
             }
-        } catch (System.IO.DirectoryNotFoundException)
+        }
+        catch (System.IO.DirectoryNotFoundException)
         {
             // Do nothing.
         }
@@ -56,7 +58,7 @@ public class CachedImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
             var res = serialImage;
             await using System.IO.Stream s = serialImage.GetStream();
             using Image img = await Image.LoadAsync(s, ct);
-            
+
             Log.Debug("Image can be loaded. Is the ratio reasonable?");
 
             var aspectRatio = (img.Width * 1.0d) / img.Height;
@@ -71,8 +73,8 @@ public class CachedImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
             {
                 Log.Warning("The image is of low quality; Not using cached image ({relativeFileName}).", relativeFileName);
                 return null;
-            }               
-            
+            }
+
             return serialImage;
         }
         catch (UnknownImageFormatException)
@@ -86,5 +88,5 @@ public class CachedImageInspector : IExportedDeckInspector<WeissSchwarzDeck, Wei
             return null;
         }
     }
-    
+
 }

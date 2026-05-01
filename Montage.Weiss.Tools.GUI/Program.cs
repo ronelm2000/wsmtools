@@ -1,9 +1,9 @@
 ﻿using Avalonia;
-using Montage.Weiss.Tools.GUI.Extensions;
-using System;
-using ReactiveUI.Avalonia.Splat;
 using Microsoft.Extensions.DependencyInjection;
+using Montage.Weiss.Tools.GUI.Extensions;
+using ReactiveUI.Avalonia.Splat;
 using Serilog;
+using System;
 
 namespace Montage.Weiss.Tools.GUI;
 

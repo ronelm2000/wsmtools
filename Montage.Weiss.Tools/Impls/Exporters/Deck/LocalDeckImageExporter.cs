@@ -62,8 +62,8 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
                 progress.Report(report);
                 return p;
             })
-            .Select(async (wsc, ct) => 
-            (   card: wsc, 
+            .Select(async (wsc, ct) =>
+            (card: wsc,
                 stream: await wsc.GetImageStreamAsync(await _cookieSession(wsc.Images.Last()), ct))
             )
             .ToDictionaryAsync(
@@ -137,7 +137,7 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
             var maxBounds = selection.Aggregate((a, b) => (Math.Max(a.Width, b.Width), Math.Max(a.Height, b.Height)));
             bounds = (limitWidth, (int)((float)maxBounds.Height / (float)maxBounds.Width * limitWidth));
             Log.Information("Adjusting image sizing to the limited bounds: {@minimumBounds}", bounds);
-        } 
+        }
         else
         {
             bounds = selection.Aggregate((a, b) => (Math.Min(a.Width, b.Width), Math.Min(a.Height, b.Height)));
@@ -183,11 +183,11 @@ public class LocalDeckImageExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
         progress.Report(report);
     }
 
-    internal record DeckImageExporterArgs (
-        int Rows, 
-        List<WeissSchwarzCard> SerialList, 
-        Dictionary<WeissSchwarzCard, Image> ImageDictionary, 
-        IImageEncoder Encoder, 
+    internal record DeckImageExporterArgs(
+        int Rows,
+        List<WeissSchwarzCard> SerialList,
+        Dictionary<WeissSchwarzCard, Image> ImageDictionary,
+        IImageEncoder Encoder,
         Path DeckImagePath,
         IProgress<DeckExportProgressReport> Progress,
         DeckExportProgressReport Report,

@@ -90,7 +90,7 @@ public class CockatriceDeckExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwa
     private Type[] _exclusionFilters = new[]
     {
         typeof(CachedImageInspector),
-        typeof(SanityImageInspector), 
+        typeof(SanityImageInspector),
         typeof(SanityTranslationsInspector)
     };
     public bool IsIncluded(IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard> item)

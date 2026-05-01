@@ -5,11 +5,11 @@ using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
 using Montage.Card.API.Interfaces.Services;
-using Montage.Weiss.Tools.Entities;
 using Montage.Card.API.Utilities;
+using Montage.Weiss.Tools.Entities;
+using Montage.Weiss.Tools.Utilities;
 using System.Runtime.CompilerServices;
 using System.Web;
-using Montage.Weiss.Tools.Utilities;
 
 namespace Montage.Weiss.Tools.Impls.PostProcessors;
 
@@ -209,5 +209,5 @@ public class YuyuteiPostProcessor(Func<CardDatabaseContext> database) : ICardPos
         internal int Price { get; set; }
     }
 
-    private readonly record struct WSKey (string Serial, string Rarity);
+    private readonly record struct WSKey(string Serial, string Rarity);
 }

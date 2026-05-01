@@ -24,7 +24,7 @@ public static class ReportExtensions
         };
     }
 
-    public static R AsRatio<T,R>(this T report, int ratioBase, float ratioInPercentage) where T : UpdateProgressReport where R : UpdateProgressReport, new()
+    public static R AsRatio<T, R>(this T report, int ratioBase, float ratioInPercentage) where T : UpdateProgressReport where R : UpdateProgressReport, new()
        => new R()
        {
            ReportMessage = report.ReportMessage,
@@ -51,18 +51,18 @@ public static class ReportExtensions
             this.outProgress = outProgress;
         }
 
-        public IProgress<O> Translate<O>(Func<O,T> func)
+        public IProgress<O> Translate<O>(Func<O, T> func)
         {
-            return new AggregateProgress<O,T>(outProgress, func);
+            return new AggregateProgress<O, T>(outProgress, func);
         }
     }
 
-    private class AggregateProgress<I,O> : IProgress<I>
+    private class AggregateProgress<I, O> : IProgress<I>
     {
         private readonly IProgress<O> _aggregateProgressReporter;
-        private readonly Func<I,O> _aggregateFunction;
+        private readonly Func<I, O> _aggregateFunction;
 
-        internal AggregateProgress(IProgress<O> aggregateProgressReporter, Func<I,O> aggregateFunction)
+        internal AggregateProgress(IProgress<O> aggregateProgressReporter, Func<I, O> aggregateFunction)
         {
             _aggregateProgressReporter = aggregateProgressReporter;
             _aggregateFunction = aggregateFunction;

@@ -11,6 +11,7 @@ using Montage.Weiss.Tools.Impls.Services;
 using Montage.Weiss.Tools.Utilities;
 
 namespace Montage.Weiss.Tools.Impls.Exporters.Deck;
+
 public class BlakeWSExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>, IFilter<IExportedDeckInspector<WeissSchwarzDeck, WeissSchwarzCard>>
 {
     private static ILogger Log = Serilog.Log.ForContext<BlakeWSExporter>();
@@ -80,18 +81,20 @@ public class BlakeWSExporter : IDeckExporter<WeissSchwarzDeck, WeissSchwarzCard>
             // Added Exception for HOL as HOL/W91 cannot accept Japanese serials
             { ReleaseID: "W91", Language: CardLanguage.Japanese } => WeissSchwarzCard.AsEnglishSerial(card.Serial),
             // Added Exception for HOL as HOL/W104 cannot accept English serials
-            {   ReleaseID: "W104" or "WE36", 
-                Language: CardLanguage.English 
+            {
+                ReleaseID: "W104" or "WE36",
+                Language: CardLanguage.English
             } => WeissSchwarzCard.AsJapaneseSerial(card.Serial),
-            
+
             // Added Exception as there's no EN support for W95
             { ReleaseID: "W95", Language: CardLanguage.English } => WeissSchwarzCard.AsJapaneseSerial(card.Serial),
 
             // Added SAO Exceptions
-            {   ReleaseID: "SE23" or "SE26" or "S65" or "S80" or "S51" or "S47" or "S26" or "S20" or "S100", 
-                Language: CardLanguage.Japanese 
+            {
+                ReleaseID: "SE23" or "SE26" or "S65" or "S80" or "S51" or "S47" or "S26" or "S20" or "S100",
+                Language: CardLanguage.Japanese
             } => WeissSchwarzCard.AsEnglishSerial(card.Serial),
-            
+
             _ => card.Serial
         };
     }

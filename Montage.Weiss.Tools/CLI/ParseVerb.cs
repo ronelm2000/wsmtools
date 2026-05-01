@@ -21,7 +21,7 @@ public class ParseVerb : IVerbCommand, IParseInfo
     [Option("with", HelpText = "Provides a hint as to what parser should be used or if post-processors are skipped (if any).", Default = new string[] { })]
     public IEnumerable<string> ParserHints { get; set; } = [];
 
-    public event EventHandler<string> SetParsed = (_,_) => { };
+    public event EventHandler<string> SetParsed = (_, _) => { };
 
     public async Task Run(IContainer container, IProgress<CommandProgressReport> progress, CancellationToken ct = default)
     {

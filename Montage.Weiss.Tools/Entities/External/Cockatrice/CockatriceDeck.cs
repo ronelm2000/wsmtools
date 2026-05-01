@@ -2,7 +2,7 @@
 
 namespace Montage.Weiss.Tools.Entities.External.Cockatrice;
 
-[XmlRoot(   "cockatrice_deck",
+[XmlRoot("cockatrice_deck",
             IsNullable = false
             )]
 public class CockatriceDeck

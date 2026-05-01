@@ -9,7 +9,7 @@ public class WeissSchwarzDeck : IDeck<WeissSchwarzCard>
     public string Remarks { get; set; } = string.Empty;
 
     public int Count => Ratios.Values.Sum();
-    internal Dictionary<string,int> AsSimpleDictionary()
+    internal Dictionary<string, int> AsSimpleDictionary()
     {
         return Ratios.Select(kyd => (kyd.Key.Serial, kyd.Value))
                      .ToDictionary(kyd => kyd.Serial, kyd => kyd.Value);

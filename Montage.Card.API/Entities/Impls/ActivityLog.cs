@@ -32,7 +32,7 @@ public static class ActivityExtensions
         return actType switch
         {
             ActivityType.Parse => "Parsing",
-            ActivityType.Delete => "Deleting",  
+            ActivityType.Delete => "Deleting",
             _ => throw new NotImplementedException()
         };
     }

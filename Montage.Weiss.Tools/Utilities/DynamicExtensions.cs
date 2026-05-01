@@ -4,7 +4,8 @@ namespace Montage.Weiss.Tools.Utilities;
 
 public static class DynamicExtensions
 {
-    public static dynamic AsOptional(dynamic obj) {
+    public static dynamic AsOptional(dynamic obj)
+    {
         return new OptionalDynamicObject(obj);
     }
 }

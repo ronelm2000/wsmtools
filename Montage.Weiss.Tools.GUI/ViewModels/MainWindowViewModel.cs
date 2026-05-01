@@ -296,7 +296,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             NonInteractive = true,
             Exporter = "doc",
-            Destination =  folder.TryGetLocalPath() ?? string.Empty,
+            Destination = folder.TryGetLocalPath() ?? string.Empty,
             Flags = ["nowarn"],
             Progress = progressReporter
         };
@@ -464,7 +464,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
 
         var plusSymbol = (searchCardList?.Count == 251) ? "+" : string.Empty;
-        Log.Information("Refreshing Card List..."); 
+        Log.Information("Refreshing Card List...");
         Log.Information("All Cards: {ser}{plus}", Math.Max(250, searchCardList?.Count ?? 0), plusSymbol);
 
         if ((searchCardList?.Count ?? 0) > 0)
@@ -818,7 +818,8 @@ public partial class MainWindowViewModel : ViewModelBase
         DeckStats = $"[ {totalCards} / {totalCharas} / {totalEvents} / {totalCXes} ]";
     }
 
-    private async Task<IStorageFolder?> AssignExportBookmark(IStorageProvider storage) {
+    private async Task<IStorageFolder?> AssignExportBookmark(IStorageProvider storage)
+    {
         var folders = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions { AllowMultiple = false });
         if (folders.Count < 1)
             return default;

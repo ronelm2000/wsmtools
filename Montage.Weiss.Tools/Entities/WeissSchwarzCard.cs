@@ -1,14 +1,13 @@
-﻿using Flurl.Http;
-using Montage.Card.API.Utilities;
+﻿using Fluent.IO;
+using Flurl.Http;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Utilities;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 using System.Text.Json;
-using Octokit;
-using Fluent.IO;
+using System.Text.Json.Serialization;
 
 namespace Montage.Weiss.Tools.Entities;
 
@@ -52,7 +51,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
     [JsonIgnore]
     [NotMapped]
     public string? CachedImagePath { get; set; }
-    
+
     public WeissSchwarzCard()
     {
         Log ??= Serilog.Log.ForContext<WeissSchwarzCard>();
@@ -80,7 +79,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
 
     public WeissSchwarzCard Clone()
     {
-        WeissSchwarzCard newCard = (WeissSchwarzCard) this.MemberwiseClone();
+        WeissSchwarzCard newCard = (WeissSchwarzCard)this.MemberwiseClone();
         newCard.Name = new MultiLanguageString { EN = this.Name.EN, JP = this.Name.JP };
         newCard.Traits = this.Traits.Select(s => s.Clone()).ToList();
         newCard.Images = this.Images.ToList();
@@ -130,7 +129,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         var builder = url.WithImageHeaders();
         if (cookieSession is not null)
             builder = builder.WithCookies(cookieSession!);
-        
+
         return await builder.GetAsync(cancellationToken: ct).ReceiveStream();
     }
 
@@ -143,7 +142,7 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
                     return true;
             }
             catch (Exception) { }
-        
+
         var url = Images.Last();
         try
         {
@@ -249,7 +248,8 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
             res.SetID = slice.ToString();
             //res.
             return res;
-        } catch (ArgumentOutOfRangeException)
+        }
+        catch (ArgumentOutOfRangeException)
         {
             return default;
         }
@@ -280,7 +280,8 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
 
     private static Func<(string subset, string side, string lang, string releaseID, string setID), string>? GetExceptionalSetFormat(string lang, string fullReleaseID)
     {
-        return (lang, fullReleaseID) switch {
+        return (lang, fullReleaseID) switch
+        {
             ("EN", "S04") => (tuple) => $"{tuple.subset}/EN-{tuple.side}{tuple.releaseID}-{tuple.setID}",
             _ => null
         };
@@ -296,18 +297,20 @@ public class WeissSchwarzCard : IExactCloneable<WeissSchwarzCard>, ICard
         };
     }
 
-    public string TypeToString(){
+    public string TypeToString()
+    {
         string res = "";
-        switch(this.Type){
+        switch (this.Type)
+        {
             case CardType.Character:
                 res = "CH";
-                break; 
+                break;
             case CardType.Event:
                 res = "EV";
-                break; 
+                break;
             case CardType.Climax:
                 res = "CX";
-                break; 
+                break;
         }
         return res;
     }

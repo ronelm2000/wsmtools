@@ -19,10 +19,10 @@ public abstract class DatabaseUpdater<ICDB, C> where ICDB : IDisposable, ICardDa
                 Log.Information("Migrating Database...");
             await database.Database.MigrateAsync(ct);
         }
-        
+
         var activityLog = await database.MigrationLog.AsQueryable()
             .Where(log => !log.IsDone)
-            .OrderBy(log => log.DateAdded) 
+            .OrderBy(log => log.DateAdded)
             .AsAsyncEnumerable()
             .ToArrayAsync()
             ;

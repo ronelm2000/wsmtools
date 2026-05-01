@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Montage.Card.API.Exceptions;
 
-namespace Montage.Card.API.Exceptions;
 public class SetParsingException : Exception
 {
     public ParserCode? SourceCode { get; }
@@ -13,7 +7,7 @@ public class SetParsingException : Exception
     public SetParsingException()
     {
     }
-    public SetParsingException(ParserCode code) : base (code.Translate())
+    public SetParsingException(ParserCode code) : base(code.Translate())
     {
         this.SourceCode = code;
     }

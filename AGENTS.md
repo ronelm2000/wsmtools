@@ -7,6 +7,19 @@ dotnet build
 dotnet test --filter TestCategory!=Manual
 ```
 
+### Pre-commit
+
+Run `dotnet format` on affected files before committing:
+
+```ps
+dotnet format --include <list_of_affected_files>
+```
+
+Example:
+```ps
+dotnet format --include Montage.Weiss.Tools/CLI/ExportVerb.cs Montage.Card.API/Interfaces/Inputs/IConsole.cs
+```
+
 ## Projects
 
 | Project | Type | Entry |

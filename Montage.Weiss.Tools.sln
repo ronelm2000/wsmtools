@@ -30,6 +30,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Montage.Weiss.Tools.GUI.Tes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".plans", ".plans", "{DB876946-133A-4755-9442-66C9327199B5}"
 	ProjectSection(SolutionItems) = preProject
+		.plans\plan-49.md = .plans\plan-49.md
 		.plans\plan-fix-enws.md = .plans\plan-fix-enws.md
 	EndProjectSection
 EndProject

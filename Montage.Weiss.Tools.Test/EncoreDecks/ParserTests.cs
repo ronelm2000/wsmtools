@@ -49,6 +49,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "Climax Trigger Test (BDML)")]
+    [TestCategory("Manual")]
     public async Task TestClimaxTriggers()
     {
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
@@ -75,6 +76,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "Akiba Test (Prisma Illya)")]
+    [TestCategory("Manual")]
     public async Task TestPIAkiba()
     {
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
@@ -117,6 +119,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "Trait Test (Yosuke Bias)")]
+    [TestCategory("Manual")]
     public async Task TestYosukeBiasTraits()
     {
         var progress = NoOpProgress<SetParserProgressReport>.Instance;

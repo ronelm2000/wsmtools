@@ -74,7 +74,7 @@ public class CockatriceDeckParser : IDeckParser<WeissSchwarzDeck, WeissSchwarzCa
                     return p;
                 })
                 .Where(p => p.card is not null)
-                .ToDictionary(p => p.card!, p => p.amount);
+                .ToDictionary(p => p.card!, p => p.amount, WeissSchwarzCard.SerialComparer);
 
             if (missingSerials.Count > 0)
             {

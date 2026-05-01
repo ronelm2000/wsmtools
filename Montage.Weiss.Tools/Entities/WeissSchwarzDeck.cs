@@ -5,7 +5,7 @@ namespace Montage.Weiss.Tools.Entities;
 public class WeissSchwarzDeck : IDeck<WeissSchwarzCard>
 {
     public string Name { get; set; } = string.Empty;
-    public Dictionary<WeissSchwarzCard, int> Ratios { get; set; } = new Dictionary<WeissSchwarzCard, int>();
+    public Dictionary<WeissSchwarzCard, int> Ratios { get; set; } = new Dictionary<WeissSchwarzCard, int>(WeissSchwarzCard.SerialComparer);
     public string Remarks { get; set; } = string.Empty;
 
     public int Count => Ratios.Values.Sum();
@@ -18,7 +18,7 @@ public class WeissSchwarzDeck : IDeck<WeissSchwarzCard>
     public WeissSchwarzDeck Clone()
     {
         var res = new WeissSchwarzDeck();
-        res.Ratios = this.Ratios.ToDictionary(kyd => kyd.Key, kyd => kyd.Value);
+        res.Ratios = this.Ratios.ToDictionary(kyd => kyd.Key, kyd => kyd.Value, WeissSchwarzCard.SerialComparer);
         res.Name = this.Name;
         res.Remarks = this.Remarks;
         return res;

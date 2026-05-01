@@ -69,11 +69,15 @@ Use `Co-Authored-By` trailer for AI attribution. Format:
 Co-Authored-By: <AI Tool Name> <email>
 ```
 
+If connected by a GitHub issue, also include `Fixes #<issue_number>` in the message body.
+
 Examples for different AI tools:
 
 **OpenCode:**
 ```
-Refactor deck exporter pipeline
+Fix deck exporter pipeline
+
+Fixes #49
 
 Extracted common export logic into base class.
 Co-Authored-By: OpenCode <noreply@opencode.ai>
@@ -81,7 +85,9 @@ Co-Authored-By: OpenCode <noreply@opencode.ai>
 
 **Claude:**
 ```
-Refactor deck exporter pipeline
+Fix deck exporter pipeline
+
+Fixes #49
 
 Extracted common export logic into base class.
 Co-Authored-By: Claude <noreply@anthropic.com>
@@ -89,7 +95,9 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 **Copilot:**
 ```
-Refactor deck exporter pipeline
+Fix deck exporter pipeline
+
+Fixes #49
 
 Extracted common export logic into base class.
 Co-Authored-By: Copilot <noreply@github.com>

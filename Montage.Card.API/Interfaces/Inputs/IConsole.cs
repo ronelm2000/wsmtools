@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Montage.Card.API.Interfaces.Inputs;
 
@@ -18,4 +20,5 @@ public interface IConsole
     ConsoleKeyInfo ReadKey(bool intercept);
     void Write(object? value);
     void WriteLine(string? message);
+    Task<string> ReadToEndAsync(CancellationToken cancellationToken = default);
 }

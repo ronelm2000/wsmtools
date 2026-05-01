@@ -1,11 +1,14 @@
 ﻿using CommandLine;
+using Fluent.IO;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 using Montage.Card.API.Entities;
 using Montage.Card.API.Entities.Impls;
 using Montage.Card.API.Interfaces.Components;
+using Montage.Card.API.Interfaces.Inputs;
 using Montage.Card.API.Interfaces.Services;
 using Montage.Card.API.Services;
+using Montage.Weiss.Tools;
 using Montage.Weiss.Tools.API;
 using Montage.Weiss.Tools.Entities;
 using Montage.Weiss.Tools.Impls.Services;
@@ -50,7 +53,7 @@ public class ExportVerb : IVerbCommand, IExportInfo
     /// For the IOC
     /// </summary>
     public ExportVerb()
-    { 
+    {
     }
 
     public async Task Run(IContainer ioc, IProgress<CommandProgressReport> progress, CancellationToken cancellationToken = default)
@@ -67,19 +70,52 @@ public class ExportVerb : IVerbCommand, IExportInfo
         Log.Information("Running...");
 
         var deck = await Parse(ioc, deckParserProgress, cancellationToken);
-        
+
         await Run(ioc, deck, cancellationToken);
     }
 
     public async Task<WeissSchwarzDeck> Parse(IContainer ioc, IProgress<DeckParserProgressReport> deckParserProgress, CancellationToken cancellationToken = default)
     {
-        var parser = await ioc.GetAllInstances<IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>>()
-            .ToAsyncEnumerable()
-            .Where(async (parser, ct) => await parser.IsCompatible(Source))
-            .OrderByDescending(parser => parser.Priority)
-            .FirstAsync(cancellationToken);
-        var deck = await parser.Parse(Source, deckParserProgress, cancellationToken);
-        return deck;
+        string sourceToUse = Source;
+        Fluent.IO.Path tempFilePath = null;
+
+        // Handle stdin/pipe input
+        if (Source == "-" || Source.Equals("pipe", StringComparison.OrdinalIgnoreCase))
+        {
+            Log.Information("Reading from stdin...");
+            var stdinContent = await Program.Console.ReadToEndAsync(cancellationToken);
+
+            if (string.IsNullOrWhiteSpace(stdinContent))
+            {
+                Log.Error("No data received from stdin.");
+                return WeissSchwarzDeck.Empty;
+            }
+
+            // Create temp file with .json extension
+            tempFilePath = FluentPathExtensions.GetTempFilePath("json");
+            await tempFilePath.WriteStringAsync(stdinContent, cancellationToken);
+
+            sourceToUse = tempFilePath.FullPath;
+        }
+
+        try
+        {
+            var parser = await ioc.GetAllInstances<IDeckParser<WeissSchwarzDeck, WeissSchwarzCard>>()
+                .ToAsyncEnumerable()
+                .Where(async (parser, ct) => await parser.IsCompatible(sourceToUse))
+                .OrderByDescending(parser => parser.Priority)
+                .FirstAsync(cancellationToken);
+            var deck = await parser.Parse(sourceToUse, deckParserProgress, cancellationToken);
+            return deck;
+        }
+        finally
+        {
+            // Clean up temp file
+            if (tempFilePath != null && tempFilePath.Exists)
+            {
+                tempFilePath.Delete();
+            }
+        }
     }
 
     public async Task<WeissSchwarzDeck> Run(IContainer ioc, WeissSchwarzDeck deck, CancellationToken token = default)

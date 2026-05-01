@@ -27,6 +27,11 @@ public class CLI : IConsole
     public bool IsOutputRedirected => Console.IsOutputRedirected;
     public bool KeyAvailable => Console.KeyAvailable;
     public void Write(object? value) => Console.Write(value);
+
+    public async Task<string> ReadToEndAsync(CancellationToken cancellationToken = default)
+    {
+        return await Console.In.ReadToEndAsync(cancellationToken);
+    }
 }
 
 

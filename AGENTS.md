@@ -35,6 +35,12 @@ dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Relea
 - `var` preferred everywhere
 - Allman braces
 
+## File I/O
+
+- Prefer `Fluent.IO.Path` over `System.IO` for file operations
+- Use `FluentPathExtensions` (in `Montage.Weiss.Tools/Utilities/`) for missing `System.IO.Path` methods
+- Available helpers: `GetTempFilePath(extension)`, `WriteStringAsync()`, `Delete()`, `CreateFileStream()`, etc.
+
 ## Commit Messages
 
 Use `Co-Authored-By` trailer for AI attribution. Format:

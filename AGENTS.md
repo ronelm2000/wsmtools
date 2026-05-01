@@ -50,6 +50,11 @@ dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Relea
 - `var` preferred everywhere
 - Allman braces
 
+## Pre-Implementation
+
+Before starting any implementation work:
+- Check `.editorconfig` and ensure `dotnet_diagnostic.IDE0005.severity = error` is set.
+
 ## File I/O
 
 - Prefer `Fluent.IO.Path` over `System.IO` for file operations

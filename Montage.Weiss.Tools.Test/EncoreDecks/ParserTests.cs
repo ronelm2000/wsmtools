@@ -15,6 +15,7 @@ public class ParserTests
     public TestContext TestContext { get; set; }
 
     [TestMethod(DisplayName = "Parse Test (Batman Ninja / BDML / LB Anime)")]
+    [TestCategory("Manual")]
     public async Task FullTestRun()
     {
         var progress = NoOpProgress<SetParserProgressReport>.Instance;

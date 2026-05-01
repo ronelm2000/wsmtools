@@ -12,6 +12,7 @@ public class ParserTests
 
     [TestMethod(DisplayName = "Full Integration Test (Local JSON) (Typical Use Case)")]
     [DeploymentItem("Resources/deck_date_a_live.json")]
+    [Timeout(60000)] // 1 min 
     public async Task FullTestRun()
     {
         await new ParseVerb()
@@ -23,7 +24,7 @@ public class ParserTests
         {
             Source = "./deck_date_a_live.json",
             Exporter = "local",
-            NonInteractive = true,
+            NonInteractive = true,  
             NoWarning = true
         }.Run(Global.Container, Global.MockProgress, TestContext.CancellationToken);
 

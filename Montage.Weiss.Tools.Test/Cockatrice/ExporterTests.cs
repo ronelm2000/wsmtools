@@ -17,6 +17,7 @@ public class ExporterTests
     public TestContext TestContext { get; set; }
 
     [TestMethod(DisplayName = "Database Exporter Test (Cockatrice)")]
+    [TestCategory("Manual")]
     public async Task TestExporterForDatabase()
     {
         await new ParseVerb()

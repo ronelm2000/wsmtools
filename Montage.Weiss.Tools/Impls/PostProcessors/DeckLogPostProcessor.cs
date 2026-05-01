@@ -188,18 +188,11 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
         var cacheSrvc = _cacheSrvc();
         var titleCodes = cardData.Select(c => c.TitleCode).ToHashSet();
         var results = new Dictionary<string, DLCardEntry>();
-        var cacheResults = cacheSrvc.GetValues(titleCodes.Select(t => (settings.Language, t)))
-            .Where(c => c.Value.Count > 0)
-            .ToDictionary(c => c.Key, c => c.Value);
-        var cacheValues = cacheResults.SelectMany(c => c.Value).ToList();
         var serialMapper = cardData.ToDictionary(c => c.Serial, c => c.TitleCode);
         var cookieJar = await _cookieJar().FindOrCreate(settings.Referrer, cancellationToken);
 
-        foreach (var kvp in cacheValues)
-            results.Add(kvp.Key, kvp.Value);
-
-        if (titleCodes.Count < 10) //TODO: How do we indicate that this is a WPR extraction? 
-            titleCodes.RemoveWhere(t => cacheResults.ContainsKey((settings.Language, t)));
+        //if (titleCodes.Count < 10) //TODO: How do we indicate that this is a WPR extraction? 
+        //    titleCodes.RemoveWhere(t => cacheResults.ContainsKey((settings.Language, t)));
 
         if (titleCodes.Count < 1)
             return results;
@@ -217,6 +210,19 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                 Authority = settings.Authority,
                 Language = settings.Language
             };
+
+            var cacheResults = cacheSrvc[(settings.Language, titleCode)];
+            if (cacheResults is not null && cacheResults.Count > 0)
+            {
+                Log.Information("Obtained cached results for [{titlecode}].", titleCode);
+                foreach (var kvp in cacheResults)
+                {
+                    results[kvp.Key] = kvp.Value;
+                    Log.Debug("Added Cached Result: {serial}", kvp.Key);
+                }
+                continue;
+            }
+
             await foreach (var entry in deckLogClient!.FindCardEntries(deckLogContext, titleCode, cancellationToken))
             {
                 if (entry.Serial is null || entry.Rarity is null)
@@ -229,7 +235,6 @@ public partial class DeckLogPostProcessor : ICardPostProcessor<WeissSchwarzCard>
                 cacheSrvc[(settings.Language, serialEncoded.NeoStandardCode)][entry.Serial + entry.Rarity] = entry;
                 Log.Debug("Encoded DeckLog Result: {serial}", entry.Serial + entry.Rarity);
             }
-
         }
         return results;
     }

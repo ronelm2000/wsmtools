@@ -13,6 +13,7 @@ public class ParserTests
 
     [TestMethod(DisplayName = "Full Integration (Local Text File) (HOTC)")]
     [DeploymentItem("Resources/shiyoko_prs_hotc.txt")]
+    [TestCategory("Manual")]
     public async Task FullTestRun()
     {
         await new ParseVerb()

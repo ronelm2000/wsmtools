@@ -7,6 +7,8 @@ dotnet build
 dotnet test --filter TestCategory!=Manual
 ```
 
+Note: `IDE0005` (unnecessary using directive) is already configured as an error in `.editorconfig` (line ~222). The `dotnet format --include <files>` pre-commit step will automatically fix these.
+
 ### Pre-commit
 
 Run `dotnet format` on affected files before committing:

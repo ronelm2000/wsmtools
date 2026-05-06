@@ -1,4 +1,4 @@
-﻿namespace Montage.Weiss.Tools.Entities.Effect.Component;
+namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 internal abstract class CardTextToken<E>
 {
@@ -10,6 +10,7 @@ internal interface ITokenRegistry
 {
     IComponentRegistry<List<CardEffectAbility>> EffectListRegistry { get; }
     IComponentRegistry<List<CardEffectCondition>> ConditionListRegistry { get; }
+    IComponentRegistry<CardEffect> EffectRegistry { get; }
 
     string[] MatchLabels(string value);
 }

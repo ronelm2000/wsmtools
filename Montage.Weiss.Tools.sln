@@ -32,6 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".plans", ".plans", "{DB8769
 	ProjectSection(SolutionItems) = preProject
 		.plans\plan-49.md = .plans\plan-49.md
 		.plans\plan-fix-enws.md = .plans\plan-fix-enws.md
+		.plans\WeissSchwarzCardTranslatorService.md = .plans\WeissSchwarzCardTranslatorService.md
 	EndProjectSection
 EndProject
 Global

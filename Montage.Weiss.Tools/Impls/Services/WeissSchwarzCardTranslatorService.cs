@@ -27,9 +27,11 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
 
         // Register ability tokens
         _effectListRegistry.Register(new PowerBoostToken());
+        _effectListRegistry.Register(new AssistPowerBoostToken());
 
         // Register effect type tokens
         _effectRegistry.Register(new ContEffectToken());
+        _effectRegistry.Register(new AssistContEffectToken());
     }
 
     IComponentRegistry<List<CardEffectAbility>> ITokenRegistry.EffectListRegistry => _effectListRegistry;

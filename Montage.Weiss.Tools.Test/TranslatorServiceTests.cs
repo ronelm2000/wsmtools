@@ -53,4 +53,32 @@ public class TranslatorServiceTests
         Assert.IsTrue(effect.EffectText.Contains("[CONT]"));
         Assert.IsTrue(effect.EffectText.Contains("+4000 power"));
     }
+
+    [TestMethod]
+    public void Translate_ContEffect_Assist()
+    {
+        var japanese = "【永】 応援 このカードの前のあなたのキャラすべてに、パワーを＋Ｘ。Ｘはそのキャラのレベル×500に等しい。";
+        var tree = _service.TranslateEffect(japanese);
+
+        Assert.AreEqual(1, tree.Effects.Count);
+        var effect = tree.Effects[0] as ContCardEffect;
+        Assert.IsNotNull(effect);
+        Assert.AreEqual("Assist", effect.Labels[0]);
+        Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level x500", effect.AbilityText);
+        Assert.IsTrue(effect.EffectText.Contains("[CONT] Assist"));
+    }
+
+    [TestMethod]
+    public void Translate_ContEffect_Assist_1500()
+    {
+        var japanese = "【永】 応援 このカードの前のあなたのキャラすべてに、パワーを＋Ｘ。Ｘはそのキャラのレベル×1500に等しい。";
+        var tree = _service.TranslateEffect(japanese);
+
+        Assert.AreEqual(1, tree.Effects.Count);
+        var effect = tree.Effects[0] as ContCardEffect;
+        Assert.IsNotNull(effect);
+        Assert.AreEqual("Assist", effect.Labels[0]);
+        Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level x1500", effect.AbilityText);
+        Assert.IsTrue(effect.EffectText.Contains("[CONT] Assist"));
+    }
 }

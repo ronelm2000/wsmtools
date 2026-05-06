@@ -1,4 +1,6 @@
-﻿namespace Montage.Weiss.Tools.Entities.Effect;
+﻿using DocumentFormat.OpenXml.Math;
+
+namespace Montage.Weiss.Tools.Entities.Effect;
 
 internal record CardEffectTree
 {
@@ -8,6 +10,7 @@ internal record CardEffectTree
 internal abstract record CardEffect
 {
     public abstract string Type { get; }
+    public required string[] Labels { get; init; }
     public required string EffectText { get; set; }
     public required string AbilityText { get; set; }
     public required List<CardEffectAbility> Abilities { get; init; }
@@ -44,6 +47,11 @@ internal record CardEffectCondition
 internal record CardEffectAbility
 {
     public required string AbilityText { get; init; }
+
+    public static CardEffectAbility operator +(CardEffectAbility a, CardEffectAbility b)
+    {
+        return new CardEffectAbility { AbilityText = $"{a.AbilityText}, and {b.AbilityText}" };
+    }
 }
 
 internal interface IConditionalCardEffect
@@ -58,6 +66,11 @@ internal interface ICostedCardEffect
     public List<CardEffectAbility> Cost { get; init; }
 }
 
+internal class CardEffectTreeExtensions
+{
+
+}
+
 internal class Test
 {
     public CardEffectTree CardEffectTree { get; } = new Montage.Weiss.Tools.Entities.Effect.CardEffectTree
@@ -68,6 +81,7 @@ internal class Test
                 AbilityText = "This card gets +500 power for each of your other 《Music》 characters.",
                 ConditionText = String.Empty,
                 Condition = [],
+                Labels = [],
                 Abilities = [
                     new CardEffectAbility {
                         AbilityText = "This card gets +500 power for each of your other 《Music》 characters."
@@ -85,6 +99,7 @@ internal class Test
                 [AUTO] [Put 1 <<Music>> character from your hand into your waiting room] When this card is placed on stage from your hand,
                 you may pay the cost. If you do, draw up to 1 card",
                 """,
+                Labels = [],
                 AbilityText = "draw up to 1 card",
                 ConditionText = "this card is placed on stage from your hand",
                 Condition = [

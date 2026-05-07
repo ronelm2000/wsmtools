@@ -11,6 +11,7 @@ internal interface ITokenRegistry
     IComponentRegistry<List<CardEffectAbility>> EffectListRegistry { get; }
     IComponentRegistry<List<CardEffectCondition>> ConditionListRegistry { get; }
     IComponentRegistry<CardEffect> EffectRegistry { get; }
+    IComponentRegistry<string> ReminderTextRegistry { get; }
 
     string[] MatchLabels(string value);
 }

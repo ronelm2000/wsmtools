@@ -81,4 +81,43 @@ public class TranslatorServiceTests
         Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level x1500", effect.AbilityText);
         Assert.IsTrue(effect.EffectText.Contains("[CONT] Assist"));
     }
+
+    [TestMethod]
+    public void Translate_WithReminderText_SingleSentence()
+    {
+        var japanese = "【自】［手札を1枚控え室に置く］ あなたのCXがCX置場に置かれた時、あなたはコストを払ってよい。そうしたら、あなたは自分の山札の上から1枚を公開し、自分の控え室のレベルＸ以下のキャラを1枚選び、手札に戻す。Ｘは公開されたカードのレベルに等しい。（CXのレベルは0として扱う）";
+        var tree = _service.TranslateEffect(japanese);
+
+        Assert.AreEqual(1, tree.Effects.Count);
+        var effect = tree.Effects[0];
+        Assert.IsFalse(string.IsNullOrEmpty(effect.ReminderText));
+        Assert.IsTrue(effect.ReminderText.Contains("CX are regarded as level 0"));
+        Assert.IsTrue(effect.EffectText.Contains("CX are regarded as level 0"));
+    }
+
+    [TestMethod]
+    public void Translate_WithReminderText_MultipleSentences()
+    {
+        var japanese = "【自】［手札を1枚控え室に置く］ あなたのCXがCX置場に置かれた時、あなたはコストを払ってよい。そうしたら、あなたは自分の山札の上から1枚を公開し、自分の控え室のレベルＸ以下のキャラを1枚選び、手札に戻す。Ｘは公開されたカードのレベルに等しい。（CXのレベルは0として扱う。公開したカードは元に戻す）";
+        var tree = _service.TranslateEffect(japanese);
+
+        Assert.AreEqual(1, tree.Effects.Count);
+        var effect = tree.Effects[0];
+        Assert.IsFalse(string.IsNullOrEmpty(effect.ReminderText));
+        Assert.IsTrue(effect.ReminderText.Contains("CX are regarded as level 0"));
+        Assert.IsTrue(effect.ReminderText.Contains("Put it on its original position"));
+        Assert.IsTrue(effect.EffectText.Contains("CX are regarded as level 0"));
+        Assert.IsTrue(effect.EffectText.Contains("Put it on its original position"));
+    }
+
+    [TestMethod]
+    public void Translate_WithoutReminderText_ReminderTextEmpty()
+    {
+        var japanese = "【永】 あなたの手札が5枚以上なら、このカードのパワーを＋2000。";
+        var tree = _service.TranslateEffect(japanese);
+
+        Assert.AreEqual(1, tree.Effects.Count);
+        var effect = tree.Effects[0];
+        Assert.AreEqual(string.Empty, effect.ReminderText);
+    }
 }

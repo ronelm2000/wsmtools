@@ -4,22 +4,24 @@
 
 ```ps
 dotnet build
-dotnet test --filter TestCategory!=Manual
+dotnet test --filter <TestClassFilter>
+```
+
+Limit coverage to the test classes of added/modified unit tests using `FullyQualifiedName~<ClassName>`:
+
+```ps
+dotnet test --filter FullyQualifiedName~NewExporterTest
 ```
 
 Note: `IDE0005` (unnecessary using directive) is already configured as an error in `.editorconfig` (line ~222). The `dotnet format --include <files>` pre-commit step will automatically fix these.
 
 ### Pre-commit
 
-Run `dotnet format` on affected files before committing:
+Run full non-manual test suite before committing (the `dotnet format --include <files>` pre-commit step will automatically fix `IDE0005` and other formatting issues):
 
 ```ps
-dotnet format --include <list_of_affected_files>
-```
-
-Example:
-```ps
-dotnet format --include Montage.Weiss.Tools/CLI/ExportVerb.cs Montage.Card.API/Interfaces/Inputs/IConsole.cs
+dotnet build
+dotnet test --filter TestCategory!=Manual
 ```
 
 ## Projects

@@ -1,5 +1,3 @@
-using Montage.Weiss.Tools.Entities.Effect;
-
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 internal class ContEffectToken : CardTextToken<CardEffect>
@@ -57,7 +55,9 @@ internal class ContEffectToken : CardTextToken<CardEffect>
             effectText += $" {string.Join("][", labels)}";
         if (!string.IsNullOrEmpty(conditionEnglish))
             effectText += $" {conditionEnglish},";
-        effectText += $" {abilityEnglish}.";
+        effectText += $" {abilityEnglish}";
+        if (!abilityEnglish.EndsWith('.') && !abilityEnglish.EndsWith('"'))
+            effectText += ".";
 
         return new ContCardEffect
         {

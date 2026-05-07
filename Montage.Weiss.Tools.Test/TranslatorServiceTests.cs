@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Weiss.Tools.Entities.Effect;
 using Montage.Weiss.Tools.Impls.Services;
@@ -48,7 +50,7 @@ public class TranslatorServiceTests
         Assert.AreEqual(1, tree.Effects.Count);
         var effect = tree.Effects[0] as ContCardEffect;
         Assert.IsNotNull(effect);
-        Assert.AreEqual("During your turn, if you control 2 or more other <<風>> characters", effect.ConditionText);
+        Assert.AreEqual("During your turn, if you have 2 or more other <<風>> characters", effect.ConditionText);
         Assert.AreEqual("this card gets +4000 power", effect.AbilityText);
         Assert.IsTrue(effect.EffectText.Contains("[CONT]"));
         Assert.IsTrue(effect.EffectText.Contains("+4000 power"));
@@ -250,7 +252,7 @@ public class TranslatorServiceTests
 
         Assert.AreEqual(1, tree.Effects.Count);
         var effect = tree.Effects[0] as AutoCardEffect;
-            Assert.IsNotNull(effect);
+        Assert.IsNotNull(effect);
         Assert.AreEqual("[AUTO][1/TURN] During the turn this card was placed on stage from the hand, when this card's damage is cancelled, put the top card of your deck into your waiting room, and deal X damage to your opponent. X is equal to that sent card's level +1.", effect.EffectText);
         Assert.AreEqual("Put the top card of your deck into your waiting room, and deal X damage to your opponent. X is equal to that sent card's level +1.", effect.AbilityText);
         Assert.IsTrue(effect.AbilityText.Contains("deal X damage to your opponent"));
@@ -276,5 +278,58 @@ public class TranslatorServiceTests
         Assert.AreEqual(expectedAbilityText, effect.AbilityText);
         Assert.AreEqual(expectedReminder, effect.ReminderText);
         Assert.IsTrue(effect.AbilityText.Contains("deal X damage to your opponent"));
+    }
+
+    [TestMethod]
+    public void Translate_ContEffect_TurnAndTraitCharacterCountPowerBoost_4()
+    {
+        var japanese = "【永】 あなたのターン中、他のあなたの《風》のキャラが4枚以上なら、このカードのパワーを＋5000。";
+        var tree = _service.TranslateEffect(japanese);
+
+        Assert.AreEqual(1, tree.Effects.Count);
+        var effect = tree.Effects[0] as ContCardEffect;
+        Assert.IsNotNull(effect);
+        Assert.AreEqual("During your turn, if you have 4 or more other <<風>> characters", effect.ConditionText);
+        Assert.IsTrue(effect.AbilityText.Contains("+5000 power"));
+        Assert.IsTrue(effect.EffectText.Contains("[CONT]"));
+        Assert.IsTrue(effect.EffectText.Contains("+5000 power"));
+    }
+
+    [TestMethod]
+    public void Translate_ContEffect_TurnAndTraitCharacterCountPowerBoostAndGainSkill()
+    {
+        var japanese = "【永】 あなたのターン中、他のあなたの《風》のキャラが4枚以上なら、このカードのパワーを＋5000し、このカードは次の能力を得る。『【永】 このカードのバトル中、相手はイベントと『助太刀』を手札からプレイできない。』";
+        var tree = _service.TranslateEffect(japanese);
+
+        var failures = new List<string>();
+
+        if (tree.Effects.Count != 1)
+            failures.Add($"Expected 1 effect, got {tree.Effects.Count}");
+
+        var effect = tree.Effects[0] as ContCardEffect;
+        if (effect == null)
+            failures.Add("Effect is not ContCardEffect");
+        else
+        {
+            var expectedCondition = "During your turn, if you have 4 or more other <<風>> characters";
+            if (effect.ConditionText != expectedCondition)
+                failures.Add($"ConditionText: expected \"{expectedCondition}\", got \"{effect.ConditionText}\"");
+
+            if (effect.AbilityText == null || !effect.AbilityText.Contains("+5000 power"))
+                failures.Add($"AbilityText should contain \"+5000 power\", got \"{effect.AbilityText}\"");
+
+            if (effect.EffectText == null || !effect.EffectText.Contains("[CONT]"))
+                failures.Add($"EffectText should contain \"[CONT]\", got \"{effect.EffectText}\"");
+
+            if (effect.EffectText == null || !effect.EffectText.Contains("+5000 power"))
+                failures.Add($"EffectText should contain \"+5000 power\", got \"{effect.EffectText}\"");
+
+            var expectedEffectText = "[CONT] During your turn, if you have 4 or more other <<風>> characters, this card gets +5000 power and the following ability. \"[CONT] During this card's battle, your opponent cannot play events or \"Backup\" from their hand.\"";
+            if (effect.EffectText != expectedEffectText)
+                failures.Add($"EffectText: expected \"{expectedEffectText}\", got \"{effect.EffectText}\"");
+        }
+
+        if (failures.Count > 0)
+            Assert.Fail(string.Join(Environment.NewLine, failures));
     }
 }

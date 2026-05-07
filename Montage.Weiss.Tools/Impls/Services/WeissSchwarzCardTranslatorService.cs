@@ -36,6 +36,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new DuringTurnPlacedFromHandConditionToken());
 
         // Register ability tokens
+        _effectListRegistry.Register(new PowerBoostWithFollowingAbilityToken());
+        _effectListRegistry.Register(new DuringBattleCannotPlayEventsOrBackupToken());
         _effectListRegistry.Register(new PowerBoostToken());
         _effectListRegistry.Register(new SoulBoostToken());
         _effectListRegistry.Register(new AllCharactersBoostToken());
@@ -55,6 +57,9 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new PutCharacterToBottomOfDeckToken());
         _effectListRegistry.Register(new DuringTurnPowerBoostToken());
         _effectListRegistry.Register(new GiveAbilitiesToken());
+        _effectListRegistry.Register(new GainFollowingAbilityToken());
+        _effectListRegistry.Register(new GainFollowingAbilityTokenV2());
+        _effectListRegistry.Register(new GainFollowingAbilityTokenV3());
         _effectListRegistry.Register(new MayPayCostThenAbilityToken());
         _effectListRegistry.Register(new DuringTurnPowerBoostFromCIPToken());
         _effectListRegistry.Register(new ChooseCardsToken());

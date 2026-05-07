@@ -5,24 +5,30 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class AutoCIPToken : CardTextToken<CardEffect>
 {
     /// <summary>
-    /// Sample: ???[(1) ??????????�????????�?�??�?????1???????] ??????????????????????????????????????????????????????1??????????
+    /// Sample: 【自】[手札から舞台に置かれた時] このカードのパワーを＋3000
     /// </summary>
-    public override Regex Matcher => new(@"^(?:\??\?)(?<labels>.?)((?:\[)(?<cost>.?)(?:\]))(?:???????????????????????????????????????)(?<effect>.*)");
+    public override Regex Matcher => new(@"^【自】\[(?<cost>.+?)\]\s*(?<effect>.+)$");
 
     public override CardEffect Translate(ITokenRegistry registry, Match match)
     {
-        var effects = registry.EffectListRegistry.GetMatch(match.Groups["effect"].Value)(registry);
-        var cost = registry.EffectListRegistry.GetMatch(match.Groups["cost"].Value)(registry);
-        var labels = registry.MatchLabels(match.Groups["labels"].Value);
+        var costText = match.Groups["cost"].Value;
+        var effectText = match.Groups["effect"].Value.Trim();
+
+        var cost = registry.EffectListRegistry.GetMatch(costText)(registry);
+        var abilities = registry.EffectListRegistry.GetMatch(effectText)(registry);
+
+        var costEnglish = string.Join(", ", cost.Select(c => c.AbilityText));
+        var abilityEnglish = string.Join(", ", abilities.Select(a => a.AbilityText));
+
         return new AutoCardEffect
         {
             ConditionText = "When this card is placed on stage from your hand",
-            EffectText = string.Empty,
+            EffectText = $"[AUTO][{costEnglish}] When this card is placed on stage from your hand, {abilityEnglish}.",
             Cost = cost,
             Condition = [ new() { ConditionText = "When this card is placed on stage from your hand" }],
-            Labels = labels,
-            Abilities = effects,
-            AbilityText = string.Empty
+            Labels = [],
+            Abilities = abilities,
+            AbilityText = abilityEnglish
         };
     }
 }

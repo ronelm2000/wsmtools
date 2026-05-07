@@ -27,19 +27,47 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new HandSizeConditionToken());
         _conditionListRegistry.Register(new TurnAndTraitCharacterCountConditionToken());
         _conditionListRegistry.Register(new CxPlacedConditionToken());
+        _conditionListRegistry.Register(new TurnOnceConditionToken());
+        _conditionListRegistry.Register(new ReverseConditionToken());
+        _conditionListRegistry.Register(new OpponentLevelConditionToken());
+        _conditionListRegistry.Register(new DamageCancelledConditionToken());
+        _conditionListRegistry.Register(new TraitCharacterCountConditionToken());
+        _conditionListRegistry.Register(new CardPlacedFromHandConditionToken());
+        _conditionListRegistry.Register(new DuringTurnPlacedFromHandConditionToken());
 
         // Register ability tokens
         _effectListRegistry.Register(new PowerBoostToken());
+        _effectListRegistry.Register(new SoulBoostToken());
+        _effectListRegistry.Register(new AllCharactersBoostToken());
+        _effectListRegistry.Register(new AllCharactersSoulBoostToken());
         _effectListRegistry.Register(new AssistPowerBoostToken());
+        _effectListRegistry.Register(new BrainstormToken());
         _effectListRegistry.Register(new PutCardFromHandToWaitingRoomToken());
         _effectListRegistry.Register(new MayPayCostToken());
         _effectListRegistry.Register(new RevealTopCardToken());
+        _effectListRegistry.Register(new RevealTopCardsToken());
         _effectListRegistry.Register(new ChooseCharacterFromWaitingRoomToken());
+        _effectListRegistry.Register(new PlaceOnStageToken());
+        _effectListRegistry.Register(new ClockToWaitingRoomToken());
+        _effectListRegistry.Register(new LookAtTopCardsToken());
+        _effectListRegistry.Register(new DealDamageToken());
+        _effectListRegistry.Register(new ReturnMultipleToHandToken());
+        _effectListRegistry.Register(new PutCharacterToBottomOfDeckToken());
+        _effectListRegistry.Register(new DuringTurnPowerBoostToken());
+        _effectListRegistry.Register(new GiveAbilitiesToken());
+        _effectListRegistry.Register(new MayPayCostThenAbilityToken());
+        _effectListRegistry.Register(new DuringTurnPowerBoostFromCIPToken());
+        _effectListRegistry.Register(new ChooseCardsToken());
+        _effectListRegistry.Register(new PutInHandToken());
+        _effectListRegistry.Register(new PutTopCardToWaitingRoomToken());
+        _effectListRegistry.Register(new XEqualsToken());
 
         // Register effect type tokens
         _effectRegistry.Register(new ContEffectToken());
         _effectRegistry.Register(new AssistContEffectToken());
         _effectRegistry.Register(new AutoEffectToken());
+        _effectRegistry.Register(new AutoCIPToken());
+        _effectRegistry.Register(new BrainstormEffectToken());
 
         // Register reminder text tokens
         _reminderTextRegistry.Register(new CxLevelZeroToken());
@@ -61,9 +89,18 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         if (string.IsNullOrWhiteSpace(value))
             return [];
 
-        return value.Split('】', StringSplitOptions.RemoveEmptyEntries)
+        var labels = value.Split('】', StringSplitOptions.RemoveEmptyEntries)
             .Select(s => s.TrimStart('【'))
             .ToArray();
+
+        // Convert Japanese labels to English
+        return labels.Select(label => label switch
+        {
+            "ターン1" => "1/TURN",
+            "応援" => "Assist",
+            "集中" => "Brainstorm",
+            _ => label
+        }).ToArray();
     }
 
     public CardEffectTree TranslateEffect(string japaneseEffectText)
@@ -93,8 +130,11 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
                     translated.Add(sentence);
                 }
             }
-            reminderTextEnglish = string.Join(". ", translated) + ".";
+            reminderTextEnglish = string.Join(". ", translated);
         }
+
+        // Debug output
+        System.Diagnostics.Debug.WriteLine($"TranslateEffect input: {japaneseEffectText}");
 
         var effect = _effectRegistry.GetMatch(japaneseEffectText)(this);
         effect.ReminderText = reminderTextEnglish;
@@ -102,7 +142,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         // Auto-include in EffectText
         if (!string.IsNullOrEmpty(reminderTextEnglish))
         {
-            effect.EffectText = effect.EffectText.TrimEnd('.') + " " + reminderTextEnglish;
+            effect.EffectText = effect.EffectText.TrimEnd('.') + ". (" + reminderTextEnglish + ")";
         }
 
         return new CardEffectTree

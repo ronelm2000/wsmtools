@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Helpers;
 using Montage.Weiss.Tools.Entities.Effect;

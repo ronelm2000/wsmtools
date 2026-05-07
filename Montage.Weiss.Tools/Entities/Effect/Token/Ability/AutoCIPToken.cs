@@ -1,5 +1,3 @@
-using Montage.Weiss.Tools.Entities.Effect;
-
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class AutoCIPToken : CardTextToken<CardEffect>
@@ -25,7 +23,7 @@ internal class AutoCIPToken : CardTextToken<CardEffect>
             ConditionText = "When this card is placed on stage from your hand",
             EffectText = $"[AUTO][{costEnglish}] When this card is placed on stage from your hand, {abilityEnglish}.",
             Cost = cost,
-            Condition = [ new() { ConditionText = "When this card is placed on stage from your hand" }],
+            Condition = [new() { ConditionText = "When this card is placed on stage from your hand" }],
             Labels = [],
             Abilities = abilities,
             AbilityText = abilityEnglish

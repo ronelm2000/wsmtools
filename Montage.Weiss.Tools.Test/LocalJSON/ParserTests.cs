@@ -24,7 +24,7 @@ public class ParserTests
         {
             Source = "./deck_date_a_live.json",
             Exporter = "local",
-            NonInteractive = true,  
+            NonInteractive = true,
             NoWarning = true
         }.Run(Global.Container, Global.MockProgress, TestContext.CancellationToken);
 

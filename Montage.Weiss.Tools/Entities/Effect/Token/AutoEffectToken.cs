@@ -119,7 +119,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         }
 
         var conditionEnglish = string.Join(", ", conditions.Select(c => c.ConditionText).Where(c => !string.IsNullOrEmpty(c)));
-        
+
         // Join abilities by sentence, then join sentences with periods
         // Each sentence's abilities are joined with Oxford comma: "A, B, and C"
         var sentenceTexts = new List<string>();
@@ -146,7 +146,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             }
             sentenceTexts.Add(sentenceAbilityEnglish);
         }
-        
+
         var abilityEnglish = string.Join(". ", sentenceTexts);
         // Capitalize first letter of AbilityText
         if (!string.IsNullOrEmpty(abilityEnglish))
@@ -154,7 +154,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             abilityEnglish = char.ToUpper(abilityEnglish[0]) + abilityEnglish[1..];
         }
         System.Diagnostics.Debug.WriteLine($"Final abilityEnglish: {abilityEnglish}");
-        
+
         var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
 
         var labelPrefix = labels.Length > 0 ? $"[{string.Join("][", labels)}]" : "";

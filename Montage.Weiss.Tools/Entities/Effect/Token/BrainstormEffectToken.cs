@@ -1,5 +1,3 @@
-using Montage.Weiss.Tools.Entities.Effect;
-
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 internal class BrainstormEffectToken : CardTextToken<CardEffect>
@@ -16,7 +14,7 @@ internal class BrainstormEffectToken : CardTextToken<CardEffect>
         {
             Labels = ["Brainstorm"],
             ConditionText = "Brainstorm",
-            Condition = [ new() { ConditionText = "Brainstorm" }],
+            Condition = [new() { ConditionText = "Brainstorm" }],
             Cost = [],
             Abilities = abilities,
             AbilityText = abilityEnglish,

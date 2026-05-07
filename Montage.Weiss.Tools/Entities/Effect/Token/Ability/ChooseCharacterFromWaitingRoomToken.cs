@@ -1,5 +1,3 @@
-using Montage.Weiss.Tools.Entities.Effect;
-
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ChooseCharacterFromWaitingRoomToken : CardTextToken<List<CardEffectAbility>>

@@ -1,8 +1,8 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
-internal class PutTopCardToWaitingRoomToken : CardTextToken<List<CardEffectAbility>>
+internal class RevealTopCardWithPrefixToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"山札の上から.*?控え室に置(?:き|く)");
+    public override Regex Matcher => new(@"あなたは自分の山札の上から(\d+)枚を公開(?:し|する)");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {
@@ -10,7 +10,7 @@ internal class PutTopCardToWaitingRoomToken : CardTextToken<List<CardEffectAbili
         [
             new CardEffectAbility
             {
-                AbilityText = "put the top card of your deck into your waiting room"
+                AbilityText = "reveal the top card of your deck"
             }
         ];
     }

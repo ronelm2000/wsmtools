@@ -19,4 +19,6 @@ internal interface ITokenRegistry
 internal interface IComponentRegistry<E>
 {
     Func<ITokenRegistry, E> GetMatch(string input);
+    bool TryMatchAtStart(string input, out Func<ITokenRegistry, E>? result, out int consumedLength);
+    bool TryFindFirstMatch(string input, out Func<ITokenRegistry, E>? result, out int matchIndex, out int matchLength);
 }

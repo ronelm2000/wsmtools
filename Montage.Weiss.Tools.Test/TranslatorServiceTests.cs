@@ -1,3 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using CsvHelper;
+using CsvHelper.Configuration.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Helpers;
 using Montage.Weiss.Tools.Entities.Effect;
@@ -238,8 +245,8 @@ public class TranslatorServiceTests
         Assert.AreEqual(1, tree.Effects.Count);
         var effect = tree.Effects[0] as AutoCardEffect;
         Assert.IsNotNull(effect);
-        Assert.AreEqual("[AUTO] When this card is placed on stage from your hand, look at up to X cards from the top of your deck, choose up to 1 card, put it into your hand, and put the rest into your waiting room. X is equal to the number of your  <<風>> characters.", effect.EffectText);
-        Assert.AreEqual("Look at up to X cards from the top of your deck, choose up to 1 card, put it into your hand, and put the rest into your waiting room. X is equal to the number of your  <<風>> characters", effect.AbilityText);
+        Assert.AreEqual("[AUTO] When this card is placed on stage from your hand, look at up to X cards from the top of your deck, choose up to 1 card, put it into your hand, and put the rest into your waiting room. X is equal to the number of your <<風>> characters.", effect.EffectText);
+        Assert.AreEqual("Look at up to X cards from the top of your deck, choose up to 1 card, put it into your hand, and put the rest into your waiting room. X is equal to the number of your <<風>> characters.", effect.AbilityText);
         Assert.IsTrue(effect.AbilityText.Contains("Look at up to X cards"));
     }
 
@@ -292,6 +299,61 @@ public class TranslatorServiceTests
         Assert.IsTrue(effect.AbilityText.Contains("+5000 power"));
         Assert.IsTrue(effect.EffectText.Contains("[CONT]"));
         Assert.IsTrue(effect.EffectText.Contains("+5000 power"));
+    }
+
+    [TestMethod]
+    [DeploymentItem("Resources/effects_550.csv")]
+    public void Translate_CSV_CrossCheckAll()
+    {
+        var csvPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "effects_550.csv");
+        Assert.IsTrue(File.Exists(csvPath), $"CSV not found at: {csvPath}");
+
+        using var reader = new StreamReader(csvPath);
+        var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            MissingFieldFound = null
+        };
+        using var csv = new CsvReader(reader, config);
+        var rows = csv.GetRecords<EffectCsvRow>()
+            .Where(r => !string.IsNullOrWhiteSpace(r.Serial)
+                     && !string.IsNullOrWhiteSpace(r.JpEffect)
+                     && !string.IsNullOrWhiteSpace(r.EnEffect))
+            .ToList();
+
+        MultiAssert.AllAreTrue(rows.Select(row => (Action)(() =>
+        {
+            CardEffectTree tree;
+            try
+            {
+                tree = _service.TranslateEffect(row.JpEffect);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"[{row.Serial}] Translation threw {ex.GetType().Name}: {ex.Message}");
+                return;
+            }
+
+            var actual = tree.Effects[0].EffectText.Trim();
+            var expected = row.EnEffect.Trim();
+            Assert.AreEqual(expected, actual, $"[{row.Serial}] EffectText mismatch");
+
+            var expectedLabels = string.IsNullOrEmpty(row.Labels)
+                ? Array.Empty<string>()
+                : [row.Labels.Trim('[', ']')];
+            CollectionAssert.AreEqual(expectedLabels, tree.Effects[0].Labels, $"[{row.Serial}] Labels mismatch");
+        })));
+    }
+
+    private sealed record EffectCsvRow
+    {
+        [Name("serial")]
+        public string Serial { get; set; } = "";
+        [Name("jp_effect")]
+        public string JpEffect { get; set; } = "";
+        [Name("en_effect")]
+        public string EnEffect { get; set; } = "";
+        [Name("labels")]
+        public string Labels { get; set; } = "";
     }
 
     [TestMethod]

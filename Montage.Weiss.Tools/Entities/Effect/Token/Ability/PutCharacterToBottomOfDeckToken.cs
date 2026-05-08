@@ -10,7 +10,7 @@ internal class PutCharacterToBottomOfDeckToken : CardTextToken<List<CardEffectAb
         [
             new CardEffectAbility
             {
-                AbilityText = "you may put that character into the bottom of your deck"
+                AbilityText = "you may put that character into the bottom of your opponent's deck"
             }
         ];
     }

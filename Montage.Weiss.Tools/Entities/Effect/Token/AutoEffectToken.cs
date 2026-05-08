@@ -20,142 +20,95 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             rest = costMatch.Groups["rest"].Value.Trim();
         }
 
-        // Extract conditions from the beginning
-        var conditionsJapanese = new List<string>();
-        var effectTextJapanese = rest;
-
-        // Split by 、 and process each part
-        var parts = effectTextJapanese.Split('、', StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim()).ToList();
-
-        var remainingParts = new List<string>();
-        var allConditionsFound = true;
-        foreach (var part in parts)
+        // Check for ASCII bracket shorthand condition like [手札から舞台に置かれた時]
+        var asciiConditionMatch = Regex.Match(rest, @"^\[(?<condition>.+?)\]\s*(?<remaining>.+)$");
+        string asciiConditionJapanese = string.Empty;
+        if (asciiConditionMatch.Success)
         {
-            if (allConditionsFound)
-            {
-                try
-                {
-                    // Try to match as a condition
-                    var condList = registry.ConditionListRegistry.GetMatch(part)(registry);
-                    conditionsJapanese.Add(part);
-                }
-                catch (NotImplementedException)
-                {
-                    // This part is not a condition, so stop looking for conditions
-                    allConditionsFound = false;
-                    remainingParts.Add(part);
-                }
-            }
-            else
-            {
-                remainingParts.Add(part);
-            }
+            asciiConditionJapanese = asciiConditionMatch.Groups["condition"].Value;
+            rest = asciiConditionMatch.Groups["remaining"].Value.Trim();
         }
-
-        effectTextJapanese = string.Join("、", remainingParts);
 
         // Translate cost
         var costAbilities = string.IsNullOrEmpty(costTextJapanese)
             ? []
             : registry.EffectListRegistry.GetMatch(costTextJapanese)(registry);
 
-        // Translate conditions
+        // Iterative condition matching using ^-anchored condition tokens
         var conditions = new List<CardEffectCondition>();
-        foreach (var cond in conditionsJapanese)
+        var remainingText = rest;
+
+        // Parse ASCII-bracket condition if present
+        if (!string.IsNullOrEmpty(asciiConditionJapanese))
         {
             try
             {
-                var condList = registry.ConditionListRegistry.GetMatch(cond)(registry);
+                var condList = registry.ConditionListRegistry.GetMatch(asciiConditionJapanese)(registry);
                 conditions.AddRange(condList);
             }
             catch (NotImplementedException)
             {
-                // Ignore conditions that don't match
             }
         }
 
-        // Translate effects - split by 。and then by 、
-        var sentenceAbilities = new List<List<CardEffectAbility>>();
-        var allAbilities = new List<CardEffectAbility>();
-        if (!string.IsNullOrEmpty(effectTextJapanese))
+        // Iteratively consume conditions from start of remaining text
+        while (true)
         {
-            var sentences = effectTextJapanese.Split('。', StringSplitOptions.RemoveEmptyEntries);
-            foreach (var sentence in sentences)
+            var trimmed = remainingText.TrimStart();
+            if (registry.ConditionListRegistry.TryMatchAtStart(trimmed, out var condFunc, out var consumed) && condFunc != null)
             {
-                var sentenceTrimmed = sentence.Trim();
-                if (string.IsNullOrEmpty(sentenceTrimmed))
-                    continue;
-
-                var sentenceAbilityList = new List<CardEffectAbility>();
-
-                // Split by 、 and try each part
-                var subParts = sentenceTrimmed.Split('、', StringSplitOptions.RemoveEmptyEntries);
-                foreach (var subPart in subParts)
-                {
-                    var partTrimmed = subPart.Trim();
-                    if (!string.IsNullOrEmpty(partTrimmed))
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Trying to match part: {partTrimmed}");
-                        try
-                        {
-                            var partAbilities = registry.EffectListRegistry.GetMatch(partTrimmed)(registry);
-                            System.Diagnostics.Debug.WriteLine($"Matched! Got {partAbilities.Count} abilities");
-                            sentenceAbilityList.AddRange(partAbilities);
-                            allAbilities.AddRange(partAbilities);
-                        }
-                        catch (NotImplementedException)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"No match found for: {partTrimmed}");
-                            // Ignore parts that don't match
-                        }
-                    }
-                }
-
-                if (sentenceAbilityList.Count > 0)
-                {
-                    sentenceAbilities.Add(sentenceAbilityList);
-                }
-            }
-        }
-
-        var conditionEnglish = string.Join(", ", conditions.Select(c => c.ConditionText).Where(c => !string.IsNullOrEmpty(c)));
-
-        // Join abilities by sentence, then join sentences with periods
-        // Each sentence's abilities are joined with Oxford comma: "A, B, and C"
-        var sentenceTexts = new List<string>();
-        foreach (var sentenceAbilityList in sentenceAbilities)
-        {
-            var abilityTexts = sentenceAbilityList.Select(a => a.AbilityText).Where(a => !string.IsNullOrEmpty(a)).ToList();
-            string sentenceAbilityEnglish;
-            if (abilityTexts.Count == 0)
-            {
-                continue;
-            }
-            else if (abilityTexts.Count == 1)
-            {
-                sentenceAbilityEnglish = abilityTexts[0];
-            }
-            else if (abilityTexts.Count == 2)
-            {
-                sentenceAbilityEnglish = $"{abilityTexts[0]}, and {abilityTexts[1]}";
+                var condList = condFunc(registry);
+                conditions.AddRange(condList);
+                remainingText = trimmed[consumed..].TrimStart('、', ' ', '\t');
             }
             else
             {
-                var allButLast = string.Join(", ", abilityTexts.Take(abilityTexts.Count - 1));
-                sentenceAbilityEnglish = $"{allButLast}, and {abilityTexts[^1]}";
+                break;
             }
-            sentenceTexts.Add(sentenceAbilityEnglish);
         }
 
-        var abilityEnglish = string.Join(". ", sentenceTexts);
-        // Capitalize first letter of AbilityText
-        if (!string.IsNullOrEmpty(abilityEnglish))
+        // Iterative ability matching using TryFindFirstMatch (matches anywhere, not just at start)
+        var allAbilities = new List<CardEffectAbility>();
+        var abilityParts = new List<string>();
+
+        while (!string.IsNullOrWhiteSpace(remainingText))
         {
-            abilityEnglish = char.ToUpper(abilityEnglish[0]) + abilityEnglish[1..];
+            var trimmed = remainingText.TrimStart();
+            if (trimmed.Length == 0)
+                break;
+
+            if (registry.EffectListRegistry.TryFindFirstMatch(trimmed, out var abilFunc, out var matchIndex, out var consumed) && abilFunc != null)
+            {
+                if (matchIndex > 0)
+                {
+                    // Skip non-matching prefix (e.g., "あなたは自分の")
+                    remainingText = trimmed[matchIndex..];
+                    continue;
+                }
+                var abilList = abilFunc(registry);
+                allAbilities.AddRange(abilList);
+                abilityParts.AddRange(abilList.Select(a => a.AbilityText));
+                remainingText = trimmed[consumed..].TrimStart('、', '。', ' ', '\t');
+            }
+            else
+            {
+                remainingText = trimmed.Length > 1 ? trimmed[1..] : "";
+            }
         }
-        System.Diagnostics.Debug.WriteLine($"Final abilityEnglish: {abilityEnglish}");
+
+        var conditionTexts = conditions.Select(c => c.ConditionText).Where(c => !string.IsNullOrEmpty(c)).ToList();
+        for (int i = 1; i < conditionTexts.Count; i++)
+        {
+            if (conditionTexts[i].Length > 0)
+                conditionTexts[i] = char.ToLower(conditionTexts[i][0]) + conditionTexts[i][1..];
+        }
+        var conditionEnglish = string.Join(", ", conditionTexts);
+
+        var abilityEnglish = JoinAbilityParts(abilityParts);
 
         var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
+        if (!string.IsNullOrEmpty(costEnglish))
+            costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
 
         var labelPrefix = labels.Length > 0 ? $"[{string.Join("][", labels)}]" : "";
         var effectText = $"[AUTO]{labelPrefix}";
@@ -168,13 +121,12 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         if (!string.IsNullOrEmpty(abilityEnglish))
         {
             var abilityForEffect = abilityEnglish;
-            // Lowercase first letter if it follows a condition
             if (!string.IsNullOrEmpty(conditionEnglish) && abilityForEffect.Length > 0)
             {
                 abilityForEffect = char.ToLower(abilityForEffect[0]) + abilityForEffect[1..];
             }
             effectText += $" {abilityForEffect}";
-            if (!abilityForEffect.EndsWith('.'))
+            if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith(']'))
                 effectText += ".";
         }
 
@@ -189,5 +141,43 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             AbilityText = abilityEnglish,
             EffectText = effectText
         };
+    }
+
+    internal static string JoinAbilityParts(List<string> parts)
+    {
+        if (parts.Count == 0)
+            return "";
+
+        // Group by sentence: uppercase start = new sentence
+        var groups = new List<List<string>>();
+        var currentGroup = new List<string> { parts[0] };
+        for (int i = 1; i < parts.Count; i++)
+        {
+            if (parts[i].Length > 0 && char.IsUpper(parts[i][0]))
+            {
+                groups.Add(currentGroup);
+                currentGroup = new List<string> { parts[i] };
+            }
+            else
+            {
+                currentGroup.Add(parts[i]);
+            }
+        }
+        groups.Add(currentGroup);
+
+        var sentenceTexts = groups.Select(group =>
+        {
+            if (group.Count == 1)
+                return group[0];
+            // Serial comma: A, B, and C
+            var allButLast = string.Join(", ", group.Take(group.Count - 1));
+            return $"{allButLast}, and {group[^1]}";
+        });
+
+        var result = string.Join(". ", sentenceTexts);
+        result = char.ToUpper(result[0]) + result[1..];
+        if (!result.EndsWith('.') && !result.EndsWith(']'))
+            result += ".";
+        return result;
     }
 }

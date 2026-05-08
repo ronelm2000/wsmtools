@@ -21,6 +21,7 @@
     </PackageReference>
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="SixLabors.ImageSharp" />
+    <PackageReference Include="CsvHelper" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,6 +45,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\shiyoko_prs_hotc.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\effects_550.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

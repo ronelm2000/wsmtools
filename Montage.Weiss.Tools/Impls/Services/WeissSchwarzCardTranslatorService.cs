@@ -23,56 +23,66 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
 
     private void RegisterDefaultTokens()
     {
-        // Register condition tokens
-        _conditionListRegistry.Register(new HandSizeConditionToken());
+        // Register condition tokens (most to least specific)
+        _conditionListRegistry.Register(new ReverseAndOpponentLevelConditionToken());
         _conditionListRegistry.Register(new TurnAndTraitCharacterCountConditionToken());
+        _conditionListRegistry.Register(new DuringTurnPlacedFromHandConditionToken());
+        _conditionListRegistry.Register(new DamageCancelledConditionToken());
         _conditionListRegistry.Register(new CxPlacedConditionToken());
-        _conditionListRegistry.Register(new TurnOnceConditionToken());
+        _conditionListRegistry.Register(new CardPlacedFromHandConditionToken());
         _conditionListRegistry.Register(new ReverseConditionToken());
         _conditionListRegistry.Register(new OpponentLevelConditionToken());
-        _conditionListRegistry.Register(new DamageCancelledConditionToken());
         _conditionListRegistry.Register(new TraitCharacterCountConditionToken());
-        _conditionListRegistry.Register(new CardPlacedFromHandConditionToken());
-        _conditionListRegistry.Register(new DuringTurnPlacedFromHandConditionToken());
+        _conditionListRegistry.Register(new TurnOnceConditionToken());
+        _conditionListRegistry.Register(new HandSizeConditionToken());
+        _conditionListRegistry.Register(new AttackConditionToken());
+        _conditionListRegistry.Register(new CxPhaseStartConditionToken());
+        _conditionListRegistry.Register(new WhenBackupUsedConditionToken());
 
-        // Register ability tokens
+        // Register ability tokens (most to least specific)
         _effectListRegistry.Register(new PowerBoostWithFollowingAbilityToken());
+        _effectListRegistry.Register(new GiveMultipleAbilitiesToken());
         _effectListRegistry.Register(new DuringBattleCannotPlayEventsOrBackupToken());
-        _effectListRegistry.Register(new PowerBoostToken());
-        _effectListRegistry.Register(new SoulBoostToken());
         _effectListRegistry.Register(new AllCharactersBoostToken());
         _effectListRegistry.Register(new AllCharactersSoulBoostToken());
         _effectListRegistry.Register(new AssistPowerBoostToken());
+        _effectListRegistry.Register(new ChooseTraitCharacterAndPowerBoostToken());
         _effectListRegistry.Register(new BrainstormToken());
-        _effectListRegistry.Register(new PutCardFromHandToWaitingRoomToken());
-        _effectListRegistry.Register(new MayPayCostToken());
-        _effectListRegistry.Register(new RevealTopCardToken());
         _effectListRegistry.Register(new RevealTopCardsToken());
-        _effectListRegistry.Register(new ChooseCharacterFromWaitingRoomToken());
-        _effectListRegistry.Register(new PlaceOnStageToken());
+        _effectListRegistry.Register(new RevealTopCardWithPrefixToken());
+        _effectListRegistry.Register(new RevealTopCardToken());
         _effectListRegistry.Register(new ClockToWaitingRoomToken());
+        _effectListRegistry.Register(new PutCardFromHandToWaitingRoomToken());
+        _effectListRegistry.Register(new ChooseCharacterFromWaitingRoomToken());
         _effectListRegistry.Register(new LookAtTopCardsToken());
-        _effectListRegistry.Register(new DealDamageToken());
+        _effectListRegistry.Register(new ChooseCardsToken());
+        _effectListRegistry.Register(new ConditionalPutInHandToken());
+        _effectListRegistry.Register(new ChooseCardAndPutInWaitingRoomToken());
+        _effectListRegistry.Register(new PutInHandToken());
         _effectListRegistry.Register(new ReturnMultipleToHandToken());
         _effectListRegistry.Register(new PutCharacterToBottomOfDeckToken());
+        _effectListRegistry.Register(new PlaceOnStageToken());
+        _effectListRegistry.Register(new MayPayCostThenAbilityToken());
+        _effectListRegistry.Register(new MayPayCostToken());
+        _effectListRegistry.Register(new DuringTurnPowerBoostFromCIPToken());
         _effectListRegistry.Register(new DuringTurnPowerBoostToken());
+        _effectListRegistry.Register(new PowerBoostToken());
+        _effectListRegistry.Register(new SoulBoostToken());
+        _effectListRegistry.Register(new DealDamageToken());
         _effectListRegistry.Register(new GiveAbilitiesToken());
         _effectListRegistry.Register(new GainFollowingAbilityToken());
         _effectListRegistry.Register(new GainFollowingAbilityTokenV2());
         _effectListRegistry.Register(new GainFollowingAbilityTokenV3());
-        _effectListRegistry.Register(new MayPayCostThenAbilityToken());
-        _effectListRegistry.Register(new DuringTurnPowerBoostFromCIPToken());
-        _effectListRegistry.Register(new ChooseCardsToken());
-        _effectListRegistry.Register(new PutInHandToken());
-        _effectListRegistry.Register(new PutTopCardToWaitingRoomToken());
         _effectListRegistry.Register(new XEqualsToken());
+        _effectListRegistry.Register(new EncoreToken());
+        _effectListRegistry.Register(new PutTopCardToWaitingRoomToken());
 
-        // Register effect type tokens
-        _effectRegistry.Register(new ContEffectToken());
+        // Register effect type tokens (most to least specific)
         _effectRegistry.Register(new AssistContEffectToken());
+        _effectRegistry.Register(new ContEffectToken());
         _effectRegistry.Register(new AutoEffectToken());
-        _effectRegistry.Register(new AutoCIPToken());
         _effectRegistry.Register(new BrainstormEffectToken());
+        _effectRegistry.Register(new EventEffectToken());
 
         // Register reminder text tokens
         _reminderTextRegistry.Register(new CxLevelZeroToken());

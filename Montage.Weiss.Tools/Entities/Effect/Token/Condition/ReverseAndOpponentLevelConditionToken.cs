@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 
 internal class ReverseAndOpponentLevelConditionToken : CardTextToken<List<CardEffectCondition>>
 {
-    public override Regex Matcher => new(@"このカードが【リバース】した時、このカードのバトル相手のレベルが(\d+)以下なら");
+    public override Regex Matcher => new(@"^このカードが【リバース】した時、このカードのバトル相手のレベルが(\d+)以下なら");
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
     {

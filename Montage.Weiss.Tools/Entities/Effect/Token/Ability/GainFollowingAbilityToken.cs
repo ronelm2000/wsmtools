@@ -96,7 +96,7 @@ internal class PowerAndGainCombinedJapaneseToken : CardTextToken<List<CardEffect
 
 internal class PowerAndGainCombinedJapaneseTokenWithPower : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカード next ability obtain\+(\d+) power");
+    public override Regex Matcher => new(@"このカード next ability obtain\+(\d+) power");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {

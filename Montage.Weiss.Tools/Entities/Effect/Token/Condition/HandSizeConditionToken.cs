@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 
 internal class HandSizeConditionToken : CardTextToken<List<CardEffectCondition>>
 {
-    public override Regex Matcher => new(@"あなたの手札が(\d+)枚以上");
+    public override Regex Matcher => new(@"^あなたの手札が(\d+)枚以上");
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
     {

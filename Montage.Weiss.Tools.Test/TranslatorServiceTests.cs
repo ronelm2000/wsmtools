@@ -344,6 +344,49 @@ public class TranslatorServiceTests
         })));
     }
 
+    [TestMethod]
+    [DeploymentItem("Resources/expansion_494_effects.csv")]
+    public void Translate_CSV_CrossCheckAll_Expansion494()
+    {
+        var csvPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "expansion_494_effects.csv");
+        Assert.IsTrue(File.Exists(csvPath), $"CSV not found at: {csvPath}");
+
+        using var reader = new StreamReader(csvPath);
+        var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            MissingFieldFound = null
+        };
+        using var csv = new CsvReader(reader, config);
+        var rows = csv.GetRecords<EffectCsvRow>()
+            .Where(r => !string.IsNullOrWhiteSpace(r.Serial)
+                     && !string.IsNullOrWhiteSpace(r.JpEffect)
+                     && !string.IsNullOrWhiteSpace(r.EnEffect))
+            .ToList();
+
+        MultiAssert.AllAreTrue(rows.Select(row => (Action)(() =>
+        {
+            CardEffectTree tree;
+            try
+            {
+                tree = _service.TranslateEffect(row.JpEffect);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"[{row.Serial}] Translation threw {ex.GetType().Name}: {ex.Message}");
+                return;
+            }
+
+            var actual = tree.Effects[0].EffectText.Trim();
+            var expected = row.EnEffect.Trim();
+            Assert.AreEqual(expected, actual, $"[{row.Serial}] EffectText mismatch");
+
+            var expectedLabels = string.IsNullOrEmpty(row.Labels)
+                ? Array.Empty<string>()
+                : [row.Labels.Trim('[', ']')];
+            CollectionAssert.AreEqual(expectedLabels, tree.Effects[0].Labels, $"[{row.Serial}] Labels mismatch");
+        })));
+    }
+
     private sealed record EffectCsvRow
     {
         [Name("serial")]

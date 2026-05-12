@@ -6,13 +6,12 @@ internal class StockCostWithCxDiscardToken : CardTextToken<List<CardEffectAbilit
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {
-        var stockCost = match.Groups[1].Value;
         var count = int.Parse(match.Groups[2].Value);
         return
         [
             new CardEffectAbility
             {
-                AbilityText = $"({stockCost}) Put {count} CX in your hand to your waiting room"
+                AbilityText = $"Put {count} CX in your hand to your waiting room"
             }
         ];
     }

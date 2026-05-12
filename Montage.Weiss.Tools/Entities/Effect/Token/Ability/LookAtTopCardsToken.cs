@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class LookAtTopCardsToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"山札を上から(Ｘ|\d+)枚まで見て");
+    public override Regex Matcher => new(@"^山札を上から(Ｘ|\d+)枚まで見て");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {

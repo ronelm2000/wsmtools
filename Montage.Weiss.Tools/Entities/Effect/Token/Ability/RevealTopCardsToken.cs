@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class RevealTopCardsToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"山札の上から(\d+)枚をめくり、控え室に置く");
+    public override Regex Matcher => new(@"^山札の上から(\d+)枚をめくり、控え室に置く");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {

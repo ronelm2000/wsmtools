@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class EncoreToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"アンコール\s*［(?<cost>.+?)］");
+    public override Regex Matcher => new(@"^アンコール\s*［(?<cost>.+?)］");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {

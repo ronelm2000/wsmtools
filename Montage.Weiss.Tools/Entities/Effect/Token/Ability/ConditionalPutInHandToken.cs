@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ConditionalPutInHandToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"そのカードが《(.+?)》のキャラなら手札に加え");
+    public override Regex Matcher => new(@"^そのカードが《(.+?)》のキャラなら手札に加え");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {

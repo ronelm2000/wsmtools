@@ -147,7 +147,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             });
         }
 
-        var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
+        var costEnglish = string.Join(" & ", costAbilities.Select(a => a.AbilityText));
         if (!string.IsNullOrEmpty(costEnglish))
             costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
 

@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class DuringTurnPowerBoostFromCIPToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"そのターン中、このカードのパワーを＋(\d+)");
+    public override Regex Matcher => new(@"^そのターン中、このカードのパワーを＋(\d+)");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {

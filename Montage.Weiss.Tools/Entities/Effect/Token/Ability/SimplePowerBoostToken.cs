@@ -1,16 +1,17 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
-internal class RevealToOpponentToken : CardTextToken<List<CardEffectAbility>>
+internal class SimplePowerBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手に見せ");
+    public override Regex Matcher => new(@"^このカードのパワー＋(\d+)\.");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {
+        var power = match.Groups[1].Value;
         return
         [
             new CardEffectAbility
             {
-                AbilityText = "reveal it to your opponent"
+                AbilityText = $"this card gets +{power} power"
             }
         ];
     }

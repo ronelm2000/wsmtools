@@ -6,6 +6,8 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
 
     public void Register(CardTextToken<E> token) => _tokens.Add(token);
 
+    public IEnumerable<CardTextToken<E>> GetAllTokens() => _tokens;
+
     public Func<ITokenRegistry, E> GetMatch(string input)
     {
         foreach (var token in _tokens)

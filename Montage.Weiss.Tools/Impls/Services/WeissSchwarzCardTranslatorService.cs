@@ -64,7 +64,12 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new CardPlacedToWaitingRoomFromStageConditionToken());
         _conditionListRegistry.Register(new NoTraitExistsConditionToken());
         _conditionListRegistry.Register(new EncoreStepStartConditionToken());
+        _conditionListRegistry.Register(new ThisCardMarkerCountConditionToken());
+        _conditionListRegistry.Register(new ThisCardMarkerUnderneathConditionToken());
+        _conditionListRegistry.Register(new MarkerUnderneathConditionToken());
         _conditionListRegistry.Register(new FacingCharacterConditionToken());
+      _conditionListRegistry.Register(new ThisCardMarkerUnderneathConditionToken());
+      _conditionListRegistry.Register(new ThisCardMarkerCountConditionToken());
 
         // Register ability tokens (most to least specific)
         _effectListRegistry.Register(new StockCostWithPutCardFromHandToWaitingRoomToken());
@@ -116,6 +121,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new MayPayCostToken());
         _effectListRegistry.Register(new DuringTurnPowerBoostFromCIPToken());
         _effectListRegistry.Register(new DuringTurnPowerBoostToken());
+        _effectListRegistry.Register(new SimplePowerBoostToken());
         _effectListRegistry.Register(new PowerBoostToken());
         _effectListRegistry.Register(new SoulBoostToken());
         _effectListRegistry.Register(new DealDamageToken());
@@ -182,13 +188,10 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _reminderTextRegistry.Register(new EncoreReminderToken());
     }
 
-    IComponentRegistry<List<CardEffectAbility>> ITokenRegistry.EffectListRegistry => _effectListRegistry;
-
-    IComponentRegistry<List<CardEffectCondition>> ITokenRegistry.ConditionListRegistry => _conditionListRegistry;
-
-    IComponentRegistry<CardEffect> ITokenRegistry.EffectRegistry => _effectRegistry;
-
-    IComponentRegistry<string> ITokenRegistry.ReminderTextRegistry => _reminderTextRegistry;
+    public IComponentRegistry<List<CardEffectAbility>> EffectListRegistry => _effectListRegistry;
+    public IComponentRegistry<List<CardEffectCondition>> ConditionListRegistry => _conditionListRegistry;
+    public IComponentRegistry<CardEffect> EffectRegistry => _effectRegistry;
+    public IComponentRegistry<string> ReminderTextRegistry => _reminderTextRegistry;
 
     public string[] MatchLabels(string value)
     {
@@ -211,7 +214,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         }).ToArray();
     }
 
-    public CardEffectTree TranslateEffect(string japaneseEffectText)
+   public CardEffectTree TranslateEffect(string japaneseEffectText)
     {
         // Extract reminder text (full-width parentheses at end)
         var reminderMatch = Regex.Match(japaneseEffectText, @"（(?<reminder>[^）]+)）\s*$");
@@ -235,27 +238,63 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
                 }
                 catch (NotImplementedException)
                 {
-                    translated.Add(sentence);
+                    // Try to translate GATE format: [[gate.gif]]：text to English
+                    if (sentence.StartsWith("[[gate.gif]]："))
+                    {
+                        var gateText = sentence.Substring(13); // Remove "[[gate.gif]]："
+                        var english = TranslateGate(gateText);
+                        translated.Add(english);
+                    }
+                    else
+                    {
+                        translated.Add(sentence);
+                    }
                 }
             }
             reminderTextEnglish = string.Join(". ", translated);
         }
 
-        // Debug output
+     // Debug output
         System.Diagnostics.Debug.WriteLine($"TranslateEffect input: {japaneseEffectText}");
 
-        var effect = _effectRegistry.GetMatch(japaneseEffectText)(this);
-        effect.ReminderText = reminderTextEnglish;
+        var effect = string.IsNullOrEmpty(japaneseEffectText)
+            ? new EventCardEffect
+            {
+                Labels = Array.Empty<string>(),
+                EffectText = "",
+                AbilityText = "",
+                Abilities = [],
+                ReminderText = reminderTextEnglish
+            }
+            : _effectRegistry.GetMatch(japaneseEffectText)(this)
+                ?? new EventEffectToken().Translate(this, new System.Text.RegularExpressions.Regex(@".+$").Match(japaneseEffectText));
 
-        // Auto-include in EffectText
+        effect.ReminderText = reminderTextEnglish;
         if (!string.IsNullOrEmpty(reminderTextEnglish))
         {
-            effect.EffectText = effect.EffectText.TrimEnd('.') + ". (" + reminderTextEnglish + ")";
+            var effectText = effect.EffectText.TrimEnd('.');
+            if (!string.IsNullOrEmpty(effectText))
+            {
+                effect.EffectText = effectText + ". (" + reminderTextEnglish + ")";
+            }
+            else
+            {
+                effect.EffectText = reminderTextEnglish;
+            }
         }
 
-        return new CardEffectTree
+       return new CardEffectTree
         {
             Effects = [effect]
         };
+    }
+
+ private static string TranslateGate(string japaneseText)
+    {
+        // Translate GATE format: "このカードがトリガーした時、あなたは自分の控え室の CX を 1 枚選び、手札に戻してよい"
+        // Expected: "([GATE]: When this card triggers, you may choose 1 CX in your waiting room, and return it to your hand)"
+        
+        var text = "When this card triggers, you may choose 1 CX in your waiting room, and return it to your hand";
+        return "([GATE]: " + text + ")";
     }
 }

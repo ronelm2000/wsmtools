@@ -1,4 +1,3 @@
-
 namespace Montage.Weiss.Tools.Entities.Effect;
 
 public record CardEffectCondition

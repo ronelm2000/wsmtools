@@ -36,6 +36,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "Batman Ninja Trait Test")]
+    [TestCategory("Manual")]
     public async Task TraitTestRun()
     {
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
@@ -90,6 +91,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "Trait Test (Akiba)")]
+    [TestCategory("Manual")]
     public async Task TestAkibaNullTraits()
     {
         var progress = NoOpProgress<SetParserProgressReport>.Instance;

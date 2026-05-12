@@ -79,6 +79,20 @@ public static class StringExtensions
         return res;
     }
 
+    public static string JoinWithOxfordComma(this IEnumerable<string> items)
+    {
+        var itemList = items.ToList();
+        if (itemList.Count == 0) return "";
+        else if (itemList.Count == 1) return itemList[0];
+        else if (itemList.Count == 2) return $"{itemList[0]} and {itemList[1]}";
+        else
+        {
+            var allButLast = itemList.Take(itemList.Count - 1);
+            var last = itemList.Last();
+            return $"{string.Join(", ", allButLast)}, and {last}";
+        }
+    }
+
     public static string Limit(this string str, int characterLimit, string continuationPhrase = " [..]")
     {
         var limit = int.Min(str.Length, characterLimit);

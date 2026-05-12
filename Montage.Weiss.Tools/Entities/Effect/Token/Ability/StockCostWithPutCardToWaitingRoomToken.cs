@@ -6,12 +6,11 @@ internal class StockCostWithPutCardToWaitingRoomToken : CardTextToken<List<CardE
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {
-        var cost = match.Groups[1].Value;
         return
         [
             new CardEffectAbility
             {
-                AbilityText = $"({cost}) put this card to your waiting room"
+                AbilityText = $"put this card to your waiting room"
             }
         ];
     }

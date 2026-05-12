@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class DuringTurnPowerBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"あなたのターン中、このカードのパワーを＋(\d+)");
+    public override Regex Matcher => new(@"^あなたのターン中、このカードのパワーを＋(\d+)\.");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {
@@ -11,7 +11,7 @@ internal class DuringTurnPowerBoostToken : CardTextToken<List<CardEffectAbility>
         [
             new CardEffectAbility
             {
-                AbilityText = $"During your turn, this card gets +{power} power"
+                AbilityText = $"this card gets +{power} power"
             }
         ];
     }

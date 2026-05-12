@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 
 internal class TraitCharacterCountConditionToken : CardTextToken<List<CardEffectCondition>>
 {
-    public override Regex Matcher => new(@"^他のあなたの《(.+?)》のキャラが(\d+)枚以上なら");
+    public override Regex Matcher => new(@"^他のあなたの《(.+?)》のキャラが(\d+)枚以上(?:なら|で)");
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
     {
@@ -12,7 +12,8 @@ internal class TraitCharacterCountConditionToken : CardTextToken<List<CardEffect
         [
             new CardEffectCondition
             {
-                ConditionText = $"If you have {count} or more other <<{trait}>> characters"
+                
+            Type = ConditionType.If,ConditionText = $"If you have {count} or more other <<{trait}>> characters"
             }
         ];
     }

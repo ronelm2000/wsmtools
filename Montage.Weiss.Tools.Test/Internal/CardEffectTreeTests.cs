@@ -31,21 +31,22 @@ public class CardEffectTreeTests
         Effects = [
             new AutoCardEffect {
                 EffectText = """
-                [AUTO] [Put 1 <<Music>> character from your hand into your waiting room] When this card is placed on stage from your hand,
+                [AUTO] [Put 1 <<Music>> character in your hand into your waiting room] When this card is placed on stage in your hand,
                 you may pay the cost. If you do, draw up to 1 card",
                 """,
                 Labels = [],
                 AbilityText = "draw up to 1 card",
-                ConditionText = "this card is placed on stage from your hand",
+                ConditionText = "this card is placed on stage in your hand",
                 Condition = [
                     new CardEffectCondition {
-                        ConditionText = "this card is placed on stage from your hand"
+                        Type = ConditionType.When,
+                        ConditionText = "this card is placed on stage in your hand"
                     }
                 ],
-                CostText = "put 1 <<Music>> character from your hand into your waiting room",
+                CostText = "put 1 <<Music>> character in your hand into your waiting room",
                 Cost = [
                     new CardEffectAbility {
-                        AbilityText = "Put 1 <<Music>> character from your hand into your waiting room"
+                        AbilityText = "Put 1 <<Music>> character in your hand into your waiting room"
                     }
                 ],
                 Abilities = [

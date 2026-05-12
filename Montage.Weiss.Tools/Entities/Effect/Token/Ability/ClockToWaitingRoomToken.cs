@@ -10,7 +10,7 @@ internal class ClockToWaitingRoomToken : CardTextToken<List<CardEffectAbility>>
         [
             new CardEffectAbility
             {
-                AbilityText = "You may put the top card of your clock into your waiting room"
+                AbilityText = "You may put the top card of your clock to your waiting room"
             }
         ];
     }

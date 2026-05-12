@@ -11,7 +11,8 @@ internal class ReverseAndOpponentLevelConditionToken : CardTextToken<List<CardEf
         [
             new CardEffectCondition
             {
-                ConditionText = $"When this card becomes [REVERSED], if this card's battle opponent is level {level} or lower"
+                
+            Type = ConditionType.When,ConditionText = $"When this card becomes [REVERSE], if this card's battle opponent is level {level} or lower"
             }
         ];
     }

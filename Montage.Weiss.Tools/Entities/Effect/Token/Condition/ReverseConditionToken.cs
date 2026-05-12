@@ -10,7 +10,8 @@ internal class ReverseConditionToken : CardTextToken<List<CardEffectCondition>>
         [
             new CardEffectCondition
             {
-                ConditionText = "When this card becomes [REVERSED]"
+                Type = ConditionType.When,
+                ConditionText = "When this card becomes [REVERSE]"
             }
         ];
     }

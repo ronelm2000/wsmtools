@@ -11,7 +11,7 @@ internal class ConditionalPutInHandToken : CardTextToken<List<CardEffectAbility>
         [
             new CardEffectAbility
             {
-                AbilityText = $"If that card is a <<{trait}>> character, add it into your hand"
+                AbilityText = $"If that card is a <<{trait}>> character, put it to your hand"
             }
         ];
     }

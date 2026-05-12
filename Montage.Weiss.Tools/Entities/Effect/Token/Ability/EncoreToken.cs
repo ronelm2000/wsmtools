@@ -8,8 +8,10 @@ internal class EncoreToken : CardTextToken<List<CardEffectAbility>>
     {
         var costText = match.Groups["cost"].Value;
         var costAbilities = registry.EffectListRegistry.GetMatch(costText)(registry);
-        var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText))
-            .Replace("your waiting room", "the waiting room");
+        var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
+        if (!string.IsNullOrEmpty(costEnglish))
+            costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
+        costEnglish = costEnglish.Replace("to your waiting room", "to the waiting room", StringComparison.Ordinal);
 
         return [new CardEffectAbility { AbilityText = $"Encore [{costEnglish}]" }];
     }

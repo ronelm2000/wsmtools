@@ -11,7 +11,8 @@ internal class HandSizeConditionToken : CardTextToken<List<CardEffectCondition>>
         [
             new CardEffectCondition
             {
-                ConditionText = $"If you have {count} or more cards in your hand"
+                
+            Type = ConditionType.If,ConditionText = $"If you have {count} or more cards in your hand"
             }
         ];
     }

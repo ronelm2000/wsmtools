@@ -9,16 +9,7 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
         var power = match.Groups[1].Value;
         var nestedJapanese = match.Groups[2].Value;
 
-        string nestedEnglish;
-        try
-        {
-            var nestedEffect = registry.EffectRegistry.GetMatch(nestedJapanese)(registry);
-            nestedEnglish = nestedEffect.EffectText;
-        }
-        catch (NotImplementedException)
-        {
-            nestedEnglish = nestedJapanese;
-        }
+        var nestedEnglish = TryTranslateNested(registry, nestedJapanese) ?? nestedJapanese;
 
         return
         [
@@ -28,110 +19,136 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
             }
         ];
     }
+
+    internal static string? TryTranslateNested(ITokenRegistry registry, string japanese)
+    {
+        if (TryMatchAny(registry, japanese, out var result))
+            return result;
+
+        var trimmed = japanese.Trim();
+        if (trimmed.Length == 0)
+            return null;
+
+        // Fallback 1: split by concatenated 『...』 blocks (』『 boundary)
+        var blockSplit = Regex.Split(trimmed, @"』\s*『");
+        if (blockSplit.Length > 1)
+        {
+            var parts = blockSplit.Select(b =>
+            {
+                var cleaned = b.Trim();
+                if (!cleaned.StartsWith("『")) cleaned = "『" + cleaned;
+                if (!cleaned.EndsWith("』")) cleaned = cleaned + "』";
+                var restripped = Regex.Replace(cleaned, @"^『(.+)』$", "$1");
+                return TryTranslateNested(registry, restripped) ?? restripped;
+            }).Where(p => p != null).ToList();
+            if (parts.Count > 0)
+                return string.Join(" ", parts);
+        }
+
+        // Fallback 2: strip effect type prefix 【自】/【永】/【起】/【カウンター】
+        var prefixStripped = Regex.Replace(trimmed, @"^【(自|永|起|カウンター)】\s*", "");
+        if (prefixStripped != trimmed)
+        {
+            var strippedResult = TryTranslateNested(registry, prefixStripped);
+            if (strippedResult != null)
+                return strippedResult;
+        }
+
+        // Fallback 3: split by sentence boundaries
+        var sentences = Regex.Split(trimmed, @"(?<=。)");
+        if (sentences.Length > 1)
+        {
+            var translatedSentences = new List<string>();
+            foreach (var sentence in sentences)
+            {
+                var s = sentence.Trim();
+                if (string.IsNullOrEmpty(s)) continue;
+                var sentenceResult = TryTranslateNested(registry, s);
+                translatedSentences.Add(sentenceResult ?? s);
+            }
+            if (translatedSentences.Count > 0)
+                return string.Join(" ", translatedSentences);
+        }
+
+        return null;
+    }
+
+    private static bool TryMatchAny(ITokenRegistry registry, string japanese, out string? result)
+    {
+        if (registry.EffectRegistry.TryFindFirstMatch(japanese, out var effectFunc, out _, out var consumed) && effectFunc != null)
+        {
+            var effect = effectFunc(registry);
+            result = effect.EffectText;
+            var remaining = japanese[consumed..].TrimStart();
+            if (!string.IsNullOrEmpty(remaining))
+            {
+                var restResult = TryTranslateNested(registry, remaining);
+                if (restResult != null)
+                    result += " " + restResult;
+            }
+            return true;
+        }
+
+        if (registry.EffectListRegistry.TryFindFirstMatch(japanese, out var abilFunc, out _, out var abilConsumed) && abilFunc != null)
+        {
+            var abils = abilFunc(registry);
+            result = string.Join(", ", abils.Select(a => a.AbilityText));
+            var remaining = japanese[abilConsumed..].TrimStart();
+            if (!string.IsNullOrEmpty(remaining))
+            {
+                var restResult = TryTranslateNested(registry, remaining);
+                if (restResult != null)
+                    result += " " + restResult;
+            }
+            return true;
+        }
+
+        result = null;
+        return false;
+    }
 }
 
 internal class GainFollowingAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"し、このカードが次の能力を得る");
+    public override Regex Matcher => new(@"し、このカードが次の能力を得る(?:。『(.+)』)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {
+        var nestedJapanese = match.Groups[1].Success ? match.Groups[1].Value : null;
+        var nestedEnglish = nestedJapanese != null ? PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese) : null;
+        var abilityText = "get the following ability";
+        if (nestedEnglish != null)
+            abilityText += $". \"{nestedEnglish}\"";
         return
         [
             new CardEffectAbility
             {
-                AbilityText = "get the following ability"
+                AbilityText = abilityText
             }
         ];
     }
 }
 
-internal class GainFollowingAbilityTokenV2 : CardTextToken<List<CardEffectAbility>>
+internal class GainFollowingAbilityTokenWithParticleWa : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"し、このカードが次の能力を得る");
+    public override Regex Matcher => new(@"し、このカードは次の能力を得る(?:。『(.+)』)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
     {
+        var nestedJapanese = match.Groups[1].Success ? match.Groups[1].Value : null;
+        var nestedEnglish = nestedJapanese != null ? PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese) : null;
+        var abilityText = "get the following ability";
+        if (nestedEnglish != null)
+            abilityText += $". \"{nestedEnglish}\"";
         return
         [
             new CardEffectAbility
             {
-                AbilityText = "get the following ability"
+                AbilityText = abilityText
             }
         ];
     }
 }
 
-internal class GainFollowingAbilityTokenV3 : CardTextToken<List<CardEffectAbility>>
-{
-    public override Regex Matcher => new(@"し、このカードは次の能力を得る");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
-    {
-        return
-        [
-            new CardEffectAbility
-            {
-                AbilityText = "get the following ability"
-            }
-        ];
-    }
-}
 
-internal class PowerAndGainCombinedJapaneseToken : CardTextToken<List<CardEffectAbility>>
-{
-    public override Regex Matcher => new(@"^このカード next ability obtain");
-
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
-    {
-        return
-        [
-            new CardEffectAbility
-            {
-                AbilityText = "get the following ability"
-            }
-        ];
-    }
-}
-
-internal class PowerAndGainCombinedJapaneseTokenWithPower : CardTextToken<List<CardEffectAbility>>
-{
-    public override Regex Matcher => new(@"このカード next ability obtain\+(\d+) power");
-
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
-    {
-        var power = match.Groups[1].Value;
-        return
-        [
-            new CardEffectAbility
-            {
-                AbilityText = $"this card gets +{power} power"
-            },
-            new CardEffectAbility
-            {
-                AbilityText = "get the following ability"
-            }
-        ];
-    }
-}
-
-internal class PowerAndGainCombinedJapaneseTokenWithPowerV2 : CardTextToken<List<CardEffectAbility>>
-{
-    public override Regex Matcher => new(@"このカード next ability obtain\+(\d+) power");
-
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
-    {
-        var power = match.Groups[1].Value;
-        return
-        [
-            new CardEffectAbility
-            {
-                AbilityText = $"this card gets +{power} power"
-            },
-            new CardEffectAbility
-            {
-                AbilityText = "get the following ability"
-            }
-        ];
-    }
-}

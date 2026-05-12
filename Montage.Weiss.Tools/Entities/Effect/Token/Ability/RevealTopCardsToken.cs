@@ -11,7 +11,7 @@ internal class RevealTopCardsToken : CardTextToken<List<CardEffectAbility>>
         [
             new CardEffectAbility
             {
-                AbilityText = $"Flip over {count} cards from the top of your deck, and put them into your waiting room"
+                AbilityText = $"Flip over {count} cards from the top of your deck, and put them to your waiting room"
             }
         ];
     }

@@ -7,26 +7,49 @@ internal class EventEffectToken : CardTextToken<CardEffect>
     public override CardEffect Translate(ITokenRegistry registry, Match match)
     {
         var input = match.Value;
-        var sentences = input.Split('。', StringSplitOptions.RemoveEmptyEntries);
+        // Protect 。 inside 『』 blocks from being used as split points
+        var protectedInput = Regex.Replace(input, @"『[^』]+』", m => m.Value.Replace("。", "\0"));
+        var sentences = protectedInput.Split('。', StringSplitOptions.RemoveEmptyEntries);
         var translatedSentences = new List<string>();
         var allAbilities = new List<CardEffectAbility>();
 
         foreach (var sentence in sentences)
         {
-            var trimmed = sentence.Trim();
+            var trimmed = sentence.Trim().Replace("\0", "。");
             if (string.IsNullOrEmpty(trimmed))
                 continue;
 
-            try
+            var sentenceAbilities = new List<CardEffectAbility>();
+            var sentenceParts = new List<string>();
+            var remainingText = trimmed;
+
+            while (!string.IsNullOrWhiteSpace(remainingText))
             {
-                var sentenceAbilities = registry.EffectListRegistry.GetMatch(trimmed)(registry);
-                allAbilities.AddRange(sentenceAbilities);
-                translatedSentences.Add(string.Join(", ", sentenceAbilities.Select(a => a.AbilityText)));
+                var t = remainingText.TrimStart();
+                if (t.Length == 0)
+                    break;
+
+                if (registry.EffectListRegistry.TryFindFirstMatch(t, out var abilFunc, out var matchIndex, out var consumed) && abilFunc != null)
+                {
+                    if (matchIndex > 0)
+                    {
+                        remainingText = t[matchIndex..];
+                        continue;
+                    }
+                    var abilList = abilFunc(registry);
+                    sentenceAbilities.AddRange(abilList);
+                    sentenceParts.AddRange(abilList.Select(a => a.AbilityText));
+                    remainingText = t[consumed..].TrimStart('、', '。', ' ', '\t');
+                }
+                else
+                {
+                    break;
+                }
             }
-            catch (NotImplementedException)
-            {
-                translatedSentences.Add(trimmed);
-            }
+
+            allAbilities.AddRange(sentenceAbilities);
+            if (sentenceParts.Count > 0)
+                translatedSentences.Add(string.Join(", ", sentenceParts));
         }
 
         var abilityEnglish = string.Join(". ", translatedSentences);

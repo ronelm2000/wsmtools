@@ -10,6 +10,7 @@ internal class CxPhaseStartConditionToken : CardTextToken<List<CardEffectConditi
         [
             new CardEffectCondition
             {
+                Type = ConditionType.When,
                 ConditionText = "At the beginning of your CX phase"
             }
         ];

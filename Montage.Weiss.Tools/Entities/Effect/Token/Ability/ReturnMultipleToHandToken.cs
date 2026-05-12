@@ -10,7 +10,7 @@ internal class ReturnMultipleToHandToken : CardTextToken<List<CardEffectAbility>
         [
             new CardEffectAbility
             {
-                AbilityText = "put the rest into your waiting room"
+                AbilityText = "put the rest to your waiting room"
             }
         ];
     }

@@ -10,6 +10,7 @@ internal class TurnOnceConditionToken : CardTextToken<List<CardEffectCondition>>
         [
             new CardEffectCondition
             {
+                Type = ConditionType.If,
                 ConditionText = "[1/TURN]"
             }
         ];

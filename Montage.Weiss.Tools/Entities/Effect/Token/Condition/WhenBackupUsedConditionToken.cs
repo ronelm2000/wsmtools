@@ -10,6 +10,7 @@ internal class WhenBackupUsedConditionToken : CardTextToken<List<CardEffectCondi
         [
             new CardEffectCondition
             {
+                Type = ConditionType.When,
                 ConditionText = "When you use this card's \"Backup\""
             }
         ];

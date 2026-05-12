@@ -2,12 +2,34 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 internal class AutoEffectToken : CardTextToken<CardEffect>
 {
-    public override Regex Matcher => new(@"^【自】(?<labels>【.+?】)?\s*(?<mainText>.+)$");
+    private static readonly string[] AbilityLeadInPrefixes =
+    [
+        "あなたは",
+        "あなたの",
+        "そうしたら、",
+        "そうしたら",
+        "その後、",
+        "その後",
+        "次の",
+        "そして、",
+        "そして"
+    ];
+
+    public override Regex Matcher => new(@"^【自】(?<labels>(?:【[^】]+】)*)\s*(?<mainText>.+)$");
 
     public override CardEffect Translate(ITokenRegistry registry, Match match)
     {
         var labels = registry.MatchLabels(match.Groups["labels"]?.Value ?? "");
         var mainText = match.Groups["mainText"].Value.Trim();
+
+        // Expected Full English Format:
+        // [AUTO] Labels [CXCOMBO][1/TURN] [<costs>] <During conditions>, <when conditions>, <if conditions>, you may pay the cost. If you do, <actions>.
+        // - Labels are optional and can be multiple, e.g. [CXCOMBO][1/TURN]
+        // - [CXCOMBO] is a label, not a cost, and should be included in the Labels list
+        // - [1/TURN] is also a label, not a cost, and should be included in the Labels list
+        // - Do not put brackets if there are no costs. For example, if the effect has no costs but has conditions and actions, it should be: [AUTO] <During conditions>, <when conditions>, <if conditions>, you may <actions>.
+        // - Do not put ", you may pay the cost. If you do," if there are no costs. For example, if the effect has conditions and actions but no costs, it should be: [AUTO] <During conditions>, <when conditions>, <if conditions>, <actions>.
+        // - Do not put extra spaces or commas. For example, if there are no during conditions, it should be: [AUTO] <when conditions>, <if conditions>, you may pay the cost. If you do, <actions>.
 
         // Extract cost if present: ［...］
         var costMatch = Regex.Match(mainText, @"^［(?<cost>.+?)］\s*(?<rest>.+)$");
@@ -67,7 +89,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             }
         }
 
-        // Iterative ability matching using TryFindFirstMatch (matches anywhere, not just at start)
+        // Iterative ability matching with controlled lead-in skipping.
         var allAbilities = new List<CardEffectAbility>();
         var abilityParts = new List<string>();
 
@@ -81,10 +103,14 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             {
                 if (matchIndex > 0)
                 {
-                    // Skip non-matching prefix (e.g., "あなたは自分の")
+                    var prefix = trimmed[..matchIndex].Trim('、', '。', ' ', '\t');
+                    if (!IsIgnorableAbilityPrefix(prefix))
+                        break;
+
                     remainingText = trimmed[matchIndex..];
                     continue;
                 }
+
                 var abilList = abilFunc(registry);
                 allAbilities.AddRange(abilList);
                 abilityParts.AddRange(abilList.Select(a => a.AbilityText));
@@ -92,7 +118,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             }
             else
             {
-                remainingText = trimmed.Length > 1 ? trimmed[1..] : "";
+                break;
             }
         }
 
@@ -106,6 +132,21 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 
         var abilityEnglish = JoinAbilityParts(abilityParts);
 
+        // Post-process opponent references: if Japanese had 相手の, replace "your" → "your opponent's"
+        // then subsequent references → "their"
+        if (mainText.Contains("相手の"))
+        {
+            var opponentRegex = new Regex(@"(?<!\bother\s+)(?<!\byour\s+opponent's\s+)\byour\b(?!\s+opponent's)");
+            abilityEnglish = opponentRegex.Replace(abilityEnglish, "your opponent's");
+
+            var firstRef = true;
+            abilityEnglish = new Regex(@"your opponent's").Replace(abilityEnglish, m =>
+            {
+                if (firstRef) { firstRef = false; return m.Value; }
+                return "their";
+            });
+        }
+
         var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
         if (!string.IsNullOrEmpty(costEnglish))
             costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
@@ -116,8 +157,6 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             effectText += $"[{costEnglish}]";
         if (!string.IsNullOrEmpty(conditionEnglish))
             effectText += $" {conditionEnglish},";
-        else if (!string.IsNullOrEmpty(costEnglish))
-            effectText += " ";
         if (!string.IsNullOrEmpty(abilityEnglish))
         {
             var abilityForEffect = abilityEnglish;
@@ -141,6 +180,20 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             AbilityText = abilityEnglish,
             EffectText = effectText
         };
+    }
+
+    private static bool IsIgnorableAbilityPrefix(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return true;
+
+        foreach (var prefix in AbilityLeadInPrefixes)
+        {
+            if (text.StartsWith(prefix, StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
     }
 
     internal static string JoinAbilityParts(List<string> parts)
@@ -176,7 +229,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 
         var result = string.Join(". ", sentenceTexts);
         result = char.ToUpper(result[0]) + result[1..];
-        if (!result.EndsWith('.') && !result.EndsWith(']'))
+        if (!result.EndsWith('.') && !result.EndsWith(']') && !result.EndsWith('"'))
             result += ".";
         return result;
     }

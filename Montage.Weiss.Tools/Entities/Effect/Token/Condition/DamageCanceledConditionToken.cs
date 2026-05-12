@@ -1,6 +1,6 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 
-internal class DamageCancelledConditionToken : CardTextToken<List<CardEffectCondition>>
+internal class DamageCanceledConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^このカードの与えたダメージがキャンセルされた時");
 
@@ -10,7 +10,8 @@ internal class DamageCancelledConditionToken : CardTextToken<List<CardEffectCond
         [
             new CardEffectCondition
             {
-                ConditionText = "when this card's damage is cancelled"
+                Type = ConditionType.When,
+                ConditionText = "When this card's damage is canceled"
             }
         ];
     }

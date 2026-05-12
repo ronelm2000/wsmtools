@@ -10,7 +10,8 @@ internal class CxPlacedConditionToken : CardTextToken<List<CardEffectCondition>>
         [
             new CardEffectCondition
             {
-                ConditionText = "When your CX is placed into your CX area"
+                Type = ConditionType.When,
+                ConditionText = "When your CX is placed to your CX area"
             }
         ];
     }

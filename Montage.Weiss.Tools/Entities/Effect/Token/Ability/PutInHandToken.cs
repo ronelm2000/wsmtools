@@ -11,7 +11,7 @@ internal class PutInHandToken : CardTextToken<List<CardEffectAbility>>
         [
             new CardEffectAbility
             {
-                AbilityText = verb.Contains("戻す") ? "return it into your hand" : "put it into your hand"
+                AbilityText = verb.Contains("戻す") ? "return it to your hand" : "put it to your hand"
             }
         ];
     }

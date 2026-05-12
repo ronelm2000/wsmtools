@@ -13,8 +13,8 @@ internal class ChooseCharacterFromWaitingRoomToken : CardTextToken<List<CardEffe
 
         var traitText = string.IsNullOrEmpty(trait) ? "" : $" <<{ExtractTrait(trait)}>>";
         var isReturnToHand = action == "手札に戻す";
-        var prep = isReturnToHand ? "from" : "in";
-        var actionText = isReturnToHand ? "return it into your hand" : "put it on any position on your stage";
+        var prep = isReturnToHand ? "in" : "in";
+        var actionText = isReturnToHand ? "return it to your hand" : "put it on any position on your stage";
 
         return
         [

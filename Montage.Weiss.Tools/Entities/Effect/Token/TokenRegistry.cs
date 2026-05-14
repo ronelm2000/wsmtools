@@ -8,17 +8,29 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
 
     public IEnumerable<CardTextToken<E>> GetAllTokens() => _tokens;
 
-    public Func<ITokenRegistry, E> GetMatch(string input)
+    public Func<ITokenRegistry, E> GetMatch(ReadOnlyMemory<char> input)
     {
-        foreach (var token in _tokens)
+        var match = _tokens.Where(token => token.Matcher.IsMatch(input.Span))
+            .ToList();
+
+        if (match.Count > 1)
         {
-            var match = token.Matcher.Match(input);
-            if (match.Success)
-            {
-                return registry => token.Translate(registry, match);
-            }
+            Log.Warning("Multiple tokens matched the input: {Input}. This may lead to unpredictable behavior.", input.ToString());
+            Log.Warning("Matched tokens: {Tokens}", string.Join(", ", match.Select(t => t.GetType().Name)));
         }
-        throw new NotImplementedException($"No token found for input: {input}");
+
+        if (match.Count == 0)
+            throw new NotImplementedException($"No token found for input: {input}");
+        else
+        {
+            var enumerator = match[0].Matcher.EnumerateMatches(input.Span);
+            foreach (var valueMatch in enumerator)
+            {
+                var slice = input.Slice(valueMatch.Index, valueMatch.Length);
+                return registry => match[0].Translate(registry, slice);
+            }
+            throw new NotImplementedException($"No token found for input: {input}");
+        }
     }
 
     public bool TryMatchAtStart(string input, out Func<ITokenRegistry, E>? result, out int consumedLength)
@@ -28,7 +40,8 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
             var match = token.Matcher.Match(input);
             if (match.Success && match.Index == 0)
             {
-                result = registry => token.Translate(registry, match);
+                var span = input.AsMemory()[match.Index..match.Length];
+                result = registry => token.Translate(registry, span);
                 consumedLength = match.Length;
                 return true;
             }
@@ -49,7 +62,8 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
             var match = token.Matcher.Match(input);
             if (match.Success && match.Index < matchIndex)
             {
-                result = registry => token.Translate(registry, match);
+                var span = input.AsMemory()[match.Index..match.Length];
+                result = registry => token.Translate(registry, span);
                 matchIndex = match.Index;
                 matchLength = match.Length;
             }

@@ -72,7 +72,6 @@ public class TranslatorServiceTests
     }
 
     [TestMethod]
-    [Ignore("For CI; To Be Removed")]
     public void Translate_ContEffect_HandSizePowerBoost()
     {
         var japanese = "【永】 あなたの手札が5枚以上なら、このカードのパワーを＋2000。";
@@ -146,7 +145,6 @@ public class TranslatorServiceTests
     }
 
     [TestMethod]
-    [Ignore("For CI; To Be Removed")]
     public void Translate_WithReminderText_SingleSentence()
     {
         var japanese = "【自】［手札を1枚控え室に置く］ あなたのCXがCX置場に置かれた時、あなたはコストを払ってよい。そうしたら、あなたは自分の山札の上から1枚を公開し、自分の控え室のレベルＸ以下のキャラを1枚選び、手札に戻す。Ｘは公開されたカードのレベルに等しい。（CXのレベルは0として扱う）";
@@ -160,7 +158,6 @@ public class TranslatorServiceTests
     }
 
     [TestMethod]
-    [Ignore("For CI; To Be Removed")]
     public void Translate_WithReminderText_MultipleSentences()
     {
         var japanese = "【自】［手札を1枚控え室に置く］ あなたのCXがCX置場に置かれた時、あなたはコストを払ってよい。そうしたら、あなたは自分の山札の上から1枚を公開し、自分の控え室のレベルＸ以下のキャラを1枚選び、手札に戻す。Ｘは公開されたカードのレベルに等しい。（CXのレベルは0として扱う。公開したカードは元に戻す）";

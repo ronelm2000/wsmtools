@@ -4,8 +4,9 @@ internal class CostPutCardFromHandToMemoryToken : CardTextToken<List<CardEffectA
 {
     public override Regex Matcher => new(@"^手札を1枚控え室に置き、このカードを思い出にする");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

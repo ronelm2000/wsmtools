@@ -4,8 +4,9 @@ internal class XEqualsToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^X は (?<description>.+?) に等しい");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var description = match.Groups["description"] is Group g && g.Success ? g.Value : match.Value;
         var translated = description switch
         {

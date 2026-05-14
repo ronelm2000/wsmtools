@@ -4,8 +4,9 @@ internal class HandLevelMinusToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^あなたの手札の(?:(?:このカード)|「(?<name>.+?)」)のレベルを－(\d+).?$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var name = match.Groups["name"].Success ? match.Groups["name"].Value : null;
         var level = match.Groups[2].Value;
         

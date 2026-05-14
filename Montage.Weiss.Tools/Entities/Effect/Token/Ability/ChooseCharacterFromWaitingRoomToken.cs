@@ -4,8 +4,9 @@ internal class ChooseCharacterFromWaitingRoomToken : CardTextToken<List<CardEffe
 {
     public override Regex Matcher => new(@"^(?:あなたは)?自分の控え室のレベル(Ｘ|\d+)以下の(《.+?》の)?キャラを(\d+)枚選び、(?<action>手札に戻す|舞台の好きな枠に置く)");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var level = match.Groups[1].Value.Replace("Ｘ", "X");
         var trait = match.Groups[2].Value;
         var count = match.Groups[3].Value;

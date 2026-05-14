@@ -4,8 +4,9 @@ internal class MayPayCostThenAbilityToken : CardTextToken<List<CardEffectAbility
 {
     public override Regex Matcher => new(@"^あなたはコストを払ってよい。そうたら、(?<effect>.+)$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var effectText = match.Groups["effect"].Value.Trim();
         var allAbilities = new List<CardEffectAbility>();
         var abilityParts = new List<string>();

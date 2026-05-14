@@ -4,8 +4,9 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
 {
     public override Regex Matcher => new(@"^【カウンター】\s*(?<mainText>.+)$");
 
-    public override CardEffect Translate(ITokenRegistry registry, Match match)
+    public override CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var mainText = match.Groups["mainText"].Value.Trim();
 
         // Extract cost if present: ［...］

@@ -4,8 +4,9 @@ internal class BrainstormEffectToken : CardTextToken<CardEffect>
 {
     public override Regex Matcher => new(@"^集中\s*(?<rest>.+)$");
 
-    public override CardEffect Translate(ITokenRegistry registry, Match match)
+    public override CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var rest = match.Groups["rest"].Value.Trim();
         var sentences = rest.Split('。', StringSplitOptions.RemoveEmptyEntries);
         var translatedSentences = new List<string>();

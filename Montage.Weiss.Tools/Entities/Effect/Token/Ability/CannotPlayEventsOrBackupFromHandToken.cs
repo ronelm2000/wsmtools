@@ -4,8 +4,9 @@ internal class CannotPlayEventsOrBackupFromHandToken : CardTextToken<List<CardEf
 {
     public override Regex Matcher => new(@"^あなたはイベントと『助太刀』を手札からプレイできない。$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

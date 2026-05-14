@@ -4,8 +4,9 @@ internal class ColorConditionIgnorePlayToken : CardTextToken<List<CardEffectAbil
 {
     public override Regex Matcher => new(@"^このカードは、色条件を満たさずに手札からプレイできる。そうでないなら、手札からプレイできない。$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

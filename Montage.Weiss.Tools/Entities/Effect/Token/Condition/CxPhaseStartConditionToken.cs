@@ -4,8 +4,9 @@ internal class CxPhaseStartConditionToken : CardTextToken<List<CardEffectConditi
 {
     public override Regex Matcher => new(@"^あなたのCXフェイズの始めに");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectCondition

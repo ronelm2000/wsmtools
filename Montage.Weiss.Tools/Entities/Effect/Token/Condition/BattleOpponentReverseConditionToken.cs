@@ -4,8 +4,9 @@ internal class BattleOpponentReverseConditionToken : CardTextToken<List<CardEffe
 {
     public override Regex Matcher => new(@"^このカードのバトル相手が【リバース】した時");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectCondition

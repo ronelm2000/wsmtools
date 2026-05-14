@@ -4,8 +4,9 @@ internal class PutCharacterToBottomOfDeckToken : CardTextToken<List<CardEffectAb
 {
     public override Regex Matcher => new(@"^そのキャラを山札の下に置いてよい");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

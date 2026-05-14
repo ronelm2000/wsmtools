@@ -4,8 +4,9 @@ internal class CostPutTopOfStockToClockStockVariantToken : CardTextToken<List<Ca
 {
     public override Regex Matcher => new(@"^あなたのストックの上から1枚をクロック置場に置く$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

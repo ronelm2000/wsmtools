@@ -4,8 +4,9 @@ internal class RestAndPutToWaitingRoomToken : CardTextToken<List<CardEffectAbili
 {
     public override Regex Matcher => new(@"^このカードを【レスト】し、このカードを控え室に置く");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

@@ -4,8 +4,9 @@ internal class ChooseCardAndPutInWaitingRoomToken : CardTextToken<List<CardEffec
 {
     public override Regex Matcher => new(@"^あなたは自分の手札を(\d+)枚選び、控え室に置(?:いて|き|く)");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var count = int.Parse(match.Groups[1].Value);
         return
         [

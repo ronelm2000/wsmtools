@@ -4,8 +4,9 @@ internal class AllCharactersSoulBoostTurnToken : CardTextToken<List<CardEffectAb
 {
     public override Regex Matcher => new(@"^あなたのキャラすべてに、そのターン中、ソウルを＋(\d+)");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var soul = int.Parse(match.Groups[1].Value);
         return
         [

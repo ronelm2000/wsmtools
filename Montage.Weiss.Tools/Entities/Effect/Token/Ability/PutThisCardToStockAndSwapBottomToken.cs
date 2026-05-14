@@ -4,8 +4,9 @@ internal class PutThisCardToStockAndSwapBottomToken : CardTextToken<List<CardEff
 {
     public override Regex Matcher => new(@"^このカードをストック置場に置き、あなたのストックの下から 1 枚を、控え室に置く");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

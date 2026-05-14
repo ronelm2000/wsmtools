@@ -4,8 +4,9 @@ internal class ErosionGainToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^このカードは《浸食》を得る。$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

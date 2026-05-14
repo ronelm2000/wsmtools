@@ -4,8 +4,9 @@ internal class TurnOnceConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^【ターン1】");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectCondition

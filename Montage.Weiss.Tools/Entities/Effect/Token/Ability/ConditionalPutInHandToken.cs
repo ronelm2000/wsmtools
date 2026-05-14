@@ -4,8 +4,9 @@ internal class ConditionalPutInHandToken : CardTextToken<List<CardEffectAbility>
 {
     public override Regex Matcher => new(@"^そのカードが《(.+?)》のキャラなら手札に加え");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var trait = match.Groups[1].Value;
         return
         [

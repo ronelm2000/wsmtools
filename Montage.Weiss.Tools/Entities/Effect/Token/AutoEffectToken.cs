@@ -17,8 +17,9 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 
     public override Regex Matcher => new(@"^【自】(?<labels>(?:【[^】]+】)*)\s*(?<mainText>.+)$");
 
-    public override CardEffect Translate(ITokenRegistry registry, Match match)
+    public override CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var labels = registry.MatchLabels(match.Groups["labels"]?.Value ?? "");
         var mainText = match.Groups["mainText"].Value.Trim();
 

@@ -4,8 +4,9 @@ internal class ChooseCharacterAndBoostToken : CardTextToken<List<CardEffectAbili
 {
     public override Regex Matcher => new(@"^あなたのキャラを(\d+)枚選び、そのターン中、パワーを＋(\d+)");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var count = int.Parse(match.Groups[1].Value);
         var power = int.Parse(match.Groups[2].Value);
         return

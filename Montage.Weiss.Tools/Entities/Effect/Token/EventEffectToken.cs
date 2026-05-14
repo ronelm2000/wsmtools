@@ -4,8 +4,9 @@ internal class EventEffectToken : CardTextToken<CardEffect>
 {
     public override Regex Matcher => new(@"^.+$");
 
-    public override CardEffect Translate(ITokenRegistry registry, Match match)
+    public override CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var input = match.Value;
         // Protect 。 inside 『』 blocks from being used as split points
         var protectedInput = Regex.Replace(input, @"『[^』]+』", m => m.Value.Replace("。", "\0"));

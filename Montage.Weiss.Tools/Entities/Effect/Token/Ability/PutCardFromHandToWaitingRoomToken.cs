@@ -4,8 +4,9 @@ internal class PutCardFromHandToWaitingRoomToken : CardTextToken<List<CardEffect
 {
     public override Regex Matcher => new(@"^手札(?:のキャラ)?を(\d+)枚控え室に置(?:いてよい|く|き)");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var count = int.Parse(match.Groups[1].Value);
         var noun = match.Value.Contains("のキャラ") ? "character" : "card";
         var may = match.Value.Contains("てよい");

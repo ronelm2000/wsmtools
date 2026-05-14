@@ -22,8 +22,9 @@ internal class CostPutTriggerCxFromHandToWaitingRoomToken : CardTextToken<List<C
 
     public override Regex Matcher => new(@"^手札のトリガーアイコンが\[\[(?<icon>[^\]]+?)\]\]の CX を 1 枚控え室に置く");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var icon = match.Groups["icon"].Value;
         var iconName = TriggerIconNames.TryGetValue(icon, out var name) ? name : icon;
         return

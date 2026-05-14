@@ -4,8 +4,9 @@ internal class SearchDeckToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^あなたは自分の山札(?:を上から(.+?)枚まで見て、その中から|見て)(《(.+?)》のキャラ|(.+?)を)?(.+?)枚まで選んで相手に見せ、(?:.+?)(?:、.+?)*\.$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var trait = match.Groups[3].Success ? match.Groups[3].Value : match.Groups[4].Value;
         var pickCount = match.Groups[5].Value.Replace("Ｘ", "X");
         
@@ -45,8 +46,9 @@ internal class SearchDeckWithTopLookToken : CardTextToken<List<CardEffectAbility
 {
     public override Regex Matcher => new(@"^あなたは自分の山札を上から(.+?)枚まで見て、その中から《(.+?)》のキャラを(.+?)枚まで選んで相手に見せ");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var count = match.Groups[1].Value.Replace("Ｘ", "X");
         var trait = match.Groups[2].Value;
         var pickCount = match.Groups[3].Value.Replace("Ｘ", "X");

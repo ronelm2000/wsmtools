@@ -4,8 +4,9 @@ internal class AllCharactersAreTraitConditionToken : CardTextToken<List<CardEffe
 {
     public override Regex Matcher => new(@"^あなたのキャラすべてが《(?<trait>.+?)》なら");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var trait = match.Groups["trait"].Value;
         return
         [

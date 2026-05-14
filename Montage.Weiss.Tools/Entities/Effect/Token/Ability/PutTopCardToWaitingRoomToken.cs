@@ -4,8 +4,9 @@ internal class PutTopCardToWaitingRoomToken : CardTextToken<List<CardEffectAbili
 {
     public override Regex Matcher => new(@"^山札の上から.*?控え室に置(?:いてよい|く|いて|き)");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var may = match.Value.Contains("てよい");
         return
         [

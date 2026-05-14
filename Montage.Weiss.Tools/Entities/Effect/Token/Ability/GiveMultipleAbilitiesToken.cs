@@ -4,8 +4,9 @@ internal class GiveMultipleAbilitiesToken : CardTextToken<List<CardEffectAbility
 {
     public override Regex Matcher => new(@"^他のあなたの「(?<cardName>.+?)」すべてに、次の(?<count>\d+)つの能力を与える。『(?<abil1>.+?)』『(?<abil2>.+?)』");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var cardName = match.Groups["cardName"].Value;
         var abil1 = match.Groups["abil1"].Value;
         var abil2 = match.Groups["abil2"].Value;

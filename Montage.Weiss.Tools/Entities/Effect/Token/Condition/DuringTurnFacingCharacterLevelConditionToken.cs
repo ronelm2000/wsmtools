@@ -4,8 +4,9 @@ internal class DuringTurnFacingCharacterLevelConditionToken : CardTextToken<List
 {
     public override Regex Matcher => new(@"^このカードの正面のキャラのレベルが(?<level>\d+)なら");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var level = match.Groups["level"].Value;
         return
         [

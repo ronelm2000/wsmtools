@@ -4,8 +4,9 @@ internal class DuringTurnPlacedFromHandConditionToken : CardTextToken<List<CardE
 {
     public override Regex Matcher => new(@"^このカードが手札から舞台に置かれたターン中");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectCondition

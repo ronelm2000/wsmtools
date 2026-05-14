@@ -4,8 +4,9 @@ internal class OpponentChooseCxAndShuffleToken : CardTextToken<List<CardEffectAb
 {
     public override Regex Matcher => new(@"^相手は自分の控え室の CX を(\d+) 枚選び、(?<rest>.+) 山札に戻し、(?:その山札を)?シャッフルする");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var count = int.Parse(match.Groups[1].Value);
         var rest = match.Groups["rest"].Value.Trim();
         // Translate optional intervening text (e.g., "それ以外のカードすべてを")

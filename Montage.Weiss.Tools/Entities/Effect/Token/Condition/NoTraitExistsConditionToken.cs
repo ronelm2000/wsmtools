@@ -4,8 +4,9 @@ internal class NoTraitExistsConditionToken : CardTextToken<List<CardEffectCondit
 {
     public override Regex Matcher => new(@"^(?:このカードは、)?あなた(?:に|の)《(.+?)》のキャラがいないなら");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var trait = match.Groups[1].Value;
         return
         [

@@ -4,8 +4,9 @@ internal class EncoreToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^アンコール\s*［(?<cost>.+?)］");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var costText = match.Groups["cost"].Value;
         var costAbilities = registry.EffectListRegistry.GetMatch(costText)(registry);
         var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));

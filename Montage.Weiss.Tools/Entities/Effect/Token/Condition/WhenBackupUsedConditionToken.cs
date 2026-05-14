@@ -4,8 +4,9 @@ internal class WhenBackupUsedConditionToken : CardTextToken<List<CardEffectCondi
 {
     public override Regex Matcher => new(@"^あなたがこのカードの『助太刀』を使った時");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectCondition

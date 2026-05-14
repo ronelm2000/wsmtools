@@ -4,8 +4,9 @@ internal class RevealTopCardWithPrefixToken : CardTextToken<List<CardEffectAbili
 {
     public override Regex Matcher => new(@"^あなたは自分の山札の上から(\d+)枚を公開(?:し|する)");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

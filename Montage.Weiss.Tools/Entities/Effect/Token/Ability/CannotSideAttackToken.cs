@@ -4,8 +4,9 @@ internal class CannotSideAttackToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^このカード(?:の正面のキャラ)?はサイドアタックできない。$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var isFacing = match.Value.Contains("の正面のキャラ");
         return
         [
@@ -21,8 +22,9 @@ internal class CannotPlayBackupDuringBattleToken : CardTextToken<List<CardEffect
 {
     public override Regex Matcher => new(@"^このカードのバトル中、相手は『助太刀』を手札からプレイできない。$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

@@ -4,8 +4,9 @@ internal class CostRestTraitCharactersToken : CardTextToken<List<CardEffectAbili
 {
     public override Regex Matcher => new(@"^他のあなたの【スタンド】している《(.+?)》のキャラを 1 枚【レスト】する");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var trait = match.Groups[1].Value;
         return
         [

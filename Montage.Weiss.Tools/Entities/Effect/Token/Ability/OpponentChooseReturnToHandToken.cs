@@ -4,8 +4,9 @@ internal class OpponentChooseReturnToHandToken : CardTextToken<List<CardEffectAb
 {
     public override Regex Matcher => new(@"^相手のキャラを(\d+) 枚まで選び、手札に戻す");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var count = int.Parse(match.Groups[1].Value);
         return
         [

@@ -233,7 +233,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
             {
                 try
                 {
-                    var translatedSentence = _reminderTextRegistry.GetMatch(sentence)(this);
+                    var translatedSentence = _reminderTextRegistry.GetMatch(sentence.AsMemory())(this);
                     translated.Add(translatedSentence);
                 }
                 catch (NotImplementedException)
@@ -266,8 +266,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
                 Abilities = [],
                 ReminderText = reminderTextEnglish
             }
-            : _effectRegistry.GetMatch(japaneseEffectText)(this)
-                ?? new EventEffectToken().Translate(this, new System.Text.RegularExpressions.Regex(@".+$").Match(japaneseEffectText));
+: _effectRegistry.GetMatch(japaneseEffectText.AsMemory())(this)
+                 ?? new EventEffectToken().Translate(this, japaneseEffectText.AsMemory());
 
         effect.ReminderText = reminderTextEnglish;
         if (!string.IsNullOrEmpty(reminderTextEnglish))

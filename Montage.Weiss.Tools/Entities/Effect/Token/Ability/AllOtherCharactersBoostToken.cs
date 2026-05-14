@@ -4,8 +4,9 @@ internal class AllOtherCharactersBoostToken : CardTextToken<List<CardEffectAbili
 {
     public override Regex Matcher => new(@"^他のあなたのキャラすべてに、パワーを＋(\d+)。$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var power = match.Groups[1].Value;
         return
         [

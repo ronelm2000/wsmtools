@@ -4,8 +4,9 @@ internal class PutInHandToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^手札に(?:加え|戻す)");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var verb = match.Groups[0].Value;
         return
         [

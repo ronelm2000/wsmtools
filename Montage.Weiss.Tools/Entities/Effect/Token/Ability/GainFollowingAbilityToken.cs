@@ -4,8 +4,9 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
 {
     public override Regex Matcher => new(@"^このカードのパワーを＋(\d+)し、このカードは次の能力を得る。『(.+)』");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var power = match.Groups[1].Value;
         var nestedJapanese = match.Groups[2].Value;
 
@@ -112,8 +113,9 @@ internal class GainFollowingAbilityToken : CardTextToken<List<CardEffectAbility>
 {
     public override Regex Matcher => new(@"^し、このカードが次の能力を得る(?:。『(.+)』)?");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var nestedJapanese = match.Groups[1].Success ? match.Groups[1].Value : null;
         var nestedEnglish = nestedJapanese != null ? PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese) : null;
         var abilityText = "get the following ability";
@@ -133,8 +135,9 @@ internal class GainFollowingAbilityTokenWithParticleWa : CardTextToken<List<Card
 {
     public override Regex Matcher => new(@"^し、このカードは次の能力を得る(?:。『(.+)』)?");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var nestedJapanese = match.Groups[1].Success ? match.Groups[1].Value : null;
         var nestedEnglish = nestedJapanese != null ? PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese) : null;
         var abilityText = "get the following ability";

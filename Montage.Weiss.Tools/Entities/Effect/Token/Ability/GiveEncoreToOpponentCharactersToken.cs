@@ -4,8 +4,9 @@ internal class GiveEncoreToOpponentCharactersToken : CardTextToken<List<CardEffe
 {
     public override Regex Matcher => new(@"^相手のすべてのキャラに、？『【自】 アンコール ［(.+?)］』を与える。?$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var costText = match.Groups[1].Value;
         string costEnglish;
         try

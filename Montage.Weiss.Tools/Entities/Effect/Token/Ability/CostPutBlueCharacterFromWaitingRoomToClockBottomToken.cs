@@ -4,8 +4,9 @@ internal class CostPutBlueCharacterFromWaitingRoomToClockBottomToken : CardTextT
 {
     public override Regex Matcher => new(@"^あなたの控え室の青のキャラを1枚クロック置場の下に置く");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

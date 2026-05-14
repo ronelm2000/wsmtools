@@ -4,8 +4,9 @@ internal class CostPutCxFromHandToWaitingRoomToken : CardTextToken<List<CardEffe
 {
     public override Regex Matcher => new(@"^手札のCXを1枚控え室に置く");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility

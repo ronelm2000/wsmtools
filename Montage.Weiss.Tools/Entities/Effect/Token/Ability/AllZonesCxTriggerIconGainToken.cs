@@ -4,8 +4,9 @@ internal class AllZonesCxTriggerIconGainToken : CardTextToken<List<CardEffectAbi
 {
     public override Regex Matcher => new(@"^あなたのすべての領域のCXのトリガーアイコンに\[\[(.+?)\]\]を与える。$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var icon = match.Groups[1].Value.Replace(".gif", "");
         return
         [

@@ -4,8 +4,9 @@ internal class PutBottomOfStockToWaitingRoomToken : CardTextToken<List<CardEffec
 {
     public override Regex Matcher => new(@"^ストックの下から(\d+) 枚を？控え室に置(?:く|いてよい|き)");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var count = match.Groups[1].Value;
         var displayCount = count.Replace("X", "X");
         var may = match.Value.Contains("てよい");

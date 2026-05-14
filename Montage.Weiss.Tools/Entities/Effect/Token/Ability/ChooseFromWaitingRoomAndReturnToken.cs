@@ -4,8 +4,9 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
 {
     public override Regex Matcher => new(@"^あなたは自分の控え室の(《(.+?)》の)?キャラを(\d+)枚選び、(?:手札に戻す|このカードの下にマーカーとして表向きに置いてよい)");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var trait = match.Groups[2].Success ? match.Groups[2].Value : null;
         var count = int.Parse(match.Groups[3].Value);
         var traitText = trait != null ? $" <<{trait}>>" : "";

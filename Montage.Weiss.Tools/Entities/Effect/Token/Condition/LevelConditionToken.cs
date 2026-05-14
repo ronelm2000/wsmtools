@@ -4,8 +4,9 @@ internal class LevelConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^(?:このカードは、)?あなたのレベル置場に、黄のカードと赤のカードと青のカードが(?<state>ある|ない)なら");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var state = match.Groups["state"].Value;
         var conditionText = state == "ある"
             ? "If your level has a yellow card, a red card and a blue card"

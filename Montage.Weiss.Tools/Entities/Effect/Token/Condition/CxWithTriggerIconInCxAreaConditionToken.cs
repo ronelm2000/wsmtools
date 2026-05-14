@@ -22,8 +22,9 @@ internal class CxWithTriggerIconInCxAreaConditionToken : CardTextToken<List<Card
 
     public override Regex Matcher => new(@"^あなたのCX置場に(?:トリガーアイコンが\[\[(?<icon>[^\]]+?)\]\]の)?CXがあるなら");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var iconGroup = match.Groups["icon"];
         if (iconGroup.Success)
         {

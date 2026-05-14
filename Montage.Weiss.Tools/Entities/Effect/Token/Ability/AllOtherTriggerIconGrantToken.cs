@@ -4,8 +4,9 @@ internal class AllOtherTriggerIconGrantToken : CardTextToken<List<CardEffectAbil
 {
     public override Regex Matcher => new(@"^他のあなたのすべての領域のトリガーアイコンが\[\[(.+?)\]\]のCXのトリガーアイコンに\[\[(.+?)\]\]を与える。$");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var fromIcon = match.Groups[1].Value.Replace(".gif", "");
         var toIcon = match.Groups[2].Value.Replace(".gif", "");
         return

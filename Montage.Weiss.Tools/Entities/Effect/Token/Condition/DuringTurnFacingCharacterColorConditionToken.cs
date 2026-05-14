@@ -12,8 +12,9 @@ internal class DuringTurnFacingCharacterColorConditionToken : CardTextToken<List
 
     public override Regex Matcher => new(@"^あなたのターン中、このカードの正面のキャラが(?<color>.+?)なら");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var color = match.Groups["color"].Value;
         var colorName = ColorMap.TryGetValue(color, out var name) ? name : color;
         return

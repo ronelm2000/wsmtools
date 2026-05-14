@@ -4,8 +4,9 @@ internal class CenterStageConditionToken : CardTextToken<List<CardEffectConditio
 {
     public override Regex Matcher => new(@"^(?<pos>前列(?:の中央の枠)?|舞台)にこのカードがい(?:るなら|て)");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var pos = match.Groups["pos"].Value;
         var conditionText = pos switch
         {

@@ -4,8 +4,9 @@ internal class MarkerUnderneathConditionToken : CardTextToken<List<CardEffectCon
 {
     public override Regex Matcher => new(@"^下にマーカーがある.*");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectCondition

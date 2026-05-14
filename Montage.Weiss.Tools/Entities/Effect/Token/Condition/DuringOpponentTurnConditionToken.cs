@@ -4,8 +4,9 @@ internal class DuringOpponentTurnConditionToken : CardTextToken<List<CardEffectC
 {
     public override Regex Matcher => new(@"^相手のターン中");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectCondition

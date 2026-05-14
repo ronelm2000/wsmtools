@@ -4,8 +4,9 @@ internal class PutCardFromHandAndThisToBottomToken : CardTextToken<List<CardEffe
 {
     public override Regex Matcher => new(@"^手札を(\d+) 枚控え室に置き、このカードを山札の下に置く");
 
-    public override List<CardEffectAbility> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var count = int.Parse(match.Groups[1].Value);
         return
         [

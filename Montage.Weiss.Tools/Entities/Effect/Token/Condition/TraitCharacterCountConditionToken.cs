@@ -4,8 +4,9 @@ internal class TraitCharacterCountConditionToken : CardTextToken<List<CardEffect
 {
     public override Regex Matcher => new(@"^他のあなたの《(.+?)》のキャラが(\d+)枚以上(?:なら|で)");
 
-    public override List<CardEffectCondition> Translate(ITokenRegistry registry, Match match)
+    public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
+        var match = Matcher.Match(span.ToString());
         var trait = match.Groups[1].Value;
         var count = match.Groups[2].Value;
         return

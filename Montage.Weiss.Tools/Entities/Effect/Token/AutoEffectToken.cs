@@ -186,6 +186,8 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         return new AutoCardEffect
         {
             Labels = labels,
+            PreConditionText = string.Empty,
+            PostConditionText = string.Empty,
             ConditionText = conditionEnglish,
             Condition = conditions,
             CostText = costEnglish,

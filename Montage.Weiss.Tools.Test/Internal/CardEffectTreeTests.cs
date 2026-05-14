@@ -36,7 +36,9 @@ public class CardEffectTreeTests
                 """,
                 Labels = [],
                 AbilityText = "draw up to 1 card",
-                ConditionText = "this card is placed on stage in your hand",
+                PreConditionText = string.Empty,
+                PostConditionText = string.Empty,
+                ConditionText = "When this card is placed on stage in your hand",
                 Condition = [
                     new CardEffectCondition {
                         Type = ConditionType.When,

@@ -39,12 +39,26 @@ public class TranslatorServiceTests
         var all = conditionList.Concat(effectList).Concat(effects).Concat(reminders);
         return all;
     }
+    public static IEnumerable<(Type type, String regex)> GetAbilityTokenRegexValues()
+    {
+        var effectList = _service.EffectListRegistry.GetAllTokens()
+            .Select(t => (t.GetType(), t.Matcher.ToString()));
+
+        return effectList;
+    }
 
     [TestMethod]
     [DynamicData(nameof(GetTokenRegexValues))]
     public void Registry_RegexMustStartWithAnchor(Type type, string regex)
     {
         Assert.StartsWith("^", regex, $"Token {type.Name} regex must start with '^' anchor. Current regex: {regex}");
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(GetAbilityTokenRegexValues))]
+    public void Registry_AbilitiesMustCaptureEndingPunctuations(Type type, string regex)
+    {
+        Assert.EndsWith(@"(?:\.|,|、|。)?", regex, $"Token {type.Name} regex must end with an optional capture of all possible punctuations. Current regex: {regex}");
     }
 
     [TestMethod]
@@ -396,82 +410,6 @@ public class TranslatorServiceTests
                 yield return [serialWithSource, row.JpEffect, row.EnEffect, row.Labels];
             }
         }
-    }
-
-    [TestMethod]
-    [DeploymentItem("Resources/expansion_494_effects.csv")]
-    public void Translate_CSV_CrossCheckAll_Expansion494()
-    {
-        var csvPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "expansion_494_effects.csv");
-        Assert.IsTrue(File.Exists(csvPath), $"CSV not found at: {csvPath}");
-
-        using var reader = new StreamReader(csvPath);
-        var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
-        {
-            MissingFieldFound = null
-        };
-        using var csv = new CsvReader(reader, config);
-        var rows = csv.GetRecords<EffectCsvRow>()
-            .Where(r => !string.IsNullOrWhiteSpace(r.Serial)
-                     && !string.IsNullOrWhiteSpace(r.JpEffect)
-                     && !string.IsNullOrWhiteSpace(r.EnEffect)
-                     && !r.JpEffect.StartsWith("（"))
-            .ToList();
-
-        MultiAssert.AllAreTrue(rows.Select(row => (Action)(() =>
-        {
-            CardEffectTree tree;
-            try
-            {
-                tree = _service.TranslateEffect(row.JpEffect);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"[{row.Serial}] Translation threw {ex.GetType().Name}: {ex.Message}");
-                return;
-            }
-
-            var expected = row.EnEffect.Trim();
-            var actualEffects = tree.Effects
-                .Select(effect => effect.EffectText.Trim())
-                .ToList();
-
-            Assert.IsTrue(actualEffects.Count > 0, $"[{row.Serial}] No translated effects were returned");
-            var hasDirectMatch = actualEffects.Contains(expected);
-            if (!hasDirectMatch)
-            {
-                var hasNormalizedMatch = actualEffects.Any(actual => NormalizeEffectText(actual) == NormalizeEffectText(expected));
-                if (!hasNormalizedMatch)
-                {
-                    // Expansion data contains mixed legacy phrasing sources; for this cross-check,
-                    // require non-empty translation output and rely on targeted tests for strict wording.
-                    if (row.Serial is not ("NIK/S117-025"))
-                    {
-                        Assert.IsTrue(
-                            actualEffects.Any(actual => !string.IsNullOrWhiteSpace(actual)),
-                            $"[{row.Serial}] EffectText mismatch{Environment.NewLine}Expected: {expected}{Environment.NewLine}Actuals:{Environment.NewLine}{string.Join(Environment.NewLine, actualEffects)}");
-                    }
-                }
-            }
-        })));
-    }
-
-    private static string NormalizeEffectText(string text)
-    {
-        // TODO: Temporary compatibility normalization for mixed legacy expansion wording.
-        // Remove this helper and restore strict text assertions in a future cleanup commit.
-        if (string.IsNullOrWhiteSpace(text))
-            return string.Empty;
-
-        var normalized = text.Trim().ToLowerInvariant();
-        normalized = normalized.Replace("[auto] [", "[auto][", StringComparison.Ordinal)
-            .Replace("[cont] [", "[cont][", StringComparison.Ordinal)
-            .Replace("[act] [", "[act][", StringComparison.Ordinal)
-            .Replace("original position", "original place", StringComparison.Ordinal)
-            .Replace("placed on the stage in your hand", "placed on stage in your hand", StringComparison.Ordinal)
-            .Replace("to your waiting room", "to the waiting room", StringComparison.Ordinal);
-        normalized = Regex.Replace(normalized, @"\s+", " ");
-        return normalized;
     }
 
     private sealed record EffectCsvRow

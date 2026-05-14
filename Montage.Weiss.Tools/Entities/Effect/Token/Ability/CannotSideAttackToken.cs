@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class CannotSideAttackToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカード(?:の正面のキャラ)?はサイドアタックできない。$");
+    public override Regex Matcher => new(@"^このカード(?:の正面のキャラ)?はサイドアタックできない(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -20,7 +20,7 @@ internal class CannotSideAttackToken : CardTextToken<List<CardEffectAbility>>
 
 internal class CannotPlayBackupDuringBattleToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカードのバトル中、相手は『助太刀』を手札からプレイできない。$");
+    public override Regex Matcher => new(@"^このカードのバトル中、相手は『助太刀』を手札からプレイできない(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

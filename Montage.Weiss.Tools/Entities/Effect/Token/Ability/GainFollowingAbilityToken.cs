@@ -111,7 +111,7 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
 
 internal class GainFollowingAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^し、このカードが次の能力を得る(?:。『(.+)』)?");
+    public override Regex Matcher => new(@"^し、このカードが次の能力を得る(?:。『(.+)』)?(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -133,7 +133,7 @@ internal class GainFollowingAbilityToken : CardTextToken<List<CardEffectAbility>
 
 internal class GainFollowingAbilityTokenWithParticleWa : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^し、このカードは次の能力を得る(?:。『(.+)』)?");
+    public override Regex Matcher => new(@"^し、このカードは次の能力を得る(?:。『(.+)』)?(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

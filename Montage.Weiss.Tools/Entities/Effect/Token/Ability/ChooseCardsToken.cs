@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ChooseCardsToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^カードを(?<count>Ｘ|\d+)枚まで選び");
+    public override Regex Matcher => new(@"^カードを(?<count>Ｘ|\d+)枚まで選び(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

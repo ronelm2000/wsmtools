@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class SearchDeckToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^あなたは自分の山札(?:を上から(.+?)枚まで見て、その中から|見て)(《(.+?)》のキャラ|(.+?)を)?(.+?)枚まで選んで相手に見せ、(?:.+?)(?:、.+?)*\.$");
+    public override Regex Matcher => new(@"^あなたは自分の山札(?:を上から(.+?)枚まで見て、その中から|見て)(《(.+?)》のキャラ|(.+?)を)?(.+?)枚まで選んで相手に見せ、(?:.+?)(?:、.+?)*(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -44,7 +44,7 @@ internal class SearchDeckToken : CardTextToken<List<CardEffectAbility>>
 
 internal class SearchDeckWithTopLookToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^あなたは自分の山札を上から(.+?)枚まで見て、その中から《(.+?)》のキャラを(.+?)枚まで選んで相手に見せ");
+    public override Regex Matcher => new(@"^あなたは自分の山札を上から(.+?)枚まで見て、その中から《(.+?)》のキャラを(.+?)枚まで選んで相手に見せ(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

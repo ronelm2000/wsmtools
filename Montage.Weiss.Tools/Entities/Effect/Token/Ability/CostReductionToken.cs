@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class CostReductionToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^手札のこのカードをプレイするにあたり、あなたは自分の「(.+?)」を1枚選び、控え室に置いてよい。そうしたら、このカードをコスト0でプレイできる。$");
+    public override Regex Matcher => new(@"^手札のこのカードをプレイするにあたり、あなたは自分の「(.+?)」を1枚選び、控え室に置いてよい。そうしたら、このカードをコスト0でプレイできる(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

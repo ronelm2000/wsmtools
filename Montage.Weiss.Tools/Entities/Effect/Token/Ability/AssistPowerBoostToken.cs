@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class AssistPowerBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカードの前のあなたのキャラすべてに、パワーを＋(Ｘ|\d+)(?:。Ｘはそのキャラのレベル×(\d+)に等しい。)?");
+    public override Regex Matcher => new(@"^このカードの前のあなたのキャラすべてに、パワーを＋(Ｘ|\d+)(?:。Ｘはそのキャラのレベル×(\d+)に等しい。)?(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class AllZonesTriggerIconGainToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^すべての領域にあるこのカードはトリガーアイコンに\[\[(.+?)\]\]を得る。$");
+    public override Regex Matcher => new(@"^すべての領域にあるこのカードはトリガーアイコンに\[\[(.+?)\]\]を得る(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

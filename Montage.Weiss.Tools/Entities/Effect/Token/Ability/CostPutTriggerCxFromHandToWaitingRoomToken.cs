@@ -20,7 +20,7 @@ internal class CostPutTriggerCxFromHandToWaitingRoomToken : CardTextToken<List<C
         ["focus.gif"] = "FOCUS"
     };
 
-    public override Regex Matcher => new(@"^手札のトリガーアイコンが\[\[(?<icon>[^\]]+?)\]\]の CX を 1 枚控え室に置く");
+    public override Regex Matcher => new(@"^手札のトリガーアイコンが\[\[(?<icon>[^\]]+?)\]\]の CX を 1 枚控え室に置く(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

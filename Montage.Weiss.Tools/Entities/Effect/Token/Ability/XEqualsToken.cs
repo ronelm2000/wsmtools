@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class XEqualsToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^X は (?<description>.+?) に等しい");
+    public override Regex Matcher => new(@"^X は (?<description>.+?) に等しい(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

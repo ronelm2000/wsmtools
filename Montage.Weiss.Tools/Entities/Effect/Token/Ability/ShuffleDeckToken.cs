@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ShuffleDeckToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^山札をシャッフルする");
+    public override Regex Matcher => new(@"^山札をシャッフルする(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ColorConditionIgnorePlayToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカードは、色条件を満たさずに手札からプレイできる。そうでないなら、手札からプレイできない。$");
+    public override Regex Matcher => new(@"^このカードは、色条件を満たさずに手札からプレイできる。そうでないなら、手札からプレイできない(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

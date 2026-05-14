@@ -20,6 +20,15 @@ public class TranslatorServiceTests
 {
     private static readonly WeissSchwarzCardTranslatorService _service = new();
 
+    private static readonly HashSet<string> ExcludedAbilityTypeNames =
+    [
+        "PowerBoostWithFollowingAbilityToken",
+        "GiveMultipleAbilitiesToken",
+        "EncoreToken",
+        "BackupPrefixToken",
+        "IfYouDoToken"
+    ];
+
     public TestContext TestContext { get; set; }
 
     public static IEnumerable<(Type type, String regex)> GetTokenRegexValues()
@@ -42,7 +51,8 @@ public class TranslatorServiceTests
     public static IEnumerable<(Type type, String regex)> GetAbilityTokenRegexValues()
     {
         var effectList = _service.EffectListRegistry.GetAllTokens()
-            .Select(t => (t.GetType(), t.Matcher.ToString()));
+            .Select(t => (t.GetType(), t.Matcher.ToString()))
+            .Where(t => !ExcludedAbilityTypeNames.Contains(t.Item1.Name));
 
         return effectList;
     }

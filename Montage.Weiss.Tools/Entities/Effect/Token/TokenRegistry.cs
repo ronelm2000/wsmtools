@@ -13,7 +13,7 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
         var match = _tokens.Where(token => token.Matcher.IsMatch(input.Span))
             .ToList();
 
-        if (match.Count > 1)
+        if (match.Count > 1 && match[0] is not CardTextToken<CardEffect>)
         {
             Log.Warning("Multiple tokens matched the input: {Input}. This may lead to unpredictable behavior.", input.ToString());
             Log.Warning("Matched tokens: {Tokens}", string.Join(", ", match.Select(t => t.GetType().Name)));

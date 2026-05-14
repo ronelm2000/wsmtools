@@ -6,6 +6,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
     [
         "あなたは",
         "あなたの",
+        "自分の",
         "そうしたら、",
         "そうしたら",
         "その後、",
@@ -119,6 +120,18 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             }
             else
             {
+                bool prefixSkipped = false;
+                foreach (var prefix in AbilityLeadInPrefixes)
+                {
+                    if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
+                    {
+                        remainingText = trimmed[prefix.Length..];
+                        prefixSkipped = true;
+                        break;
+                    }
+                }
+                if (prefixSkipped) continue;
+
                 break;
             }
         }

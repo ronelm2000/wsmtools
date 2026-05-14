@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class DealDamageToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手に X ダメージを与える(?:。X はそのカードのレベル＋1 に等しい(?:\.|,|、|。)?)?(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^相手に[XＸ]\s*ダメージを与える(?:。[XＸ]\s*はそのカードのレベル＋1\s*に等しい(?:\.|,|、|。)?)?(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -19,7 +19,7 @@ internal class DealDamageToken : CardTextToken<List<CardEffectAbility>>
 
 internal class DealVariableDamageToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手に X ダメージを与える。X はそのキャラのソウルに等しい(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^相手に[XＸ]\s*ダメージを与える。[XＸ]\s*はそのキャラのソウルに等しい(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

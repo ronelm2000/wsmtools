@@ -9,6 +9,12 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         { "経験", "Experience" }
     };
 
+    private static readonly string[] ConditionalLeadInPrefixes =
+    [
+        "そして、",
+        "そして"
+    ];
+
     public override Regex Matcher => new(@"^【永】\s*(?<mainText>.+)$");
 
     public override CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
@@ -80,7 +86,19 @@ internal class ContEffectToken : CardTextToken<CardEffect>
             }
             else
             {
-                break;
+                var stripped = false;
+                foreach (var prefix in ConditionalLeadInPrefixes)
+                {
+                    if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
+                    {
+                        abilityText = trimmed[prefix.Length..];
+                        stripped = true;
+                        break;
+                    }
+                }
+                if (stripped) continue;
+
+                throw new NotImplementedException($"Unrecognized ability text: {trimmed}");
             }
         }
 

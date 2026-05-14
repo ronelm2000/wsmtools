@@ -92,9 +92,9 @@ internal class ContEffectToken : CardTextToken<CardEffect>
             if (!startsWithConditional)
             {
                 if (i == 0)
-                    conditionTexts[i] = "If " + conditionTexts[i];
+                    conditionTexts[i] = "If " + char.ToLower(conditionTexts[i][0]) + conditionTexts[i][1..];
                 else
-                    conditionTexts[i] = "if " + conditionTexts[i];
+                    conditionTexts[i] = "if " + char.ToLower(conditionTexts[i][0]) + conditionTexts[i][1..];
             }
         }
         for (int i = 1; i < conditionTexts.Count; i++)

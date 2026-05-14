@@ -355,8 +355,21 @@ public class TranslatorServiceTests
     }
 
     [TestMethod]
+    public void Translate_ContEffect_NonExistentConditionMustCrash()
+    {
+        var japanese = "【永】 あなたのターン中、他のあなたadded_textの《不存在》のキャラが4枚以上なら、このカードのパワーを＋5000。";
+        Assert.ThrowsExactly<NotImplementedException>(() => _service.TranslateEffect(japanese));
+    }
+
+    [TestMethod]
+    public void Translate_ContEffect_NonExistentAbilityMustCrash()
+    {
+        var japanese = "【永】 あなたのターン中、他のあなたadded_textの《不存在》のキャラが4枚以上なら、このカードのadded_textパワーを＋5000。";
+        Assert.ThrowsExactly<NotImplementedException>(() => _service.TranslateEffect(japanese));
+    }
+
+    [TestMethod]
     [DynamicData(nameof(TranslateCsvCrossCheckAllData))]
-    [Ignore("Cross-check test for all CSV entries; disabled currently 'cus broken")]
     public void Translate_CSV_CrossCheckAll(string serial, string jpEffect, string enEffect, string labels)
     {
         CardEffectTree tree;

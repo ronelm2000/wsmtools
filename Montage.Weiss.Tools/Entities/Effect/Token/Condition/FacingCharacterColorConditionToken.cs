@@ -22,7 +22,7 @@ internal class FacingCharacterColorConditionToken : CardTextToken<List<CardEffec
             new CardEffectCondition
             {
                 
-            Type = ConditionType.If,ConditionText = $"the character facing this card is {colorName}"
+            Type = ConditionType.If,ConditionText = $"if the character facing this card is {colorName}"
             }
         ];
     }

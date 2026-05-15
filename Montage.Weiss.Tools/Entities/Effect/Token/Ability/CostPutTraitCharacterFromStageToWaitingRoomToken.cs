@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class CostPutTraitCharacterFromStageToWaitingRoomToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^他のあなたの舞台の《(.+?)》のキャラを 1 枚控え室に置く(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^他のあなたの舞台の《(.+?)》のキャラを\s*1\s*枚控え室に置く(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

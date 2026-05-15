@@ -35,12 +35,13 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new DuringTurnPlacedFromHandConditionToken());
         _conditionListRegistry.Register(new DamageCanceledConditionToken());
         _conditionListRegistry.Register(new CxWithTriggerIconInCxAreaConditionToken());
+        _conditionListRegistry.Register(new YourCxWithTriggerIconTriggeredConditionToken());
         _conditionListRegistry.Register(new CxPlacedConditionToken());
         _conditionListRegistry.Register(new CardPlacedFromHandConditionToken());
         _conditionListRegistry.Register(new ReverseConditionToken());
         _conditionListRegistry.Register(new BattleOpponentReverseConditionToken());
         _conditionListRegistry.Register(new FacingCharacterColorConditionToken());
-        _conditionListRegistry.Register(new DuringTurnFacingCharacterLevelConditionToken());
+        _conditionListRegistry.Register(new FacingCharacterLevelConditionToken());
         _conditionListRegistry.Register(new DuringTurnFacingCharacterColorConditionToken());
         _conditionListRegistry.Register(new OpponentLevelConditionToken());
         _conditionListRegistry.Register(new LevelConditionToken());
@@ -57,6 +58,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new CenterStageConditionToken());
         _conditionListRegistry.Register(new AttackConditionToken());
         _conditionListRegistry.Register(new CxPhaseStartConditionToken());
+        _conditionListRegistry.Register(new OpponentAttackPhaseStartConditionToken());
+        _conditionListRegistry.Register(new CannotBeChosenConditionToken());
         _conditionListRegistry.Register(new WhenBackupUsedConditionToken());
         _conditionListRegistry.Register(new CxNamedInCxAreaConditionToken());
         _conditionListRegistry.Register(new CxNamedPlacedConditionToken());
@@ -134,6 +137,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new CannotPlayBackupDuringBattleToken());
         _effectListRegistry.Register(new HandLevelMinusToken());
         _effectListRegistry.Register(new AllZonesTriggerIconGainToken());
+        _effectListRegistry.Register(new PerformTriggerIconEffectAbilityToken());
         _effectListRegistry.Register(new CannotPlayEventsOrBackupFromHandToken());
         _effectListRegistry.Register(new AllTraitCharactersBoostToken());
         _effectListRegistry.Register(new AllOtherTraitCharactersBoostToken());
@@ -150,6 +154,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new PutCxFromHandToWaitingRoomRestThisCardToken());
         _effectListRegistry.Register(new RestThisCardToken());
         _effectListRegistry.Register(new PutThisCardToWaitingRoomToken());
+        _effectListRegistry.Register(new ReturnThisCardToHandToken());
         _effectListRegistry.Register(new RestTraitCharactersToken());
         _effectListRegistry.Register(new PutCardToWaitingRoomAndThisToWaitingRoomToken());
         _effectListRegistry.Register(new PutCardFromHandAndThisToBottomToken());
@@ -167,6 +172,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new OpponentChooseReturnToHandToken());
         _effectListRegistry.Register(new AllCharactersSoulBoostTurnToken());
         _effectListRegistry.Register(new DealVariableDamageToken());
+        _effectListRegistry.Register(new CannotBeChosenAbilityToken());
         
         // Register effect type tokens (most to least specific)
         _effectRegistry.Register(new AssistContEffectToken());
@@ -238,12 +244,18 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
                 }
                 catch (NotImplementedException)
                 {
-                    // Try to translate GATE format: [[gate.gif]]：text to English
-                    if (sentence.StartsWith("[[gate.gif]]："))
+                    // Try to translate trigger icon format: [[icon.gif]]：text to English
+                    var iconMatch = Regex.Match(sentence, @"^\[\[(?<icon>[^\]]+?)\]\]：");
+                    if (iconMatch.Success)
                     {
-                        var gateText = sentence.Substring(13); // Remove "[[gate.gif]]："
-                        var english = TranslateGate(gateText);
-                        translated.Add(english);
+                        var icon = iconMatch.Groups["icon"].Value;
+                        var iconName = TriggerIconHelper.GetIconName(icon);
+                        var iconText = sentence.Substring(iconMatch.Length);
+                        var english = TranslateTriggerIconReminderText(icon, iconName, iconText);
+                        if (english != null)
+                            translated.Add(english);
+                        else
+                            translated.Add(sentence);
                     }
                     else
                     {
@@ -289,12 +301,18 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         };
     }
 
- private static string TranslateGate(string japaneseText)
+ private static string? TranslateTriggerIconReminderText(string icon, string iconName, string japaneseText)
     {
-        // Translate GATE format: "このカードがトリガーした時、あなたは自分の控え室の CX を 1 枚選び、手札に戻してよい"
-        // Expected: "([GATE]: When this card triggers, you may choose 1 CX in your waiting room, and return it to your hand)"
-        
-        var text = "When this card triggers, you may choose 1 CX in your waiting room, and return it to your hand";
-        return "([GATE]: " + text + ")";
+        return icon.ToLowerInvariant() switch
+        {
+            "gate.gif" => $"([{iconName}]: When this card triggers, you may choose 1 CX in your waiting room, and return it to your hand)",
+            "choice.gif" => $"([{iconName}]: When this card triggers, you may choose a character with [SOUL] in its trigger icon in your waiting room, and return it to your hand or put it to your stock)",
+            "shot.gif" => $"([{iconName}]: During this turn, when the next damage dealt by the attacking character that triggered this card is canceled, deal 1 damage to your opponent)",
+            "treasure.gif" => $"([{iconName}]: When this card triggers, return this card to your hand. You may put the top card of your deck to your stock)",
+            "standby.gif" => $"([{iconName}]: When this card triggers, you may choose 1 character with a level equal to or less than your level +1 in your waiting room, and put it on any position of your stage as[REST])",
+            "salvage.gif" => $"([{iconName}]: When this card triggers, you may choose 1 character in your waiting room, and return it to your hand)",
+            "stock.gif" => $"([{iconName}]: When this card triggers, you may put the top card of your deck to your stock)",
+            _ => null
+        };
     }
 }

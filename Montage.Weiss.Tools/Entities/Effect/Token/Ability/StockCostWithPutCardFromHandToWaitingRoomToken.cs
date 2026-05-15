@@ -7,13 +7,14 @@ internal class StockCostWithPutCardFromHandToWaitingRoomToken : CardTextToken<Li
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
+        var cost = match.Groups[1].Value;
         var count = int.Parse(match.Groups[2].Value);
         var noun = match.Value.Contains("のキャラ") ? "character" : "card";
         return
         [
             new CardEffectAbility
             {
-                AbilityText = $"Put {count} {(count == 1 ? noun : noun + "s")} in your hand to your waiting room"
+                AbilityText = $"({cost}) Put {count} {(count == 1 ? noun : noun + "s")} in your hand to your waiting room"
             }
         ];
     }

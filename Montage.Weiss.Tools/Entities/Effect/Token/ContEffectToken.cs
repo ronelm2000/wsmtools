@@ -106,13 +106,21 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         for (int i = 0; i < conditionTexts.Count; i++)
         {
             if (conditionTexts[i].Length == 0) continue;
-            var startsWithConditional = conditionTexts[i].StartsWith("If") || conditionTexts[i].StartsWith("When") || conditionTexts[i].StartsWith("During") || conditionTexts[i].StartsWith("At");
+            var startsWithConditional = conditionTexts[i].StartsWith("If", StringComparison.OrdinalIgnoreCase) || conditionTexts[i].StartsWith("When", StringComparison.OrdinalIgnoreCase) || conditionTexts[i].StartsWith("During", StringComparison.OrdinalIgnoreCase) || conditionTexts[i].StartsWith("At", StringComparison.OrdinalIgnoreCase) || conditionTexts[i].StartsWith("For", StringComparison.OrdinalIgnoreCase);
             if (!startsWithConditional)
             {
                 if (i == 0)
+                {
                     conditionTexts[i] = "If " + char.ToLower(conditionTexts[i][0]) + conditionTexts[i][1..];
+                }
                 else
+                {
                     conditionTexts[i] = "if " + char.ToLower(conditionTexts[i][0]) + conditionTexts[i][1..];
+                }
+            }
+            else if (i == 0)
+            {
+                conditionTexts[i] = char.ToUpper(conditionTexts[i][0]) + conditionTexts[i][1..];
             }
         }
         for (int i = 1; i < conditionTexts.Count; i++)
@@ -122,12 +130,13 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         }
         var conditionEnglish = string.Join(", ", conditionTexts);
         var abilityEnglish = AutoEffectToken.JoinAbilityParts(abilityParts);
-
+        
         var effectText = "[CONT]";
         if (labels.Length > 0)
             effectText += $" {string.Join("][", labels)}";
         if (!string.IsNullOrEmpty(conditionEnglish))
             effectText += $" {conditionEnglish},";
+        
         var abilityForEffect = abilityEnglish;
         if (abilityForEffect.Length > 0)
         {

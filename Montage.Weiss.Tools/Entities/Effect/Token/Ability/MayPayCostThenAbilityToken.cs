@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class MayPayCostThenAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^あなたはコストを払ってよい。そうたら、(?<effect>.+)(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^あなたはコストを払ってよい。そうしたら、(?<effect>.+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

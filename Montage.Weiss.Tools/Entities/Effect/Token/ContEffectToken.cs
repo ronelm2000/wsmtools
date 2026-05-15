@@ -12,9 +12,7 @@ internal class ContEffectToken : CardTextToken<CardEffect>
     private static readonly string[] ConditionalLeadInPrefixes =
     [
         "そして、",
-        "そして",
-        "し、",
-        "し"
+        "そして"
     ];
 
     public override Regex Matcher => new(@"^【永】\s*(?<mainText>.+)$");

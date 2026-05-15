@@ -1,6 +1,6 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 
-internal class FacingCharacterLevelConditionToken : CardTextToken<List<CardEffectCondition>>
+internal class DuringTurnFacingCharacterLevelConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^このカードの正面のキャラのレベルが(?<level>\d+)なら");
 
@@ -13,7 +13,7 @@ internal class FacingCharacterLevelConditionToken : CardTextToken<List<CardEffec
             new CardEffectCondition
             {
                 
-            Type = ConditionType.If,ConditionText = $"if the character facing this card is level {level}"
+            Type = ConditionType.During,ConditionText = $"the character facing this card is level {level}"
             }
         ];
     }

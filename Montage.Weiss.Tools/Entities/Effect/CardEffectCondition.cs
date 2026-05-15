@@ -21,10 +21,6 @@ public enum ConditionType
     /// </summary>
     During,
     /// <summary>
-    /// At conditions are dependent on a specific timing, such as "At the end of the turn", or "At the beginning of your main phase". These should only occur after "During" conditions.
-    /// </summary>
-    At,
-    /// <summary>
     /// Pre-conditions occur before `During` conditions, and are separated by JP periods.
     /// "This ability activates up to 1 time per turn" for example, is a pre-condition.
     /// </summary>

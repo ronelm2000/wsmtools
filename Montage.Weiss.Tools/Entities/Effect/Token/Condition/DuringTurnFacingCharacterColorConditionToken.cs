@@ -22,7 +22,7 @@ internal class DuringTurnFacingCharacterColorConditionToken : CardTextToken<List
             new CardEffectCondition
             {
                 
-            Type = ConditionType.During,ConditionText = $"During your turn, if the character facing this card is {colorName}"
+            Type = ConditionType.During,ConditionText = $"During your turn, the character facing this card is {colorName}"
             }
         ];
     }

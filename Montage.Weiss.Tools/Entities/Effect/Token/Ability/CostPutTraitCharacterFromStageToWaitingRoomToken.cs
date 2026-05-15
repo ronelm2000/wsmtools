@@ -12,7 +12,7 @@ internal class CostPutTraitCharacterFromStageToWaitingRoomToken : CardTextToken<
         [
             new CardEffectAbility
             {
-                AbilityText = $"Put 1 other <<{trait}>> character in your center stage to your waiting room"
+                AbilityText = $"Put 1 other <<{trait}>> character in your stage to your waiting room"
             }
         ];
     }

@@ -12,7 +12,7 @@ internal class CardPlacedFromHandConditionToken : CardTextToken<List<CardEffectC
             new CardEffectCondition
             {
                 Type = ConditionType.When,
-                ConditionText = "When this card is placed on the stage in your hand"
+                ConditionText = "When this card is placed on stage in your hand"
             }
         ];
     }

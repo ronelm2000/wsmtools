@@ -317,7 +317,7 @@ public class TranslatorServiceTests
         Assert.AreEqual(1, tree.Effects.Count);
         var effect = tree.Effects[0] as AutoCardEffect;
         Assert.IsNotNull(effect);
-        Assert.AreEqual("[AUTO] When this card is placed on stage in your hand, look at up to X cards from the top of your deck, choose up to 1 card, put it to your hand, and put the rest to your waiting room. X is equal to the number of your <<風>> characters.", effect.EffectText);
+        Assert.AreEqual("[AUTO] When this card is placed on stage from your hand, look at up to X cards from the top of your deck, choose up to 1 card, put it to your hand, and put the rest to your waiting room. X is equal to the number of your <<風>> characters.", effect.EffectText);
         Assert.AreEqual("Look at up to X cards from the top of your deck, choose up to 1 card, put it to your hand, and put the rest to your waiting room. X is equal to the number of your <<風>> characters.", effect.AbilityText);
         Assert.IsTrue(effect.AbilityText.Contains("Look at up to X cards"));
     }

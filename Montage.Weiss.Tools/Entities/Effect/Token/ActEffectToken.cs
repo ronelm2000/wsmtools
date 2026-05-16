@@ -82,8 +82,10 @@ internal class ActEffectToken : CardTextToken<CardEffect>
                 abilityForEffect = char.ToLower(abilityForEffect[0]) + abilityForEffect[1..];
             parts.Add(abilityForEffect);
         }
-        var effectText = string.Join(" ", parts);
+        var effectText = labels.Length > 0 ? string.Join(" ", parts) : string.Join("", parts);
         if (!string.IsNullOrEmpty(abilityEnglish))
+            effectText += " " + abilityEnglish;
+        if (!string.IsNullOrEmpty(abilityEnglish) && !effectText.TrimEnd().EndsWith("."))
             effectText += ".";
 
         var finalLabels = labels;

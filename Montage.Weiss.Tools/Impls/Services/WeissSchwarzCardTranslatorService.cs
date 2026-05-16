@@ -74,6 +74,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new ThisCardMarkerUnderneathConditionToken());
         _conditionListRegistry.Register(new MarkerUnderneathConditionToken());
         _conditionListRegistry.Register(new FacingCharacterConditionToken());
+        _conditionListRegistry.Register(new FacingOpponentCharacterConditionToken());
       _conditionListRegistry.Register(new ThisCardMarkerUnderneathConditionToken());
       _conditionListRegistry.Register(new ThisCardMarkerCountConditionToken());
 
@@ -153,6 +154,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new TraitGainToken());
         _effectListRegistry.Register(new LevelAndPowerBoostToken());
         _effectListRegistry.Register(new CannotPlayFromHandToken());
+        _effectListRegistry.Register(new OpponentCannotPlayEventsToken());
         _effectListRegistry.Register(new ColorConditionIgnorePlayToken());
         _effectListRegistry.Register(new CostReductionToken());
         _effectListRegistry.Register(new AllOtherTriggerIconGrantToken());
@@ -180,6 +182,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new BackupPrefixToken());
         _effectListRegistry.Register(new OpponentPutToClockToken());
         _effectListRegistry.Register(new OpponentChooseReturnToHandToken());
+        _effectListRegistry.Register(new OpponentDeckToWrAndWrToDeckToken());
         _effectListRegistry.Register(new AllCharactersSoulBoostTurnToken());
         _effectListRegistry.Register(new DealVariableDamageToken());
         _effectListRegistry.Register(new CannotBeChosenAbilityToken());

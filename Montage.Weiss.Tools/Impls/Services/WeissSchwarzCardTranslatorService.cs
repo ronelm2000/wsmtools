@@ -160,6 +160,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new PutThisCardToWaitingRoomToken());
         _effectListRegistry.Register(new ReturnThisCardToHandToken());
         _effectListRegistry.Register(new RestAnyCharactersToken());
+        _effectListRegistry.Register(new TurnOnceAbilityToken());
         _effectListRegistry.Register(new RestTraitCharactersToken());
         _effectListRegistry.Register(new PutCardToWaitingRoomAndThisToWaitingRoomToken());
         _effectListRegistry.Register(new PutCardFromHandAndThisToBottomToken());

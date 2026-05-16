@@ -12,8 +12,13 @@ internal class DuringOpponentTurnAllCharactersAreTraitConditionToken : CardTextT
         [
             new CardEffectCondition
             {
-                
-            Type = ConditionType.During,ConditionText = $"During your opponent's turn, if all of your characters are <<{trait}>>"
+                Type = ConditionType.During,
+                ConditionText = "During your opponent's turn"
+            },
+            new CardEffectCondition
+            {
+                Type = ConditionType.If,
+                ConditionText = $"all of your characters are <<{trait}>>"
             }
         ];
     }

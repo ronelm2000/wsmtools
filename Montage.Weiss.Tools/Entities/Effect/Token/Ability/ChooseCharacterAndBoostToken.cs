@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ChooseCharacterAndBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^あなたのキャラを(\d+)枚選び、そのターン中、パワーを＋(\d+)(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたの|自分の)?キャラを(\d+)枚選び、そのターン中、パワーを＋(\d+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

@@ -24,6 +24,13 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         var labels = registry.MatchLabels(match.Groups["labels"]?.Value ?? "");
         var mainText = match.Groups["mainText"].Value.Trim();
 
+        // Handle "加速 " (Accelerate) keyword prefix
+        var hasAccelerate = mainText.StartsWith("加速", StringComparison.Ordinal);
+        if (hasAccelerate)
+        {
+            mainText = Regex.Replace(mainText, @"^加速\s*", "");
+        }
+
         // Expected Full English Format:
         // [AUTO] Labels [CXCOMBO][1/TURN] [<costs>] <During conditions>, <when conditions>, <if conditions>, you may pay the cost. If you do, <actions>.
         // - Labels are optional and can be multiple, e.g. [CXCOMBO][1/TURN]
@@ -166,9 +173,10 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
 
         var labelPrefix = labels.Length > 0 ? $"[{string.Join("][", labels)}]" : "";
-        var effectText = $"[AUTO]{labelPrefix}";
+        var accelerateInsert = hasAccelerate ? " Accelerate" : "";
+        var effectText = $"[AUTO]{accelerateInsert}{labelPrefix}";
         if (!string.IsNullOrEmpty(costEnglish))
-            effectText += $"[{costEnglish}]";
+            effectText += $"{(hasAccelerate ? " " : "")}[{costEnglish}]";
         if (!string.IsNullOrEmpty(conditionEnglish))
             effectText += $" {conditionEnglish},";
         if (!string.IsNullOrEmpty(abilityEnglish))
@@ -183,9 +191,13 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                 effectText += ".";
         }
 
+        var finalLabels = labels;
+        if (hasAccelerate)
+            finalLabels = [.. finalLabels, "Accelerate"];
+
         return new AutoCardEffect
         {
-            Labels = labels,
+            Labels = finalLabels,
             PreConditionText = string.Empty,
             PostConditionText = string.Empty,
             ConditionText = conditionEnglish,

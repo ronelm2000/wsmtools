@@ -86,8 +86,12 @@ internal class ActEffectToken : CardTextToken<CardEffect>
         if (!string.IsNullOrEmpty(abilityEnglish))
             effectText += ".";
 
+        var finalLabels = labels;
+        if (Regex.IsMatch(mainText, @"^集中"))
+            finalLabels = [.. finalLabels, "Brainstorm"];
+
         return new ActCardEffect {
-                Labels = labels,
+                Labels = finalLabels,
                 CostText = costEnglish,
                 Cost = costAbilities,
                 Abilities = allAbilities,

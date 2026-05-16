@@ -1,41 +1,38 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
-internal class BrainstormToken : CardTextToken<List<CardEffectAbility>>
+internal class ThoseCardsTriggerIconConditionToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^集中\s+(?<rest>.+)(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^それらのカードのトリガーアイコンが(?<icon>\[[^\]]+\])の(?<remaining>.+)$");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var rest = match.Groups["rest"].Value.Trim();
+        var iconMatch = match.Groups["icon"].Value;
+        var remaining = match.Groups["remaining"].Value.Trim();
 
-        var costMatch = Regex.Match(rest, @"^［(?<cost>.+?)］\s*(?<remaining>.+)$");
-        string costText = string.Empty;
-        string remainingText = rest;
-
-        if (costMatch.Success)
+        // Extract the icon name from [[iconName]]
+        var iconMatchResult = System.Text.RegularExpressions.Regex.Match(iconMatch, @"\[\[(.+?)\]\]");
+        string iconText = "[???]";
+        if (iconMatchResult.Success && iconMatchResult.Groups[1].Success)
         {
-            costText = costMatch.Groups["cost"].Value;
-            remainingText = costMatch.Groups["remaining"].Value.Trim();
+            iconText = $"[{iconMatchResult.Groups[1].Value}]";
         }
 
-        var costAbilities = ParseTokenList(registry, costText);
-        var abilities = ParseTokenList(registry, remainingText);
+        // Create the "For each CX" phrase
+        var cxPhrase = $"For each CX with {iconText} in its trigger icon revealed among those cards";
 
-        var costEnglish = string.Join(" ", costAbilities.Select(a => a.AbilityText));
-        var abilityEnglish = AutoEffectToken.JoinAbilityParts(abilities.Select(a => a.AbilityText).ToList());
+        // Parse the remaining text
+        var abilities = ParseTokenList(registry, remaining);
+        var abilityEnglish = JoinAbilityParts(abilities.Select(a => a.AbilityText).ToList());
 
-        var fullText = "Brainstorm";
-        if (!string.IsNullOrEmpty(costEnglish))
-            fullText += $" [{costEnglish}]";
-        if (!string.IsNullOrEmpty(abilityEnglish))
-            fullText += $" {abilityEnglish}";
-
+        // Combine into a single ability
         return
         [
             new CardEffectAbility
             {
-                AbilityText = fullText
+                AbilityText = string.IsNullOrEmpty(abilityEnglish)
+                    ? cxPhrase
+                    : $"{cxPhrase} {abilityEnglish}"
             }
         ];
     }
@@ -69,5 +66,10 @@ internal class BrainstormToken : CardTextToken<List<CardEffectAbility>>
         }
 
         return result;
+    }
+
+    private static string JoinAbilityParts(List<string> parts)
+    {
+        return string.Join(" ", parts.Where(p => !string.IsNullOrEmpty(p)));
     }
 }

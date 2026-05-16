@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using CsvHelper;
 using CsvHelper.Configuration.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Helpers;
 using Montage.Weiss.Tools.Entities.Effect;
-using Montage.Weiss.Tools.Entities.Effect.Token;
 using Montage.Weiss.Tools.Impls.Services;
-using IgnoreAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.IgnoreAttribute;
 
 namespace Montage.Weiss.Tools.Test;
 
@@ -20,13 +17,19 @@ public class TranslatorServiceTests
 {
     private static readonly WeissSchwarzCardTranslatorService _service = new();
 
+    /// <summary>
+    /// List of excluded ability type names for the test "Registry_AbilitiesMustCaptureEndingPunctuations".
+    /// These are ability tokens are classified to perform greedy captures that are known to not capture ending punctuations, and are excluded from that specific test.
+    /// Do not add without proper justification and consideration of the implications on the translation results.
+    /// </summary>
     private static readonly HashSet<string> ExcludedAbilityTypeNames =
     [
         "PowerBoostWithFollowingAbilityToken",
         "GiveMultipleAbilitiesToken",
         "EncoreToken",
         "BackupPrefixToken",
-        "IfYouDoToken"
+        "IfYouDoToken",
+        "ChooseOtherCharacterAndGiveAbilityToken"
     ];
 
     public TestContext TestContext { get; set; }

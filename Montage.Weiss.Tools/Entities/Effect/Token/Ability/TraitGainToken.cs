@@ -1,17 +1,18 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
-internal class ErosionGainToken : CardTextToken<List<CardEffectAbility>>
+internal class TraitGainToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカードは《浸食》を得る(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^このカードは《(.+?)》を得る(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
+        var trait = match.Groups[1].Value;
         return
         [
             new CardEffectAbility
             {
-                AbilityText = "this card gets <<Corruption>>"
+                AbilityText = $"this card gets <<{trait}>>"
             }
         ];
     }

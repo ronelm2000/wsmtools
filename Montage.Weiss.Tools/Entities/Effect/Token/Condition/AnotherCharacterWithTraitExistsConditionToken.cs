@@ -1,8 +1,8 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 
-internal class DuringTurnTraitExistsConditionToken : CardTextToken<List<CardEffectCondition>>
+internal class AnotherCharacterWithTraitExistsConditionToken : CardTextToken<List<CardEffectCondition>>
 {
-    public override Regex Matcher => new(@"^あなたのターン中、他のあなたの《.+》のキャラがいるなら");
+    public override Regex Matcher => new(@"^他のあなたの《(?<trait>.+?)》のキャラがいるなら");
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -12,8 +12,8 @@ internal class DuringTurnTraitExistsConditionToken : CardTextToken<List<CardEffe
         [
             new CardEffectCondition
             {
-                Type = ConditionType.During,
-                ConditionText = $"During your turn, if you have another <<{trait}>> character"
+                Type = ConditionType.If,
+                ConditionText = $"If you have another <<{trait}>> character"
             }
         ];
     }

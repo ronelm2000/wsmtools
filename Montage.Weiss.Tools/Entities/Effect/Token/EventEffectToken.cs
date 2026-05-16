@@ -72,7 +72,12 @@ internal class EventEffectToken : CardTextToken<CardEffect>
 
             allAbilities.AddRange(sentenceAbilities);
             if (sentenceParts.Count > 0)
-                translatedSentences.Add(string.Join(", ", sentenceParts));
+            {
+                var joined = string.Join(", ", sentenceParts);
+                if (translatedSentences.Count > 0)
+                    joined = char.ToUpper(joined[0]) + joined[1..];
+                translatedSentences.Add(joined);
+            }
         }
 
         var abilityEnglish = string.Join(". ", translatedSentences);

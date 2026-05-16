@@ -7,7 +7,9 @@ using CsvHelper;
 using CsvHelper.Configuration.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Helpers;
+using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities.Effect;
+using Montage.Weiss.Tools.Entities.Effect.Token;
 using Montage.Weiss.Tools.Impls.Services;
 
 namespace Montage.Weiss.Tools.Test;
@@ -60,6 +62,10 @@ public class TranslatorServiceTests
         return effectList;
     }
 
+    public static IEnumerable<(string tokenName, CardTextToken<List<CardEffectCondition>> condition)> GetConditionTokenRegexValues()
+        => _service.ConditionListRegistry.GetAllTokens()
+            .Select(t => (t.GetType().Name, t));
+
     [TestMethod]
     [DynamicData(nameof(GetTokenRegexValues))]
     public void Registry_RegexMustStartWithAnchor(Type type, string regex)
@@ -72,6 +78,16 @@ public class TranslatorServiceTests
     public void Registry_AbilitiesMustCaptureEndingPunctuations(Type type, string regex)
     {
         Assert.EndsWith(@"(?:\.|,|、|。)?", regex, $"Token {type.Name} regex must end with an optional capture of all possible punctuations. Current regex: {regex}");
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(GetConditionTokenRegexValues))]
+    public void Registry_ConditionsMustBeAtomic(string tokenName, CardTextToken<List<CardEffectCondition>> condition)
+    {
+        var result = condition.Translate(_service, "dummy".AsMemory());
+        Assert.IsTrue(result is not null);
+        Assert.IsFalse(result!.Any(e => e.ConditionText.Contains("during", StringComparison.OrdinalIgnoreCase) && e.ConditionText.Contains("if", StringComparison.OrdinalIgnoreCase)),
+            $"Token {tokenName} must be designed to capture atomic conditions without including conjunctions or multiple conditions. Result: {result.Select(e => e.ConditionText).ConcatAsString(";")}");
     }
 
     [TestMethod]

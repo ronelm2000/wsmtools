@@ -34,6 +34,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new DuringTurnAllCharactersAreTraitConditionToken());
         _conditionListRegistry.Register(new DuringTurnPlacedFromHandConditionToken());
         _conditionListRegistry.Register(new DamageCanceledConditionToken());
+        _conditionListRegistry.Register(new DamageNotCanceledConditionToken());
         _conditionListRegistry.Register(new CxWithTriggerIconInCxAreaConditionToken());
         _conditionListRegistry.Register(new YourCxWithTriggerIconTriggeredConditionToken());
         _conditionListRegistry.Register(new CxPlacedConditionToken());

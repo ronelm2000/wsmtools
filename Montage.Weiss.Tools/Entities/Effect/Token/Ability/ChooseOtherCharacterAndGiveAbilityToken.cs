@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ChooseOtherCharacterAndGiveAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^他の自分のキャラを(\d+)枚選び、そのターン中、次の能力を与える。『(.+)』");
+    public override Regex Matcher => new(@"^(?:あなたは)?他の自分のキャラを(\d+)枚選び、そのターン中、次の能力を与える。『(.+)』");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

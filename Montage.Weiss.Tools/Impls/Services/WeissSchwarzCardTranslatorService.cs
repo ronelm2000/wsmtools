@@ -109,12 +109,15 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new CostPutBlueCharacterFromWaitingRoomToClockBottomToken());
         _effectListRegistry.Register(new ChooseCharacterFromWaitingRoomToken());
         _effectListRegistry.Register(new LookAtTopCardsToken());
+        _effectListRegistry.Register(new ChooseFromLookedAndPutOnTopToken());
         _effectListRegistry.Register(new ChooseCardsToken());
         _effectListRegistry.Register(new ChooseTraitCharacterToken());
         _effectListRegistry.Register(new SearchDeckWithTopLookToken());
         _effectListRegistry.Register(new SearchDeckToken());
         _effectListRegistry.Register(new ChooseFromWaitingRoomAndReturnToken());
         _effectListRegistry.Register(new ChooseOtherCharacterAndGiveAbilityToken());
+        _effectListRegistry.Register(new AllCenterStageExceptThisCardGiveAbilityToken());
+        _effectListRegistry.Register(new ChooseCharacterBoostAndGiveAbilityToken());
         _effectListRegistry.Register(new ChooseCharacterAndBoostToken());
         _effectListRegistry.Register(new OpponentChooseCxAndShuffleToken());
         _effectListRegistry.Register(new RevealToOpponentToken());

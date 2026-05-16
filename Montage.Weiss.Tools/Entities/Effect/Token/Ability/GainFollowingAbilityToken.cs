@@ -74,6 +74,19 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
         return null;
     }
 
+    private static readonly string[] NestedLeadInPrefixes =
+    [
+        "あなたは",
+        "あなたの",
+        "自分の",
+        "そうしたら、",
+        "そうしたら",
+        "その後、",
+        "その後",
+        "そして、",
+        "そして"
+    ];
+
     private static bool TryMatchAny(ITokenRegistry registry, string japanese, out string? result)
     {
         if (registry.EffectRegistry.TryFindFirstMatch(japanese, out var effectFunc, out _, out var consumed) && effectFunc != null)
@@ -102,6 +115,18 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
                     result += " " + restResult;
             }
             return true;
+        }
+
+        // Strip lead-in prefixes and retry
+        var trimmed = japanese.TrimStart();
+        foreach (var prefix in NestedLeadInPrefixes)
+        {
+            if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                var rest = trimmed[prefix.Length..].TrimStart('、', ' ', '\t');
+                if (!string.IsNullOrEmpty(rest) && rest != japanese)
+                    return TryMatchAny(registry, rest, out result);
+            }
         }
 
         result = null;

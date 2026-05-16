@@ -1,8 +1,10 @@
+using System.Text.RegularExpressions;
+
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
-internal class ChooseOtherCharacterAndGiveAbilityToken : CardTextToken<List<CardEffectAbility>>
+internal class ChooseCharacterAndGiveAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:あなたは)?(他の)?自分のキャラを(\d+)枚選び、そのターン中、次の能力を与える。『(.+)』");
+    public override Regex Matcher => new(@"^(?:あなたは)?(自分の)?キャラを (\d+) 枚選び、そのターン中、次の能力を与える。『(.+)』");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -15,7 +17,7 @@ internal class ChooseOtherCharacterAndGiveAbilityToken : CardTextToken<List<Card
         [
             new CardEffectAbility
             {
-                AbilityText = $"choose {count} of your other characters, and that character gets the following ability until end of turn. \"{nestedEnglish}\""
+                AbilityText = $"choose {count} of your characters, and that character gets the following ability until end of turn. \"{nestedEnglish}\""
             }
         ];
     }

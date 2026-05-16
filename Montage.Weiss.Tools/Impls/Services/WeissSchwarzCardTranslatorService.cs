@@ -120,6 +120,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new AllCenterStageExceptThisCardGiveAbilityToken());
         _effectListRegistry.Register(new ChooseCharacterBoostAndGiveAbilityToken());
         _effectListRegistry.Register(new ChooseCharacterAndBoostToken());
+        _effectListRegistry.Register(new ChooseCharacterAndGiveAbilityToken());
         _effectListRegistry.Register(new OpponentChooseCxAndShuffleToken());
         _effectListRegistry.Register(new RevealToOpponentToken());
         _effectListRegistry.Register(new ConditionalPutInHandToken());

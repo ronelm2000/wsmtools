@@ -8,7 +8,7 @@ internal class HandLevelMinusToken : CardTextToken<List<CardEffectAbility>>
     {
         var match = Matcher.Match(span.ToString());
         var name = match.Groups["name"].Success ? match.Groups["name"].Value : null;
-        var level = match.Groups[2].Value;
+        var level = match.Groups[1].Value;
         
         // Clean up nested quotes for proper English formatting
         if (!string.IsNullOrEmpty(name))

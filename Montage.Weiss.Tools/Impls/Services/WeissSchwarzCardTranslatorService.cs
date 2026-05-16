@@ -48,6 +48,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new LevelConditionToken());
         _conditionListRegistry.Register(new InClockConditionToken());
         _conditionListRegistry.Register(new TraitCharacterCountConditionToken());
+        _conditionListRegistry.Register(new CompoundCardInLevelConditionToken());
         _conditionListRegistry.Register(new ExperienceConditionToken());
         _conditionListRegistry.Register(new TraitCountConditionToken());
         _conditionListRegistry.Register(new AnotherTraitNotExistsConditionToken());

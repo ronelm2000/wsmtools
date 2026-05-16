@@ -20,10 +20,32 @@ internal class EventEffectToken : CardTextToken<CardEffect>
             if (string.IsNullOrEmpty(trimmed))
                 continue;
 
+            var conditions = new List<CardEffectCondition>();
             var sentenceAbilities = new List<CardEffectAbility>();
             var sentenceParts = new List<string>();
             var remainingText = trimmed;
 
+            // Extract sentence-level pre-conditions first (e.g., "このカードは、あなたの《NIKKE》のキャラがいないなら")
+            while (true)
+            {
+                var t = remainingText.TrimStart();
+                if (t.Length == 0)
+                    break;
+
+                if (registry.ConditionListRegistry.TryMatchAtStart(t, out var condFunc, out var consumed) && condFunc != null)
+                {
+                    var condList = condFunc(registry);
+                    conditions.AddRange(condList);
+                    sentenceParts.AddRange(condList.Select(c => c.ConditionText));
+                    remainingText = t[consumed..].TrimStart('、', '。', ' ', '\t');
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // Then parse remaining text for ability tokens
             while (!string.IsNullOrWhiteSpace(remainingText))
             {
                 var t = remainingText.TrimStart();

@@ -7,7 +7,7 @@ internal class HandSizeConditionToken : CardTextToken<List<CardEffectCondition>>
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var count = int.Parse(match.Groups[1].Value);
+        var count = int.TryParse(match.Groups[1].Value, out var result) ? result : 0;
         return
         [
             new CardEffectCondition

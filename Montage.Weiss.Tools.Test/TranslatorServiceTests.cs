@@ -403,6 +403,20 @@ public class TranslatorServiceTests
     }
 
     [TestMethod]
+    public void Translate_AutoEffect_NonExistentConditionMustCrash()
+    {
+        var japanese = "【自】 あなたがこのカードの『non_existent_label』を使った時、あなたは自分の山札の上から1枚を公開する。そのカードが《風》のキャラなら手札に加え、あなたは自分の手札を1枚選び、控え室に置く。（そうでないなら元に戻す）";
+        Assert.ThrowsExactly<NotImplementedException>(() => _service.TranslateEffect(japanese));
+    }
+
+    [TestMethod]
+    public void Translate_AutoEffect_NonExistentAbilityMustCrash()
+    {
+        var japanese = "【自】 あなたがこのカードの『助太刀』を使った時、あなたは自分の山札の上から1枚枚枚枚枚を公開する。そのカードが《風》のキャラなら手札に加え、あなたは自分の手札を1枚選び、控え室に置く。（そうでないなら元に戻す）";
+        Assert.ThrowsExactly<NotImplementedException>(() => _service.TranslateEffect(japanese));
+    }
+
+    [TestMethod]
     [DynamicData(nameof(TranslateCsvCrossCheckAllData))]
     public void Translate_CSV_CrossCheckAll(string serial, string jpEffect, string enEffect, string labels)
     {

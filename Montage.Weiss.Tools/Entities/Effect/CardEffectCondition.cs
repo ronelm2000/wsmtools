@@ -1,3 +1,5 @@
+using Montage.Card.API.Utilities;
+
 namespace Montage.Weiss.Tools.Entities.Effect;
 
 public enum ConditionConjunction
@@ -15,6 +17,51 @@ public record CardEffectCondition
     public required ConditionType Type { get; init; }
     public required string ConditionText { get; init; }
     public ConditionConjunction Conjunction { get; init; } = ConditionConjunction.And;
+}
+
+public static class CardEffectConditionExtensions {
+    public static string AggregateToString(this IEnumerable<CardEffectCondition> conditions)
+    {
+        if (!conditions.Any()) return string.Empty;
+        var typeGroups = conditions.GroupBy(c => c.Type).ToList();
+        var parts = new List<string>();
+
+        foreach (var typeGroup in typeGroups)
+        {
+            var typeStr = typeGroup.Key switch
+            {
+                ConditionType.When => "When",
+                ConditionType.If => "If",
+                ConditionType.During => "During",
+                ConditionType.At => "At",
+                ConditionType.PreCondition => "",
+                ConditionType.PostCondition => "",
+                _ => throw new InvalidOperationException("Unknown condition type")
+            };
+            if (typeGroup.Key == ConditionType.PreCondition || typeGroup.Key == ConditionType.PostCondition)
+            {
+                // Pre and post conditions are anchored; they should be skipped and inserted from its parent (typically CardEffect)
+                continue;
+            }
+
+            var conjunctionGroups = typeGroup.GroupBy(c => c.Conjunction).ToList();
+            var conjunctionParts = new List<string>();
+            foreach (var conjunctionGroup in conjunctionGroups)
+            {
+                var conjunctionStr = conjunctionGroup.Key switch
+                {
+                    ConditionConjunction.And => "and",
+                    ConditionConjunction.Or => "or",
+                    ConditionConjunction.Continuation => "and",
+                    _ => throw new InvalidOperationException("Unknown conjunction")
+                };
+                conjunctionParts.Add(conjunctionGroup.Select(c => c.ConditionText).JoinWithOxfordComma(conjunctionStr, true));
+            }
+            var combinedConjunctions = conjunctionParts.JoinWithOxfordComma();
+            parts.Add($"{typeStr} {combinedConjunctions}".Trim());
+        }
+        return string.Join(",", parts);
+    }
 }
 
 public enum ConditionType

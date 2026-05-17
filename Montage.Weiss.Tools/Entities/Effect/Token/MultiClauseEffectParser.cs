@@ -110,6 +110,28 @@ public static class MultiClauseEffectParser
         return new ParsedSentence(conditions, abilities, text);
     }
 
+    public static List<ParsedSentence> Parse(
+        string input,
+        ITokenRegistry registry,
+        LeadInPrefixMap? prefixMap = null)
+    {
+        var protectedInput = Regex.Replace(input, @"『[^』]+』", m => m.Value.Replace("。", "\0"));
+        var sentences = protectedInput.Split('。', StringSplitOptions.RemoveEmptyEntries);
+        var results = new List<ParsedSentence>();
+
+        foreach (var sentence in sentences)
+        {
+            var trimmed = sentence.Trim().Replace("\0", "。");
+            if (string.IsNullOrEmpty(trimmed))
+                continue;
+
+            var parsed = ParseSentence(trimmed, registry, prefixMap);
+            results.Add(parsed);
+        }
+
+        return results;
+    }
+
     private static string BuildSentenceText(List<CardEffectCondition> conditions, List<CardEffectAbility> abilities)
     {
         var parts = new List<string>();

@@ -16,9 +16,9 @@ public enum AbilityPrefix
     Subject,
 }
 
-public record CardEffectAbility
+public record CardEffectAbility : ICardAbility
 {
-    public required string AbilityText { get; init; }
+    public virtual required string AbilityText { get; init; }
     public AbilityPrefix Prefix { get; init; } = AbilityPrefix.And;
 
     public static CardEffectAbility operator +(CardEffectAbility a, CardEffectAbility b)

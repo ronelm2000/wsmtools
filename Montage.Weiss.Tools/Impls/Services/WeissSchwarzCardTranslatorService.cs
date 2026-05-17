@@ -139,6 +139,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new OpponentChooseCxAndShuffleToken());
         _effectListRegistry.Register(new RevealToOpponentToken());
         _effectListRegistry.Register(new ConditionalPutInHandToken());
+        _effectListRegistry.Register(new ConditionalAbilityToken());
         _effectListRegistry.Register(new ChooseCardAndPutInWaitingRoomToken());
         _effectListRegistry.Register(new PutInHandToken());
         _effectListRegistry.Register(new ReturnMultipleToHandToken());

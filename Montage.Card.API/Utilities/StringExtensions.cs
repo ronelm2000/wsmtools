@@ -79,17 +79,18 @@ public static class StringExtensions
         return res;
     }
 
-    public static string JoinWithOxfordComma(this IEnumerable<string> items)
+    public static string JoinWithOxfordComma(this IEnumerable<string> items, string conjunction = "and", bool useCommaInPairs = false)
     {
         var itemList = items.ToList();
+        var commaInPairs = useCommaInPairs ? (", ") : "";
         if (itemList.Count == 0) return "";
         else if (itemList.Count == 1) return itemList[0];
-        else if (itemList.Count == 2) return $"{itemList[0]} and {itemList[1]}";
+        else if (itemList.Count == 2) return $"{itemList[0]} {commaInPairs}{conjunction} {itemList[1]}";
         else
         {
             var allButLast = itemList.Take(itemList.Count - 1);
             var last = itemList.Last();
-            return $"{string.Join(", ", allButLast)}, and {last}";
+            return $"{string.Join(", ", allButLast)}, {conjunction} {last}";
         }
     }
 

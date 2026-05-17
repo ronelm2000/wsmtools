@@ -110,6 +110,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 
         // Iterative condition matching using ^-anchored condition tokens
         var conditions = new List<CardEffectCondition>();
+        var tokenLog = new List<string>();
         var remainingText = rest;
 
         // Parse ASCII-bracket condition if present
@@ -117,6 +118,9 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         {
             try
             {
+                var condMatch = registry.ConditionListRegistry.Match(asciiConditionJapanese.Trim().AsMemory());
+                if (condMatch != null)
+                    tokenLog.Add(condMatch.Match.Token);
                 var condList = registry.ConditionListRegistry.GetMatch(asciiConditionJapanese.Trim().AsMemory())(registry);
                 conditions.AddRange(condList);
             }
@@ -131,6 +135,9 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             var trimmed = remainingText.TrimStart();
             if (registry.ConditionListRegistry.TryMatchAtStart(trimmed, out var condFunc, out var consumed) && condFunc != null)
             {
+                var condMatch = registry.ConditionListRegistry.Match(trimmed.AsMemory());
+                if (condMatch != null)
+                    tokenLog.Add(condMatch.Match.Token);
                 var condList = condFunc(registry);
                 conditions.AddRange(condList);
                 remainingText = trimmed[consumed..].TrimStart('、', ' ', '\t');
@@ -163,6 +170,9 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                     continue;
                 }
 
+                var abilMatch = registry.EffectListRegistry.Match(trimmed.AsMemory());
+                if (abilMatch != null)
+                    tokenLog.Add(abilMatch.Match.Token);
                 var abilList = abilFunc(registry);
                 allAbilities.AddRange(abilList);
                 abilityParts.AddRange(abilList.Select(a => a.AbilityText));
@@ -252,7 +262,8 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             Cost = costAbilities,
             Abilities = allAbilities,
             AbilityText = abilityEnglish,
-            EffectText = effectText
+            EffectText = effectText,
+            TokenLog = tokenLog
         };
     }
 

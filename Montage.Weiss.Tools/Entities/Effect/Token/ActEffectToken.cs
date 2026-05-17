@@ -29,6 +29,7 @@ internal class ActEffectToken : CardTextToken<CardEffect>
         // Iterative ability matching
         var allAbilities = new List<CardEffectAbility>();
         var abilityParts = new List<string>();
+        var tokenLog = new List<string>();
         var remainingText = rest;
 
         while (!string.IsNullOrWhiteSpace(remainingText))
@@ -44,6 +45,9 @@ internal class ActEffectToken : CardTextToken<CardEffect>
                     remainingText = trimmed[matchIndex..];
                     continue;
                 }
+                var abilMatch = registry.EffectListRegistry.Match(trimmed.AsMemory());
+                if (abilMatch != null)
+                    tokenLog.Add(abilMatch.Match.Token);
                 var abilList = abilFunc(registry);
                 allAbilities.AddRange(abilList);
                 abilityParts.AddRange(abilList.Select(a => a.AbilityText));
@@ -98,7 +102,8 @@ internal class ActEffectToken : CardTextToken<CardEffect>
                 Cost = costAbilities,
                 Abilities = allAbilities,
                 AbilityText = abilityEnglish,
-                EffectText = effectText
+                EffectText = effectText,
+                TokenLog = tokenLog
         };
     }
 }

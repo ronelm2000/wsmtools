@@ -326,6 +326,31 @@ public class TranslatorServiceTests
     }
 
     [TestMethod]
+    public void Translate_AutoEffect_TokenLogMustNotBeEmpty()
+    {
+        var japanese = "【自】 このカードが手札から舞台に置かれた時、あなたは自分のクロックの上から1枚までを、控え室に置き、そのターン中、このカードのパワーを＋3000。";
+        var tree = _service.TranslateEffect(japanese);
+
+        Assert.AreEqual(1, tree.Effects.Count);
+        var effect = tree.Effects[0] as AutoCardEffect;
+        Assert.IsNotNull(effect);
+        Assert.IsNotEmpty(effect!.TokenLog);
+    }
+
+
+    [TestMethod]
+    public void Translate_ActEffect_TokenLogMustNotBeEmpty()
+    {
+        var japanese = "【起】［手札を1枚控え室に置き、このカードを控え室に置く］ あなたは自分の控え室の《NIKKE》のキャラを1枚選び、手札に戻す。";
+        var tree = _service.TranslateEffect(japanese);
+
+        Assert.AreEqual(1, tree.Effects.Count);
+        var effect = tree.Effects[0] as ActCardEffect;
+        Assert.IsNotNull(effect);
+        Assert.IsNotEmpty(effect!.TokenLog);
+    }
+
+    [TestMethod]
     public void Translate_LookAtTopCards_Token()
     {
         var japanese = "【自】 このカードが手札から舞台に置かれた時、あなたは自分の山札を上からＸ枚まで見て、カードを1枚まで選び、手札に加え、残りのカードを控え室に置く。Ｘはあなたの《風》のキャラの枚数に等しい。";

@@ -69,12 +69,16 @@ internal class ContEffectToken : CardTextToken<CardEffect>
 
         // Iteratively consume conditions from start of remaining text
         var conditions = new List<CardEffectCondition>();
+        var tokenLog = new List<string>();
 
         while (true)
         {
             var trimmed = remainingText.TrimStart();
             if (registry.ConditionListRegistry.TryMatchAtStart(trimmed, out var condFunc, out var consumed) && condFunc != null)
             {
+                var condMatch = registry.ConditionListRegistry.Match(trimmed.AsMemory());
+                if (condMatch != null)
+                    tokenLog.Add(condMatch.Match.Token);
                 var condList = condFunc(registry);
                 conditions.AddRange(condList);
                 remainingText = trimmed[consumed..].TrimStart('、', ' ', '\t');
@@ -103,6 +107,9 @@ internal class ContEffectToken : CardTextToken<CardEffect>
                     abilityText = trimmed[matchIndex..];
                     continue;
                 }
+                var abilMatch = registry.EffectListRegistry.Match(trimmed.AsMemory());
+                if (abilMatch != null)
+                    tokenLog.Add(abilMatch.Match.Token);
                 var abilList = abilFunc(registry);
                 allAbilities.AddRange(abilList);
                 abilityParts.AddRange(abilList.Select(a => a.AbilityText));
@@ -180,7 +187,8 @@ internal class ContEffectToken : CardTextToken<CardEffect>
             Condition = conditions,
             Abilities = allAbilities,
             AbilityText = abilityEnglish,
-            EffectText = effectText
+            EffectText = effectText,
+            TokenLog = tokenLog
         };
     }
 }

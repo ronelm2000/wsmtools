@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class SoulBoostOneToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^ソウルを＋1");
+    public override Regex Matcher => new(@"^ソウルを＋1(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

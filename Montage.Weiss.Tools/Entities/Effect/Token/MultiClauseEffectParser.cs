@@ -165,8 +165,10 @@ public static class MultiClauseEffectParser
 
             if (!prefixSkipped)
             {
-                // Also try skipping subject prefixes (あなたは, 自分の) without setting prefix
-                foreach (var prefix in new[] { "あなたは", "あなたの", "自分の", "このカードは", "このカードが", "相手の", "他のあなたの", "他の", "次の" })
+                // Try skipping subject prefixes that are rarely part of token regexes.
+                // NOTE: 'あなたの', '相手の', '他の', 'このカードは', 'このカードが', '次の' are EXCLUDED
+                // because many token regexes include them (e.g. AllCharactersBoostToken: ^あなたのキャラすべてに).
+                foreach (var prefix in new[] { "あなたは", "自分の" })
                 {
                     if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
                     {
@@ -178,9 +180,25 @@ public static class MultiClauseEffectParser
                 }
             }
 
+            // Fallback: try matching the original (un-skipped) text.
+            // This handles tokens whose regex includes the prefix (e.g. GiveEncoreToOpponentCharactersToken starts with "相手の")
             if (!prefixSkipped)
             {
-                Log.Debug("ParseSentence: no prefix to skip, breaking. remaining='{Remaining}'", trimmed);
+                var originalMatch = registry.EffectListRegistry.Match(trimmed.AsMemory());
+                if (originalMatch != null)
+                {
+                    var abilList = originalMatch.Translate(registry);
+                    foreach (var abil in abilList)
+                    {
+                        abilities.Add(abil);
+                    }
+                    Log.Debug("ParseSentence: fallback match by '{Token}', consumed {Len} chars, remaining='{Remaining}'",
+                        originalMatch.Match.Token, originalMatch.Match.Length, trimmed[originalMatch.Match.Length..]);
+                    remainingText = trimmed[originalMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
+                    continue;
+                }
+
+                Log.Debug("ParseSentence: no prefix to skip nor fallback match, breaking. remaining='{Remaining}'", trimmed);
                 break;
             }
         }
@@ -197,7 +215,10 @@ public static class MultiClauseEffectParser
         ITokenRegistry registry,
         LeadInPrefixMap? prefixMap = null)
     {
+        // Protect 「」, 『』, and cost-pay patterns from 。 splitting
         var protectedInput = Regex.Replace(input, @"『[^』]+』", m => m.Value.Replace("。", "\0"));
+        protectedInput = Regex.Replace(protectedInput, @"〔[^〕]+〕", m => m.Value.Replace("。", "\0"));
+        protectedInput = Regex.Replace(protectedInput, @"コストを払ってよい。", m => m.Value.Replace("。", "\0"));
         var sentences = protectedInput.Split('。', StringSplitOptions.RemoveEmptyEntries);
         var results = new List<ParsedSentence>();
 

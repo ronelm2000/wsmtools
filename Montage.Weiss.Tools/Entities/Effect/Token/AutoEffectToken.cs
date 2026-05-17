@@ -95,23 +95,24 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             }
         }
 
-        // Parse the rest as a single sentence (no 。 splitting)
-        var parsed = MultiClauseEffectParser.ParseSentence(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
-        allConditions.AddRange(parsed.Conditions);
-        foreach (var abil in parsed.Abilities)
+        // Parse with sentence splitting on 。
+        var parsedSentences = MultiClauseEffectParser.Parse(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
+        foreach (var parsed in parsedSentences)
         {
-            allAbilities.Add(abil);
-            abilityParts.Add(abil.AbilityText);
-        }
-
-        // Log tokens from parsed sentence
-        foreach (var cond in parsed.Conditions)
-        {
-            tokenLog.Add($"Cond:{cond.Type}");
-        }
-        foreach (var abil in parsed.Abilities)
-        {
-            tokenLog.Add($"Abil:{abil.Prefix}");
+            allConditions.AddRange(parsed.Conditions);
+            foreach (var abil in parsed.Abilities)
+            {
+                allAbilities.Add(abil);
+                abilityParts.Add(abil.AbilityText);
+            }
+            foreach (var cond in parsed.Conditions)
+            {
+                tokenLog.Add($"Cond:{cond.Type}");
+            }
+            foreach (var abil in parsed.Abilities)
+            {
+                tokenLog.Add($"Abil:{abil.Prefix}");
+            }
         }
 
         // Format conditions
@@ -206,13 +207,19 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         if (abilities.Count == 0)
             return "";
 
-        // Group by sentence: abilities with IfYouDo/Otherwise/AfterThat prefix start new sentences
+        // Group by sentence: start new sentence for IfYouDo/Otherwise/AfterThat
+        // or abilities whose text starts with condition keywords
         var groups = new List<List<CardEffectAbility>>();
         var currentGroup = new List<CardEffectAbility> { abilities[0] };
         for (int i = 1; i < abilities.Count; i++)
         {
             var abil = abilities[i];
-            if (abil.Prefix is AbilityPrefix.IfYouDo or AbilityPrefix.Otherwise or AbilityPrefix.AfterThat)
+            var startsWithConditional = abil.AbilityText.StartsWith("If", StringComparison.OrdinalIgnoreCase)
+                || abil.AbilityText.StartsWith("When", StringComparison.OrdinalIgnoreCase)
+                || abil.AbilityText.StartsWith("During", StringComparison.OrdinalIgnoreCase)
+                || abil.AbilityText.StartsWith("At", StringComparison.OrdinalIgnoreCase);
+            if (abil.Prefix is AbilityPrefix.IfYouDo or AbilityPrefix.Otherwise or AbilityPrefix.AfterThat
+                || startsWithConditional)
             {
                 groups.Add(currentGroup);
                 currentGroup = new List<CardEffectAbility> { abil };

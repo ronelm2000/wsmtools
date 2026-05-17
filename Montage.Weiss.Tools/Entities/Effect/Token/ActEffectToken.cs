@@ -2,6 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 internal class ActEffectToken : CardTextToken<CardEffect>
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<ActEffectToken>();
     public override Regex Matcher => new(@"^【起】(?<labels>(?:【[^】]+】)*)\s*(?<mainText>.+)$");
 
     public override CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
@@ -21,43 +22,18 @@ internal class ActEffectToken : CardTextToken<CardEffect>
             rest = costMatch.Groups["rest"].Value.Trim();
         }
 
-        // Translate cost
+        // Translate cost using Match API (same pattern as AutoEffectToken)
         var costAbilities = string.IsNullOrEmpty(costTextJapanese)
-            ? []
-            : registry.EffectListRegistry.GetMatch(costTextJapanese.AsMemory())(registry);
+            ? new List<CardEffectAbility>()
+            : ParseCostText(registry, costTextJapanese);
 
-        // Iterative ability matching
-        var allAbilities = new List<CardEffectAbility>();
-        var abilityParts = new List<string>();
+        // Parse the rest using MultiClauseEffectParser
         var tokenLog = new List<string>();
-        var remainingText = rest;
+        var parsed = MultiClauseEffectParser.ParseSentence(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
+        var allAbilities = parsed.Abilities;
+        var abilityParts = parsed.Abilities.Select(a => a.AbilityText).ToList();
 
-        while (!string.IsNullOrWhiteSpace(remainingText))
-        {
-            var trimmed = remainingText.TrimStart();
-            if (trimmed.Length == 0)
-                break;
-
-            if (registry.EffectListRegistry.TryFindFirstMatch(trimmed, out var abilFunc, out var matchIndex, out var consumed) && abilFunc != null)
-            {
-                if (matchIndex > 0)
-                {
-                    remainingText = trimmed[matchIndex..];
-                    continue;
-                }
-                var abilMatch = registry.EffectListRegistry.Match(trimmed.AsMemory());
-                if (abilMatch != null)
-                    tokenLog.Add(abilMatch.Match.Token);
-                var abilList = abilFunc(registry);
-                allAbilities.AddRange(abilList);
-                abilityParts.AddRange(abilList.Select(a => a.AbilityText));
-                remainingText = trimmed[consumed..].TrimStart('、', '。', ' ', '\t');
-            }
-            else
-            {
-                break;
-            }
-        }
+        Log.Debug("ActEffectToken: parsed {AbilCount} abilities from '{Rest}'", allAbilities.Count, rest);
 
         // Post-process opponent references
         if (mainText.Contains("相手の"))
@@ -105,5 +81,22 @@ internal class ActEffectToken : CardTextToken<CardEffect>
                 EffectText = effectText,
                 TokenLog = tokenLog
         };
+    }
+
+    private static List<CardEffectAbility> ParseCostText(ITokenRegistry registry, string costText)
+    {
+        var costAbilities = new List<CardEffectAbility>();
+        var costRemaining = costText;
+        while (!string.IsNullOrWhiteSpace(costRemaining))
+        {
+            var t = costRemaining.TrimStart();
+            var matchResult = registry.EffectListRegistry.Match(t.AsMemory());
+            if (matchResult == null) break;
+
+            var abils = matchResult.Translate(registry);
+            costAbilities.AddRange(abils);
+            costRemaining = t[matchResult.Match.Length..].TrimStart('、', ' ', '\t');
+        }
+        return costAbilities;
     }
 }

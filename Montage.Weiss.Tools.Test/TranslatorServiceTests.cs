@@ -62,6 +62,14 @@ public class TranslatorServiceTests
         return effectList;
     }
 
+    public static IEnumerable<(Type type, String regex)> GetAbilityTokenRegexValuesV2()
+    {
+        var effectList = _service.EffectListRegistry.GetAllTokens()
+            .Select(t => (t.GetType(), t.Matcher.ToString()));
+
+        return effectList;
+    }
+
     public static IEnumerable<(string tokenName, CardTextToken<List<CardEffectCondition>> condition)> GetConditionTokenRegexValues()
         => _service.ConditionListRegistry.GetAllTokens()
             .Select(t => (t.GetType().Name, t));
@@ -78,6 +86,13 @@ public class TranslatorServiceTests
     public void Registry_AbilitiesMustCaptureEndingPunctuations(Type type, string regex)
     {
         Assert.EndsWith(@"(?:\.|,|、|。)?", regex, $"Token {type.Name} regex must end with an optional capture of all possible punctuations. Current regex: {regex}");
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(GetAbilityTokenRegexValuesV2))]
+    public void Registry_AbilityRegexMustNotContainSpaces(Type type, string regex)
+    {
+        Assert.DoesNotContain(" ", regex, $"Token {type.Name} regex must not contain spaces. Current regex: {regex}");
     }
 
     [TestMethod]

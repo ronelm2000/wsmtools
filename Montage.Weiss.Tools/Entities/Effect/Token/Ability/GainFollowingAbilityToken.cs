@@ -1,14 +1,53 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
-internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffectAbility>>
+internal class PowerBoostWithDurationToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカードのパワーを＋(\d+)し、このカードは次の能力を得る。『(.+)』");
+    private static readonly ILogger Log = Serilog.Log.ForContext<PowerBoostWithDurationToken>();
+
+    private static readonly Dictionary<string, string> DurationMap = new()
+    {
+        { "そのターン中", " until end of turn" },
+        { "このターン中", " until end of turn" },
+        { "次の相手のターンの終わりまで", " until the end of your opponent's next turn" },
+        { "次の相手のターンの終了時まで", " until the end of your opponent's next turn" },
+    };
+
+    public override Regex Matcher => new(@"^(?:(?<duration>そのターン中|このターン中|次の相手のターンの終わりまで|次の相手のターンの終了時まで)、)?このカードのパワーを[＋\+](?<power>\d+)");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var power = match.Groups[1].Value;
-        var nestedJapanese = match.Groups[2].Value;
+        var durationGroup = match.Groups["duration"];
+        var power = match.Groups["power"].Value;
+
+        var durationText = "";
+        if (durationGroup.Success && DurationMap.TryGetValue(durationGroup.Value, out var dur))
+        {
+            durationText = dur;
+        }
+
+        Log.Debug("PowerBoostWithDurationToken: matched input='{Input}', power={Power}, duration='{Duration}'",
+            span.ToString(), power, durationText);
+
+        return
+        [
+            new CardEffectAbility
+            {
+                AbilityText = $"this card gets +{power} power{durationText}"
+            }
+        ];
+    }
+}
+
+internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffectAbility>>
+{
+    public override Regex Matcher => new(@"^このカードのパワーを[＋\+](?<power>\d+)し、このカードは次の能力を得る。『(?<nested>.+)』");
+
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
+    {
+        var match = Matcher.Match(span.ToString());
+        var power = match.Groups["power"].Value;
+        var nestedJapanese = match.Groups["nested"].Value;
 
         var nestedEnglish = TryTranslateNested(registry, nestedJapanese) ?? nestedJapanese;
 
@@ -134,6 +173,45 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
 
         result = null;
         return false;
+    }
+}
+
+internal class PowerBoostWithFollowingAbilitiesToken : CardTextToken<List<CardEffectAbility>>
+{
+    private static readonly Dictionary<string, string> DurationMap = new()
+    {
+        { "そのターン中", "until end of turn" },
+        { "このターン中", "until end of turn" },
+        { "次の相手のターンの終わりまで", "until the end of your opponent's next turn" },
+        { "次の相手のターンの終了時まで", "until the end of your opponent's next turn" },
+    };
+
+    public override Regex Matcher => new(@"^(?:(?<duration>そのターン中|このターン中|次の相手のターンの終わりまで|次の相手のターンの終了時まで)、)?このカードのパワーを＋(?<power>\d+)し、このカードは次の2つの能力を得る。『(?<nested1>.+)』『(?<nested2>.+)』");
+
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
+    {
+        var match = Matcher.Match(span.ToString());
+        var durationGroup = match.Groups["duration"];
+        var power = match.Groups["power"].Value;
+        var nestedJapanese1 = match.Groups["nested1"].Value;
+        var nestedJapanese2 = match.Groups["nested2"].Value;
+
+        var durationText = "";
+        if (durationGroup.Success && DurationMap.TryGetValue(durationGroup.Value, out var dur))
+        {
+            durationText = $" {dur}";
+        }
+
+        var nestedEnglish1 = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese1) ?? nestedJapanese1;
+        var nestedEnglish2 = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese2) ?? nestedJapanese2;
+
+        return
+        [
+            new CardEffectAbility
+            {
+                AbilityText = $"this card gets +{power} power and the following abilities{durationText}. \"{nestedEnglish1}\" \"{nestedEnglish2}\""
+            }
+        ];
     }
 }
 

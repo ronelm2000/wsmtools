@@ -11,6 +11,18 @@ public record ParsedSentence(
 
 public static class MultiClauseEffectParser
 {
+    private static readonly Dictionary<string, string> DurationTextMap = new()
+    {
+        { "そのターン中", " until end of turn" },
+        { "このターン中", " until end of turn" },
+        { "次の相手のターンの終わりまで", " until the end of your opponent's next turn" },
+        { "次の相手のターンの終了時まで", " until the end of your opponent's next turn" },
+        { "このカードのバトル中", " during this card's battle" },
+        { "あなたのターン中", " during your turn" },
+    };
+
+    private static readonly HashSet<string> DurationPrefixes = new(DurationTextMap.Keys.Select(k => k + "、").Concat(DurationTextMap.Keys));
+
     public static readonly LeadInPrefixMap DefaultPrefixMap = new(new Dictionary<string, AbilityPrefix>
     {
         { "し、", AbilityPrefix.Continuation },
@@ -59,6 +71,7 @@ public static class MultiClauseEffectParser
         var conditions = new List<CardEffectCondition>();
         var abilities = new List<CardEffectAbility>();
         var remainingText = sentence.Trim();
+        string? pendingDuration = null;
 
         Log.Debug("ParseSentence: input='{Input}'", sentence);
 
@@ -100,15 +113,18 @@ public static class MultiClauseEffectParser
             Log.Debug("ParseSentence: ability iteration {Iter}, trying to match='{Text}'", iteration, trimmed);
 
             // Step 1: Try matching at index 0 FIRST (before any prefix stripping)
-            // This allows tokens with ^あなたの, ^自分の, ^相手の etc. to match
             var abilMatch = registry.EffectListRegistry.Match(trimmed.AsMemory());
             if (abilMatch != null)
             {
                 var abilList = abilMatch.Translate(registry);
                 foreach (var abil in abilList)
                 {
-                    abilities.Add(abil);
+                    var finalText = pendingDuration != null ? abil.AbilityText + pendingDuration : abil.AbilityText;
+                    Log.Debug("ParseSentence: ability '{Token}' with pending duration '{Duration}' -> '{FinalText}'",
+                        abilMatch.Match.Token, pendingDuration, finalText);
+                    abilities.Add(abil with { AbilityText = finalText });
                 }
+                pendingDuration = null;
                 Log.Debug("ParseSentence: ability matched by '{Token}', consumed {Len} chars, remaining='{Remaining}'",
                     abilMatch.Match.Token, abilMatch.Match.Length, trimmed[abilMatch.Match.Length..]);
                 remainingText = trimmed[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
@@ -123,6 +139,14 @@ public static class MultiClauseEffectParser
             {
                 if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
                 {
+                    // Check if this is a duration prefix
+                    var durationKey = prefix.TrimEnd('、');
+                    if (DurationTextMap.TryGetValue(durationKey, out var durText))
+                    {
+                        pendingDuration = durText;
+                        Log.Debug("ParseSentence: detected duration prefix '{Prefix}' -> '{DurationText}'", prefix, durText);
+                    }
+
                     var prefixType = prefixMap?.Prefixes.TryGetValue(prefix, out var p) == true ? p : AbilityPrefix.And;
                     remainingText = trimmed[prefix.Length..].TrimStart('、', ' ', '\t');
                     Log.Debug("ParseSentence: skipped prefix='{Prefix}', now trying='{Remaining}'", prefix, remainingText);
@@ -134,8 +158,12 @@ public static class MultiClauseEffectParser
                         var abilList = abilMatch.Translate(registry);
                         foreach (var abil in abilList)
                         {
-                            abilities.Add(abil with { Prefix = prefixType });
+                            var finalText = pendingDuration != null ? abil.AbilityText + pendingDuration : abil.AbilityText;
+                            Log.Debug("ParseSentence: after prefix skip, ability '{Token}' with duration '{Duration}' -> '{FinalText}'",
+                                abilMatch.Match.Token, pendingDuration, finalText);
+                            abilities.Add(abil with { AbilityText = finalText, Prefix = prefixType });
                         }
+                        pendingDuration = null;
                         Log.Debug("ParseSentence: after prefix skip, matched by '{Token}', remaining='{Remaining}'",
                             abilMatch.Match.Token, remainingText[abilMatch.Match.Length..]);
                         remainingText = remainingText[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
@@ -163,16 +191,32 @@ public static class MultiClauseEffectParser
         return new ParsedSentence(conditions, abilities, text);
     }
 
-    // Prefixes that should be skipped before matching (conjunctions only)
+    // Prefixes that should be skipped before matching (conjunctions + subject prefixes + duration prefixes)
+    // IMPORTANT: Longer prefixes must come before shorter ones to avoid partial matches
     public static readonly string[] SkippablePrefixes =
     [
-        "し、", "し", "て、", "て",
-        "そうしたら、", "そうしたら",
+        // Duration prefixes (longest first)
+        "次の相手のターンの終わりまで、", "次の相手のターンの終わりまで",
+        "次の相手のターンの終了時まで、", "次の相手のターンの終了時まで",
+        "このカードのバトル中、", "このカードのバトル中",
+        "あなたのターン中、", "あなたのターン中",
+        "そのターン中、このカードは", "このターン中、このカードは",
+        "そのターン中、", "そのターン中",
+        "このターン中、", "このターン中",
+        // Conjunctions
         "そうでないなら、", "そうでないなら",
         "そうでなければ、", "そうでなければ",
         "そうしなければ、", "そうしなければ",
+        "そうしたら、", "そうしたら",
         "その後、", "その後",
         "そして、", "そして",
+        "し、", "し", "て、", "て",
+        // Subject prefixes (longer first)
+        "他のあなたの", "他の",
+        "このカードは", "このカードが",
+        "あなたは", "あなたの", "自分の",
+        "相手は", "相手の",
+        "次の",
     ];
 
     public static List<ParsedSentence> Parse(

@@ -30,34 +30,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token;
 /// </remarks>
 internal class AutoEffectToken : CardTextToken<CardEffect>
 {
-    private static readonly string[] AbilityLeadInPrefixes =
-    [
-        "あなたは",
-        "あなたの",
-        "自分の",
-        "そうしたら、",
-        "そうしたら",
-        "そうでないなら、",
-        "そうでないなら",
-        "そうでなければ、",
-        "そうでなければ",
-        "そうしなければ、",
-        "そうしなければ",
-        "その後、",
-        "その後",
-        "次の",
-        "そして、",
-        "そして",
-        "し、",
-        "し",
-        "て、",
-        "て",
-        "他のあなたの",
-        "他の",
-        "相手の",
-        "このカードは",
-        "このカードが"
-    ];
+    private static readonly ILogger Log = Serilog.Log.ForContext<AutoEffectToken>();
 
     public override Regex Matcher => new(@"^【自】(?<labels>(?:【[^】]+】)*)\s*(?<mainText>.+)$");
 
@@ -73,15 +46,6 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         {
             mainText = Regex.Replace(mainText, @"^加速\s*", "");
         }
-
-        // Expected Full English Format:
-        // [AUTO] Labels [CXCOMBO][1/TURN] [<costs>] <During conditions>, <when conditions>, <if conditions>, you may pay the cost. If you do, <actions>.
-        // - Labels are optional and can be multiple, e.g. [CXCOMBO][1/TURN]
-        // - [CXCOMBO] is a label, not a cost, and should be included in the Labels list
-        // - [1/TURN] is also a label, not a cost, and should be included in the Labels list
-        // - Do not put brackets if there are no costs. For example, if the effect has no costs but has conditions and actions, it should be: [AUTO] <During conditions>, <when conditions>, <if conditions>, you may <actions>.
-        // - Do not put ", you may pay the cost. If you do," if there are no costs. For example, if the effect has conditions and actions but no costs, it should be: [AUTO] <During conditions>, <when conditions>, <if conditions>, <actions>.
-        // - Do not put extra spaces or commas. For example, if there are no during conditions, it should be: [AUTO] <when conditions>, <if conditions>, you may pay the cost. If you do, <actions>.
 
         // Extract cost if present: ［...］
         var costMatch = Regex.Match(mainText, @"^［(?<cost>.+?)］\s*(?<rest>.+)$");
@@ -103,101 +67,55 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             rest = asciiConditionMatch.Groups["remaining"].Value.Trim();
         }
 
-        // Translate cost
-        var costAbilities = string.IsNullOrEmpty(costTextJapanese)
-            ? []
-            : registry.EffectListRegistry.GetMatch(costTextJapanese.AsMemory())(registry);
-
-        // Iterative condition matching using ^-anchored condition tokens
-        var conditions = new List<CardEffectCondition>();
+        // Translate cost using Match API
+        var costAbilities = new List<CardEffectAbility>();
         var tokenLog = new List<string>();
-        var remainingText = rest;
+        if (!string.IsNullOrEmpty(costTextJapanese))
+        {
+            var costRemaining = costTextJapanese;
+            while (!string.IsNullOrWhiteSpace(costRemaining))
+            {
+                var t = costRemaining.TrimStart();
+                var m = registry.EffectListRegistry.Match(t.AsMemory());
+                if (m == null) break;
+                var abils = m.Translate(registry);
+                costAbilities.AddRange(abils);
+                tokenLog.Add($"Cost:{m.Match.Token}");
+                costRemaining = t[m.Match.Length..].TrimStart('、', ' ', '\t');
+            }
+        }
 
         // Parse ASCII-bracket condition if present
+        var conditions = new List<CardEffectCondition>();
         if (!string.IsNullOrEmpty(asciiConditionJapanese))
         {
             try
             {
                 var condMatch = registry.ConditionListRegistry.Match(asciiConditionJapanese.Trim().AsMemory());
                 if (condMatch != null)
-                    tokenLog.Add(condMatch.Match.Token);
-                var condList = registry.ConditionListRegistry.GetMatch(asciiConditionJapanese.Trim().AsMemory())(registry);
-                conditions.AddRange(condList);
+                {
+                    tokenLog.Add($"Cond:{condMatch.Match.Token}");
+                    var condList = condMatch.Translate(registry);
+                    conditions.AddRange(condList);
+                }
             }
             catch (NotImplementedException)
             {
             }
         }
 
-        // Iteratively consume conditions from start of remaining text
-        while (true)
-        {
-            var trimmed = remainingText.TrimStart();
-            if (registry.ConditionListRegistry.TryMatchAtStart(trimmed, out var condFunc, out var consumed) && condFunc != null)
-            {
-                var condMatch = registry.ConditionListRegistry.Match(trimmed.AsMemory());
-                if (condMatch != null)
-                    tokenLog.Add(condMatch.Match.Token);
-                var condList = condFunc(registry);
-                conditions.AddRange(condList);
-                remainingText = trimmed[consumed..].TrimStart('、', ' ', '\t');
-            }
-            else
-            {
-                break;
-            }
-        }
+        // Use MultiClauseEffectParser.ParseSentence for condition + ability parsing
+        var parsed = MultiClauseEffectParser.ParseSentence(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
+        conditions.AddRange(parsed.Conditions);
+        var allAbilities = parsed.Abilities;
 
-        // Iterative ability matching with controlled lead-in skipping.
-        var allAbilities = new List<CardEffectAbility>();
-        var abilityParts = new List<string>();
+        // Log matched tokens
+        foreach (var c in parsed.Conditions)
+            tokenLog.Add($"Cond:{c.GetType().Name}");
+        foreach (var a in allAbilities)
+            tokenLog.Add($"Abil:{a.GetType().Name}");
 
-        while (!string.IsNullOrWhiteSpace(remainingText))
-        {
-            var trimmed = remainingText.TrimStart();
-            if (trimmed.Length == 0)
-                break;
-
-            if (registry.EffectListRegistry.TryFindFirstMatch(trimmed, out var abilFunc, out var matchIndex, out var consumed) && abilFunc != null)
-            {
-                if (matchIndex > 0)
-                {
-                    var prefix = trimmed[..matchIndex].Trim('、', '。', ' ', '\t');
-                    if (!IsIgnorableAbilityPrefix(prefix))
-                        throw new NotImplementedException($"Unrecognized ability text prefix: {prefix}");
-
-                    remainingText = trimmed[matchIndex..];
-                    continue;
-                }
-
-                var abilMatch = registry.EffectListRegistry.Match(trimmed.AsMemory());
-                if (abilMatch != null)
-                    tokenLog.Add(abilMatch.Match.Token);
-                var abilList = abilFunc(registry);
-                allAbilities.AddRange(abilList);
-                abilityParts.AddRange(abilList.Select(a => a.AbilityText));
-                remainingText = trimmed[consumed..].TrimStart('、', '。', ' ', '\t');
-            }
-            else
-            {
-                bool prefixSkipped = false;
-                foreach (var prefix in AbilityLeadInPrefixes)
-                {
-                    if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
-                    {
-                        remainingText = trimmed[prefix.Length..];
-                        prefixSkipped = true;
-                        break;
-                    }
-                }
-                if (prefixSkipped) continue;
-
-                break;
-            }
-        }
-
-        if (!string.IsNullOrWhiteSpace(remainingText))
-            throw new NotImplementedException($"Unrecognized text remaining after ability parsing: {remainingText.Trim()}");
+        var abilityParts = allAbilities.Select(a => a.AbilityText).ToList();
 
         var conditionTexts = conditions.Select(c => c.ConditionText).Where(c => !string.IsNullOrEmpty(c)).ToList();
         for (int i = 1; i < conditionTexts.Count; i++)
@@ -243,7 +161,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                 abilityForEffect = char.ToLower(abilityForEffect[0]) + abilityForEffect[1..];
             }
             effectText += $" {abilityForEffect}";
-            if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith(']'))
+            if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith(']') && !abilityForEffect.EndsWith('"'))
                 effectText += ".";
         }
 
@@ -265,20 +183,6 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             EffectText = effectText,
             TokenLog = tokenLog
         };
-    }
-
-    private static bool IsIgnorableAbilityPrefix(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-            return true;
-
-        foreach (var prefix in AbilityLeadInPrefixes)
-        {
-            if (text.StartsWith(prefix, StringComparison.Ordinal))
-                return true;
-        }
-
-        return false;
     }
 
     internal static string JoinAbilityParts(List<string> parts)

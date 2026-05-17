@@ -2,39 +2,22 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class MayPayCostThenAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<MayPayCostThenAbilityToken>();
+
     public override Regex Matcher => new(@"^あなたはコストを払ってよい。そうしたら、(?<effect>.+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
         var effectText = match.Groups["effect"].Value.Trim();
-        var allAbilities = new List<CardEffectAbility>();
-        var abilityParts = new List<string>();
-        var remainingText = effectText;
 
-        while (!string.IsNullOrWhiteSpace(remainingText))
-        {
-            var trimmed = remainingText.TrimStart();
-            if (trimmed.Length == 0)
-                break;
+        Log.Debug("MayPayCostThenAbilityToken: parsing effectText='{Text}'", effectText);
 
-            if (registry.EffectListRegistry.TryFindFirstMatch(trimmed, out var abilFunc, out var matchIndex, out var consumed) && abilFunc != null)
-            {
-                if (matchIndex > 0)
-                {
-                    remainingText = trimmed[matchIndex..];
-                    continue;
-                }
-                var abilList = abilFunc(registry);
-                allAbilities.AddRange(abilList);
-                abilityParts.AddRange(abilList.Select(a => a.AbilityText));
-                remainingText = trimmed[consumed..].TrimStart('、', '。', ' ', '\t');
-            }
-            else
-            {
-                remainingText = trimmed.Length > 1 ? trimmed[1..] : "";
-            }
-        }
+        var parsed = MultiClauseEffectParser.ParseSentence(effectText, registry, MultiClauseEffectParser.DefaultPrefixMap);
+        var abilityParts = parsed.Abilities.Select(a => a.AbilityText).ToList();
+
+        Log.Debug("MayPayCostThenAbilityToken: parsed {Count} abilities: {Abilities}",
+            abilityParts.Count, string.Join(" | ", abilityParts));
 
         var joined = AutoEffectToken.JoinAbilityParts(abilityParts);
         if (joined.Length > 0)

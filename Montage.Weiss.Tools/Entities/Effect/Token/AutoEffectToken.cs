@@ -127,21 +127,6 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 
         var abilityEnglish = JoinAbilityParts(abilityParts);
 
-        // Post-process opponent references: if Japanese had 相手の, replace "your" → "your opponent's"
-        // then subsequent references → "their"
-        if (mainText.Contains("相手の"))
-        {
-            var opponentRegex = new Regex(@"(?<!\bother\s+)(?<!\byour\s+opponent's\s+)\byour\b(?!\s+opponent's)");
-            abilityEnglish = opponentRegex.Replace(abilityEnglish, "your opponent's");
-
-            var firstRef = true;
-            abilityEnglish = new Regex(@"your opponent's").Replace(abilityEnglish, m =>
-            {
-                if (firstRef) { firstRef = false; return m.Value; }
-                return "their";
-            });
-        }
-
         var costEnglish = string.Join(" & ", costAbilities.Select(a => a.AbilityText));
         if (!string.IsNullOrEmpty(costEnglish))
             costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];

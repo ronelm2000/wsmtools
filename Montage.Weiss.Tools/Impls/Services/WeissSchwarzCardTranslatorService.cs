@@ -89,9 +89,9 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new StockCostWithChooseCardAndPutToWaitingRoomToken());
         _effectListRegistry.Register(new StockCostWithCxDiscardToken());
         _effectListRegistry.Register(new StockCostToken());
-        _effectListRegistry.Register(new PowerBoostWithDurationToken());
-        _effectListRegistry.Register(new PowerBoostWithFollowingAbilityToken());
         _effectListRegistry.Register(new PowerBoostWithFollowingAbilitiesToken());
+        _effectListRegistry.Register(new PowerBoostWithFollowingAbilityToken());
+        _effectListRegistry.Register(new PowerBoostWithDurationToken());
         _effectListRegistry.Register(new GiveMultipleAbilitiesToken());
         _effectListRegistry.Register(new DuringBattleCannotPlayEventsOrBackupToken());
         _effectListRegistry.Register(new AllCharactersBoostToken());

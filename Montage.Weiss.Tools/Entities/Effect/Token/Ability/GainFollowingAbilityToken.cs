@@ -41,13 +41,28 @@ internal class PowerBoostWithDurationToken : CardTextToken<List<CardEffectAbilit
 
 internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカードのパワーを[＋\+](?<power>\d+)し、このカードは次の能力を得る。『(?<nested>.+)』");
+    private static readonly Dictionary<string, string> DurationMap = new()
+    {
+        { "そのターン中", " until end of turn" },
+        { "このターン中", " until end of turn" },
+        { "次の相手のターンの終わりまで", " until the end of your opponent's next turn" },
+        { "次の相手のターンの終了時まで", " until the end of your opponent's next turn" },
+    };
+
+    public override Regex Matcher => new(@"^(?:(?<duration>そのターン中|このターン中|次の相手のターンの終わりまで|次の相手のターンの終了時まで)、)?このカードのパワーを[＋\+](?<power>\d+)し、このカードは次の能力を得る。『(?<nested>.+)』");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
+        var durationGroup = match.Groups["duration"];
         var power = match.Groups["power"].Value;
         var nestedJapanese = match.Groups["nested"].Value;
+
+        var durationText = "";
+        if (durationGroup.Success && DurationMap.TryGetValue(durationGroup.Value, out var dur))
+        {
+            durationText = dur;
+        }
 
         var nestedEnglish = TryTranslateNested(registry, nestedJapanese) ?? nestedJapanese;
 
@@ -55,7 +70,7 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
         [
             new CardEffectAbility
             {
-                AbilityText = $"this card gets +{power} power and the following ability. \"{nestedEnglish}\""
+                AbilityText = $"this card gets +{power} power and the following ability{durationText}. \"{nestedEnglish}\""
             }
         ];
     }

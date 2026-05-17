@@ -52,6 +52,28 @@ dotnet publish ./Montage.Weiss.Tools.GUI/Montage.Weiss.Tools.GUI.csproj -c Relea
 - `var` preferred everywhere
 - Allman braces
 
+## Logging
+
+When adding debug/diagnostic logging to a class, always declare a static logger at the top of the class:
+
+```csharp
+// Instance class
+internal class AutoEffectToken : CardTextToken<CardEffect>
+{
+    private static readonly ILogger Log = Serilog.Log.ForContext<AutoEffectToken>();
+    // ...
+}
+
+// Static class
+public static class MultiClauseEffectParser
+{
+    private static readonly ILogger Log = Serilog.Log.ForContext(typeof(MultiClauseEffectParser));
+    // ...
+}
+```
+
+Use `Log.Debug(...)` for parsing diagnostics, token match traces, and intermediate state. This is the standard for all effect tokens and parser classes.
+
 ## Pre-Implementation
 
 Before starting any implementation work:

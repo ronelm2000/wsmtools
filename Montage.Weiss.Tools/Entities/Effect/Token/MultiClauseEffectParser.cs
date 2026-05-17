@@ -11,34 +11,49 @@ public record ParsedSentence(
 
 public static class MultiClauseEffectParser
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext(typeof(MultiClauseEffectParser));
     public static readonly LeadInPrefixMap DefaultPrefixMap = new(new Dictionary<string, AbilityPrefix>
     {
+        // Continuation (し、/て、) → Continuation
         { "し、", AbilityPrefix.Continuation },
         { "し", AbilityPrefix.Continuation },
         { "て、", AbilityPrefix.Continuation },
         { "て", AbilityPrefix.Continuation },
+        // If you do (そうしたら) → IfYouDo
         { "そうしたら、", AbilityPrefix.IfYouDo },
         { "そうしたら", AbilityPrefix.IfYouDo },
+        // Otherwise (そうでないなら/そうでなければ/そうしなければ) → Otherwise
         { "そうでないなら、", AbilityPrefix.Otherwise },
         { "そうでないなら", AbilityPrefix.Otherwise },
         { "そうでなければ、", AbilityPrefix.Otherwise },
         { "そうでなければ", AbilityPrefix.Otherwise },
         { "そうしなければ、", AbilityPrefix.Otherwise },
         { "そうしなければ", AbilityPrefix.Otherwise },
+        // After that (その後) → AfterThat
         { "その後、", AbilityPrefix.AfterThat },
         { "その後", AbilityPrefix.AfterThat },
+        // Subject prefixes that should be consumed as part of ability matching (not skipped)
         { "あなたは", AbilityPrefix.Subject },
         { "あなたの", AbilityPrefix.Subject },
         { "自分の", AbilityPrefix.Subject },
-        { "このカードは", AbilityPrefix.Subject },
-        { "このカードが", AbilityPrefix.Subject },
-        { "相手の", AbilityPrefix.Subject },
-        { "他のあなたの", AbilityPrefix.Subject },
-        { "他の", AbilityPrefix.Subject },
+        // Then/and (そして) → Continuation
         { "そして、", AbilityPrefix.Continuation },
         { "そして", AbilityPrefix.Continuation },
-        { "次の", AbilityPrefix.Subject },
+        // These are part of ability text, NOT lead-in prefixes to skip
+        // "相手の", "他の", "他のあなたの", "このカードは", "このカードが", "次の" — removed from skip list
     });
+
+    // Prefixes that should be skipped before matching (conjunctions only)
+    public static readonly string[] SkippablePrefixes =
+    [
+        "し、", "し", "て、", "て",
+        "そうしたら、", "そうしたら",
+        "そうでないなら、", "そうでないなら",
+        "そうでなければ、", "そうでなければ",
+        "そうしなければ、", "そうしなければ",
+        "その後、", "その後",
+        "そして、", "そして",
+    ];
 
     public static (AbilityPrefix Prefix, string Remaining) DetectLeadInPrefix(string input, LeadInPrefixMap? map = null)
     {
@@ -60,6 +75,9 @@ public static class MultiClauseEffectParser
         var abilities = new List<CardEffectAbility>();
         var remainingText = sentence.Trim();
 
+        Log.Debug("ParseSentence: input='{Input}'", sentence);
+
+        // Match conditions from start
         while (true)
         {
             var trimmed = remainingText.TrimStart();
@@ -70,41 +88,105 @@ public static class MultiClauseEffectParser
             {
                 var condList = condMatch.Translate(registry);
                 conditions.AddRange(condList);
+                Log.Debug("ParseSentence: condition matched by '{Token}', consumed {Len} chars, remaining='{Remaining}'",
+                    condMatch.Match.Token, condMatch.Match.Length, trimmed[condMatch.Match.Length..]);
                 remainingText = trimmed[condMatch.Match.Length..].TrimStart('、', ' ', '\t');
             }
             else
             {
+                Log.Debug("ParseSentence: no more conditions, remaining='{Remaining}'", trimmed);
                 break;
             }
         }
 
+        // Match abilities with prefix skipping
+        int iteration = 0;
         while (!string.IsNullOrWhiteSpace(remainingText))
         {
+            iteration++;
+            if (iteration > 20)
+            {
+                Log.Debug("ParseSentence: too many iterations, breaking. remaining='{Remaining}'", remainingText);
+                break;
+            }
             var trimmed = remainingText.TrimStart();
             if (trimmed.Length == 0) break;
 
-            var (prefix, remaining) = DetectLeadInPrefix(trimmed, prefixMap);
-            if (prefix != AbilityPrefix.And)
-            {
-                remainingText = remaining;
-                continue;
-            }
+            Log.Debug("ParseSentence: ability iteration {Iter}, trying to match='{Text}'", iteration, trimmed);
 
+            // Try matching at index 0 first
             var abilMatch = registry.EffectListRegistry.Match(trimmed.AsMemory());
             if (abilMatch != null)
             {
                 var abilList = abilMatch.Translate(registry);
                 foreach (var abil in abilList)
                 {
-                    abilities.Add(abil with { Prefix = prefix });
+                    abilities.Add(abil);
                 }
+                Log.Debug("ParseSentence: ability matched by '{Token}', consumed {Len} chars, remaining='{Remaining}'",
+                    abilMatch.Match.Token, abilMatch.Match.Length, trimmed[abilMatch.Match.Length..]);
                 remainingText = trimmed[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
+                continue;
             }
-            else
+
+            Log.Debug("ParseSentence: no direct match, trying skippable prefixes...");
+
+            // No match at index 0 — try skipping skippable prefixes
+            bool prefixSkipped = false;
+            foreach (var prefix in SkippablePrefixes)
             {
+                if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
+                {
+                    var prefixType = prefixMap?.Prefixes.TryGetValue(prefix, out var p) == true ? p : AbilityPrefix.And;
+                    remainingText = trimmed[prefix.Length..].TrimStart('、', ' ', '\t');
+                    Log.Debug("ParseSentence: skipped prefix='{Prefix}', now trying='{Remaining}'", prefix, remainingText);
+
+                    // Try matching again after skipping
+                    abilMatch = registry.EffectListRegistry.Match(remainingText.AsMemory());
+                    if (abilMatch != null)
+                    {
+                        var abilList = abilMatch.Translate(registry);
+                        foreach (var abil in abilList)
+                        {
+                            abilities.Add(abil with { Prefix = prefixType });
+                        }
+                        Log.Debug("ParseSentence: after prefix skip, matched by '{Token}', remaining='{Remaining}'",
+                            abilMatch.Match.Token, remainingText[abilMatch.Match.Length..]);
+                        remainingText = remainingText[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
+                        prefixSkipped = true;
+                        break;
+                    }
+
+                    // Still no match — skip prefix and continue outer loop
+                    prefixSkipped = true;
+                    break;
+                }
+            }
+
+            if (!prefixSkipped)
+            {
+                // Also try skipping subject prefixes (あなたは, 自分の) without setting prefix
+                foreach (var prefix in new[] { "あなたは", "あなたの", "自分の", "このカードは", "このカードが", "相手の", "他のあなたの", "他の", "次の" })
+                {
+                    if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
+                    {
+                        remainingText = trimmed[prefix.Length..].TrimStart('、', ' ', '\t');
+                        Log.Debug("ParseSentence: skipped subject prefix='{Prefix}', now='{Remaining}'", prefix, remainingText);
+                        prefixSkipped = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!prefixSkipped)
+            {
+                Log.Debug("ParseSentence: no prefix to skip, breaking. remaining='{Remaining}'", trimmed);
                 break;
             }
         }
+
+        Log.Debug("ParseSentence: done. {CondCount} conditions, {AbilCount} abilities",
+            conditions.Count, abilities.Count);
 
         var text = BuildSentenceText(conditions, abilities);
         return new ParsedSentence(conditions, abilities, text);

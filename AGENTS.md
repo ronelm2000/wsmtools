@@ -110,12 +110,13 @@ Use the appropriate `Co-Authored-By` line based on which AI tool assisted with t
 ## Git Commit Pitfalls
 
 - `git commit` silently succeeds doing nothing if no changes are staged. Always verify `git status` shows staged changes before committing.
-- `commit.gpgsign=true` is set globally. If GPG agent passphrase cache expires mid-session, `git commit` may hang waiting for input. Use `git commit --no-gpg-sign -m "msg"` to bypass if needed. GPG key `<key_id>` is active — verify with `gpg --list-secret-keys` if signing issues arise.
+- `commit.gpgsign=true` is set globally — use GPG signing by default. If GPG agent passphrase cache expires mid-session and `git commit` hangs waiting for input, fall back to `git commit --no-gpg-sign -m "msg"`. GPG key `<key_id>` is active — verify with `gpg --list-secret-keys` if signing issues arise.
 - Multi-line commit messages (e.g. subject + body + `Co-Authored-By` trailer) cannot use `-m "line1\nline2"` — PowerShell does not pass embedded newlines through `-m` correctly. Use separate `-m` arguments for each paragraph:
   ```ps
-  git commit --no-gpg-sign -m "Subject line" -m "Body paragraph" -m "Co-Authored-By: ..."
+  git commit -m "Subject line" -m "Body paragraph" -m 'Co-Authored-By: OpenCode <noreply@opencode.ai>'
   ```
   Each `-m` becomes a paragraph separated by a blank line. Verify with `git log -1 --format="%B"`.
+- Angle brackets `<>` inside a `-m` argument (as in `Co-Authored-By: <email>`) cause PowerShell to interpret them as redirection operators in **double-quoted** strings (`"..."`). Use **single quotes** (`'...'`) for any `-m` value containing `<>`. Single quotes pass the content literally without any interpretation.
 
 ## Package Management
 

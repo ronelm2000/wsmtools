@@ -5,7 +5,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </summary>
 /// <remarks>
 /// <para><b>Expected Input:</b> <c>相手のキャラすべてに、『【自】 アンコール ［(2)］』を与える。</c></para>
-/// <para><b>Regex:</b> ^相手の(?:すべてのキャラに|キャラすべてに)、？『\【自\】\s*アンコール\s*［(.+?)］』を与える(?:\.|,|、|。)?</para>
+/// <para><b>Regex:</b> ^相手の(?:すべてのキャラに|キャラすべてに)、『\【自\】\s*アンコール\s*［(.+?)］』を与える(?:\.|,|、|。)?</para>
 /// <para><b>Captures:</b></para>
 /// <list type="bullet">
 ///   <item><description>Group 1: Encore cost text (e.g., "(2)" or "手札のキャラを1枚控え室に置く")</description></item>
@@ -14,7 +14,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class GiveEncoreToOpponentCharactersToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手の(?:すべてのキャラに|キャラすべてに)、？『\【自\】\s*アンコール\s*［(.+?)］』を与える");
+    public override Regex Matcher => new(@"^相手の(?:すべてのキャラに|キャラすべてに)、(?:\s)?『\【自\】\s*アンコール\s*［(.+?)］』を与える");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

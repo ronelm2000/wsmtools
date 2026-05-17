@@ -19,15 +19,11 @@ internal class DealDamageToken : CardTextToken<List<CardEffectAbility>>
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var input = span.ToString();
-        var hasLevelDef = input.Contains("はそのカードのレベル＋1");
         return
         [
             new CardEffectAbility
             {
-                AbilityText = hasLevelDef
-                    ? "deal X damage to your opponent. X is equal to that sent card's level +1"
-                    : "deal X damage to your opponent"
+                AbilityText = "deal X damage to your opponent. X is equal to that sent card's level +1"
             }
         ];
     }

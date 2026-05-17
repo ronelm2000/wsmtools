@@ -1,13 +1,35 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
+/// <summary>
+/// Matches continuous effect (【永】) clauses and parses their conditions and abilities.
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>【永】 あなたの手札が5枚以上なら、このカードのパワーを＋2000。</c></para>
+/// <para><b>Regex:</c> ^【永】\s*(?&lt;mainText&gt;.+)$</para>
+/// <para><b>Captures:</b></para>
+/// <list type="bullet">
+///   <item><description>mainText: All text after 【永】</description></item>
+/// </list>
+/// <para><b>Expected Full English Format:</b></para>
+/// <code>[CONT] [Labels] During [Conditions], when [Conditions], if [Condition], [Ability].</code>
+/// <para><b>Notes:</b></para>
+/// <list type="bullet">
+///   <item><description>Labels like 応援 (Assist), 経験 (Experience) are parsed without brackets</description></item>
+///   <item><description>Multiple labels can appear: 記憶 応援, etc.</description></item>
+///   <item><description>Conditions are iteratively matched from the start of remaining text</description></item>
+///   <item><description>Abilities are iteratively matched from the remaining text after conditions</description></item>
+/// </list>
+/// </remarks>
 internal class ContEffectToken : CardTextToken<CardEffect>
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<ContEffectToken>();
 
+    // Known labels that can appear after 【永】 — order matters: longer labels first
     private static readonly Dictionary<string, string> LabelMap = new()
     {
         { "応援", "Assist" },
-        { "経験", "Experience" }
+        { "経験", "Experience" },
+        { "記憶", "Memory" },
     };
 
     public override Regex Matcher => new(@"^【永】\s*(?<mainText>.+)$");
@@ -17,19 +39,24 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         var match = Matcher.Match(span.ToString());
         var mainText = match.Groups["mainText"].Value.Trim();
 
-        var labels = Array.Empty<string>();
+        var labels = new List<string>();
         var remainingText = mainText;
 
-        // Check for labels like "応援" (without 【】)
-        var labelMatch = Regex.Match(remainingText, @"^(?<label>\S+?)\s+(?<rest>.+)$");
-        if (labelMatch.Success)
+        // Check for labels like "応援" (without 【】) — supports multiple labels
+        while (true)
         {
-            var label = labelMatch.Groups["label"].Value;
-            if (LabelMap.ContainsKey(label))
+            var labelMatch = Regex.Match(remainingText, @"^(?<label>\S+?)\s+(?<rest>.+)$");
+            if (labelMatch.Success)
             {
-                labels = [LabelMap[label]];
-                remainingText = labelMatch.Groups["rest"].Value.Trim();
+                var label = labelMatch.Groups["label"].Value;
+                if (LabelMap.TryGetValue(label, out var englishLabel))
+                {
+                    labels.Add(englishLabel);
+                    remainingText = labelMatch.Groups["rest"].Value.Trim();
+                    continue;
+                }
             }
+            break;
         }
 
         // Use MultiClauseEffectParser for condition + ability parsing
@@ -72,7 +99,7 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         var abilityEnglish = AutoEffectToken.JoinAbilityParts(abilityParts);
         
         var effectText = "[CONT]";
-        if (labels.Length > 0)
+        if (labels.Count > 0)
             effectText += $" {string.Join("][", labels)}";
         if (!string.IsNullOrEmpty(conditionEnglish))
             effectText += $" {conditionEnglish},";
@@ -86,12 +113,12 @@ internal class ContEffectToken : CardTextToken<CardEffect>
                 abilityForEffect = char.ToLower(abilityForEffect[0]) + abilityForEffect[1..];
         }
         effectText += $" {abilityForEffect}";
-        if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith('"'))
+        if (!abilityForEffect.EndsWith('.') && !abilityForEffect.Contains("get the following abilities"))
             effectText += ".";
 
         return new ContCardEffect
         {
-            Labels = labels,
+            Labels = labels.ToArray(),
             ConditionText = conditionEnglish,
             Condition = conditions,
             Abilities = allAbilities,

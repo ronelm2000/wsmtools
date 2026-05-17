@@ -16,28 +16,32 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class AssistPowerBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカードの前のあなたのキャラすべてに、パワーを＋(X|Ｘ|\d+)(?:。(X|Ｘ)はそのキャラのレベル×(\d+)に等しい)?(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^このカードの前のあなたの(?:《(.+?)》の)?キャラすべてに、パワーを＋(X|Ｘ|\d+)(?:。(X|Ｘ)はそのキャラのレベル×(\d+)に等しい)?(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var powerValue = match.Groups[1].Value;
-        var hasLevelMultiplier = match.Groups[2].Success && match.Groups[3].Success;
+        var trait = match.Groups[1].Value;
+        var powerValue = match.Groups[2].Value;
+        var hasLevelMultiplier = match.Groups[3].Success && match.Groups[4].Success;
         
-        // Check if it's a fixed number (not X)
         var isFixedNumber = !powerValue.Equals("X", StringComparison.Ordinal) && 
                             !powerValue.Equals("Ｘ", StringComparison.Ordinal) &&
                             int.TryParse(powerValue, out _);
+        
+        var subject = string.IsNullOrEmpty(trait)
+            ? "All of your characters in front of this card"
+            : $"All of your <<{trait}>> characters in front of this card";
         
         return
         [
             new CardEffectAbility
             {
                 AbilityText = isFixedNumber
-                    ? $"All of your characters in front of this card get +{powerValue} power"
+                    ? $"{subject} get +{powerValue} power"
                     : hasLevelMultiplier
-                        ? $"All of your characters in front of this card get +X power. X is equal to that character's level x{match.Groups[3].Value}"
-                        : "All of your characters in front of this card get +X power"
+                        ? $"{subject} get +X power. X is equal to that character's level ×{match.Groups[4].Value}"
+                        : $"{subject} get +X power"
             }
         ];
     }

@@ -220,7 +220,6 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new PutTopXCardsToWrToken());
         
         // Register effect type tokens (most to least specific)
-        _effectRegistry.Register(new AssistContEffectToken());
         _effectRegistry.Register(new ContEffectToken());
         _effectRegistry.Register(new AutoEffectToken());
         _effectRegistry.Register(new ActEffectToken());

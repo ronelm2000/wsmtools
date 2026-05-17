@@ -15,8 +15,6 @@ internal class XEqualsToken : CardTextToken<List<CardEffectAbility>>
                 "X is equal to the level of the revealed card",
             _ when description.Contains("そのカードのレベル＋1") =>
                 "X is equal to that sent card's level +1",
-            _ when description.Contains("そのキャラのソウル") =>
-                "X is equal to that character's soul",
             _ when description.Contains("それらのカードの") =>
                 $"X is equal to the number of {ExtractTrait(description)} characters put this way",
             _ when description.Contains("あなたの") && description.Contains("キャラの枚数") =>

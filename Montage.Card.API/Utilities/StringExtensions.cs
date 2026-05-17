@@ -79,6 +79,18 @@ public static class StringExtensions
         return res;
     }
 
+    /// <summary>
+    /// Joins a sequence of strings with an Oxford comma and a customizable conjunction.
+    /// </summary>
+    /// <param name="items">The strings to join.</param>
+    /// <param name="conjunction">The conjunction to use between the last two items (default: "and").</param>
+    /// <param name="useCommaInPairs">If true, adds a comma before the conjunction for 2-item lists (default: false).</param>
+    /// <returns>A single joined string, or empty string if no items.</returns>
+    /// <example>
+    /// new[] { "A", "B", "C" }.JoinWithOxfordComma() → "A, B, and C"
+    /// new[] { "A", "B" }.JoinWithOxfordComma() → "A and B"
+    /// new[] { "A", "B" }.JoinWithOxfordComma("or", true) → "A, or B"
+    /// </example>
     public static string JoinWithOxfordComma(this IEnumerable<string> items, string conjunction = "and", bool useCommaInPairs = false)
     {
         var itemList = items.ToList();

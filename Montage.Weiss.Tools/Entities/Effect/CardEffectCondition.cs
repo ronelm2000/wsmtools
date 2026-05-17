@@ -20,6 +20,20 @@ public record CardEffectCondition
 }
 
 public static class CardEffectConditionExtensions {
+    /// <summary>
+    /// Aggregates a list of <see cref="CardEffectCondition"/> into a single English condition string.
+    /// </summary>
+    /// <remarks>
+    /// Groups conditions by <see cref="ConditionType"/> (During, When, If, At), then joins them
+    /// with appropriate conjunctions based on <see cref="ConditionConjunction"/>. Pre-conditions
+    /// and post-conditions are skipped as they are anchored and inserted by the parent CardEffect.
+    /// </remarks>
+    /// <param name="conditions">The conditions to aggregate.</param>
+    /// <returns>A formatted English condition string, or empty string if no conditions.</returns>
+    /// <example>
+    /// Input: [During your turn], [if you have 3 or more other characters]
+    /// Output: "During your turn, if you have 3 or more other characters"
+    /// </example>
     public static string AggregateToString(this IEnumerable<CardEffectCondition> conditions)
     {
         if (!conditions.Any()) return string.Empty;

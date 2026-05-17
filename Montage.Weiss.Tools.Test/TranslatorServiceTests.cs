@@ -11,12 +11,14 @@ using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities.Effect;
 using Montage.Weiss.Tools.Entities.Effect.Token;
 using Montage.Weiss.Tools.Impls.Services;
+using Serilog;
 
 namespace Montage.Weiss.Tools.Test;
 
 [TestClass]
 public class TranslatorServiceTests
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<TranslatorServiceTests>();
     private static readonly WeissSchwarzCardTranslatorService _service = new();
 
     /// <summary>
@@ -388,6 +390,20 @@ public class TranslatorServiceTests
         Assert.IsTrue(effect.EffectText.Contains("+5000 power"));
     }
 
+
+    [TestMethod]
+    public void Translate_ContEffect_TokenLogMustNotBeEmpty()
+    {
+        var japanese = "【永】 あなたのターン中、他のあなたの《風》のキャラが4枚以上なら、このカードのパワーを＋5000。";
+        var tree = _service.TranslateEffect(japanese);
+
+        Assert.AreEqual(1, tree.Effects.Count);
+        var effect = tree.Effects[0] as ContCardEffect;
+
+        Assert.IsNotEmpty(effect!.TokenLog);
+    }
+
+
     [TestMethod]
     public void Translate_ContEffect_NonExistentConditionMustCrash()
     {
@@ -440,6 +456,8 @@ public class TranslatorServiceTests
             : labels
                 .Trim('[', ']')
                 .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        Log.Debug("Full Effect:[ {@effect}", tree.Effects[0]);
 
         MultiAssert.AllAreTrue([
             () => Assert.AreEqual(expected, actual, $"[{serial}] EffectText mismatch{Environment.NewLine}Expected: {expected}{Environment.NewLine}Actual: {actual}"),

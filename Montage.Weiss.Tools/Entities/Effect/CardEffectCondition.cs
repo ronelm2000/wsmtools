@@ -1,9 +1,20 @@
 namespace Montage.Weiss.Tools.Entities.Effect;
 
+public enum ConditionConjunction
+{
+    /// <summary>Default. Conditions joined by "and": "if X, and Y, and Z".</summary>
+    And,
+    /// <summary>`か` / `または` — "or". Output: "if X or Y".</summary>
+    Or,
+    /// <summary>`で` — continuative "and" for conditions. Same output as And but semantically distinct.</summary>
+    Continuation,
+}
+
 public record CardEffectCondition
 {
     public required ConditionType Type { get; init; }
     public required string ConditionText { get; init; }
+    public ConditionConjunction Conjunction { get; init; } = ConditionConjunction.And;
 }
 
 public enum ConditionType

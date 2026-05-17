@@ -30,7 +30,12 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
         if (trimmed.Length == 0)
             return null;
 
-        // Fallback 1: split by concatenated 『...』 blocks (』『 boundary)
+        var parsed = MultiClauseEffectParser.ParseSentence(trimmed, registry);
+        if (parsed.Abilities.Count > 0 || parsed.Conditions.Count > 0)
+        {
+            return parsed.Text;
+        }
+
         var blockSplit = Regex.Split(trimmed, @"』\s*『");
         if (blockSplit.Length > 1)
         {
@@ -46,7 +51,6 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
                 return string.Join(" ", parts);
         }
 
-        // Fallback 2: strip effect type prefix 【自】/【永】/【起】/【カウンター】
         var prefixStripped = Regex.Replace(trimmed, @"^【(自|永|起|カウンター)】\s*", "");
         if (prefixStripped != trimmed)
         {
@@ -55,7 +59,6 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
                 return strippedResult;
         }
 
-        // Fallback 3: split by sentence boundaries
         var sentences = Regex.Split(trimmed, @"(?<=。)");
         if (sentences.Length > 1)
         {

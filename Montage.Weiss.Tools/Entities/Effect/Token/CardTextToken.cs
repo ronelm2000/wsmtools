@@ -1,5 +1,15 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
+public record TokenMatch(
+    ReadOnlyMemory<char> Input,
+    int Index,
+    int Length,
+    string Token);
+
+public record TokenMatchResult<E>(
+    TokenMatch Match,
+    Func<ITokenRegistry, E> Translate);
+
 /// <summary>
 /// Base class for all Japanese card text parsing tokens.
 /// Each token defines a regex pattern that matches specific Japanese text clauses
@@ -82,6 +92,17 @@ public interface IComponentRegistry<E>
 {
     /// <summary>Returns all registered tokens in registration order</summary>
     IEnumerable<CardTextToken<E>> GetAllTokens();
+
+    /// <summary>
+    /// Matches input against all registered tokens. Only returns matches at index 0.
+    /// </summary>
+    /// <remarks>
+    /// Strictness: Tokens matching at Index &gt; 0 are NOT returned. Instead, a warning
+    /// is logged via Serilog.Log showing what text would be skipped and which tokens
+    /// matched mid-string. This enforces that all parsing consumes from the start.
+    /// Callers must handle null by either throwing or skipping known lead-in prefixes.
+    /// </remarks>
+    TokenMatchResult<E>? Match(ReadOnlyMemory<char> input);
 
     /// <summary>
     /// Finds a token that matches the input and returns a translation function.

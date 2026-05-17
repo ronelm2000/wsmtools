@@ -107,6 +107,11 @@ Co-Authored-By: Copilot <noreply@github.com>
 
 Use the appropriate `Co-Authored-By` line based on which AI tool assisted with the changes.
 
+## Git Commit Pitfalls
+
+- `git commit` silently succeeds doing nothing if no changes are staged. Always verify `git status` shows staged changes before committing.
+- `commit.gpgsign=true` is set globally. If GPG agent passphrase cache expires mid-session, `git commit` may hang waiting for input. Use `git commit --no-gpg-sign -m "msg"` to bypass if needed. GPG key `<key_id>` is active — verify with `gpg --list-secret-keys` if signing issues arise.
+
 ## Package Management
 
 Centralized in `Directory.Packages.props`. Floating versions enabled.

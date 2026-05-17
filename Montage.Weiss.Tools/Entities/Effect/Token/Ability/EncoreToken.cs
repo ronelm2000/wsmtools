@@ -8,7 +8,7 @@ internal class EncoreToken : CardTextToken<List<CardEffectAbility>>
     {
         var match = Matcher.Match(span.ToString());
         var costText = match.Groups["cost"].Value;
-        var costAbilities = registry.EffectListRegistry.GetMatch(costText)(registry);
+        var costAbilities = registry.EffectListRegistry.GetMatch(costText.AsMemory())(registry);
         var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
         if (!string.IsNullOrEmpty(costEnglish))
             costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];

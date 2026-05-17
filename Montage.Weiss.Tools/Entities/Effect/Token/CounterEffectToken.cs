@@ -23,7 +23,7 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
         // Translate cost
         var costAbilities = string.IsNullOrEmpty(costTextJapanese)
             ? []
-            : registry.EffectListRegistry.GetMatch(costTextJapanese)(registry);
+            : registry.EffectListRegistry.GetMatch(costTextJapanese.AsMemory())(registry);
 
         // Check for condition
         var conditionMatch = Regex.Match(rest, @"^(?<condition>.+?)なら、?(?<effect>.+)$");
@@ -38,7 +38,7 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
 
         var conditions = string.IsNullOrEmpty(conditionTextJapanese)
             ? []
-            : registry.ConditionListRegistry.GetMatch(conditionTextJapanese)(registry);
+            : registry.ConditionListRegistry.GetMatch(conditionTextJapanese.AsMemory())(registry);
 
         // Iterative ability matching
         var allAbilities = new List<CardEffectAbility>();

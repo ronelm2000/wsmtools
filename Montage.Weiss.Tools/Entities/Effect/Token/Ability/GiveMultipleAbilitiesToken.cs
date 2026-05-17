@@ -14,7 +14,7 @@ internal class GiveMultipleAbilitiesToken : CardTextToken<List<CardEffectAbility
         string nestedEnglish1, nestedEnglish2;
         try
         {
-            var nestedEffect1 = registry.EffectRegistry.GetMatch(abil1)(registry);
+            var nestedEffect1 = registry.EffectRegistry.GetMatch(abil1.AsMemory())(registry);
             nestedEnglish1 = nestedEffect1.EffectText;
         }
         catch (NotImplementedException)
@@ -24,7 +24,7 @@ internal class GiveMultipleAbilitiesToken : CardTextToken<List<CardEffectAbility
 
         try
         {
-            var nestedEffect2 = registry.EffectRegistry.GetMatch(abil2)(registry);
+            var nestedEffect2 = registry.EffectRegistry.GetMatch(abil2.AsMemory())(registry);
             nestedEnglish2 = nestedEffect2.EffectText;
         }
         catch (NotImplementedException)

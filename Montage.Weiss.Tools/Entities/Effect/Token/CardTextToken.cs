@@ -109,15 +109,4 @@ public interface IComponentRegistry<E>
     /// <returns>True if a token matched anywhere in the input, false otherwise</returns>
     bool TryFindFirstMatch(string input, out Func<ITokenRegistry, E>? result, out int matchIndex, out int matchLength);
 
-    /// <summary>
-    /// Finds a token that matches the input and returns a translation function.
-    /// Throws if no match is found.
-    /// </summary>
-    /// <param name="input">The text to match against</param>
-    /// <returns>A function that translates the input using the matched token</returns>
-    /// <exception cref="InvalidOperationException">Thrown when no token matches the input</exception>
-    public Func<ITokenRegistry, E> GetMatch(string input)
-    {
-        return GetMatch(input.AsMemory()) ?? throw new InvalidOperationException($"No match found for input: {input}");
-    }
 }

@@ -91,7 +91,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         // Translate cost
         var costAbilities = string.IsNullOrEmpty(costTextJapanese)
             ? []
-            : registry.EffectListRegistry.GetMatch(costTextJapanese)(registry);
+            : registry.EffectListRegistry.GetMatch(costTextJapanese.AsMemory())(registry);
 
         // Iterative condition matching using ^-anchored condition tokens
         var conditions = new List<CardEffectCondition>();
@@ -102,7 +102,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         {
             try
             {
-                var condList = registry.ConditionListRegistry.GetMatch(asciiConditionJapanese)(registry);
+                var condList = registry.ConditionListRegistry.GetMatch(asciiConditionJapanese.AsMemory())(registry);
                 conditions.AddRange(condList);
             }
             catch (NotImplementedException)

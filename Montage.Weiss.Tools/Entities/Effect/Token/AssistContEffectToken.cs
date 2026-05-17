@@ -8,7 +8,7 @@ internal class AssistContEffectToken : CardTextToken<CardEffect>
     {
         var match = Matcher.Match(span.ToString());
         var effectText = match.Groups["effect"].Value.Trim();
-        var abilities = registry.EffectListRegistry.GetMatch(effectText)(registry);
+        var abilities = registry.EffectListRegistry.GetMatch(effectText.AsMemory())(registry);
         var abilityEnglish = string.Join(", ", abilities.Select(a => a.AbilityText));
 
         return new ContCardEffect

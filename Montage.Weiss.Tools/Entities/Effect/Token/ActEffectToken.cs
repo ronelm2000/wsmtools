@@ -24,7 +24,7 @@ internal class ActEffectToken : CardTextToken<CardEffect>
         // Translate cost
         var costAbilities = string.IsNullOrEmpty(costTextJapanese)
             ? []
-            : registry.EffectListRegistry.GetMatch(costTextJapanese)(registry);
+            : registry.EffectListRegistry.GetMatch(costTextJapanese.AsMemory())(registry);
 
         // Iterative ability matching
         var allAbilities = new List<CardEffectAbility>();

@@ -142,7 +142,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                 {
                     var prefix = trimmed[..matchIndex].Trim('、', '。', ' ', '\t');
                     if (!IsIgnorableAbilityPrefix(prefix))
-                        break;
+                        throw new NotImplementedException($"Unrecognized ability text prefix: {prefix}");
 
                     remainingText = trimmed[matchIndex..];
                     continue;
@@ -170,6 +170,9 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                 break;
             }
         }
+
+        if (!string.IsNullOrWhiteSpace(remainingText))
+            throw new NotImplementedException($"Unrecognized text remaining after ability parsing: {remainingText.Trim()}");
 
         var conditionTexts = conditions.Select(c => c.ConditionText).Where(c => !string.IsNullOrEmpty(c)).ToList();
         for (int i = 1; i < conditionTexts.Count; i++)

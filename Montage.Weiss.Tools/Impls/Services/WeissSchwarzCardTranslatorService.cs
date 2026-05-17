@@ -39,6 +39,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new YourCxWithTriggerIconTriggeredConditionToken());
         _conditionListRegistry.Register(new CxPlacedConditionToken());
         _conditionListRegistry.Register(new CardPlacedFromHandConditionToken());
+        _conditionListRegistry.Register(new CardPlacedFromHandToCxAreaConditionToken());
         _conditionListRegistry.Register(new ReverseConditionToken());
         _conditionListRegistry.Register(new BattleOpponentReverseConditionToken());
         _conditionListRegistry.Register(new FacingCharacterColorConditionToken());

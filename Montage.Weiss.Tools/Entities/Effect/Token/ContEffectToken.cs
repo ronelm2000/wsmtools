@@ -1,5 +1,27 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
+/// <summary>
+/// Matches continuous effect (【永】) clauses and parses their conditions and abilities.
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>【永】 あなたの手札が5枚以上なら、このカードのパワーを＋2000。</c></para>
+/// <para><b>Regex:</c> ^【永】\s*(?&lt;mainText&gt;.+)$</para>
+/// <para><b>Captures:</b></para>
+/// <list type="bullet">
+///   <item><description>mainText: All text after 【永】</description></item>
+/// </list>
+/// <para><b>Expected Full English Format:</b></para>
+/// <code>[CONT] [Labels] During [Conditions], when [Conditions], if [Condition], [Ability].</code>
+/// <para><b>Notes:</b></para>
+/// <list type="bullet">
+///   <item><description>Labels like 応援 (Assist), 経験 (Experience) are parsed without brackets</description></item>
+///   <item><description>Conditions are iteratively matched from the start of remaining text</description></item>
+///   <item><description>Abilities are iteratively matched from the remaining text after conditions</description></item>
+/// </list>
+/// <para><b>Scope Expansion:</b> To support variations, add alternative patterns for:
+/// - Different effect type indicators (【継続】, 【常駐])
+/// - Different label formats (labels with brackets, multiple labels)</para>
+/// </remarks>
 internal class ContEffectToken : CardTextToken<CardEffect>
 {
     // Known labels that can appear after 【永】

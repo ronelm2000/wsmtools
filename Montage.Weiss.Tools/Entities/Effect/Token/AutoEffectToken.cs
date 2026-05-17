@@ -1,5 +1,33 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
+/// <summary>
+/// Matches auto effect (【自】) clauses and parses their labels, costs, conditions, and abilities.
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>【自】【ターン1】 ［手札を1枚置く］ あなたのCXが置かれた時、あなたはコストを払ってよい。</c></para>
+/// <para><b>Regex:</c> ^【自】(?&lt;labels&gt;(?:【[^】]+】)*)\s*(?&lt;mainText&gt;.+)$</para>
+/// <para><b>Captures:</b></para>
+/// <list type="bullet">
+///   <item><description>labels: All bracketed labels like 【ターン1】,【CXCOMBO】</description></item>
+///   <item><description>mainText: All text after labels</description></item>
+/// </list>
+/// <para><b>Expected Full English Format:</b></para>
+/// <code>[AUTO] Labels [CXCOMBO][1/TURN] [&lt;costs&gt;] &lt;During conditions&gt;, &lt;when conditions&gt;, &lt;if conditions&gt;, you may pay the cost. If you do, &lt;actions&gt;.</code>
+/// <para><b>Notes:</b></para>
+/// <list type="bullet">
+///   <item><description>Labels are optional and can be multiple</description></item>
+///   <item><description>[CXCOMBO] and [1/TURN] are labels, not costs</description></item>
+///   <item><description>Do not include brackets if there are no costs</description></item>
+///   <item><description>Do not include ", you may pay the cost. If you do," if there are no costs</description></item>
+///   <item><description>Costs are in ［...］ format</description></item>
+///   <item><description>Conditions are iteratively matched from the start of remaining text</description></item>
+///   <item><description>Abilities are iteratively matched with controlled lead-in skipping</description></item>
+/// </list>
+/// <para><b>Scope Expansion:</b> To support variations, add alternative patterns for:
+/// - Different effect type indicators (【自動】)
+/// - Different cost formats (ASCII brackets [...])
+/// - Different label formats</para>
+/// </remarks>
 internal class AutoEffectToken : CardTextToken<CardEffect>
 {
     private static readonly string[] AbilityLeadInPrefixes =

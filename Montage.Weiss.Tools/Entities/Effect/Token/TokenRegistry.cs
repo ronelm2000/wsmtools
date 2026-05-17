@@ -1,5 +1,20 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
+/// <summary>
+/// Generic implementation of IComponentRegistry that manages a collection of CardTextToken instances.
+/// Tokens are matched in registration order, with the first match taking precedence.
+/// </summary>
+/// <typeparam name="E">The type this registry handles (CardEffect, List&lt;CardEffectAbility&gt;, etc.)</typeparam>
+/// <remarks>
+/// <para><b>Matching Behavior:</b></para>
+/// <list type="bullet">
+///   <item><description><c>GetMatch</c> - Finds all tokens that match the input, warns if multiple match, uses first match</description></item>
+///   <item><description><c>TryMatchAtStart</c> - Finds the first token that matches at the start of the input (index 0)</description></item>
+///   <item><description><c>TryFindFirstMatch</c> - Finds the token that matches earliest in the input string</description></item>
+/// </list>
+/// <para><b>Token Registration Order:</b> Tokens should be registered from most specific to most general.
+/// More specific patterns should be registered first to ensure they take precedence over general patterns.</para>
+/// </remarks>
 internal class ComponentRegistry<E> : IComponentRegistry<E>
 {
     private readonly List<CardTextToken<E>> _tokens = [];

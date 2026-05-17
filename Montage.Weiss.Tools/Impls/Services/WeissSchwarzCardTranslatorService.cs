@@ -75,8 +75,9 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new MarkerUnderneathConditionToken());
         _conditionListRegistry.Register(new FacingCharacterConditionToken());
         _conditionListRegistry.Register(new FacingOpponentCharacterConditionToken());
-      _conditionListRegistry.Register(new ThisCardMarkerUnderneathConditionToken());
-      _conditionListRegistry.Register(new ThisCardMarkerCountConditionToken());
+        _conditionListRegistry.Register(new NoFacingCharacterOrReversedConditionToken());
+        _conditionListRegistry.Register(new NoCardInMemoryConditionToken());
+        _conditionListRegistry.Register(new MemoryCountConditionToken());
 
         // Register ability tokens (most to least specific)
         _effectListRegistry.Register(new StockCostWithPutCardFromHandToWaitingRoomToken());
@@ -89,6 +90,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new AllCharactersBoostToken());
         _effectListRegistry.Register(new AllCharactersSoulBoostToken());
         _effectListRegistry.Register(new AssistPowerBoostToken());
+        _effectListRegistry.Register(new PowerBoostPerOtherNikkeToken());
         _effectListRegistry.Register(new ChooseTraitCharacterAndPowerBoostToken());
         _effectListRegistry.Register(new BrainstormToken());
         _effectListRegistry.Register(new RevealTopCardsToken());
@@ -184,6 +186,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new OpponentPutToClockToken());
         _effectListRegistry.Register(new OpponentChooseReturnToHandToken());
         _effectListRegistry.Register(new OpponentDeckToWrAndWrToDeckToken());
+        _effectListRegistry.Register(new AllPlayersPerformActionToken());
         _effectListRegistry.Register(new AllCharactersSoulBoostTurnToken());
         _effectListRegistry.Register(new DealVariableDamageToken());
         _effectListRegistry.Register(new CannotBeChosenAbilityToken());

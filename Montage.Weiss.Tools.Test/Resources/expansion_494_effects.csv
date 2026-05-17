@@ -207,7 +207,7 @@ NIK/S117-103,【自】 このカードが手札から舞台に置かれた時、
 NIK/S117-103,【自】 このカードが【リバース】した時、このカードのバトル相手のレベルが0以下なら、あなたはそのキャラを山札の下に置いてよい。,"[AUTO] When this card becomes [REVERSE], if this card's battle opponent is level 0 or lower, you may put that character at the bottom of your opponent's deck.",
 NIK/S117-104,【自】 このカードが【リバース】した時、あなたは相手の控え室のカードを1枚選び、山札の上に置いてよい。,"[AUTO] When this card becomes [REVERSE], you may choose 1 card in your opponent's waiting room, and put it on the top of their deck.",
 NIK/S117-104,【自】【CXコンボ】 このカードがアタックした時、CX置場に「Maid in Valentine」があり、あなたの手札が6枚以下で、他のあなたの《NIKKE》のキャラがいるなら、そのアタック中、あなたはトリガーステップにトリガーチェックを2回行う。,"[AUTO][CXCOMBO] When this card attacks, if ""Maid in Valentine"" is in your CX area, your hand has 6 or less cards, and you have another <<NIKKE>> character, during that attack, perform a trigger check 2 times on the trigger step.",[CXCOMBO]
-NIK/S117-105,【永】 相手のキャラすべてに、『【自】 アンコール ［(2)］』を与える。,"[CONT] All of your opponent's characters get ""[AUTO] Encore [(2)]"".",Encore
+NIK/S117-105,【永】 相手のキャラすべてに、『【自】 アンコール ［(2)］』を与える。,"[CONT] All of your opponent's characters get ""[AUTO] Encore [(2)]"".",
 NIK/S117-105,【永】 このカードの下のマーカー1枚につき、このカードのパワーを＋1500。,"[CONT] For each marker underneath this card, this card gets +1500 power.",
 NIK/S117-105,【自】 このカードのバトル相手が【リバース】した時、あなたは自分の控え室の《NIKKE》のキャラを1枚選び、このカードの下にマーカーとして表向きに置いてよい。,"[AUTO] When this card's battle opponent becomes [REVERSE], you may choose 1 <<NIKKE>> character in your waiting room, and put it face up underneath this card as a marker.",
 NIK/S117-106,【自】 このカードが手札から舞台に置かれた時、あなたは自分の山札の上から2枚を、控え室に置く。それらのカードにCXがあるなら、このカードを【レスト】する。,"[AUTO] When this card is placed on stage from your hand, put the top 2 cards of your deck to your waiting room. If there is a CX among those cards, [REST] this card.",

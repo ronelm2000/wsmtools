@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class PutBottomOfStockToWaitingRoomToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^ストックの下から(\d+) 枚を？控え室に置(?:く|いてよい|き)(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^ストックの下から(\d+)枚を？控え室に置(?:く|いてよい|き)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

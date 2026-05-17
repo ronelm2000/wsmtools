@@ -102,7 +102,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         {
             try
             {
-                var condList = registry.ConditionListRegistry.GetMatch(asciiConditionJapanese.AsMemory())(registry);
+                var condList = registry.ConditionListRegistry.GetMatch(asciiConditionJapanese.Trim().AsMemory())(registry);
                 conditions.AddRange(condList);
             }
             catch (NotImplementedException)

@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class OpponentChooseCxAndShuffleToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手は自分の控え室の CX を(\d+) 枚選び、(?<rest>.+) 山札に戻し、(?:その山札を)?シャッフルする(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^相手は自分の控え室のCXを(\d+)枚選び、(?<rest>.+)山札に戻し、(?:その山札を)?シャッフルする(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

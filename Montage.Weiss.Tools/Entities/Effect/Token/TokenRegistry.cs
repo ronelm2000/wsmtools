@@ -38,6 +38,7 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
 
             if (match.Index == 0)
             {
+                Log.Debug("TokenRegistry.Match: token '{Token}' matched at index 0 for input='{Input}'", token.GetType().Name, inputStr);
                 bestAtZero = new TokenMatch(input, 0, match.Length, token.GetType().Name);
                 var slice = input.Slice(match.Index, match.Length);
                 bestTranslate = registry => token.Translate(registry, slice);

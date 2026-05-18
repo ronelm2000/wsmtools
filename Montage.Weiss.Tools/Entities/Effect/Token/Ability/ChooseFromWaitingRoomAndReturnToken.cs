@@ -28,6 +28,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
             : triggerIcon;
         var count = int.Parse(match.Groups[3].Value);
         var action = match.Groups["action"].Value;
+        var mayText = action.EndsWith("てよい", StringComparison.Ordinal) || action.EndsWith("ていい", StringComparison.Ordinal) ? "you may " : "";
         
         if (action.Contains("マーカーとして", StringComparison.Ordinal))
         {
@@ -37,7 +38,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
                 [
                     new CardEffectAbility
                     {
-                        AbilityText = $"choose {count} CX with [{triggerIconClean.ToUpper()}] in its trigger icon in your waiting room, and put it face up underneath this card as a marker"
+                        AbilityText = $"{mayText}choose {count} CX with [{triggerIconClean.ToUpper()}] in its trigger icon in your waiting room, and put it face up underneath this card as a marker"
                     }
                 ];
             }
@@ -46,7 +47,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
             [
                 new CardEffectAbility
                 {
-                    AbilityText = $"choose {count}{traitTextForMarker} character in your waiting room, and put it face up underneath this card as a marker"
+                    AbilityText = $"{mayText}choose {count}{traitTextForMarker} character in your waiting room, and put it face up underneath this card as a marker"
                 }
             ];
         }
@@ -57,7 +58,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
             [
                 new CardEffectAbility
                 {
-                    AbilityText = $"choose {count} CX with [{triggerIconClean.ToUpper()}] in its trigger icon in your waiting room, and return it to your hand"
+                    AbilityText = $"{mayText}choose {count} CX with [{triggerIconClean.ToUpper()}] in its trigger icon in your waiting room, and return it to your hand"
                 }
             ];
         }
@@ -67,7 +68,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
         [
             new CardEffectAbility
             {
-                AbilityText = $"choose {count}{traitTextForReturn} character in your waiting room, and return it to your hand"
+                AbilityText = $"{mayText}choose {count}{traitTextForReturn} character in your waiting room, and return it to your hand"
             }
         ];
     }

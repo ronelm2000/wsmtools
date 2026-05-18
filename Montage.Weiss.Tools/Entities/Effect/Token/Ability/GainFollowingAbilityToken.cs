@@ -75,14 +75,63 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
         ];
     }
 
+    private static readonly string[] NestedLeadInPrefixes =
+    [
+        "あなたは",
+        "あなたの",
+        "自分の",
+        "そうしたら、",
+        "そうしたら",
+        "その後、",
+        "その後",
+        "そして、",
+        "そして"
+    ];
+
     internal static string? TryTranslateNested(ITokenRegistry registry, string japanese)
     {
-        if (TryMatchAny(registry, japanese, out var result))
-            return result;
-
         var trimmed = japanese.Trim();
         if (trimmed.Length == 0)
             return null;
+
+        // Strip lead-in prefixes
+        foreach (var prefix in NestedLeadInPrefixes)
+        {
+            if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                var rest = trimmed[prefix.Length..].TrimStart('、', ' ', '\t');
+                if (!string.IsNullOrEmpty(rest) && rest != trimmed)
+                    return TryTranslateNested(registry, rest);
+            }
+        }
+
+        // Try effect match first (handles 【自】/【永】/【起】 prefixes via AutoEffectToken etc.)
+        if (TryMatchEffect(registry, trimmed, out var effectResult))
+            return effectResult;
+
+        // Strip 【】 prefix and try ability match
+        var prefixMatch = Regex.Match(trimmed, @"^【(自|永|起|カウンター)】\s*");
+        if (prefixMatch.Success)
+        {
+            var effectType = prefixMatch.Groups[1].Value;
+            var prefixStripped = trimmed[prefixMatch.Length..];
+            var strippedResult = TryTranslateNested(registry, prefixStripped);
+            if (strippedResult != null)
+            {
+                var typePrefix = effectType switch
+                {
+                    "自" => "[AUTO] ",
+                    "永" => "[CONT] ",
+                    "起" => "[ACT] ",
+                    "カウンター" => "[COUNTER] ",
+                    _ => ""
+                };
+                return typePrefix + strippedResult;
+            }
+        }
+
+        if (TryMatchAbility(registry, trimmed, out var abilityResult))
+            return abilityResult;
 
         var parsed = MultiClauseEffectParser.ParseSentence(trimmed, registry);
         if (parsed.Abilities.Count > 0 || parsed.Conditions.Count > 0)
@@ -105,14 +154,6 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
                 return string.Join(" ", parts);
         }
 
-        var prefixStripped = Regex.Replace(trimmed, @"^【(自|永|起|カウンター)】\s*", "");
-        if (prefixStripped != trimmed)
-        {
-            var strippedResult = TryTranslateNested(registry, prefixStripped);
-            if (strippedResult != null)
-                return strippedResult;
-        }
-
         var sentences = Regex.Split(trimmed, @"(?<=。)");
         if (sentences.Length > 1)
         {
@@ -131,20 +172,26 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
         return null;
     }
 
-    private static readonly string[] NestedLeadInPrefixes =
-    [
-        "あなたは",
-        "あなたの",
-        "自分の",
-        "そうしたら、",
-        "そうしたら",
-        "その後、",
-        "その後",
-        "そして、",
-        "そして"
-    ];
+    private static bool TryMatchAbility(ITokenRegistry registry, string japanese, out string? result)
+    {
+        if (registry.EffectListRegistry.TryFindFirstMatch(japanese, out var abilFunc, out _, out var abilConsumed) && abilFunc != null)
+        {
+            var abils = abilFunc(registry);
+            result = string.Join(", ", abils.Select(a => a.AbilityText));
+            var remaining = japanese[abilConsumed..].TrimStart();
+            if (!string.IsNullOrEmpty(remaining))
+            {
+                var restResult = TryTranslateNested(registry, remaining);
+                if (restResult != null)
+                    result += " " + restResult;
+            }
+            return true;
+        }
+        result = null;
+        return false;
+    }
 
-    private static bool TryMatchAny(ITokenRegistry registry, string japanese, out string? result)
+    private static bool TryMatchEffect(ITokenRegistry registry, string japanese, out string? result)
     {
         if (registry.EffectRegistry.TryFindFirstMatch(japanese, out var effectFunc, out _, out var consumed) && effectFunc != null)
         {
@@ -159,33 +206,6 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
             }
             return true;
         }
-
-        if (registry.EffectListRegistry.TryFindFirstMatch(japanese, out var abilFunc, out _, out var abilConsumed) && abilFunc != null)
-        {
-            var abils = abilFunc(registry);
-            result = string.Join(", ", abils.Select(a => a.AbilityText));
-            var remaining = japanese[abilConsumed..].TrimStart();
-            if (!string.IsNullOrEmpty(remaining))
-            {
-                var restResult = TryTranslateNested(registry, remaining);
-                if (restResult != null)
-                    result += " " + restResult;
-            }
-            return true;
-        }
-
-        // Strip lead-in prefixes and retry
-        var trimmed = japanese.TrimStart();
-        foreach (var prefix in NestedLeadInPrefixes)
-        {
-            if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
-            {
-                var rest = trimmed[prefix.Length..].TrimStart('、', ' ', '\t');
-                if (!string.IsNullOrEmpty(rest) && rest != japanese)
-                    return TryMatchAny(registry, rest, out result);
-            }
-        }
-
         result = null;
         return false;
     }

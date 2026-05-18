@@ -17,18 +17,18 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class SimplePowerBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカードのパワー＋(\d+)(?:\.|,|、|。)?");
-
+    public override Regex Matcher => new(@"^このカードのパワー(?:を)?[＋\+]([XＸ\d]+)(?:\.|,|、|。)?");
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var power = match.Groups[1].Value;
+        var powerStr = match.Groups[1].Value.Replace("Ｘ", "X");
         return
         [
             new CardEffectAbility
             {
-                AbilityText = $"this card gets +{power} power"
+                AbilityText = $"this card gets +{powerStr} power"
             }
         ];
     }
 }
+

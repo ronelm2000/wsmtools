@@ -74,6 +74,12 @@ public static class MultiClauseEffectParser
 
 Use `Log.Debug(...)` for parsing diagnostics, token match traces, and intermediate state. This is the standard for all effect tokens and parser classes.
 
+## Code Analysis
+
+- Do not guess how code works — verify with debug logs.
+- If a class lacks debug logs and you need to understand its behavior, add them before making changes.
+- Log intermediate values, branch decisions, and unexpected states to visualize execution flow.
+
 ## Pre-Implementation
 
 Before starting any implementation work:

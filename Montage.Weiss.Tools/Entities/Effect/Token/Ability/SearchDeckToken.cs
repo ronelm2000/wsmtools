@@ -56,7 +56,7 @@ internal class SearchDeckToken : CardTextToken<List<CardEffectAbility>>
         [
             new CardEffectAbility
             {
-                AbilityText = $"search your deck for up to {pickCount} <<{trait}>> character, reveal it to your opponent{additional}"
+                AbilityText = $"search your deck for up to {pickCount} <<{trait}>> character from among them, reveal it to your opponent{additional}"
             }
         ];
     }

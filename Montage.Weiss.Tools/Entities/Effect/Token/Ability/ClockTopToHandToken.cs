@@ -8,12 +8,13 @@ internal class ClockTopToHandToken : CardTextToken<List<CardEffectAbility>>
     {
         var match = Matcher.Match(span.ToString());
         var count = int.Parse(match.Groups[1].Value);
+        var countText = count == 1 ? "" : $"{count} ";
         var noun = count == 1 ? "card" : "cards";
         return
         [
             new CardEffectAbility
             {
-                AbilityText = $"return the top {count} {noun} of your clock to your hand"
+                AbilityText = $"return the top {countText}{noun} of your clock to your hand"
             }
         ];
     }

@@ -87,6 +87,7 @@ internal class ActEffectToken : CardTextToken<CardEffect>
                     costEnglish += sep + costTexts[i];
                 }
             }
+            costEnglish = AutoEffectToken.CapitalizeFirstAlpha(costEnglish);
         }
 
         // Build label list (MatchLabels already returns correct format, e.g. "[COUNTER]" or "Brainstorm")

@@ -13,7 +13,7 @@ internal class AnotherSpecificCardExistsConditionToken : CardTextToken<List<Card
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = $"You have another \"{name}\""
+                ConditionText = $"you have another \"{name}\""
             }
         ];
     }

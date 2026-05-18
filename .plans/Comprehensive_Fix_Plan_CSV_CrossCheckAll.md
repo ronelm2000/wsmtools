@@ -72,6 +72,36 @@
 | NIK/S117-105 | 2 | Trailing period after `"` + "If for each marker" | Token period output + `ConditionType.For` |
 | NIK/S117-107 | 1 | Compound `し、` effects split with `.` instead of `, and` | Prefix-based `JoinAbilityPartsFromSentences` |
 
+---
+
+## Sprint 5 Completed (2026-05-19 session)
+
+### Fixes
+- [x] **Bare CX handling**: `ChooseFromWaitingRoomAndReturnToken` regex added `|CX` alternative; translate handles bare CX output (fixes NIK/S117-042)
+- [x] **StockCostToken registration order**: Swapped with `StockCostWithCxDiscardToken` so `(N)` stock cost is preserved (fixes NIK/S117-042 cost format)
+- [x] **Optional `あなたは` in MayPayCost* tokens**: Regex `^(?:あなたは)?` for both `MayPayCostThenAbilityToken` and `MayPayCostToken` — enables matching after `ParseSentence` prefix stripping
+- [x] **ChooseOpponentCardsFromWrAndReturnToDeckToken**: New token for `あなたは相手の控え室のカードをN枚(まで)選び、山札に戻し、相手はその山札をシャッフルする` (fixes NIK/S117-031 row 3)
+- [x] **ClockTopToHandToken**: New token for `あなたは自分のクロックの上からN枚を、手札に戻す` (fixes NIK/S117-060 row 3)
+- [x] **DrawCardToken**: New token for `あなたはN枚引く。` (terminal form, no `まで`) (fixes NIK/S117-069)
+- [x] **Duration prepending**: Added `そのアタック中` to `DurationTextMap` + `SkippablePrefixes`; `ApplyDuration` prepends "during…" durations with comma + lowercases following ability text (fixes NIK/S117-062, NIK/S117-098)
+
+### Test Results
+| Metric | Before Sprint 5 | After Sprint 5 | Δ |
+|--------|----------------|----------------|---|
+| CSV passes | 125 | **130** | **+5** |
+| `NotImplementedException` | 0 | **0** | **0** |
+| Build errors | 0 | 0 | 0 |
+
+### Serials Fixed
+| Serial | Rows Fixed | Issue | Fix |
+|--------|-----------|-------|-----|
+| NIK/S117-042 | 1 | Bare `CX` not matched in `ChooseFromWaitingRoomAndReturnToken` + stock cost dropped | Regex + registration order |
+| NIK/S117-031 | 1 | Opponent WR→deck pattern missing | New `ChooseOpponentCardsFromWrAndReturnToDeckToken` |
+| NIK/S117-060 | 1 | Clock top to hand pattern missing | New `ClockTopToHandToken` |
+| NIK/S117-062 | 1 | `そのアタック中` duration not handled + trigger check duration order | Duration map + prepending logic |
+| NIK/S117-069 | 2 | Draw 1 card terminal form (`引く` not `引き`) missing | New `DrawCardToken` |
+| NIK/S117-098 | 1 | Same trigger check pattern as S117-062 | Duration prepending fix |
+
 ### RC-A: Assist/Power Boost Tokens (High Impact - ~15 failures)
 
 #### RC-A1: Assist Power Boost X = Level × N
@@ -916,13 +946,14 @@ This runs all tests whose `TestCategory` tag contains the specified serial. The 
 - **After Phase 1.5 (early 2026-05-18)**: **119 passed / 127 failed / 246 total** (+19 from 100)
 - **After Sprint 2 (late 2026-05-18)**: **122 passed / 124 failed / 246 total** (+3 from 119)
 - **After Sprint 3 (AD-0/1 architecture + token fixes)**: **123 passed / 123 failed / 246 total** (+1 from 122, 0 NotImplementedException)
-- **After Sprint 4 (this session — prefix joining + token fixes)**: **125 passed / 121 failed / 246 total** (+2 from 123)
+- **After Sprint 4 (prefix joining + token fixes)**: **125 passed / 121 failed / 246 total** (+2 from 123)
+- **After Sprint 5 (missing tokens + duration fix)**: **130 passed / 116 failed / 246 total** (+5 from 125)
 - **NotImplementedException count**: 24 → **0** ✅ (sustained)
-- **Tokens created**: 30+ token files
+- **Tokens created**: 30+ token files (3 new this session)
 - **Tokens registered**: All registered in WeissSchwarzCardTranslatorService
-- **Tests fixed by Sprint 4**: NIK/S117-013 (double period), NIK/S117-105 (2 rows: trailing period + If prefix), NIK/S117-107 (compound effect joining) = **+4**
+- **Tests fixed by Sprint 5**: NIK/S117-042 (CX + cost fix), NIK/S117-031 (opponent WR to deck), NIK/S117-060 (clock to hand), NIK/S117-062/098 (trigger check duration), NIK/S117-069 (draw 1 card) = **+7 rows**, **+5 unique**
 - **Sustained regressions**: 0 (all previously passing tests preserved)
-- **Remaining work**: 121 failures — output-format mismatches and missing token patterns. Individual token patterns and CSV alignment.
+- **Remaining work**: 116 failures — output-format mismatches, missing token patterns, truncated abilities, CounterEffectToken Japanese output.
 
 ## Completed
 

@@ -2,6 +2,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 internal class CounterEffectToken : CardTextToken<CardEffect>
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<CounterEffectToken>();
+
     public override Regex Matcher => new(@"^【カウンター】\s*(?<mainText>.+)$");
 
     public override CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
@@ -20,10 +22,20 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
             rest = costMatch.Groups["rest"].Value.Trim();
         }
 
-        // Translate cost
-        var costAbilities = string.IsNullOrEmpty(costTextJapanese)
-            ? []
-            : registry.EffectListRegistry.GetMatch(costTextJapanese.AsMemory())(registry);
+        // Translate cost using Match API
+        var costAbilities = new List<CardEffectAbility>();
+        if (!string.IsNullOrEmpty(costTextJapanese))
+        {
+            var costRemaining = costTextJapanese;
+            while (!string.IsNullOrWhiteSpace(costRemaining))
+            {
+                var t = costRemaining.TrimStart();
+                var m = registry.EffectListRegistry.Match(t.AsMemory());
+                if (m == null) break;
+                costAbilities.AddRange(m.Translate(registry));
+                costRemaining = t[m.Match.Length..].TrimStart('、', ' ', '\t');
+            }
+        }
 
         // Check for condition
         var conditionMatch = Regex.Match(rest, @"^(?<condition>.+?)なら、?(?<effect>.+)$");
@@ -40,32 +52,21 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
             ? []
             : registry.ConditionListRegistry.GetMatch(conditionTextJapanese.AsMemory())(registry);
 
-        // Iterative ability matching
+        // Use MultiClauseEffectParser for ability parsing
         var allAbilities = new List<CardEffectAbility>();
         var abilityParts = new List<string>();
-        var remainingText = effectTextJapanese;
-
-        while (!string.IsNullOrWhiteSpace(remainingText))
+        if (!string.IsNullOrEmpty(effectTextJapanese))
         {
-            var trimmed = remainingText.TrimStart();
-            if (trimmed.Length == 0)
-                break;
+            var parsedList = MultiClauseEffectParser.Parse(effectTextJapanese, registry, MultiClauseEffectParser.DefaultPrefixMap);
+            allAbilities = parsedList.SelectMany(p => p.Abilities).ToList();
+            abilityParts = allAbilities.Select(a => a.AbilityText).ToList();
 
-            if (registry.EffectListRegistry.TryFindFirstMatch(trimmed, out var abilFunc, out var matchIndex, out var consumed) && abilFunc != null)
+            foreach (var p in parsedList)
             {
-                if (matchIndex > 0)
+                if (!string.IsNullOrWhiteSpace(p.Remaining) && p.Abilities.Count == 0)
                 {
-                    remainingText = trimmed[matchIndex..];
-                    continue;
+                    Log.Debug("CounterEffect: sentence '{Sentence}' had unparsed remaining: '{Remaining}'", p.Text, p.Remaining);
                 }
-                var abilList = abilFunc(registry);
-                allAbilities.AddRange(abilList);
-                abilityParts.AddRange(abilList.Select(a => a.AbilityText));
-                remainingText = trimmed[consumed..].TrimStart('、', '。', ' ', '\t');
-            }
-            else
-            {
-                remainingText = trimmed.Length > 1 ? trimmed[1..] : "";
             }
         }
 
@@ -78,7 +79,7 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
             ).ToList();
         }
 
-        var conditionEnglish = conditions.FirstOrDefault()?.ConditionText ?? "";
+        var conditionEnglish = conditions.Count > 0 ? conditions.AggregateToString() : "";
         var abilityEnglish = AutoEffectToken.JoinAbilityParts(abilityParts);
 
         var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));

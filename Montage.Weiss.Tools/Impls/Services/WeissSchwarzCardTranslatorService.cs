@@ -90,8 +90,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         // Register ability tokens (most to least specific)
         _effectListRegistry.Register(new StockCostWithPutCardFromHandToWaitingRoomToken());
         _effectListRegistry.Register(new StockCostWithChooseCardAndPutToWaitingRoomToken());
-        _effectListRegistry.Register(new StockCostWithCxDiscardToken());
         _effectListRegistry.Register(new StockCostToken());
+        _effectListRegistry.Register(new StockCostWithCxDiscardToken());
         _effectListRegistry.Register(new PowerBoostWithFollowingAbilitiesToken());
         _effectListRegistry.Register(new PowerBoostWithFollowingAbilityToken());
         _effectListRegistry.Register(new PowerBoostGainEncoreToken());
@@ -141,6 +141,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new SearchLevelXOrLowerTraitToken());
         _effectListRegistry.Register(new SearchLevel0OrLowerToken());
         _effectListRegistry.Register(new ChooseFromWaitingRoomAndReturnToDeckToken());
+        _effectListRegistry.Register(new ChooseOpponentCardsFromWrAndReturnToDeckToken());
         _effectListRegistry.Register(new ChooseFromWaitingRoomAndReturnToken());
         _effectListRegistry.Register(new ChooseOtherCharacterAndGiveAbilityToken());
         _effectListRegistry.Register(new AllCenterStageExceptThisCardGiveAbilityToken());
@@ -171,6 +172,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new SoulBoostOneToken());
         _effectListRegistry.Register(new DrawAndDiscardToken());
         _effectListRegistry.Register(new DrawUpToNToken());
+        _effectListRegistry.Register(new DrawCardToken());
         _effectListRegistry.Register(new CannotBeChosenAbilityToken());
         _effectListRegistry.Register(new StrikerAbilityToken());
         _effectListRegistry.Register(new DealFixedDamageToken());
@@ -201,6 +203,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new CannotPlayFromHandToken());
         _effectListRegistry.Register(new OpponentCannotPlayEventsToken());
         _effectListRegistry.Register(new ColorConditionIgnorePlayToken());
+        _effectListRegistry.Register(new ClockTopToHandToken());
         _effectListRegistry.Register(new CostReductionToken());
         _effectListRegistry.Register(new AllOtherTriggerIconGrantToken());
         _effectListRegistry.Register(new AllZonesCxTriggerIconGainToken());

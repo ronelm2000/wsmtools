@@ -20,6 +20,7 @@ public static class MultiClauseEffectParser
         { "次の相手のターンの終了時まで", " until the end of your opponent's next turn" },
         { "このカードのバトル中", " during this card's battle" },
         { "あなたのターン中", " during your turn" },
+        { "そのアタック中", " during that attack" },
     };
 
     private static readonly HashSet<string> DurationPrefixes = new(DurationTextMap.Keys.Select(k => k + "、").Concat(DurationTextMap.Keys));
@@ -120,7 +121,7 @@ public static class MultiClauseEffectParser
                 var abilList = abilMatch.Translate(registry);
                 foreach (var abil in abilList)
                 {
-                    var finalText = pendingDuration != null ? abil.AbilityText + pendingDuration : abil.AbilityText;
+                    var finalText = pendingDuration != null ? ApplyDuration(abil.AbilityText, pendingDuration) : abil.AbilityText;
                     Log.Debug("ParseSentence: ability '{Token}' with pending duration '{Duration}' -> '{FinalText}'",
                         abilMatch.Match.Token, pendingDuration, finalText);
                     abilities.Add(abil with { AbilityText = finalText });
@@ -159,7 +160,7 @@ public static class MultiClauseEffectParser
                         var abilList = abilMatch.Translate(registry);
                         foreach (var abil in abilList)
                         {
-                            var finalText = pendingDuration != null ? abil.AbilityText + pendingDuration : abil.AbilityText;
+                            var finalText = pendingDuration != null ? ApplyDuration(abil.AbilityText, pendingDuration) : abil.AbilityText;
                             Log.Debug("ParseSentence: after prefix skip, ability '{Token}' with duration '{Duration}' -> '{FinalText}'",
                                 abilMatch.Match.Token, pendingDuration, finalText);
                             abilities.Add(abil with { AbilityText = finalText, Prefix = prefixType });
@@ -199,10 +200,11 @@ public static class MultiClauseEffectParser
     [
         // Duration prefixes (longest first)
         "次の相手のターンの終わりまで、", "次の相手のターンの終わりまで",
-        "次の相手のターンの終了時まで、", "次の相手のターンの終了時まで",
+        "次の相手のターンの終了時まで", "次の相手のターンの終了時まで",
         "このカードのバトル中、", "このカードのバトル中",
         "あなたのターン中、", "あなたのターン中",
         "そのターン中、このカードは", "このターン中、このカードは",
+        "そのアタック中、", "そのアタック中",
         "そのターン中、", "そのターン中",
         "このターン中、", "このターン中",
         // Conjunctions
@@ -268,5 +270,17 @@ public static class MultiClauseEffectParser
         if (!result.EndsWith('.') && !result.EndsWith(']') && !result.EndsWith('"'))
             result += ".";
         return result;
+    }
+
+    private static string ApplyDuration(string abilityText, string duration)
+    {
+        var trimmedDuration = duration.TrimStart();
+        if (trimmedDuration.StartsWith("during", StringComparison.OrdinalIgnoreCase))
+        {
+            var dur = char.ToUpper(trimmedDuration[0]) + trimmedDuration[1..];
+            var lowerAbility = abilityText.Length > 0 ? char.ToLower(abilityText[0]) + abilityText[1..] : abilityText;
+            return $"{dur}, {lowerAbility}";
+        }
+        return abilityText + duration;
     }
 }

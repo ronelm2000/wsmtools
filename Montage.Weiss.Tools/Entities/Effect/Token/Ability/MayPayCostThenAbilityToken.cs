@@ -4,7 +4,7 @@ internal class MayPayCostThenAbilityToken : CardTextToken<List<CardEffectAbility
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<MayPayCostThenAbilityToken>();
 
-    public override Regex Matcher => new(@"^あなたはコストを払ってよい。そうしたら、(?<effect>.+)(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたは)?コストを払ってよい。そうしたら、(?<effect>.+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

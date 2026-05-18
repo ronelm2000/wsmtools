@@ -6,7 +6,8 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
 
     // Matches: あなたは自分の控え室の (《...》の)?キャラを...枚選び、手札に戻す
     // Also matches: あなたは自分の控え室のトリガーアイコンが...の CX を...枚選び、手札に戻す
-    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?自分の控え室の(?:(?:《(.+?)》の)?キャラ|トリガーアイコンが\[\[(.+?)\]\]のCX)を(\d+)枚選び、(?<action>手札に戻す|このカードの下にマーカーとして表向きに置いてよい)");
+    // Also matches: あなたは自分の控え室の CX を...枚選び、手札に戻す (bare CX without trigger icon)
+    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?自分の控え室の(?:(?:《(.+?)》の)?キャラ|トリガーアイコンが\[\[(.+?)\]\]のCX|CX)を(\d+)枚選び、(?<action>手札に戻す|このカードの下にマーカーとして表向きに置いてよい)");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -62,13 +63,23 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
                 }
             ];
         }
+
+        if (string.IsNullOrEmpty(trait))
+        {
+            return
+            [
+                new CardEffectAbility
+                {
+                    AbilityText = $"{mayText}choose {count} CX in your waiting room, and return it to your hand"
+                }
+            ];
+        }
         
-        var traitTextForReturn = trait != null ? $" <<{trait}>>" : "";
         return
         [
             new CardEffectAbility
             {
-                AbilityText = $"{mayText}choose {count}{traitTextForReturn} character in your waiting room, and return it to your hand"
+                AbilityText = $"{mayText}choose {count} <<{trait}>> character in your waiting room, and return it to your hand"
             }
         ];
     }

@@ -134,6 +134,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ChooseFromLookedAndPutOnTopToken());
         _effectListRegistry.Register(new ChooseCardsToken());
         _effectListRegistry.Register(new ChooseTraitCharacterToken());
+        _effectListRegistry.Register(new ChooseTraitCharacterFromWrAndPutToStockToken());
         _effectListRegistry.Register(new SearchDeckWithTopLookToken());
         _effectListRegistry.Register(new SearchDeckSimpleToken());
         _effectListRegistry.Register(new SearchDeckToken());

@@ -30,12 +30,13 @@ internal class GiveEncoreToOpponentCharactersToken : CardTextToken<List<CardEffe
         var match = Matcher.Match(span.ToString());
         var costText = match.Groups[1].Value;
         string costEnglish;
-        try
+        var costMatch = registry.EffectListRegistry.Match(costText.AsMemory());
+        if (costMatch != null)
         {
-            var costAbilities = registry.EffectListRegistry.GetMatch(costText.AsMemory())(registry);
+            var costAbilities = costMatch.Translate(registry);
             costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
         }
-        catch (NotImplementedException)
+        else
         {
             costEnglish = costText;
         }

@@ -105,29 +105,17 @@ public interface IComponentRegistry<E>
     TokenMatchResult<E>? Match(ReadOnlyMemory<char> input);
 
     /// <summary>
-    /// Finds a token that matches the input and returns a translation function.
+    /// <para>Attempts to match a token at the start of the input string.</para>
+    /// <para>Legacy — prefer <see cref="Match"/> for all new code.</para>
     /// </summary>
-    /// <param name="input">The text to match against</param>
-    /// <returns>A function that translates the input using the matched token, or null if no match</returns>
-    Func<ITokenRegistry, E>? GetMatch(ReadOnlyMemory<char> input);
-
-    /// <summary>
-    /// Attempts to match a token at the start of the input string.
-    /// </summary>
-    /// <param name="input">The text to match against</param>
-    /// <param name="result">Translation function if a match was found, null otherwise</param>
-    /// <param name="consumedLength">Number of characters consumed by the match</param>
-    /// <returns>True if a token matched at the start, false otherwise</returns>
+    [Obsolete("Use Match instead — only returns index-0 matches")]
     bool TryMatchAtStart(string input, out Func<ITokenRegistry, E>? result, out int consumedLength);
 
     /// <summary>
-    /// Finds the first token that matches anywhere in the input string.
+    /// <para>Finds the first token that matches anywhere in the input string.</para>
+    /// <para>Legacy — prefer <see cref="Match"/> with prefix skipping.</para>
     /// </summary>
-    /// <param name="input">The text to match against</param>
-    /// <param name="result">Translation function if a match was found, null otherwise</param>
-    /// <param name="matchIndex">Index where the match starts in the input</param>
-    /// <param name="matchLength">Length of the matched text</param>
-    /// <returns>True if a token matched anywhere in the input, false otherwise</returns>
+    [Obsolete("Use Match instead — only returns index-0 matches")]
     bool TryFindFirstMatch(string input, out Func<ITokenRegistry, E>? result, out int matchIndex, out int matchLength);
 
 }

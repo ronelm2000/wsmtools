@@ -306,12 +306,13 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
             var translated = new List<string>();
             foreach (var sentence in sentences)
             {
-                try
+                var matchResult = _reminderTextRegistry.Match(sentence.AsMemory());
+                if (matchResult != null)
                 {
-                    var translatedSentence = _reminderTextRegistry.GetMatch(sentence.AsMemory())(this);
+                    var translatedSentence = matchResult.Translate(this);
                     translated.Add(translatedSentence);
                 }
-                catch (NotImplementedException)
+                else
                 {
                     // Try to translate trigger icon format: [[icon.gif]]：text to English
                     var iconMatch = Regex.Match(sentence, @"^\[\[(?<icon>[^\]]+?)\]\]：");
@@ -347,7 +348,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
                 Abilities = [],
                 ReminderText = reminderTextEnglish
             }
-: _effectRegistry.GetMatch(japaneseEffectText.AsMemory())(this)
+: _effectRegistry.Match(japaneseEffectText.AsMemory())?.Translate(this)
                  ?? new EventEffectToken().Translate(this, japaneseEffectText.AsMemory());
 
         effect.ReminderText = reminderTextEnglish;

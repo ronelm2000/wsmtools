@@ -12,25 +12,11 @@ internal class GiveMultipleAbilitiesToken : CardTextToken<List<CardEffectAbility
         var abil2 = match.Groups["abil2"].Value;
 
         string nestedEnglish1, nestedEnglish2;
-        try
-        {
-            var nestedEffect1 = registry.EffectRegistry.GetMatch(abil1.AsMemory())(registry);
-            nestedEnglish1 = nestedEffect1.EffectText;
-        }
-        catch (NotImplementedException)
-        {
-            nestedEnglish1 = abil1;
-        }
+        var effMatch1 = registry.EffectRegistry.Match(abil1.AsMemory());
+        nestedEnglish1 = effMatch1?.Translate(registry).EffectText ?? abil1;
 
-        try
-        {
-            var nestedEffect2 = registry.EffectRegistry.GetMatch(abil2.AsMemory())(registry);
-            nestedEnglish2 = nestedEffect2.EffectText;
-        }
-        catch (NotImplementedException)
-        {
-            nestedEnglish2 = abil2;
-        }
+        var effMatch2 = registry.EffectRegistry.Match(abil2.AsMemory());
+        nestedEnglish2 = effMatch2?.Translate(registry).EffectText ?? abil2;
 
         return
         [

@@ -67,7 +67,7 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
 
         var conditions = string.IsNullOrEmpty(conditionTextJapanese)
             ? []
-            : registry.ConditionListRegistry.GetMatch(conditionTextJapanese.AsMemory())(registry);
+            : registry.ConditionListRegistry.Match(conditionTextJapanese.AsMemory())?.Translate(registry) ?? [];
 
         // Use MultiClauseEffectParser for ability parsing
         List<ParsedSentence>? parsedList = null;

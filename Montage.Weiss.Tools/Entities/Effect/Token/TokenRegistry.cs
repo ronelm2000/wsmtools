@@ -69,31 +69,7 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
         return null;
     }
 
-    public Func<ITokenRegistry, E> GetMatch(ReadOnlyMemory<char> input)
-    {
-        var match = _tokens.Where(token => token.Matcher.IsMatch(input.Span))
-            .ToList();
-
-        if (match.Count > 1 && match[0] is not CardTextToken<CardEffect>)
-        {
-            Log.Warning("Multiple tokens matched the input: {Input}. This may lead to unpredictable behavior.", input.ToString());
-            Log.Warning("Matched tokens: {Tokens}", string.Join(", ", match.Select(t => t.GetType().Name)));
-        }
-
-        if (match.Count == 0)
-            throw new NotImplementedException($"No token found for input: {input}");
-        else
-        {
-            var enumerator = match[0].Matcher.EnumerateMatches(input.Span);
-            foreach (var valueMatch in enumerator)
-            {
-                var slice = input.Slice(valueMatch.Index, valueMatch.Length);
-                return registry => match[0].Translate(registry, slice);
-            }
-            throw new NotImplementedException($"No token found for input: {input}");
-        }
-    }
-
+    [Obsolete("Use Match instead — only returns index-0 matches")]
     public bool TryMatchAtStart(string input, out Func<ITokenRegistry, E>? result, out int consumedLength)
     {
         foreach (var token in _tokens)
@@ -112,6 +88,7 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
         return false;
     }
 
+    [Obsolete("Use Match with prefix skipping instead")]
     public bool TryFindFirstMatch(string input, out Func<ITokenRegistry, E>? result, out int matchIndex, out int matchLength)
     {
         result = null;

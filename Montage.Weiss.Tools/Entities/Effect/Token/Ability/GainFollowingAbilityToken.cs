@@ -105,11 +105,7 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
             }
         }
 
-        // Try effect match first (handles 【自】/【永】/【起】 prefixes via AutoEffectToken etc.)
-        if (TryMatchEffect(registry, trimmed, out var effectResult))
-            return effectResult;
-
-        // Strip 【】 prefix and try ability match
+        // Strip 【】 prefix first and try ability match on the stripped content
         var prefixMatch = Regex.Match(trimmed, @"^【(自|永|起|カウンター)】\s*");
         if (prefixMatch.Success)
         {
@@ -130,8 +126,13 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
             }
         }
 
+        // Try ability match before effect match for nested contexts
         if (TryMatchAbility(registry, trimmed, out var abilityResult))
             return abilityResult;
+
+        // Try effect match as fallback (handles multi-clause effects)
+        if (TryMatchEffect(registry, trimmed, out var effectResult))
+            return effectResult;
 
         var parsed = MultiClauseEffectParser.ParseSentence(trimmed, registry);
         if (parsed.Abilities.Count > 0 || parsed.Conditions.Count > 0)

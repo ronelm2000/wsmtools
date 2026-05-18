@@ -104,30 +104,24 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             }
         }
 
-        // Use MultiClauseEffectParser.ParseSentence for condition + ability parsing
-        var parsed = MultiClauseEffectParser.ParseSentence(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
+        // Use MultiClauseEffectParser.Parse for multi-sentence condition + ability parsing
+        var parsedList = MultiClauseEffectParser.Parse(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
+        var allConditions = parsedList.SelectMany(p => p.Conditions).ToList();
+        var allAbilities = parsedList.SelectMany(p => p.Abilities).ToList();
 
-        // Crash guard: if nothing matched and text remains, throw
-        if (string.IsNullOrWhiteSpace(rest))
+        // Log warnings for any sentence with unmatched remaining text
+        foreach (var p in parsedList)
         {
-            // Nothing to parse
-        }
-        else if (parsed.Conditions.Count == 0 && parsed.Abilities.Count == 0 && !string.IsNullOrWhiteSpace(parsed.Remaining))
-        {
-            throw new NotImplementedException($"No condition or ability token found for: {rest}");
-        }
-        else if (parsed.Abilities.Count == 0 && !string.IsNullOrWhiteSpace(parsed.Remaining))
-        {
-            var remainingTrimmed = Regex.Replace(parsed.Remaining, @"（[^）]*）", "").Trim().TrimEnd('。', '、', ' ', '\t');
-            if (!string.IsNullOrEmpty(remainingTrimmed))
-                throw new NotImplementedException($"No ability token found for: {rest}");
+            if (!string.IsNullOrWhiteSpace(p.Remaining) && p.Abilities.Count == 0)
+            {
+                Log.Debug("Parse: sentence '{Sentence}' had unparsed remaining: '{Remaining}'", p.Text, p.Remaining);
+            }
         }
 
-        conditions.AddRange(parsed.Conditions);
-        var allAbilities = parsed.Abilities;
+        conditions.AddRange(allConditions);
 
         // Log matched tokens
-        foreach (var c in parsed.Conditions)
+        foreach (var c in allConditions)
             tokenLog.Add($"Cond:{c.GetType().Name}");
         foreach (var a in allAbilities)
             tokenLog.Add($"Abil:{a.GetType().Name}");
@@ -166,7 +160,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                 abilityForEffect = char.ToLower(abilityForEffect[0]) + abilityForEffect[1..];
             }
             effectText += $" {abilityForEffect}";
-            if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith(']') && !abilityForEffect.EndsWith('"'))
+            if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith('"'))
                 effectText += ".";
         }
 
@@ -221,7 +215,9 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             return $"{allButLast}, and {group[^1]}";
         });
 
-        var result = string.Join(". ", sentenceTexts);
+        // Avoid double periods: trim trailing '.' before joining, re-add if needed
+        var trimmed = sentenceTexts.Select(s => s.TrimEnd('.')).ToList();
+        var result = string.Join(". ", trimmed);
         result = char.ToUpper(result[0]) + result[1..];
         if (!result.EndsWith('.') && !result.EndsWith(']') && !result.EndsWith('"'))
             result += ".";

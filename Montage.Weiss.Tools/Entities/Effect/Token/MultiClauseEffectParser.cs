@@ -228,6 +228,10 @@ public static class MultiClauseEffectParser
     {
         var protectedInput = Regex.Replace(input, @"『[^』]+』", m => m.Value.Replace("。", "\0"));
         protectedInput = Regex.Replace(protectedInput, @"〔[^〕]+〕", m => m.Value.Replace("。", "\0"));
+        // Protect `。` before `『』` — nested ability text belongs to the preceding sentence
+        protectedInput = Regex.Replace(protectedInput, @"。(?=『[^』]+』)", m => "\0");
+        // Protect `。` before variable definitions: パワーを＋X。Xは...に等しい。
+        protectedInput = Regex.Replace(protectedInput, @"。(?=[ＸＹXY]は[^。]*に等しい)", m => "\0");
         protectedInput = Regex.Replace(protectedInput, @"コストを払ってよい。", m => m.Value.Replace("。", "\0"));
         // Protect X/Y variable definitions: Ｘは...に等しい。Ｙは...に等しい。
         protectedInput = Regex.Replace(protectedInput, @"[ＸＹXY]は[^。]*に等しい。", m => m.Value.Replace("。", "\0"));

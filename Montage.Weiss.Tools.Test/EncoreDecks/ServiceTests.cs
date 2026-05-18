@@ -10,6 +10,7 @@ public class ServiceTests
     public TestContext TestContext { get; set; }
 
     [TestMethod(DisplayName = "Set List Test")]
+    [TestCategory("CI")]
     public async Task TestSetListTestAsync()
     {
         var edSrvc = Global.Container.GetInstance<EncoreDecksService>();

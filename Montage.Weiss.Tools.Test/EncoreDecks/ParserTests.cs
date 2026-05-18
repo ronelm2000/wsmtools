@@ -66,6 +66,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "Serial Test (Prisma Illya)")]
+    [TestCategory("CI")]
     public async Task TestPISerials()
     {
         var progress = NoOpProgress<SetParserProgressReport>.Instance;
@@ -110,6 +111,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "Color Test (Akiba)(Edge Case)")]
+    [TestCategory("Manual")]
     public async Task TestAkibaColors()
     {
         var progress = NoOpProgress<SetParserProgressReport>.Instance;

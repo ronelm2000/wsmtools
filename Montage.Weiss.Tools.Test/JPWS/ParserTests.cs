@@ -12,6 +12,7 @@ public class ParserTests
     public TestContext TestContext { get; set; }
 
     [TestMethod(DisplayName = "JP WS Parser Compatibility Test")]
+    [TestCategory("Manual")]
     public async Task TestCompatibility()
     {
         var parser = new JapaneseWSURLParser();
@@ -28,6 +29,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "JP WS Parser Live Parse Test")]
+    [TestCategory("CI")]
     public async Task TestParser()
     {
         var progress = Global.MockProgress;

@@ -22,6 +22,7 @@ public class MergeTests
         };
 
     [TestMethod(DisplayName = "Example Test Case from Plan")]
+    [TestCategory("CI")]
     public void Merge_ExampleTestCase()
     {
         var mergeVerb = CreateMergeVerb();
@@ -74,6 +75,7 @@ public class MergeTests
     }
 
     [TestMethod(DisplayName = "Basic Merge - No Overlap")]
+    [TestCategory("CI")]
     public void Merge_BasicNoOverlap()
     {
         var mergeVerb = CreateMergeVerb();
@@ -99,6 +101,7 @@ public class MergeTests
     }
 
     [TestMethod(DisplayName = "Foil Replacement")]
+    [TestCategory("CI")]
     public void Merge_FoilReplacement()
     {
         var mergeVerb = CreateMergeVerb();
@@ -122,6 +125,7 @@ public class MergeTests
     }
 
     [TestMethod(DisplayName = "Ratio Capping - Overflow")]
+    [TestCategory("CI")]
     public void Merge_RatioCappingOverflow()
     {
         var mergeVerb = CreateMergeVerb();
@@ -145,6 +149,7 @@ public class MergeTests
     }
 
     [TestMethod(DisplayName = "S2 Unique Cards - Not Added")]
+    [TestCategory("CI")]
     public void Merge_S2UniqueCardsNotAdded()
     {
         var mergeVerb = CreateMergeVerb();
@@ -168,6 +173,7 @@ public class MergeTests
     }
 
     [TestMethod(DisplayName = "Multiple Cards Same Base Serial")]
+    [TestCategory("CI")]
     public void Merge_MultipleCardsSameBaseSerial()
     {
         var mergeVerb = CreateMergeVerb();
@@ -193,6 +199,7 @@ public class MergeTests
     }
 
     [TestMethod(DisplayName = "Total Ratios Should Match S1 Total")]
+    [TestCategory("CI")]
     public void Merge_TotalRatiosMatchS1Total()
     {
         var mergeVerb = CreateMergeVerb();

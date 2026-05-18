@@ -14,6 +14,7 @@ public class PostProcessorTests
     public TestContext TestContext { get; set; }
 
     [TestMethod(DisplayName = "API Version Check (DeckLog JP)")]
+    [TestCategory("CI")]
     public async Task EnsureLatestVersionJP()
     {
         var deckLogPP = Global.Container.GetInstance<DeckLogPostProcessor>();
@@ -23,6 +24,7 @@ public class PostProcessorTests
     }
 
     [TestMethod(DisplayName = "API Version Test (DeckLog EN)")]
+    [TestCategory("CI")]
     public async Task EnsureLatestVersionEN()
     {
         var deckLogPP = Global.Container.GetInstance<DeckLogPostProcessor>();

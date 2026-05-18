@@ -13,6 +13,7 @@ public class ParserTests
 
     [TestMethod(DisplayName = "WS Custom Card Parser Test")]
     [DeploymentItem("Resources")]
+    [TestCategory("CI")]
     public async Task TestParser()
     {
         var filePath = "./machikado_mazoku.ws-set";

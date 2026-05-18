@@ -18,6 +18,7 @@ public class CardTests
     public TestContext TestContext { get; set; }
 
     [TestMethod(DisplayName = "Serial Parser Test")]
+    [TestCategory("CI")]
     public async Task TestSerialParser()
     {
         var serials = new[] {
@@ -45,6 +46,7 @@ public class CardTests
     }
 
     [TestMethod(DisplayName = "Foil Removal Serial Test")]
+    [TestCategory("CI")]
     public async Task TestFoilRemovalSerial()
     {
         var serials = new[] {
@@ -69,6 +71,7 @@ public class CardTests
     }
 
     [TestMethod(DisplayName = "English Set Test")]
+    [TestCategory("CI")]
     public async Task TestEnglishSetTypes()
     {
         var serials = new[] {

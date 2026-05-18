@@ -15,6 +15,7 @@ public class ParserTests
     public TestContext TestContext { get; set; }
 
     [TestMethod(DisplayName = "EN WS Parser Test")]
+    [TestCategory("CI")]
     public async Task TestParser()
     {
         var progressReporter = NoOpProgress<object>.Instance;
@@ -51,6 +52,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "EN WS Parser - SearchResults URL Test")]
+    [TestCategory("CI")]
     public async Task TestSearchResultsUrl()
     {
         var progressReporter = NoOpProgress<object>.Instance;
@@ -65,6 +67,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "EN WS Parser - SearchResults Compatibility Test")]
+    [TestCategory("CI")]
     public async Task TestSearchResultsCompatibility()
     {
         var parser = Global.Container.GetInstance<EnglishWSURLParser>()!;
@@ -78,6 +81,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "EN WS Parser - SearchResults Missing Expansion Test")]
+    [TestCategory("CI")]
     public async Task TestSearchResultsMissingExpansion()
     {
         var url = "https://en.ws-tcg.com/cardlist/searchresults/?view=text";

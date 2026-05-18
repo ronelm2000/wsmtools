@@ -53,6 +53,7 @@ public class IntegrationTests
     }
 
     [TestMethod(DisplayName = "Help Test")]
+    [TestCategory("CI")]
     public async Task HelpTestRun()
     {
         Program.Console = Substitute.For<IConsole>();
@@ -67,6 +68,7 @@ public class IntegrationTests
     }
 
     [TestMethod(DisplayName = "Regular Run (Update) Test")]
+    [TestCategory("CI")]
     public async Task RegularRunUpdateTest()
     {
         Program.Console = Substitute.For<IConsole>();

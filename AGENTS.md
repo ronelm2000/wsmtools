@@ -7,6 +7,16 @@ dotnet build
 dotnet test --filter <TestClassFilter>
 ```
 
+### Testing a specific card
+
+To test for a specific card serial (e.g., `NIK/S117-008`), use substring matching with the `~` operator:
+
+```ps
+dotnet test --filter "TestCategory~NIK/S117-008"
+```
+
+This runs all tests whose `TestCategory` tag contains `NIK/S117-008`.
+
 Limit coverage to the test classes of added/modified unit tests using `FullyQualifiedName~<ClassName>`:
 
 ```ps

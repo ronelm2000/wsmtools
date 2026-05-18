@@ -9,8 +9,8 @@ internal class LevelConditionToken : CardTextToken<List<CardEffectCondition>>
         var match = Matcher.Match(span.ToString());
         var state = match.Groups["state"].Value;
         var conditionText = state == "ある"
-            ? "If your level has a yellow card, a red card and a blue card"
-            : "If you do not have a yellow card, a red card and a blue card in your level";
+            ? "your level has a yellow card, a red card and a blue card"
+            : "you do not have a yellow card, a red card and a blue card in your level";
         return
         [
             new CardEffectCondition

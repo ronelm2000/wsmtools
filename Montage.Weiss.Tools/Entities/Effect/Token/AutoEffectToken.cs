@@ -106,6 +106,23 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 
         // Use MultiClauseEffectParser.ParseSentence for condition + ability parsing
         var parsed = MultiClauseEffectParser.ParseSentence(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
+
+        // Crash guard: if nothing matched and text remains, throw
+        if (string.IsNullOrWhiteSpace(rest))
+        {
+            // Nothing to parse
+        }
+        else if (parsed.Conditions.Count == 0 && parsed.Abilities.Count == 0 && !string.IsNullOrWhiteSpace(parsed.Remaining))
+        {
+            throw new NotImplementedException($"No condition or ability token found for: {rest}");
+        }
+        else if (parsed.Abilities.Count == 0 && !string.IsNullOrWhiteSpace(parsed.Remaining))
+        {
+            var remainingTrimmed = Regex.Replace(parsed.Remaining, @"（[^）]*）", "").Trim().TrimEnd('。', '、', ' ', '\t');
+            if (!string.IsNullOrEmpty(remainingTrimmed))
+                throw new NotImplementedException($"No ability token found for: {rest}");
+        }
+
         conditions.AddRange(parsed.Conditions);
         var allAbilities = parsed.Abilities;
 
@@ -121,9 +138,18 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 
         var abilityEnglish = JoinAbilityParts(abilityParts);
 
-        var costEnglish = string.Join(" & ", costAbilities.Select(a => a.AbilityText));
-        if (!string.IsNullOrEmpty(costEnglish))
+        var costTexts = costAbilities.Select(a => a.AbilityText).ToList();
+        var costEnglish = "";
+        if (costTexts.Count > 0)
+        {
+            costEnglish = costTexts[0];
+            for (int i = 1; i < costTexts.Count; i++)
+            {
+                var sep = i == 1 && Regex.IsMatch(costTexts[0], @"^\(\d+\)$") ? " " : " & ";
+                costEnglish += sep + costTexts[i];
+            }
             costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
+        }
 
         var labelPrefix = labels.Length > 0 ? $"[{string.Join("][", labels)}]" : "";
         var accelerateInsert = hasAccelerate ? " Accelerate" : "";

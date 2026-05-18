@@ -178,6 +178,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new GainEncoreAbilityToken());
         _effectListRegistry.Register(new XEqualsToken());
         _effectListRegistry.Register(new ThoseCardsTriggerIconConditionToken());
+        _effectListRegistry.Register(new ForEachCxToken());
         _effectListRegistry.Register(new EncoreToken());
         _effectListRegistry.Register(new CannotSideAttackToken());
         _effectListRegistry.Register(new CannotPlayBackupDuringBattleToken());

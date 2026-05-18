@@ -2,6 +2,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 internal class ActEffectToken : CardTextToken<CardEffect>
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<ActEffectToken>();
+
     public override Regex Matcher => new(@"^【起】(?<labels>(?:【[^】]+】)*)\s*(?<mainText>.+)$");
 
     public override CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
@@ -9,6 +11,13 @@ internal class ActEffectToken : CardTextToken<CardEffect>
         var match = Matcher.Match(span.ToString());
         var labels = registry.MatchLabels(match.Groups["labels"]?.Value ?? "");
         var mainText = match.Groups["mainText"].Value.Trim();
+        var hasBrainstorm = mainText.StartsWith("集中", StringComparison.Ordinal);
+
+        // Handle Brainstorm label prefix before cost extraction
+        if (hasBrainstorm)
+        {
+            mainText = Regex.Replace(mainText, @"^集中\s*", "");
+        }
 
         // Extract cost if present: ［...］
         var costMatch = Regex.Match(mainText, @"^［(?<cost>.+?)］\s*(?<rest>.+)$");
@@ -21,79 +30,66 @@ internal class ActEffectToken : CardTextToken<CardEffect>
             rest = costMatch.Groups["rest"].Value.Trim();
         }
 
-        // Translate cost
-        var costAbilities = string.IsNullOrEmpty(costTextJapanese)
-            ? []
-            : registry.EffectListRegistry.GetMatch(costTextJapanese.AsMemory())(registry);
-
-        // Iterative ability matching
-        var allAbilities = new List<CardEffectAbility>();
-        var abilityParts = new List<string>();
+        // Translate cost using Match API
+        var costAbilities = new List<CardEffectAbility>();
         var tokenLog = new List<string>();
-        var remainingText = rest;
-
-        while (!string.IsNullOrWhiteSpace(remainingText))
+        if (!string.IsNullOrEmpty(costTextJapanese))
         {
-            var trimmed = remainingText.TrimStart();
-            if (trimmed.Length == 0)
-                break;
-
-            if (registry.EffectListRegistry.TryFindFirstMatch(trimmed, out var abilFunc, out var matchIndex, out var consumed) && abilFunc != null)
+            var costRemaining = costTextJapanese;
+            while (!string.IsNullOrWhiteSpace(costRemaining))
             {
-                if (matchIndex > 0)
-                {
-                    remainingText = trimmed[matchIndex..];
-                    continue;
-                }
-                var abilMatch = registry.EffectListRegistry.Match(trimmed.AsMemory());
-                if (abilMatch != null)
-                    tokenLog.Add(abilMatch.Match.Token);
-                var abilList = abilFunc(registry);
-                allAbilities.AddRange(abilList);
-                abilityParts.AddRange(abilList.Select(a => a.AbilityText));
-                remainingText = trimmed[consumed..].TrimStart('、', '。', ' ', '\t');
-            }
-            else
-            {
-                break;
+                var t = costRemaining.TrimStart();
+                var m = registry.EffectListRegistry.Match(t.AsMemory());
+                if (m == null) break;
+                var abils = m.Translate(registry);
+                costAbilities.AddRange(abils);
+                tokenLog.Add($"Cost:{m.Match.Token}");
+                costRemaining = t[m.Match.Length..].TrimStart('、', ' ', '\t');
             }
         }
 
-        // Post-process opponent references
-        if (mainText.Contains("相手の"))
-        {
-            var opponentRegex = new Regex(@"(?<!\bother\s+)(?<!\byour\s+opponent's\s+)\byour\b(?!\s+opponent's)");
-            abilityParts = abilityParts.Select(part =>
-                opponentRegex.Replace(part, "your opponent's", 1)
-            ).ToList();
-        }
+        // Use MultiClauseEffectParser for ability parsing (supports multi-sentence effects like Brainstorm)
+        var parsedList = MultiClauseEffectParser.Parse(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
+        var allAbilities = parsedList.SelectMany(p => p.Abilities).ToList();
+        var abilityParts = allAbilities.Select(a => a.AbilityText).ToList();
+
+        foreach (var a in allAbilities)
+            tokenLog.Add($"Abil:{a.GetType().Name}");
 
         var abilityEnglish = AutoEffectToken.JoinAbilityParts(abilityParts);
 
-        var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
-        if (!string.IsNullOrEmpty(costEnglish))
-            costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
+        var costTexts = costAbilities.Select(a => a.AbilityText).ToList();
+        var costEnglish = "";
+        if (costTexts.Count > 0)
+        {
+            costEnglish = costTexts[0];
+            for (int i = 1; i < costTexts.Count; i++)
+            {
+                var sep = i == 1 && Regex.IsMatch(costTexts[0], @"^\(\d+\)$") ? " " : " & ";
+                costEnglish += sep + costTexts[i];
+            }
+        }
+
+        var finalLabels = labels;
+        if (hasBrainstorm)
+            finalLabels = [.. finalLabels, "Brainstorm"];
 
         var prefixParts = new List<string> { "[ACT]" };
-        if (labels.Length > 0)
-            prefixParts.AddRange(labels.Select(label => $"[{label}]"));
+        foreach (var label in finalLabels)
+            prefixParts.Add($" {label}");
         if (!string.IsNullOrEmpty(costEnglish))
-            prefixParts.Add($"[{costEnglish}]");
+        {
+            var space = finalLabels.Length > 0 ? " " : "";
+            prefixParts.Add($"{space}[{costEnglish}]");
+        }
         
         var effectText = string.Join("", prefixParts);
         if (!string.IsNullOrEmpty(abilityEnglish))
         {
-            var abilityForEffect = abilityEnglish;
-            if (labels.Length > 0 && abilityForEffect.Length > 0)
-                abilityForEffect = char.ToLower(abilityForEffect[0]) + abilityForEffect[1..];
-            effectText += $" {abilityForEffect}";
+            effectText += $" {abilityEnglish}";
         }
         if (!effectText.TrimEnd().EndsWith("."))
             effectText += ".";
-
-        var finalLabels = labels;
-        if (Regex.IsMatch(mainText, @"^集中"))
-            finalLabels = [.. finalLabels, "Brainstorm"];
 
         return new ActCardEffect {
                 Labels = finalLabels,

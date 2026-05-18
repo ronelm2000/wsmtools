@@ -7,7 +7,8 @@ public record LeadInPrefixMap(
 public record ParsedSentence(
     List<CardEffectCondition> Conditions,
     List<CardEffectAbility> Abilities,
-    string Text);
+    string Text,
+    string Remaining = "");
 
 public static class MultiClauseEffectParser
 {
@@ -184,11 +185,12 @@ public static class MultiClauseEffectParser
             }
         }
 
-        Log.Debug("ParseSentence: done. {CondCount} conditions, {AbilCount} abilities",
-            conditions.Count, abilities.Count);
+        Log.Debug("ParseSentence: done. {CondCount} conditions, {AbilCount} abilities, remaining='{Remaining}'",
+            conditions.Count, abilities.Count, remainingText);
 
+        var remaining = remainingText.Trim();
         var text = BuildSentenceText(conditions, abilities);
-        return new ParsedSentence(conditions, abilities, text);
+        return new ParsedSentence(conditions, abilities, text, remaining);
     }
 
     // Prefixes that should be skipped before matching (conjunctions + subject prefixes + duration prefixes)

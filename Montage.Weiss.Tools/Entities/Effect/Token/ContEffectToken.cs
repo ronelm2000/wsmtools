@@ -62,9 +62,31 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         // Use MultiClauseEffectParser for condition + ability parsing
         var tokenLog = new List<string>();
         var parsed = MultiClauseEffectParser.ParseSentence(remainingText, registry, MultiClauseEffectParser.DefaultPrefixMap);
+
+        // Crash guard: if nothing matched and text remains, throw
+        if (string.IsNullOrWhiteSpace(remainingText))
+        {
+            // Nothing to parse
+        }
+        else if (parsed.Conditions.Count == 0 && parsed.Abilities.Count == 0 && !string.IsNullOrWhiteSpace(parsed.Remaining))
+        {
+            throw new NotImplementedException($"No condition or ability token found for: {remainingText}");
+        }
+        else if (parsed.Abilities.Count == 0 && !string.IsNullOrWhiteSpace(parsed.Remaining))
+        {
+            var remainingTrimmed = Regex.Replace(parsed.Remaining, @"（[^）]*）", "").Trim().TrimEnd('。', '、', ' ', '\t');
+            if (!string.IsNullOrEmpty(remainingTrimmed))
+                throw new NotImplementedException($"No ability token found for: {remainingText}");
+        }
+
         var conditions = parsed.Conditions;
         var allAbilities = parsed.Abilities;
         var abilityParts = parsed.Abilities.Select(a => a.AbilityText).ToList();
+
+        foreach (var c in conditions)
+            tokenLog.Add($"Cond:{c.GetType().Name}");
+        foreach (var a in allAbilities)
+            tokenLog.Add($"Abil:{a.GetType().Name}");
 
         Log.Debug("ContEffectToken: parsed {CondCount} conditions, {AbilCount} abilities from '{Rest}'",
             conditions.Count, allAbilities.Count, remainingText);

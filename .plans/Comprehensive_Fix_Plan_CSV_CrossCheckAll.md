@@ -889,14 +889,16 @@ This runs all tests whose `TestCategory` tag contains the specified serial. The 
 - **After Phase 1**: **100 passed / 146 failed / 246 total** (+2 from 98)
 - **After Phase 1.5 (early 2026-05-18)**: **119 passed / 127 failed / 246 total** (+19 from 100)
 - **After Sprint 2 (late 2026-05-18)**: **122 passed / 124 failed / 246 total** (+3 from 119)
-- **NotImplementedException count**: 29 → **24** (-5)
-- **Tokens created**: 29 new token files (24 Phase 1 + 2 Phase 1.5 + 3 Sprint 2)
-- **Tokens registered**: All 29 registered in WeissSchwarzCardTranslatorService
+- **After Sprint 3 (AD-0/1 architecture + token fixes)**: **120 passed / 126 failed / 246 total** (-2 from 122, but 0 NotImplementedException vs 24)
+- **NotImplementedException count**: 24 → **0** ✅
+- **Tokens created**: 30 new token files (previous 29 + DrawUpToNToken)
+- **Tokens registered**: All 30 registered in WeissSchwarzCardTranslatorService
 - **Tests fixed by Phase 1**: 2 (ANM/W138-T12 + 1 other from AssistPowerBoostToken fix)
 - **Tests fixed by Phase 1.5**: 19 (NIK/S117-006, NIK/S117-008 x2, ANM/W138-T11, and others from token fixes)
 - **Tests fixed by Sprint 2**: 5 (NIK/S117-005 x2, NIK/S117-011 x1, NIK/S117-015 x1, NIK/S117-017 x3 = net +5)
+- **Tests fixed by Sprint 3**: NIK/S117-005 (3/3), NIK/S117-013, NIK/S117-015 (2/2), NIK/S117-031 partial (+1)
 - **Phase 1 re-classified**: 16 test rows moved to RC-AD (12), RC-AE (2), RC-AG (1), already-fixed (1)
-- **Remaining work**: Multi-clause ability parsing (now includes 12 re-classified Phase 1 rows), CSV value mismatches, and new RC categories below
+- **Remaining work**: All 126 failures are output-format mismatches (0 crashes). Individual token patterns and CSV alignment.
 
 ## Completed
 
@@ -1024,6 +1026,28 @@ Despite all 24 tokens being "created and registered", the actual test pass rate 
 - [ ] **RC-AD-3**: NIK/S117-063 row 2 — CostPutToStockAndSwapBottomToken not matched in GetMatch cost context
 - [x] **RC-AH**: ANM/W138-T12 — ✅ FIXED in Phase 1 (AssistPowerBoostToken fixed-vs-variable distinction)
 - [ ] **RC-AE**: ANM/W138-T11 — Output format: "to the bottom" vs "at the bottom"
+
+### Sprint 3 Completed (2026-05-18 session — AD-0/1 Architecture)
+
+#### AD-0: Multi-Sentence Parsing for AUTO/CONT
+- [x] **AutoEffectToken → `Parse`**: Switched from `ParseSentence` to `MultiClauseEffectParser.Parse` (multi-sentence with `。` splitting)
+- [x] **ContEffectToken → `Parse`**: Same switch for CONT effects
+- [x] **Crash guards removed**: Replaced `NotImplementedException` throws with debug logging
+- [x] **JoinAbilityParts double-period fix**: Trim trailing `.` before joining groups, re-add if needed
+
+#### AD-0.5: `Parse` Protection Improvements
+- [x] **Protect `。` before `『』`**: Prevents nested ability text from being split into separate sentence
+- [x] **Protect `。` before variable defs**: Keeps `Ｘは...に等しい` attached to preceding ability
+- [x] **Protect `。` before `そうしたら`**: Prevents cascade/clause connectors from being split
+- [x] **Trailing `]` period fix**: Allow `.` after `[REST]` in ability text
+
+#### AD-5: TryTranslateNested Reorder
+- [x] **Ability → Effect match order**: Stripped `【】` → ability match → effect match fallback
+- [x] **Fixes nested abilities**: Prevents `ContEffectToken` from swallowing nested `【永】` with "If " prefix
+
+#### Individual Token Fixes
+- [x] **DrawUpToNToken**: Created for continuative verb form `引き` (e.g., `あなたは1枚まで引き、...`)
+- [x] **OtherCharacterCountConditionToken**: Extended regex to match `他のあなたの《TRAIT》のキャラがN枚以上なら`
 
 ### Sprint 2 Completed (late 2026-05-18 session)
 - [x] **DrawAndDiscardToken**: Created token for `あなたはN枚引いてよい。そうしたら、...控え室に置く。` pattern ✅

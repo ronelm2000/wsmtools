@@ -12,7 +12,7 @@ internal class PutCardFromHandAndThisToBottomToken : CardTextToken<List<CardEffe
         [
             new CardEffectAbility
             {
-                AbilityText = $"Put {count} {(count == 1 ? "card" : "cards")} in your hand to your waiting room, and put this card at the bottom of your deck"
+                AbilityText = $"Put {count} {(count == 1 ? "card" : "cards")} in your hand to your waiting room & Put this card at the bottom of your deck"
             }
         ];
     }

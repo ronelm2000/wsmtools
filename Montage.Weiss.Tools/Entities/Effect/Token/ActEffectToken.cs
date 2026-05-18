@@ -74,22 +74,21 @@ internal class ActEffectToken : CardTextToken<CardEffect>
         if (!string.IsNullOrEmpty(costEnglish))
             costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
 
-        var parts = new List<string> { "[ACT]" };
+        var prefixParts = new List<string> { "[ACT]" };
         if (labels.Length > 0)
-            parts.AddRange(labels.Select(label => $"[{label}]"));
+            prefixParts.AddRange(labels.Select(label => $"[{label}]"));
         if (!string.IsNullOrEmpty(costEnglish))
-            parts.Add($"[{costEnglish}]");
+            prefixParts.Add($"[{costEnglish}]");
+        
+        var effectText = string.Join("", prefixParts);
         if (!string.IsNullOrEmpty(abilityEnglish))
         {
             var abilityForEffect = abilityEnglish;
             if (labels.Length > 0 && abilityForEffect.Length > 0)
                 abilityForEffect = char.ToLower(abilityForEffect[0]) + abilityForEffect[1..];
-            parts.Add(abilityForEffect);
+            effectText += $" {abilityForEffect}";
         }
-        var effectText = labels.Length > 0 ? string.Join(" ", parts) : string.Join("", parts);
-        if (!string.IsNullOrEmpty(abilityEnglish))
-            effectText += " " + abilityEnglish;
-        if (!string.IsNullOrEmpty(abilityEnglish) && !effectText.TrimEnd().EndsWith("."))
+        if (!effectText.TrimEnd().EndsWith("."))
             effectText += ".";
 
         var finalLabels = labels;

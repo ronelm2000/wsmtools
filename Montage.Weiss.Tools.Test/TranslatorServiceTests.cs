@@ -512,9 +512,7 @@ public class TranslatorServiceTests
         var actual = tree.Effects[0].EffectText.Trim();
         var expectedLabels = string.IsNullOrEmpty(labels)
             ? Array.Empty<string>()
-            : labels
-                .Trim('[', ']')
-                .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            : labels.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
         if (jpEffect.StartsWith("【自】") && tree.Effects[0] is not AutoCardEffect)
         {
@@ -533,7 +531,7 @@ public class TranslatorServiceTests
 
         MultiAssert.AllAreTrue([
             () => Assert.AreEqual(expected, actual, $"[{serial}] EffectText mismatch{Environment.NewLine}Expected: {expected}{Environment.NewLine}Actual: {actual}"),
-            () => CollectionAssert.AreEqual(expectedLabels, tree.Effects[0].Labels, $"[{serial}] Labels mismatch")
+            () => CollectionAssert.AreEqual(expectedLabels, tree.Effects[0].Labels, $"[{serial}]{Environment.NewLine}Expected: {string.Join(", ", expectedLabels)}{Environment.NewLine}Actual: {string.Join(", ", tree.Effects[0].Labels)}{Environment.NewLine}Labels mismatched")
         ], Assert.Fail);
     }
 

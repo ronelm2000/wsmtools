@@ -39,6 +39,9 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         var match = Matcher.Match(span.ToString());
         var labels = registry.MatchLabels(match.Groups["labels"]?.Value ?? "");
         var mainText = match.Groups["mainText"].Value.Trim();
+        // MatchLabels now returns bracketed format (e.g. "[CXCOMBO]") for CSV comparison.
+        // Strip brackets for effect text formatting — they'll be re-added by labelPrefix.
+        var formatLabels = labels.Select(l => l.Trim('[', ']')).ToArray();
 
         // Handle "加速 " (Accelerate) keyword prefix
         var hasAccelerate = mainText.StartsWith("加速", StringComparison.Ordinal);
@@ -142,7 +145,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
         }
 
-        var labelPrefix = labels.Length > 0 ? $"[{string.Join("][", labels)}]" : "";
+        var labelPrefix = formatLabels.Length > 0 ? $"[{string.Join("][", formatLabels)}]" : "";
         var accelerateInsert = hasAccelerate ? " Accelerate" : "";
         var effectText = $"[AUTO]{accelerateInsert}{labelPrefix}";
         if (!string.IsNullOrEmpty(costEnglish))

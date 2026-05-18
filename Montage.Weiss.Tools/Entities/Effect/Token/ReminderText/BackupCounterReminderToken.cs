@@ -2,8 +2,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.ReminderText;
 
 internal class BackupCounterReminderToken : CardTextToken<string>
 {
-    public override Regex Matcher => new(@"^あなたは自分のフロントアタックされているキャラを(\d+) 枚選び、そのターン中、パワーを＋(\d+)");
-
+    public override Regex Matcher => new(@"^あなたは自分のフロントアタックされているキャラを(\d+)枚選び、そのターン中、パワーを＋(\d+)");
+    
     public override string Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());

@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class BackupPrefixToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^助太刀(\d+)レベル(\d+)\s*［(?:\((\d+)\)\s*)?手札のこのカードを控え室に置く］");
+    public override Regex Matcher => new(@"^助太刀(\d+)\s*レベル(\d+)\s*［(?:\((\d+)\)\s*)?手札のこのカードを控え室に置く］");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

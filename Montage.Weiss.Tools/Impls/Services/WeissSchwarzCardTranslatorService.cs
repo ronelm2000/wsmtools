@@ -278,13 +278,15 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
             .ToArray();
 
         // Convert Japanese labels to English
+        // Output format matches CSV label column: bracketed labels use [LABEL] format,
+        // while keyword-style labels (like Brainstorm) remain bare.
         return labels.Select(label => label switch
         {
-            "ターン1" => "1/TURN",
-            "応援" => "Assist",
+            "ターン1" => "[1/TURN]",
+            "応援" => "[Assist]",
             "集中" => "Brainstorm",
-            "CXコンボ" => "CXCOMBO",
-            "カウンター" => "COUNTER",
+            "CXコンボ" => "[CXCOMBO]",
+            "カウンター" => "[COUNTER]",
             _ => label
         }).ToArray();
     }
@@ -357,7 +359,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
             var effectText = effect.EffectText.TrimEnd('.');
             if (!string.IsNullOrEmpty(effectText))
             {
-                effect.EffectText = effectText + ". (" + reminderTextEnglish + ")";
+                var separator = effectText.EndsWith(']') ? " " : ". ";
+                effect.EffectText = effectText + separator + "(" + reminderTextEnglish + ")";
             }
             else
             {

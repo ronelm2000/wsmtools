@@ -120,9 +120,10 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
                 effectText += ".";
         }
 
+        var counterLabels = registry.MatchLabels("【カウンター】");
         return new EventCardEffect
         {
-            Labels = ["COUNTER"],
+            Labels = counterLabels,
             Abilities = parsedList?.SelectMany(p => p.Abilities).ToList() ?? [],
             AbilityText = abilityEnglish,
             EffectText = effectText

@@ -29,7 +29,7 @@ internal class CannotPlayBackupDuringBattleToken : CardTextToken<List<CardEffect
         [
             new CardEffectAbility
             {
-                AbilityText = "Your opponent cannot play \"Backup\" from their hand during this card's battle."
+                AbilityText = "During this card's battle, your opponent cannot play \"Backup\" from their hand"
             }
         ];
     }

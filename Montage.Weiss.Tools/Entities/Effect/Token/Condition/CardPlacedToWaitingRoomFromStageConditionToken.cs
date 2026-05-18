@@ -12,7 +12,7 @@ internal class CardPlacedToWaitingRoomFromStageConditionToken : CardTextToken<Li
             new CardEffectCondition
             {
                 Type = ConditionType.When,
-                ConditionText = "When this card is put to your waiting room from the stage"
+                ConditionText = "this card is put to your waiting room from the stage"
             }
         ];
     }

@@ -69,33 +69,7 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         Log.Debug("ContEffectToken: parsed {CondCount} conditions, {AbilCount} abilities from '{Rest}'",
             conditions.Count, allAbilities.Count, remainingText);
 
-        var conditionTexts = conditions.Select(c => c.ConditionText).Where(c => !string.IsNullOrEmpty(c)).ToList();
-        for (int i = 0; i < conditionTexts.Count; i++)
-        {
-            if (conditionTexts[i].Length == 0) continue;
-            var startsWithConditional = conditionTexts[i].StartsWith("If", StringComparison.OrdinalIgnoreCase) || conditionTexts[i].StartsWith("When", StringComparison.OrdinalIgnoreCase) || conditionTexts[i].StartsWith("During", StringComparison.OrdinalIgnoreCase) || conditionTexts[i].StartsWith("At", StringComparison.OrdinalIgnoreCase) || conditionTexts[i].StartsWith("For", StringComparison.OrdinalIgnoreCase);
-            if (!startsWithConditional)
-            {
-                if (i == 0)
-                {
-                    conditionTexts[i] = "If " + char.ToLower(conditionTexts[i][0]) + conditionTexts[i][1..];
-                }
-                else
-                {
-                    conditionTexts[i] = "if " + char.ToLower(conditionTexts[i][0]) + conditionTexts[i][1..];
-                }
-            }
-            else if (i == 0)
-            {
-                conditionTexts[i] = char.ToUpper(conditionTexts[i][0]) + conditionTexts[i][1..];
-            }
-        }
-        for (int i = 1; i < conditionTexts.Count; i++)
-        {
-            if (conditionTexts[i].Length > 0)
-                conditionTexts[i] = char.ToLower(conditionTexts[i][0]) + conditionTexts[i][1..];
-        }
-        var conditionEnglish = string.Join(", ", conditionTexts);
+        var conditionEnglish = conditions.AggregateToString();
         var abilityEnglish = AutoEffectToken.JoinAbilityParts(abilityParts);
         
         var effectText = "[CONT]";
@@ -113,7 +87,7 @@ internal class ContEffectToken : CardTextToken<CardEffect>
                 abilityForEffect = char.ToLower(abilityForEffect[0]) + abilityForEffect[1..];
         }
         effectText += $" {abilityForEffect}";
-        if (!abilityForEffect.EndsWith('.') && !abilityForEffect.Contains("get the following abilities"))
+        if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith('"') && !abilityForEffect.Contains("get the following abilities"))
             effectText += ".";
 
         return new ContCardEffect

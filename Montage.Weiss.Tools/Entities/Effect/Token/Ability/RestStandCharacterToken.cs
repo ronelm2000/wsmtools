@@ -25,9 +25,15 @@ internal class RestStandCharacterToken : CardTextToken<List<CardEffectAbility>>
             var owner = match.Groups[1].Value;
             var desc = match.Groups[2].Value;
             var ownerText = owner == "相手" ? "your opponent's" : "your";
-            var descText = desc.Replace("レベル 3 以下のキャラ", "level 3 or lower characters")
-                               .Replace("レベル 0 以下のキャラ", "level 0 or lower characters")
-                               .Replace("キャラ", "characters");
+            var normalizedDesc = desc.Replace(" ", "");
+            var descText = normalizedDesc switch
+            {
+                _ when normalizedDesc.Contains("レベル3以下のキャラ") => "level 3 or lower characters",
+                _ when normalizedDesc.Contains("レベル0以下のキャラ") => "level 0 or lower characters",
+                _ when normalizedDesc.Contains("レベルX以下のキャラ") => "level X or lower characters",
+                _ when normalizedDesc.Contains("レベル") => normalizedDesc.Replace("レベル", "level ").Replace("以下のキャラ", " or lower characters"),
+                _ => normalizedDesc.Replace("キャラ", "characters")
+            };
             return
             [
                 new CardEffectAbility

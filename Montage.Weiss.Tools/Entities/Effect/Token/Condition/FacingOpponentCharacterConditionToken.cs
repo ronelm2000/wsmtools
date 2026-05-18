@@ -11,7 +11,7 @@ internal class FacingOpponentCharacterConditionToken : CardTextToken<List<CardEf
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = "if there is a character facing this card"
+                ConditionText = "there is a character facing this card"
             }
         ];
     }

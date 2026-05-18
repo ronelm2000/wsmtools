@@ -12,8 +12,8 @@ internal class CxNamedPlacedConditionToken : CardTextToken<List<CardEffectCondit
         [
             new CardEffectCondition
             {
-                
-            Type = ConditionType.If,ConditionText = $"When \"{name}\" is placed on your CX area"
+            Type = ConditionType.When,
+            ConditionText = $"\"{name}\" is placed on your CX area"
             }
         ];
     }

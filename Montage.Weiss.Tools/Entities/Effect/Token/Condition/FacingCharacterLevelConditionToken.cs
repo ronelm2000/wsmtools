@@ -12,8 +12,8 @@ internal class FacingCharacterLevelConditionToken : CardTextToken<List<CardEffec
         [
             new CardEffectCondition
             {
-                
-            Type = ConditionType.If,ConditionText = $"if the character facing this card is level {level}"
+                Type = ConditionType.If,
+                ConditionText = $"the character facing this card is level {level}"
             }
         ];
     }

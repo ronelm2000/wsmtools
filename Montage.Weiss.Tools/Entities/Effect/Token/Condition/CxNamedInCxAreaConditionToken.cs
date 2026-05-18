@@ -13,7 +13,8 @@ internal class CxNamedInCxAreaConditionToken : CardTextToken<List<CardEffectCond
             new CardEffectCondition
             {
                 
-            Type = ConditionType.If,ConditionText = $"If \"{name}\" is in your CX area"
+            Type = ConditionType.If,
+                ConditionText = $"\"{name}\" is in your CX area"
             }
         ];
     }

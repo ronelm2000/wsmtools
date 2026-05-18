@@ -13,7 +13,8 @@ internal class NoTraitExistsConditionToken : CardTextToken<List<CardEffectCondit
             new CardEffectCondition
             {
                 
-            Type = ConditionType.If,ConditionText = $"If you do not have a <<{trait}>> character"
+            Type = ConditionType.If,
+                ConditionText = $"you do not have a <<{trait}>> character"
             }
         ];
     }

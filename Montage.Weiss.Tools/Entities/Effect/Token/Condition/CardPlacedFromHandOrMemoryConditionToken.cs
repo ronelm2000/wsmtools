@@ -1,8 +1,8 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 
-internal class DamageNotCanceledConditionToken : CardTextToken<List<CardEffectCondition>>
+internal class CardPlacedFromHandOrMemoryConditionToken : CardTextToken<List<CardEffectCondition>>
 {
-    public override Regex Matcher => new(@"^このカードの与えたダメージがキャンセルされなかった時");
+    public override Regex Matcher => new(@"^このカードが手札か思い出置場から舞台に置かれた時");
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -12,7 +12,7 @@ internal class DamageNotCanceledConditionToken : CardTextToken<List<CardEffectCo
             new CardEffectCondition
             {
                 Type = ConditionType.When,
-                ConditionText = "damage dealt by this card is not canceled"
+                ConditionText = "this card is placed on stage from your hand or memory"
             }
         ];
     }

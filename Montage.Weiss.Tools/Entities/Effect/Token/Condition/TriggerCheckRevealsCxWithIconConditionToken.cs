@@ -13,7 +13,8 @@ internal class TriggerCheckRevealsCxWithIconConditionToken : CardTextToken<List<
             new CardEffectCondition
             {
                 
-            Type = ConditionType.When,ConditionText = $"When this card's trigger check reveals a CX with [{icon.ToUpper()}] in its trigger icon"
+            Type = ConditionType.When,
+                ConditionText = $"this card's trigger check reveals a CX with [{icon.ToUpper()}] in its trigger icon"
             }
         ];
     }

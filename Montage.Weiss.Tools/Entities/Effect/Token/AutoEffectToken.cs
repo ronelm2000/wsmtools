@@ -117,13 +117,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 
         var abilityParts = allAbilities.Select(a => a.AbilityText).ToList();
 
-        var conditionTexts = conditions.Select(c => c.ConditionText).Where(c => !string.IsNullOrEmpty(c)).ToList();
-        for (int i = 1; i < conditionTexts.Count; i++)
-        {
-            if (conditionTexts[i].Length > 0)
-                conditionTexts[i] = char.ToLower(conditionTexts[i][0]) + conditionTexts[i][1..];
-        }
-        var conditionEnglish = string.Join(", ", conditionTexts);
+        var conditionEnglish = conditions.AggregateToString();
 
         var abilityEnglish = JoinAbilityParts(abilityParts);
 

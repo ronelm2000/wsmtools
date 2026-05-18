@@ -12,7 +12,7 @@ internal class AttackConditionToken : CardTextToken<List<CardEffectCondition>>
             new CardEffectCondition
             {
                 Type = ConditionType.When,
-                ConditionText = "When this card attacks"
+                ConditionText = "this card attacks"
             }
         ];
     }

@@ -20,7 +20,7 @@ internal class CardExistsInMemoryConditionToken : CardTextToken<List<CardEffectC
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = "If this card is in your memory"
+                ConditionText = "this card is in your memory"
             }
         ];
     }

@@ -13,7 +13,7 @@ internal class AnotherCharacterWithTraitExistsConditionToken : CardTextToken<Lis
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = $"If you have another <<{trait}>> character"
+                ConditionText = $"you have another <<{trait}>> character"
             }
         ];
     }

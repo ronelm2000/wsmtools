@@ -20,7 +20,7 @@ internal class NoColorCardsInLevelConditionToken : CardTextToken<List<CardEffect
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = "If there are no color cards in your level"
+                ConditionText = "there are no color cards in your level"
             }
         ];
     }

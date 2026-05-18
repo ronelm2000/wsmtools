@@ -1,8 +1,11 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
-internal class ClockToWaitingRoomToken : CardTextToken<List<CardEffectAbility>>
+/// <summary>
+/// Matches "put top card of clock to waiting room" clauses (without subject prefix).
+/// </summary>
+internal class ClockToWaitingRoomSimpleToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^あなたは自分のクロックの上から(?<count>\d+)枚(?<upTo>まで)?を、控え室に置(?<verb>いてよい|き|く)(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^クロックの上から(?<count>\d+)枚(?<upTo>まで)?を、?控え室に置(?<verb>いてよい|き|く)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

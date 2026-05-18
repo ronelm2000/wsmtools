@@ -13,7 +13,7 @@ internal class DuringOpponentTurnAllCharactersAreTraitConditionToken : CardTextT
             new CardEffectCondition
             {
                 Type = ConditionType.During,
-                ConditionText = "During your opponent's turn"
+                ConditionText = "your opponent's turn"
             },
             new CardEffectCondition
             {

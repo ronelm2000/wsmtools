@@ -15,7 +15,8 @@ internal class AnotherTraitNotExistsConditionToken : CardTextToken<List<CardEffe
             new CardEffectCondition
             {
                 
-            Type = ConditionType.If,ConditionText = $"If you have {count} or more other <<{trait}>> characters, and you do not have another \"{name}\""
+            Type = ConditionType.If,
+                ConditionText = $"you have {count} or more other <<{trait}>> characters, and you do not have another \"{name}\""
             }
         ];
     }

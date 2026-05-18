@@ -14,7 +14,8 @@ internal class TraitCountConditionToken : CardTextToken<List<CardEffectCondition
             new CardEffectCondition
             {
                 
-            Type = ConditionType.If,ConditionText = $"If you have {count} or more <<{trait}>> characters"
+            Type = ConditionType.If,
+                ConditionText = $"you have {count} or more <<{trait}>> characters"
             }
         ];
     }

@@ -12,7 +12,7 @@ internal class DuringTurnConditionToken : CardTextToken<List<CardEffectCondition
             new CardEffectCondition
             {
                 Type = ConditionType.During,
-                ConditionText = "During your turn"
+                ConditionText = "your turn"
             }
         ];
     }

@@ -19,8 +19,8 @@ internal class DrawPhaseStartConditionToken : CardTextToken<List<CardEffectCondi
         [
             new CardEffectCondition
             {
-                Type = ConditionType.When,
-                ConditionText = "At the beginning of your opponent's draw phase"
+                Type = ConditionType.At,
+                ConditionText = "the beginning of your opponent's draw phase"
             }
         ];
     }

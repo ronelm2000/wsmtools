@@ -12,7 +12,7 @@ internal class OpponentAttackPhaseStartConditionToken : CardTextToken<List<CardE
             new CardEffectCondition
             {
                 Type = ConditionType.At,
-                ConditionText = "At the beginning of your opponent's attack phase"
+                ConditionText = "the beginning of your opponent's attack phase"
             }
         ];
     }

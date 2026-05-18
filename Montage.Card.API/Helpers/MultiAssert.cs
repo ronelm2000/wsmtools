@@ -2,9 +2,10 @@
 
 public static class MultiAssert
 {
-    public static void AllAreTrue(IEnumerable<Action> assertions, string message = "")
+    public static void AllAreTrue(IEnumerable<Action> assertions, Action<string>? finalAssertMethod = null, string message = "")
     {
         var exceptions = new List<Exception>();
+        var list = new List<string>();
         foreach (var assertion in assertions)
         {
             try
@@ -14,9 +15,13 @@ public static class MultiAssert
             catch (Exception ex)
             {
                 exceptions.Add(ex);
+                list.Add(ex.Message);
             }
         }
         if (exceptions.Count > 0)
+        {
+            finalAssertMethod?.Invoke(message + ":" + Environment.NewLine + string.Join(Environment.NewLine, list));
             throw new AggregateException(message, exceptions);
+        }
     }
 }

@@ -13,7 +13,7 @@ internal class NoCardInMemoryConditionToken : CardTextToken<List<CardEffectCondi
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = $"If you do not have \"{name}\" in your memory"
+                ConditionText = $"you do not have \"{name}\" in your memory"
             }
         ];
     }

@@ -39,6 +39,7 @@ public static class CardEffectConditionExtensions {
         if (!conditions.Any()) return string.Empty;
         var typeGroups = conditions.GroupBy(c => c.Type).ToList();
         var parts = new List<string>();
+        bool isFirst = true;
 
         foreach (var typeGroup in typeGroups)
         {
@@ -54,7 +55,6 @@ public static class CardEffectConditionExtensions {
             };
             if (typeGroup.Key == ConditionType.PreCondition || typeGroup.Key == ConditionType.PostCondition)
             {
-                // Pre and post conditions are anchored; they should be skipped and inserted from its parent (typically CardEffect)
                 continue;
             }
 
@@ -72,9 +72,15 @@ public static class CardEffectConditionExtensions {
                 conjunctionParts.Add(conjunctionGroup.Select(c => c.ConditionText).JoinWithOxfordComma(conjunctionStr, true));
             }
             var combinedConjunctions = conjunctionParts.JoinWithOxfordComma();
-            parts.Add($"{typeStr} {combinedConjunctions}".Trim());
+            var part = $"{typeStr} {combinedConjunctions}".Trim();
+            if (!isFirst)
+            {
+                part = char.ToLower(part[0]) + part[1..];
+            }
+            parts.Add(part);
+            isFirst = false;
         }
-        return string.Join(",", parts);
+        return string.Join(", ", parts);
     }
 }
 

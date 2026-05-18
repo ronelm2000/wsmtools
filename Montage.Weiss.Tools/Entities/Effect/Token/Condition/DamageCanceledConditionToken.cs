@@ -25,7 +25,7 @@ internal class DamageCanceledConditionToken : CardTextToken<List<CardEffectCondi
             new CardEffectCondition
             {
                 Type = ConditionType.When,
-                ConditionText = "When this card's damage is canceled"
+                ConditionText = "this card's damage is canceled"
             }
         ];
     }

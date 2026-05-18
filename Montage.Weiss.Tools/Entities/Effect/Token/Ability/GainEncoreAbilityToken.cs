@@ -12,6 +12,45 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </list>
 /// <para><b>Output:</b> <c>This card gets "[AUTO] Encore [cost]"</c></para>
 /// </remarks>
+internal class PowerBoostGainEncoreToken : CardTextToken<List<CardEffectAbility>>
+{
+    private static readonly ILogger Log = Serilog.Log.ForContext<PowerBoostGainEncoreToken>();
+
+    public override Regex Matcher => new(@"^このカードのパワーを[＋\+](?<power>\d+)し、このカードは『\【自\】\s*アンコール\s*［(?<cost>.+?)］』を得る");
+
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
+    {
+        var match = Matcher.Match(span.ToString());
+        var power = match.Groups["power"].Value;
+        var costText = match.Groups["cost"].Value;
+
+        var costMatch = registry.EffectListRegistry.Match(costText.AsMemory());
+        string costEnglish;
+        if (costMatch != null)
+        {
+            var costAbilities = costMatch.Translate(registry);
+            costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
+            if (costEnglish.Length > 0)
+                costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
+        }
+        else
+        {
+            costEnglish = costText;
+        }
+
+        Log.Debug("PowerBoostGainEncoreToken: power={Power}, cost='{Cost}' -> '{English}'",
+            power, costText, costEnglish);
+
+        return
+        [
+            new CardEffectAbility
+            {
+                AbilityText = $"this card gets +{power} power and \"[AUTO] Encore [{costEnglish}]\""
+            }
+        ];
+    }
+}
+
 internal class GainEncoreAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^このカードは『\【自\】\s*アンコール\s*［(?<cost>.+?)］』を得る");
@@ -20,13 +59,17 @@ internal class GainEncoreAbilityToken : CardTextToken<List<CardEffectAbility>>
     {
         var match = Matcher.Match(span.ToString());
         var costText = match.Groups["cost"].Value;
+
+        var costMatch = registry.EffectListRegistry.Match(costText.AsMemory());
         string costEnglish;
-        try
+        if (costMatch != null)
         {
-            var costAbilities = registry.EffectListRegistry.GetMatch(costText.AsMemory())(registry);
+            var costAbilities = costMatch.Translate(registry);
             costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
+            if (costEnglish.Length > 0)
+                costEnglish = char.ToUpper(costEnglish[0]) + costEnglish[1..];
         }
-        catch (NotImplementedException)
+        else
         {
             costEnglish = costText;
         }

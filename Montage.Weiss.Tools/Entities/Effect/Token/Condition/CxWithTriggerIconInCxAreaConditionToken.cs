@@ -17,7 +17,7 @@ internal class CxWithTriggerIconInCxAreaConditionToken : CardTextToken<List<Card
                 new CardEffectCondition
                 {
                     Type = ConditionType.If,
-                    ConditionText = $"If a CX with [{iconName}] in its trigger icon is in your CX area"
+                    ConditionText = $"a CX with [{iconName}] in its trigger icon is in your CX area"
                 }
             ];
         }
@@ -28,7 +28,7 @@ internal class CxWithTriggerIconInCxAreaConditionToken : CardTextToken<List<Card
                 new CardEffectCondition
                 {
                     Type = ConditionType.If,
-                    ConditionText = "If a CX is in your CX area"
+                    ConditionText = "a CX is in your CX area"
                 }
             ];
         }

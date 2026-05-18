@@ -13,7 +13,7 @@ internal class MemoryCountConditionToken : CardTextToken<List<CardEffectConditio
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = $"If your memory has {count} or more cards"
+                ConditionText = $"your memory has {count} or more cards"
             }
         ];
     }

@@ -15,7 +15,7 @@ internal class ExperienceConditionToken : CardTextToken<List<CardEffectCondition
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = $"If \"{c1}\" and \"{c2}\" are in your level"
+                ConditionText = $"\"{c1}\" and \"{c2}\" are in your level"
             }
         ];
     }

@@ -12,7 +12,7 @@ internal class NoFacingCharacterOrReversedConditionToken : CardTextToken<List<Ca
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = "If there is no character facing this card or the character facing this card is [REVERSE]"
+                ConditionText = "there is no character facing this card or the character facing this card is [REVERSE]"
             }
         ];
     }

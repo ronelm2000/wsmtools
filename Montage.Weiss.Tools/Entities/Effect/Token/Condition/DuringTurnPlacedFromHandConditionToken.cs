@@ -12,7 +12,7 @@ internal class DuringTurnPlacedFromHandConditionToken : CardTextToken<List<CardE
             new CardEffectCondition
             {
                 Type = ConditionType.During,
-                ConditionText = "During the turn this card was placed on stage from the hand"
+                ConditionText = "the turn this card was placed on stage from the hand"
             }
         ];
     }

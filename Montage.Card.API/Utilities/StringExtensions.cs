@@ -97,7 +97,7 @@ public static class StringExtensions
         var commaInPairs = useCommaInPairs ? (", ") : "";
         if (itemList.Count == 0) return "";
         else if (itemList.Count == 1) return itemList[0];
-        else if (itemList.Count == 2) return $"{itemList[0]} {commaInPairs}{conjunction} {itemList[1]}";
+        else if (itemList.Count == 2) return $"{itemList[0]}{commaInPairs}{conjunction} {itemList[1]}";
         else
         {
             var allButLast = itemList.Take(itemList.Count - 1);

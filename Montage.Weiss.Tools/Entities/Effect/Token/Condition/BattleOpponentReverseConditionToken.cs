@@ -12,7 +12,7 @@ internal class BattleOpponentReverseConditionToken : CardTextToken<List<CardEffe
             new CardEffectCondition
             {
                 Type = ConditionType.When,
-                ConditionText = "When this card's battle opponent becomes [REVERSE]"
+                ConditionText = "this card's battle opponent becomes [REVERSE]"
             }
         ];
     }

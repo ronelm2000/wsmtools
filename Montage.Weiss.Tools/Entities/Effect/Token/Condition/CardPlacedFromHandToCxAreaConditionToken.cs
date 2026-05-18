@@ -20,7 +20,7 @@ internal class CardPlacedFromHandToCxAreaConditionToken : CardTextToken<List<Car
             new CardEffectCondition
             {
                 Type = ConditionType.When,
-                ConditionText = "When this card is placed on your CX area from your hand"
+                ConditionText = "this card is placed on your CX area from your hand"
             }
         ];
     }

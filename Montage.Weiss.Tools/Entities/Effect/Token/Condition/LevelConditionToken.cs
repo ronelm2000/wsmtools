@@ -16,7 +16,8 @@ internal class LevelConditionToken : CardTextToken<List<CardEffectCondition>>
             new CardEffectCondition
             {
                 
-            Type = ConditionType.If,ConditionText = conditionText
+            Type = ConditionType.If,
+                ConditionText = conditionText
             }
         ];
     }

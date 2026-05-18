@@ -13,7 +13,8 @@ internal class InClockConditionToken : CardTextToken<List<CardEffectCondition>>
             new CardEffectCondition
             {
                 
-            Type = ConditionType.If,ConditionText = $"If \"{name}\" is in your clock"
+            Type = ConditionType.If,
+                ConditionText = $"\"{name}\" is in your clock"
             }
         ];
     }

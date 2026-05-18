@@ -14,7 +14,7 @@ internal class YourCxWithTriggerIconTriggeredConditionToken : CardTextToken<List
             new CardEffectCondition
             {
                 Type = ConditionType.When,
-                ConditionText = $"When your CX with [{iconName}] in its trigger icon triggers"
+                ConditionText = $"your CX with [{iconName}] in its trigger icon triggers"
             }
         ];
     }

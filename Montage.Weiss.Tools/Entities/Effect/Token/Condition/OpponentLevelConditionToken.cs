@@ -12,8 +12,8 @@ internal class OpponentLevelConditionToken : CardTextToken<List<CardEffectCondit
         [
             new CardEffectCondition
             {
-                
-            Type = ConditionType.If,ConditionText = $"if this card's battle opponent is level {level} or lower"
+                Type = ConditionType.If,
+                ConditionText = $"this card's battle opponent is level {level} or lower"
             }
         ];
     }

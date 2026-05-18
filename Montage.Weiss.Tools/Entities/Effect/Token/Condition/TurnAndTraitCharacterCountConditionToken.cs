@@ -14,12 +14,12 @@ internal class TurnAndTraitCharacterCountConditionToken : CardTextToken<List<Car
             new CardEffectCondition
             {
                 Type = ConditionType.During,
-                ConditionText = "During your turn"
+                ConditionText = "your turn"
             },
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = $"If you have {count} or more other <<{trait}>> characters"
+                ConditionText = $"you have {count} or more other <<{trait}>> characters"
             }
         ];
     }

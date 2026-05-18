@@ -11,7 +11,7 @@ internal class FrontalAttackedConditionToken : CardTextToken<List<CardEffectCond
             new CardEffectCondition
             {
                 Type = ConditionType.When,
-                ConditionText = "When this card is frontal attacked"
+                ConditionText = "this card is frontal attacked"
             }
         ];
     }

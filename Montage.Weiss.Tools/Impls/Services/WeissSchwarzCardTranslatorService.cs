@@ -39,6 +39,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new YourCxWithTriggerIconTriggeredConditionToken());
         _conditionListRegistry.Register(new CxPlacedConditionToken());
         _conditionListRegistry.Register(new CardPlacedFromHandConditionToken());
+        _conditionListRegistry.Register(new CardPlacedFromHandOrMemoryConditionToken());
         _conditionListRegistry.Register(new CardPlacedFromHandToCxAreaConditionToken());
         _conditionListRegistry.Register(new ReverseConditionToken());
         _conditionListRegistry.Register(new BattleOpponentReverseConditionToken());
@@ -91,6 +92,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new StockCostToken());
         _effectListRegistry.Register(new PowerBoostWithFollowingAbilitiesToken());
         _effectListRegistry.Register(new PowerBoostWithFollowingAbilityToken());
+        _effectListRegistry.Register(new PowerBoostGainEncoreToken());
         _effectListRegistry.Register(new PowerBoostWithDurationToken());
         _effectListRegistry.Register(new GiveMultipleAbilitiesToken());
         _effectListRegistry.Register(new DuringBattleCannotPlayEventsOrBackupToken());
@@ -106,6 +108,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new RevealTopCardWithPrefixToken());
         _effectListRegistry.Register(new RevealTopCardToken());
         _effectListRegistry.Register(new RevealTopCardIfTraitAddToHandToken());
+        _effectListRegistry.Register(new ClockToWaitingRoomSimpleToken());
         _effectListRegistry.Register(new ClockToWaitingRoomToken());
         _effectListRegistry.Register(new PutCardFromHandToWaitingRoomToken());
         _effectListRegistry.Register(new CostPutTriggerCxFromHandToWaitingRoomToken());
@@ -147,6 +150,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ReturnMultipleToHandToken());
         _effectListRegistry.Register(new PutCharacterToBottomOfDeckToken());
         _effectListRegistry.Register(new PutCharacterToBottomOfOpponentDeckToken());
+        _effectListRegistry.Register(new PutCharacterToClockToken());
+        _effectListRegistry.Register(new PutThisCardToMemoryToken());
         _effectListRegistry.Register(new PlaceOnStageToken());
         _effectListRegistry.Register(new MayPayCostThenAbilityToken());
         _effectListRegistry.Register(new MayPayCostToken());
@@ -157,6 +162,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new PowerBoostToken());
         _effectListRegistry.Register(new SoulBoostToken());
         _effectListRegistry.Register(new SoulBoostOneToken());
+        _effectListRegistry.Register(new DealFixedDamageToken());
         _effectListRegistry.Register(new DealDamageToken());
         _effectListRegistry.Register(new DealDamageXTimesToken());
         _effectListRegistry.Register(new DealXDamageToken());
@@ -169,6 +175,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new EncoreToken());
         _effectListRegistry.Register(new CannotSideAttackToken());
         _effectListRegistry.Register(new CannotPlayBackupDuringBattleToken());
+        _effectListRegistry.Register(new CannotMoveToAnotherPositionToken());
         _effectListRegistry.Register(new HandLevelMinusToken());
         _effectListRegistry.Register(new AllZonesTriggerIconGainToken());
         _effectListRegistry.Register(new PerformTriggerIconEffectAbilityToken());
@@ -178,6 +185,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new AllOtherCharactersBoostToken());
         _effectListRegistry.Register(new TraitGainToken());
         _effectListRegistry.Register(new LevelAndPowerBoostToken());
+        _effectListRegistry.Register(new LevelBoostToken());
         _effectListRegistry.Register(new CannotPlayFromHandToken());
         _effectListRegistry.Register(new OpponentCannotPlayEventsToken());
         _effectListRegistry.Register(new ColorConditionIgnorePlayToken());

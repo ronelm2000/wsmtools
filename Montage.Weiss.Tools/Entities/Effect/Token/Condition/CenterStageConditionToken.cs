@@ -10,7 +10,7 @@ internal class CenterStageConditionToken : CardTextToken<List<CardEffectConditio
         var pos = match.Groups["pos"].Value;
         var conditionText = pos switch
         {
-            "前列" => "if this card is in your center stage",
+            "前列" => "this card is in your center stage",
             "前列の中央の枠" => "this card is in the middle position of your center stage",
             "舞台" => "this card is in the stage",
             _ => $"this card is in the {pos}"
@@ -20,7 +20,8 @@ internal class CenterStageConditionToken : CardTextToken<List<CardEffectConditio
             new CardEffectCondition
             {
                 
-            Type = ConditionType.If,ConditionText = conditionText
+            Type = ConditionType.If,
+                ConditionText = conditionText
             }
         ];
     }

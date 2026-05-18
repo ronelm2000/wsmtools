@@ -13,7 +13,8 @@ internal class StockCountConditionToken : CardTextToken<List<CardEffectCondition
             new CardEffectCondition
             {
                 
-            Type = ConditionType.If,ConditionText = $"If your stock has {count} or more cards"
+            Type = ConditionType.If,
+                ConditionText = $"your stock has {count} or more cards"
             }
         ];
     }

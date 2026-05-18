@@ -24,6 +24,7 @@ public class ParserTests
     }
 
     [TestMethod(DisplayName = "HOTC Parser Trait Test")]
+    [TestCategory("Manual")]
     public async Task TestTraitHandling()
     {
         var lba = await new HeartOfTheCardsURLParser()

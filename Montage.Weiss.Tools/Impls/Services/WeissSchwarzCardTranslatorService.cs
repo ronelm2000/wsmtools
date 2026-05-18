@@ -50,6 +50,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new OpponentLevelConditionToken());
         _conditionListRegistry.Register(new LevelConditionToken());
         _conditionListRegistry.Register(new InClockConditionToken());
+        _conditionListRegistry.Register(new OtherCharacterCountConditionToken());
         _conditionListRegistry.Register(new TraitCharacterCountConditionToken());
         _conditionListRegistry.Register(new CompoundCardInLevelConditionToken());
         _conditionListRegistry.Register(new ExperienceConditionToken());
@@ -70,6 +71,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new CxNamedInCxAreaConditionToken());
         _conditionListRegistry.Register(new CxNamedPlacedConditionToken());
         _conditionListRegistry.Register(new TriggerCheckRevealsCxWithIconConditionToken());
+        _conditionListRegistry.Register(new CardWithMarkerPlacedToWaitingRoomFromStageConditionToken());
         _conditionListRegistry.Register(new CardPlacedToWaitingRoomFromStageConditionToken());
         _conditionListRegistry.Register(new NoTraitExistsConditionToken());
         _conditionListRegistry.Register(new EncoreStepStartConditionToken());
@@ -156,6 +158,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new PutCharacterToClockToken());
         _effectListRegistry.Register(new PutThisCardToMemoryToken());
         _effectListRegistry.Register(new PlaceOnStageToken());
+        _effectListRegistry.Register(new ReturnThisCardToStageAsRestToken());
         _effectListRegistry.Register(new MayPayCostThenAbilityToken());
         _effectListRegistry.Register(new MayPayCostToken());
         _effectListRegistry.Register(new DuringTurnPowerBoostFromCIPToken());

@@ -233,6 +233,8 @@ public static class MultiClauseEffectParser
         // Protect `。` before variable definitions: パワーを＋X。Xは...に等しい。
         protectedInput = Regex.Replace(protectedInput, @"。(?=[ＸＹXY]は[^。]*に等しい)", m => "\0");
         protectedInput = Regex.Replace(protectedInput, @"コストを払ってよい。", m => m.Value.Replace("。", "\0"));
+        // Protect `。` before `そうしたら` — cascade/clause connectors (after specific patterns like コストを払ってよい)
+        protectedInput = Regex.Replace(protectedInput, @"。(?=そうしたら)", m => "\0");
         // Protect X/Y variable definitions: Ｘは...に等しい。Ｙは...に等しい。
         protectedInput = Regex.Replace(protectedInput, @"[ＸＹXY]は[^。]*に等しい。", m => m.Value.Replace("。", "\0"));
         // Protect parenthetical notes: (CXのレベルは0として扱う), (ダメージキャンセルは発生する)

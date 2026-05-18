@@ -170,6 +170,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new SoulBoostToken());
         _effectListRegistry.Register(new SoulBoostOneToken());
         _effectListRegistry.Register(new DrawAndDiscardToken());
+        _effectListRegistry.Register(new DrawUpToNToken());
         _effectListRegistry.Register(new CannotBeChosenAbilityToken());
         _effectListRegistry.Register(new StrikerAbilityToken());
         _effectListRegistry.Register(new DealFixedDamageToken());

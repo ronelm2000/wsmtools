@@ -97,6 +97,84 @@
 
 ---
 
+## Cross-Check with Comprehensive Fix Plan
+
+Cross-referenced with `.plans/Comprehensive_Fix_Plan_CSV_CrossCheckAll.md` (baseline: 100/246, 148 failing rows).
+
+### Out-of-Scope Items (Not RC-AD)
+
+These items from the RC-AD plan's remaining failures are **not multi-clause parsing issues** and belong to other root cause categories:
+
+| RC-AD Item | Actual RC | Reason |
+|------------|-----------|--------|
+| AD-5: Wrong token matched (NIK/S117-105) | RC-C2 | Token matching issue, not nested ability |
+| Unrecognized ability patterns (~60+) | RC-A through RC-K, RC-M through RC-Z | Missing tokens or regex gaps, not parsing pipeline |
+| Minor spacing/capitalization (~15) | RC-AE | Output format mismatches, CSV alignment |
+
+### Resolved by Architectural Changes (Since Comprehensive Plan Baseline)
+
+These items from the comprehensive plan are **now fixed** by RC-AD architectural changes:
+
+| Comprehensive Plan Item | RC-AD Fix | Status |
+|------------------------|-----------|--------|
+| RC-A1: AssistPowerBoostToken regex | Token fix + RC-AD multi-clause | ✅ Fixed |
+| RC-A2: PowerBoostPerOtherNikkeToken | Registration order + prefix skipping | ✅ Fixed |
+| RC-A3: PowerBoostPerOpponentRestToken | Registration order + prefix skipping | ✅ Fixed |
+| RC-A4: SoulBoostOneToken | `し、` in SkippablePrefixes | ✅ Fixed |
+| RC-B1 through RC-B4: Cost tokens | `Match` API replaces `GetMatch` | ✅ Fixed |
+| RC-C1: GainEncoreAbilityToken | Created + `Match` API | ✅ Fixed |
+| RC-D1: CxNamedPlacedConditionToken | Regex `(あなたの)?` prefix | ✅ Fixed |
+| RC-F1: PlacedFromHandPowerBoostToken | Created | ✅ Fixed |
+| RC-G1: BattleOpponentLevelConditionToken | Created | ✅ Fixed |
+| RC-H1: SearchLevelXOrLowerTraitToken | Created | ✅ Fixed |
+| RC-H2: RevealTopCardIfTraitAddToHandToken | Created | ✅ Fixed |
+| RC-I1: TriggerCheckTwoTimesToken | Created | ✅ Fixed |
+| RC-I2: PutClockToWrOrStockToken | Created | ✅ Fixed |
+| RC-J1: ActEffectToken cost parsing | Duplication bug fixed | ✅ Fixed |
+| RC-K: Various tokens (ExchangeLevel, DealDamageX, etc.) | Created | ✅ Fixed |
+| RC-AH: AssistPowerBoostToken regression | Fixed vs variable X distinction | ✅ Fixed |
+
+### Needs Re-Analysis Due to Architectural Changes
+
+These items from the comprehensive plan **need re-evaluation** because RC-AD architectural changes altered their root cause:
+
+| Comprehensive Plan Item | Change Impact | Re-Analysis Needed |
+|------------------------|---------------|-------------------|
+| RC-AE: Output format mismatches | Condition prefix stripping changed `ConditionText` format; `AggregateToString` now handles prefix generation. Many "output mismatch" failures may now be fixed or have different root causes. | Check each RC-AE failure against new condition formatting |
+| RC-D2: Memory card exists condition | `CardExistsInMemoryConditionToken` created but still fails due to multi-clause CXCOMBO chain. Now an RC-AD issue. | Re-classified to RC-AD |
+| RC-F2: LookAtTopCardsToken follow-up | Token exists but follow-up action discarded. Multi-clause issue. | Re-classified to RC-AD |
+| RC-G2: ReverseCharacterOptionalToken | Token created but not matching after prefix strip. Multi-clause issue. | Re-classified to RC-AD |
+| RC-L: Sub-ability granting | `GainFollowingAbilityToken` and `PowerBoostWithFollowingAbilityToken` enhanced. `TryTranslateNested` still uses `TryFindFirstMatch`. | Partially fixed, RC-5.4 remaining |
+| RC-V: Complex CONT AND/OR conjunction | `AggregateToString` now handles conjunction grouping. May be fixed. | Verify |
+| RC-AB: Cannot play events/backup | `CannotPlayBackupDuringBattleToken` word order fixed. CONT embedding may still fail. | Partially fixed |
+| RC-AG: Complex chain conditions | Condition tokens now atomic; `AggregateToString` groups by type. Chain parsing improved but `で`/`て` connectors may still need work. | Partially fixed |
+
+### Key Finding: Outdated in Both Plans
+
+Both plans state: **"AutoEffectToken still uses legacy parsing loop at lines 133-197 with TryMatchAtStart/TryFindFirstMatch"**
+
+**This is now FALSE.** `AutoEffectToken` has been fully refactored:
+- Uses `MultiClauseEffectParser.ParseSentence` for condition + ability parsing
+- Uses `Match` API for cost parsing (no more `GetMatch`)
+- No `TryMatchAtStart`, `TryFindFirstMatch`, or `GetMatch` calls remain
+- Debug logging added
+
+### Remaining Work (Aligned with Both Plans)
+
+| Priority | Item | Est. Impact | Notes |
+|----------|------|-------------|-------|
+| High | AD-5.4: `TryMatchAny` uses `TryFindFirstMatch` | ~2 failures | Replace with `Match` API in `GainFollowingAbilityToken` |
+| High | AD-5.2: Duration prefix variant | ~2 failures | Add `そのターン中、` to `PowerBoostWithFollowingAbilityToken` |
+| High | AD-5.9: CXCOMBO condition parsing | ~1 failure | Japanese text leaking — condition token not matching |
+| Medium | Sentence boundary (`。`) splitting | ~10 failures | `AutoEffectToken` uses `ParseSentence` not `Parse` |
+| Medium | Continuation `し、` handling | ~6 failures | Already in `SkippablePrefixes` but may not cover all cases |
+| Medium | Condition chains with `で`/`て` | ~12 failures | Overlaps with RC-AG — condition tokens need connector variants |
+| Low | Output format alignment (RC-AE) | ~15 failures | CSV updates or token wording adjustments |
+| Low | Missing tokens (RC-M through RC-Z) | ~20 failures | New tokens needed, not RC-AD scope |
+
+---
+
+
 ## Overview
 
 **RC-AD** is the single largest root cause category (~40+ failures). It is **architectural**, not a missing token issue. Individual tokens exist for most sub-patterns, but the parsing pipeline stops at the first matched ability clause and discards the rest.
@@ -864,7 +942,7 @@ while (!string.IsNullOrWhiteSpace(remainingText))
 | RC-AD-5.8 | Pluralization | NIK/S117-093 | 1 | "character" vs "characters" — minor wording issue. |
 | RC-AD-5.9 | CXCOMBO condition parsing (Japanese leaking) | NIK/S117-087 | 1 | `If CX置場に「OVER ZONE」が置かれた時、前列にこのカードがいる,` — CXCOMBO conditions not fully parsed. |
 
-**Key Finding**: The plan states `AutoEffectToken` was "fully refactored" (commit 460fe66) to delegate to `ParseSentence`, but the actual code at `AutoEffectToken.cs:133-197` still contains the legacy parsing loop with `TryMatchAtStart` and `TryFindFirstMatch`. This is the single largest blocker for AD-5 resolution.
+**Key Finding**: ~~The plan states `AutoEffectToken` was "fully refactored" (commit 460fe66) to delegate to `ParseSentence`, but the actual code at `AutoEffectToken.cs:133-197` still contains the legacy parsing loop with `TryMatchAtStart` and `TryFindFirstMatch`.~~ **RESOLVED** — `AutoEffectToken` now fully delegates to `MultiClauseEffectParser.ParseSentence`, uses `Match` API for costs, and has no legacy API calls. The single largest blocker is now `TryMatchAny` in `GainFollowingAbilityToken` still using `TryFindFirstMatch`.
 
 **Total AD-5 impact**: ~22 failures across 9 root causes (some serials have multiple effects). Down from ~26.
 
@@ -969,7 +1047,7 @@ dotnet test --filter "TestCategory!=Manual" --no-build
 - [ ] `GainFollowingAbilityToken.TryMatchAny` uses `Match` API instead of `TryFindFirstMatch`
 - [ ] Output format: comma placement, "during" position, "and" vs ". This card gets" aligned
 - [ ] CXCOMBO condition parsing fixed (no Japanese leaking)
-- [ ] All 26 AD-5 failures resolved or reclassified
+- [ ] All 22 AD-5 failures resolved or reclassified (down from 26)
 - [x] 0 regressions in previously passing tests (101 baseline)
 - [x] `ActEffectToken` delegates to `MultiClauseEffectParser`
 - [x] `ContEffectToken` delegates to `MultiClauseEffectParser`
@@ -990,6 +1068,14 @@ dotnet test --filter "TestCategory!=Manual" --no-build
 - [x] `GainEncoreAbilityToken` uses `Match` API (no more `GetMatch`)
 - [x] `ChooseFromWaitingRoomAndReturnToken` fixed — "you may" prefix for optional actions
 - [x] `ActEffectToken` duplication bug fixed — no more double ability text
+- [x] `ActEffectToken` spacing fixed — proper `[ACT][cost]` format
+- [x] Registration order fixes — `NoFacingCharacterOrReversedConditionToken`, `PutCardFromHandAndThisToBottomToken`
+- [x] `CxNamedPlacedConditionToken` regex fixed — optional `(あなたの)?` prefix
+- [x] Phase start condition types fixed — `CxPhaseStart`, `EncoreStepStart`, `DrawPhaseStart` changed from `When` to `At`
+- [x] 16 items from Comprehensive Fix Plan resolved by RC-AD architectural changes
+- [ ] Cross-check: Verify RC-AE output format mismatches against new condition formatting
+- [ ] Cross-check: Verify RC-V complex CONT conjunction style with `AggregateToString`
+- [ ] Cross-check: Verify RC-AB CannotPlayBackupDuringBattleToken CONT embedding
 - [x] `ActEffectToken` spacing fixed — proper `[ACT][cost]` format
 - [x] `ContEffectToken` now uses `AggregateToString` — removed duplicate condition prefix handling
 - [x] Phase start condition types fixed — `CxPhaseStartConditionToken`, `EncoreStepStartConditionToken`, `DrawPhaseStartConditionToken` changed from `When` to `At`
@@ -1055,18 +1141,18 @@ dotnet test --filter "TestCategory!=Manual" --no-build
 ## Notes
 
 - **Infrastructure phases (AD-0, AD-0.5, AD-1, AD-2, AD-3, AD-4) are complete**. The core types, registry, parser, prefix map, and cost matching all exist.
-- **AutoEffectToken fully refactored** (commit 460fe66). Delegates to `ParseSentence`, uses `Match` API, has debug logging.
+- **AutoEffectToken fully refactored** (commit 460fe66). Delegates to `ParseSentence`, uses `Match` API, has debug logging. **No legacy API calls remain.**
 - **Integration phase (AD-6) is complete**. `AutoEffectToken`, `ActEffectToken`, and `ContEffectToken` all delegate to `ParseSentence`/`Parse`. ActEffectToken duplication bug fixed. ContEffectToken uses `AggregateToString`.
 - **Token regex fixes committed** (f5912d8): `GiveEncoreToOpponentCharactersToken` regex, `AssistPowerBoostToken` trait/`×`, `AssistContEffectToken` merged into `ContEffectToken`, punctuation handling for nested abilities.
 - **Condition prefix stripping complete** — all condition tokens now defer to `Type` for prefix generation via `AggregateToString`.
 - **Registration order fixes committed** — `NoFacingCharacterOrReversedConditionToken` before `FacingCharacterColorConditionToken`, `PutCardFromHandAndThisToBottomToken` before `PutCardFromHandToWaitingRoomToken`.
 - **13 new tokens added** across 3 commits.
+- **Cross-check with Comprehensive Fix Plan**: 16 items from the comprehensive plan are now resolved by RC-AD architectural changes. 8 items need re-analysis due to condition prefix stripping and `AggregateToString` changes. See "Cross-Check with Comprehensive Fix Plan" section above.
 - **Priority next steps**:
   1. Fix `TryFindFirstMatch` calls in `GainFollowingAbilityToken.TryMatchAny` with `Match` API (~2 failures).
   2. Fix CXCOMBO condition parsing for NIK/S117-087 (Japanese leaking).
-  3. Fix NIK/S117-105 wrong token match (separate root cause).
-  4. Address remaining output format mismatches (trailing periods, spacing).
-  5. Add more condition/ability tokens for uncovered patterns.
+  3. Address remaining output format mismatches (trailing periods, spacing) — many may be fixed by condition prefix stripping.
+  4. Add more condition/ability tokens for uncovered patterns (RC-M through RC-Z, out of RC-AD scope).
 - **Do NOT create new tokens for RC-AD**. The tokens already exist. The problem is either the parsing pipeline or that the regex of existing tokens do not cover it due to missing prefix capture.
 - **CSV updates should wait** until RC-AD is fully implemented. Output format may change.
 - **Phase ordering matters**: AD-0 → AD-0.5 → AD-1/AD-2 (parallel) → AD-3 → AD-5 → AD-6. AD-4 is handled by AD-0.5.

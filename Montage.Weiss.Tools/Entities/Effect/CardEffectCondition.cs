@@ -49,6 +49,7 @@ public static class CardEffectConditionExtensions {
                 ConditionType.If => "If",
                 ConditionType.During => "During",
                 ConditionType.At => "At",
+                ConditionType.For => "For each",
                 ConditionType.PreCondition => "",
                 ConditionType.PostCondition => "",
                 _ => throw new InvalidOperationException("Unknown condition type")
@@ -102,6 +103,12 @@ public enum ConditionType
     /// At conditions are dependent on a specific timing, such as "At the end of the turn", or "At the beginning of your main phase". These should only occur after "During" conditions.
     /// </summary>
     At,
+    /// <summary>
+    /// For conditions indicate a "per X" or "for each X" relationship, e.g. "marker underneath this card".
+    /// The prefix "For each" is prepended by <see cref="CardEffectConditionExtensions.AggregateToString"/>
+    /// following the standard ConditionType pattern (unlike PreCondition/PostCondition which are anchored externally).
+    /// </summary>
+    For,
     /// <summary>
     /// Pre-conditions occur before `During` conditions, and are separated by JP periods.
     /// "This ability activates up to 1 time per turn" for example, is a pre-condition.

@@ -50,13 +50,11 @@ internal class ActEffectToken : CardTextToken<CardEffect>
 
         // Use MultiClauseEffectParser for ability parsing (supports multi-sentence effects like Brainstorm)
         var parsedList = MultiClauseEffectParser.Parse(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
-        var allAbilities = parsedList.SelectMany(p => p.Abilities).ToList();
-        var abilityParts = allAbilities.Select(a => a.AbilityText).ToList();
 
-        foreach (var a in allAbilities)
+        foreach (var a in parsedList.SelectMany(p => p.Abilities))
             tokenLog.Add($"Abil:{a.GetType().Name}");
 
-        var abilityEnglish = AutoEffectToken.JoinAbilityParts(abilityParts);
+        var abilityEnglish = AutoEffectToken.JoinAbilityPartsFromSentences(parsedList);
 
         var costTexts = costAbilities.Select(a => a.AbilityText).ToList();
         var costEnglish = "";
@@ -95,7 +93,7 @@ internal class ActEffectToken : CardTextToken<CardEffect>
                 Labels = finalLabels,
                 CostText = costEnglish,
                 Cost = costAbilities,
-                Abilities = allAbilities,
+                Abilities = parsedList.SelectMany(p => p.Abilities).ToList(),
                 AbilityText = abilityEnglish,
                 EffectText = effectText,
                 TokenLog = tokenLog

@@ -10,7 +10,16 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// <list type="bullet">
 ///   <item><description>Group 1: Encore cost text (e.g., "(2)" or "手札のキャラを1枚控え室に置く")</description></item>
 /// </list>
-/// <para><b>Output:</b> <c>All of your opponent's characters get "[AUTO] Encore [cost]"</c></para>
+/// <para><b>Output:</b> <c>All of your opponent's characters get "[AUTO] Encore [cost]".</c></para>
+/// <para><b>Notes:</b></para>
+/// <list type="bullet">
+///   <item><description>A period is appended after the closing quotation mark so that sentence-ending punctuation is correct.</description></item>
+/// </list>
+/// <para><b>Scope Expansion:</b></para>
+/// <list type="bullet">
+///   <item><description>Currently uses legacy <c>GetMatch</c> API for cost parsing — should migrate to <c>Match</c> API.</description></item>
+///   <item><description>Add <c>This card gets</c> variants if opponent-targeting patterns expand.</description></item>
+/// </list>
 /// </remarks>
 internal class GiveEncoreToOpponentCharactersToken : CardTextToken<List<CardEffectAbility>>
 {
@@ -34,7 +43,7 @@ internal class GiveEncoreToOpponentCharactersToken : CardTextToken<List<CardEffe
         [
             new CardEffectAbility
             {
-                AbilityText = "All of your opponent's characters get \"[AUTO] Encore [" + costEnglish + "]\""
+                AbilityText = "All of your opponent's characters get \"[AUTO] Encore [" + costEnglish + "]\".",
             }
         ];
     }

@@ -107,7 +107,6 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         // Use MultiClauseEffectParser.Parse for multi-sentence condition + ability parsing
         var parsedList = MultiClauseEffectParser.Parse(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
         var allConditions = parsedList.SelectMany(p => p.Conditions).ToList();
-        var allAbilities = parsedList.SelectMany(p => p.Abilities).ToList();
 
         // Log warnings for any sentence with unmatched remaining text
         foreach (var p in parsedList)
@@ -123,14 +122,12 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         // Log matched tokens
         foreach (var c in allConditions)
             tokenLog.Add($"Cond:{c.GetType().Name}");
-        foreach (var a in allAbilities)
+        foreach (var a in parsedList.SelectMany(p => p.Abilities))
             tokenLog.Add($"Abil:{a.GetType().Name}");
-
-        var abilityParts = allAbilities.Select(a => a.AbilityText).ToList();
 
         var conditionEnglish = conditions.AggregateToString();
 
-        var abilityEnglish = JoinAbilityParts(abilityParts);
+        var abilityEnglish = JoinAbilityPartsFromSentences(parsedList);
 
         var costTexts = costAbilities.Select(a => a.AbilityText).ToList();
         var costEnglish = "";
@@ -177,7 +174,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             Condition = conditions,
             CostText = costEnglish,
             Cost = costAbilities,
-            Abilities = allAbilities,
+            Abilities = parsedList.SelectMany(p => p.Abilities).ToList(),
             AbilityText = abilityEnglish,
             EffectText = effectText,
             TokenLog = tokenLog
@@ -222,5 +219,76 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         if (!result.EndsWith('.') && !result.EndsWith(']') && !result.EndsWith('"'))
             result += ".";
         return result;
+    }
+
+    /// <summary>
+    /// Joins ability lists per-sentence using <see cref="AbilityPrefix"/> for within-sentence connectors,
+    /// then joins sentences with <c>". "</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>Within each <see cref="ParsedSentence"/>, abilities are joined using prefix-specific connectors:</para>
+    /// <list type="bullet">
+    ///   <item><description><see cref="AbilityPrefix.And"/> (default): serial comma — <c>A, B, and C</c></description></item>
+    ///   <item><description><see cref="AbilityPrefix.Continuation"/>: <c>, and</c> with redundant "this card" subject stripped</description></item>
+    ///   <item><description><see cref="AbilityPrefix.Subject"/>: space separator</description></item>
+    /// </list>
+    /// <para>Across sentences, results are joined with <c>". "</c>. Trailing periods before <c>"</c> are preserved.</para>
+    /// </remarks>
+    /// <param name="sentences">Parsed sentences from <see cref="MultiClauseEffectParser.Parse"/>.</param>
+    /// <returns>A single English string with all abilities combined, e.g. <c>"do X, and do Y. Then do Z."</c></returns>
+    internal static string JoinAbilityPartsFromSentences(List<ParsedSentence> sentences)
+    {
+        var sentenceTexts = new List<string>();
+        foreach (var ps in sentences)
+        {
+            var abilities = ps.Abilities;
+            if (abilities.Count == 0) continue;
+
+            var result = abilities[0].AbilityText;
+            for (int i = 1; i < abilities.Count; i++)
+            {
+                var prefix = abilities[i].Prefix;
+                string connector;
+                var next = abilities[i].AbilityText;
+                if (prefix == AbilityPrefix.And)
+                {
+                    // Default: serial comma — ", and " before last item, ", " otherwise
+                    connector = (i == abilities.Count - 1) ? ", and " : ", ";
+                }
+                else
+                {
+                    connector = prefix switch
+                    {
+                        AbilityPrefix.Continuation => ", and ",
+                        AbilityPrefix.Subject => " ",
+                        _ => ", ",
+                    };
+                }
+                if (next.Length > 0 && char.IsUpper(next[0]))
+                    next = char.ToLower(next[0]) + next[1..];
+                // For continuations, strip redundant "this card" subject
+                if (prefix == AbilityPrefix.Continuation)
+                {
+                    if (next.StartsWith("this card ", StringComparison.Ordinal))
+                        next = next[10..];
+                    else if (next.StartsWith("this card's ", StringComparison.Ordinal))
+                        next = next[12..];
+                }
+                result += connector + next;
+            }
+            sentenceTexts.Add(result);
+        }
+
+        if (sentenceTexts.Count == 0) return "";
+
+        var trimmed = sentenceTexts.Select(s => {
+            if (s.Length >= 2 && s[^1] == '.' && s[^2] == '"') return s;
+            return s.TrimEnd('.');
+        }).ToList();
+        var joined = string.Join(". ", trimmed);
+        joined = char.ToUpper(joined[0]) + joined[1..];
+        if (!joined.EndsWith('.') && !joined.EndsWith(']') && !joined.EndsWith('"'))
+            joined += ".";
+        return joined;
     }
 }

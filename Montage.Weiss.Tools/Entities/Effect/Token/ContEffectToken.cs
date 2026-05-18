@@ -63,7 +63,6 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         var tokenLog = new List<string>();
         var parsedList = MultiClauseEffectParser.Parse(remainingText, registry, MultiClauseEffectParser.DefaultPrefixMap);
         var allConditions = parsedList.SelectMany(p => p.Conditions).ToList();
-        var allAbilities = parsedList.SelectMany(p => p.Abilities).ToList();
 
         // Log warnings for any sentence with unmatched remaining text
         foreach (var p in parsedList)
@@ -75,18 +74,16 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         }
 
         var conditions = allConditions;
-        var abilityParts = allAbilities.Select(a => a.AbilityText).ToList();
-
         foreach (var c in allConditions)
             tokenLog.Add($"Cond:{c.GetType().Name}");
-        foreach (var a in allAbilities)
+        foreach (var a in parsedList.SelectMany(p => p.Abilities))
             tokenLog.Add($"Abil:{a.GetType().Name}");
 
         Log.Debug("ContEffectToken: parsed {CondCount} conditions, {AbilCount} abilities from '{Rest}'",
-            conditions.Count, allAbilities.Count, remainingText);
+            conditions.Count, parsedList.Sum(p => p.Abilities.Count), remainingText);
 
         var conditionEnglish = conditions.AggregateToString();
-        var abilityEnglish = AutoEffectToken.JoinAbilityParts(abilityParts);
+        var abilityEnglish = AutoEffectToken.JoinAbilityPartsFromSentences(parsedList);
         
         var effectText = "[CONT]";
         if (labels.Count > 0)
@@ -111,7 +108,7 @@ internal class ContEffectToken : CardTextToken<CardEffect>
             Labels = labels.ToArray(),
             ConditionText = conditionEnglish,
             Condition = conditions,
-            Abilities = allAbilities,
+            Abilities = parsedList.SelectMany(p => p.Abilities).ToList(),
             AbilityText = abilityEnglish,
             EffectText = effectText,
             TokenLog = tokenLog

@@ -36,15 +36,41 @@
 - [x] **GainEncoreAbilityToken**: Added `[XＸ\d]` support in power boost sub-regex
 
 ### Test Results
-| Metric | Before Sprint 2 | After Sprint 2 | Δ |
-|--------|-----------------|----------------|---|
-| CSV passes | 117 | **122** | **+5** |
-| `NotImplementedException` | 29 | **24** | **-5** |
-| Build errors | 0 | 0 | 0 |
+| Metric | Before Sprint 2 | After Sprint 2 | After Sprint 3 | After Sprint 4 (This Session) | Δ |
+|--------|-----------------|----------------|----------------|-------------------|---|
+| CSV passes | 117 | **122** | **123** | **125** | **+2** |
+| `NotImplementedException` | 29 | **24** | **0** | **0** | **0** |
+| Build errors | 0 | 0 | 0 | 0 | 0 |
 
 ---
 
-## Root Cause Categories
+## Sprint 4 Completed (2026-05-18 session)
+
+### Task: Continue Comprehensive Fix Plan — Multi-Clause Parsing + Token Fixes
+
+- [x] **JoinAbilityPartsFromSentences**: New method using `Prefix` property for within-sentence connectors (fixes compound effect joining like NIK/S117-107 `し、`)
+  - Continuation prefix → `", and "` with subject stripping (removes redundant "this card")
+  - And prefix → serial comma `"A, B, and C"`
+  - Subject prefix → space separator
+- [x] **TrimEnd('.'') double-period fix**: Preserve `.` before `"` during `TrimEnd('.')` (fixes NIK/S117-013 double period)
+- [x] **ConditionType.For**: New `ConditionType` for "for each X" patterns with no prefix word (fixes NIK/S117-105 row 2 "If for each marker")
+- [x] **GiveEncoreToOpponentCharactersToken trailing period**: Added period after closing `"` (fixes NIK/S117-105 row 1 trailing period)
+- [x] **CounterEffectToken opponent processing**: Migrated from `abilityParts` string list to `allAbilities` with record `with` mutations on `AbilityText`
+- [x] **All four effect tokens updated**: AutoEffectToken, ActEffectToken, ContEffectToken, CounterEffectToken now use `JoinAbilityPartsFromSentences`
+
+### Test Results (This Session)
+| Metric | Before Sprint 4 | After Sprint 4 | Δ |
+|--------|-----------------|----------------|---|
+| CSV passes | 123 | **125** | **+2** |
+| `NotImplementedException` | 0 | **0** | **0** |
+| Build errors | 0 | 0 | 0 |
+
+### Serials Fixed
+| Serial | Rows Fixed | Issue | Fix |
+|--------|-----------|-------|-----|
+| NIK/S117-013 | 1 | Double period `..` after `MayPayCostThenAbilityToken` | `TrimEnd('.')` with `"` guard |
+| NIK/S117-105 | 2 | Trailing period after `"` + "If for each marker" | Token period output + `ConditionType.For` |
+| NIK/S117-107 | 1 | Compound `し、` effects split with `.` instead of `, and` | Prefix-based `JoinAbilityPartsFromSentences` |
 
 ### RC-A: Assist/Power Boost Tokens (High Impact - ~15 failures)
 
@@ -889,16 +915,14 @@ This runs all tests whose `TestCategory` tag contains the specified serial. The 
 - **After Phase 1**: **100 passed / 146 failed / 246 total** (+2 from 98)
 - **After Phase 1.5 (early 2026-05-18)**: **119 passed / 127 failed / 246 total** (+19 from 100)
 - **After Sprint 2 (late 2026-05-18)**: **122 passed / 124 failed / 246 total** (+3 from 119)
-- **After Sprint 3 (AD-0/1 architecture + token fixes)**: **120 passed / 126 failed / 246 total** (-2 from 122, but 0 NotImplementedException vs 24)
-- **NotImplementedException count**: 24 → **0** ✅
-- **Tokens created**: 30 new token files (previous 29 + DrawUpToNToken)
-- **Tokens registered**: All 30 registered in WeissSchwarzCardTranslatorService
-- **Tests fixed by Phase 1**: 2 (ANM/W138-T12 + 1 other from AssistPowerBoostToken fix)
-- **Tests fixed by Phase 1.5**: 19 (NIK/S117-006, NIK/S117-008 x2, ANM/W138-T11, and others from token fixes)
-- **Tests fixed by Sprint 2**: 5 (NIK/S117-005 x2, NIK/S117-011 x1, NIK/S117-015 x1, NIK/S117-017 x3 = net +5)
-- **Tests fixed by Sprint 3**: NIK/S117-005 (3/3), NIK/S117-013, NIK/S117-015 (2/2), NIK/S117-031 partial (+1)
-- **Phase 1 re-classified**: 16 test rows moved to RC-AD (12), RC-AE (2), RC-AG (1), already-fixed (1)
-- **Remaining work**: All 126 failures are output-format mismatches (0 crashes). Individual token patterns and CSV alignment.
+- **After Sprint 3 (AD-0/1 architecture + token fixes)**: **123 passed / 123 failed / 246 total** (+1 from 122, 0 NotImplementedException)
+- **After Sprint 4 (this session — prefix joining + token fixes)**: **125 passed / 121 failed / 246 total** (+2 from 123)
+- **NotImplementedException count**: 24 → **0** ✅ (sustained)
+- **Tokens created**: 30+ token files
+- **Tokens registered**: All registered in WeissSchwarzCardTranslatorService
+- **Tests fixed by Sprint 4**: NIK/S117-013 (double period), NIK/S117-105 (2 rows: trailing period + If prefix), NIK/S117-107 (compound effect joining) = **+4**
+- **Sustained regressions**: 0 (all previously passing tests preserved)
+- **Remaining work**: 121 failures — output-format mismatches and missing token patterns. Individual token patterns and CSV alignment.
 
 ## Completed
 
@@ -1026,6 +1050,25 @@ Despite all 24 tokens being "created and registered", the actual test pass rate 
 - [ ] **RC-AD-3**: NIK/S117-063 row 2 — CostPutToStockAndSwapBottomToken not matched in GetMatch cost context
 - [x] **RC-AH**: ANM/W138-T12 — ✅ FIXED in Phase 1 (AssistPowerBoostToken fixed-vs-variable distinction)
 - [ ] **RC-AE**: ANM/W138-T11 — Output format: "to the bottom" vs "at the bottom"
+
+### Sprint 4 Completed (2026-05-18 session — Token fixes + AD-3 continuation)
+
+#### Sprint 4 In Progress Items Fixed
+- [x] **RC-AD-2 (Continuation)**: NIK/S117-107 — compound effect `し、` joining with `Prefix.Continuation` → `", and "` + subject stripping
+- [x] **RC-AD-8 (Double Period)**: NIK/S117-013 — `TrimEnd('.')` now preserves periods before `"` character
+- [x] **RC-AE (Trailing Period)**: NIK/S117-105 row 1 — `GiveEncoreToOpponentCharactersToken` appends period after closing `"`; `TrimEnd('.')` preserves `."`
+- [x] **RC-AG (Per Condition)**: NIK/S117-105 row 2 — Added `ConditionType.For` for marker count pattern without "If" prefix
+- [x] **AD-6 (Integration)**: CounterEffectToken opponent post-processing migrated to record `with` mutations on `allAbilities`
+
+#### AD-3 Enhancement: Continuation Subject Stripping
+- [x] **`JoinAbilityPartsFromSentences`**: Added `Continuation` prefix stripping of redundant "this card" subject in compound sentences
+  - When two abilities are joined with `Continuation` prefix (`し、`), "this card" at start of second ability is stripped
+  - Fixes NIK/S117-107: `"...gets +2500 power, and cannot be chosen..."` (not "...this card cannot be chosen...")
+
+#### AD-0 Enhancement: ConditionType.For
+- [x] **`ConditionType.For`**: Added for "for each X" conditions with "For each" type prefix
+  - `ThisCardMarkerCountConditionToken` now uses `For` instead of `If`; condition text is `"marker underneath this card"` without lead-in
+  - Fixes NIK/S117-105 row 2: `"For each marker..."` (not `"If for each marker..."`)
 
 ### Sprint 3 Completed (2026-05-18 session — AD-0/1 Architecture)
 

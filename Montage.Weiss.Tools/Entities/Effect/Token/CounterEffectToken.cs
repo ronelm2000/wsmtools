@@ -1,5 +1,22 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
+/// <summary>
+/// Matches counter effect (【カウンター】) clauses with optional cost, condition, and effect text.
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>【カウンター】 助太刀3000 レベル2 ［(1) 手札のこのカードを控え室に置く］</c></para>
+/// <para><b>Regex:</b> ^【カウンター】\s*(?&lt;mainText&gt;.+)$</para>
+/// <para><b>Parsing Flow:</b></para>
+/// <list type="bullet">
+///   <item><description>Extracts cost from ［...］ brackets using <c>Match</c> API</description></item>
+///   <item><description>Extracts condition from <c>...なら、...</c> pattern using <c>GetMatch</c> API</description></item>
+///   <item><description>Parses effect text via <see cref="MultiClauseEffectParser.Parse"/> for multi-sentence ability parsing</description></item>
+///   <item><description>Applies opponent-reference post-processing when <c>相手の</c> is present in input</description></item>
+///   <item><description>Joins ability parts with <see cref="AutoEffectToken.JoinAbilityPartsFromSentences"/></description></item>
+/// </list>
+/// <para><b>Expected Format:</b> <c>[COUNTER] [cost] condition, effect.</c></para>
+/// <para><b>Scope Expansion:</b> Condition parsing uses legacy <c>GetMatch</c> — should migrate to <c>Match</c> API.</para>
+/// </remarks>
 internal class CounterEffectToken : CardTextToken<CardEffect>
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<CounterEffectToken>();
@@ -53,13 +70,22 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
             : registry.ConditionListRegistry.GetMatch(conditionTextJapanese.AsMemory())(registry);
 
         // Use MultiClauseEffectParser for ability parsing
-        var allAbilities = new List<CardEffectAbility>();
-        var abilityParts = new List<string>();
+        List<ParsedSentence>? parsedList = null;
         if (!string.IsNullOrEmpty(effectTextJapanese))
         {
-            var parsedList = MultiClauseEffectParser.Parse(effectTextJapanese, registry, MultiClauseEffectParser.DefaultPrefixMap);
-            allAbilities = parsedList.SelectMany(p => p.Abilities).ToList();
-            abilityParts = allAbilities.Select(a => a.AbilityText).ToList();
+            parsedList = MultiClauseEffectParser.Parse(effectTextJapanese, registry, MultiClauseEffectParser.DefaultPrefixMap);
+
+            // Post-process opponent references directly on ability texts
+            if (mainText.Contains("相手の"))
+            {
+                var opponentRegex = new Regex(@"(?<!\bother\s+)(?<!\byour\s+opponent's\s+)\byour\b(?!\s+opponent's)");
+                parsedList = parsedList.Select(ps => ps with
+                {
+                    Abilities = ps.Abilities.Select(a =>
+                        a with { AbilityText = opponentRegex.Replace(a.AbilityText, "your opponent's", 1) }
+                    ).ToList()
+                }).ToList();
+            }
 
             foreach (var p in parsedList)
             {
@@ -70,17 +96,8 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
             }
         }
 
-        // Post-process opponent references
-        if (mainText.Contains("相手の"))
-        {
-            var opponentRegex = new Regex(@"(?<!\bother\s+)(?<!\byour\s+opponent's\s+)\byour\b(?!\s+opponent's)");
-            abilityParts = abilityParts.Select(part =>
-                opponentRegex.Replace(part, "your opponent's", 1)
-            ).ToList();
-        }
-
         var conditionEnglish = conditions.Count > 0 ? conditions.AggregateToString() : "";
-        var abilityEnglish = AutoEffectToken.JoinAbilityParts(abilityParts);
+        var abilityEnglish = AutoEffectToken.JoinAbilityPartsFromSentences(parsedList ?? []);
 
         var costEnglish = string.Join(", ", costAbilities.Select(a => a.AbilityText));
         if (!string.IsNullOrEmpty(costEnglish))
@@ -106,7 +123,7 @@ internal class CounterEffectToken : CardTextToken<CardEffect>
         return new EventCardEffect
         {
             Labels = ["COUNTER"],
-            Abilities = allAbilities,
+            Abilities = parsedList?.SelectMany(p => p.Abilities).ToList() ?? [],
             AbilityText = abilityEnglish,
             EffectText = effectText
         };

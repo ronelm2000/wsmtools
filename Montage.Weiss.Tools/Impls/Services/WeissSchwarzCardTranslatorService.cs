@@ -86,6 +86,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new BattleOpponentLevelConditionToken());
         _conditionListRegistry.Register(new DrawPhaseStartConditionToken());
         _conditionListRegistry.Register(new NoColorCardsInLevelConditionToken());
+        _conditionListRegistry.Register(new XEqualsConditionToken());
 
         // Register ability tokens (most to least specific)
         _effectListRegistry.Register(new StockCostWithPutCardFromHandToWaitingRoomToken());
@@ -184,7 +185,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new GainFollowingAbilityToken());
         _effectListRegistry.Register(new GainFollowingAbilityTokenWithParticleWa());
         _effectListRegistry.Register(new GainEncoreAbilityToken());
-        _effectListRegistry.Register(new XEqualsToken());
+        // XEqualsToken moved to ConditionListRegistry as PostCondition
+        // _effectListRegistry.Register(new XEqualsToken());
         _effectListRegistry.Register(new ThoseCardsTriggerIconConditionToken());
         _effectListRegistry.Register(new ForEachCxToken());
         _effectListRegistry.Register(new EncoreToken());

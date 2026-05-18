@@ -245,40 +245,63 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         foreach (var ps in sentences)
         {
             var abilities = ps.Abilities;
-            if (abilities.Count == 0) continue;
+            var postConditions = ps.Conditions.Where(c => c.Type == ConditionType.PostCondition).ToList();
 
-            var result = abilities[0].AbilityText;
-            for (int i = 1; i < abilities.Count; i++)
+            if (abilities.Count == 0 && postConditions.Count == 0) continue;
+
+            string result;
+            if (abilities.Count > 0)
             {
-                var prefix = abilities[i].Prefix;
-                string connector;
-                var next = abilities[i].AbilityText;
-                if (prefix == AbilityPrefix.And)
+                result = abilities[0].AbilityText;
+                for (int i = 1; i < abilities.Count; i++)
                 {
-                    // Default: serial comma — ", and " before last item, ", " otherwise
-                    connector = (i == abilities.Count - 1) ? ", and " : ", ";
+                    var prefix = abilities[i].Prefix;
+                    string connector;
+                    var next = abilities[i].AbilityText;
+                    if (prefix == AbilityPrefix.And)
+                    {
+                        connector = (i == abilities.Count - 1) ? ", and " : ", ";
+                    }
+                    else
+                    {
+                        connector = prefix switch
+                        {
+                            AbilityPrefix.Continuation => ", and ",
+                            AbilityPrefix.Subject => " ",
+                            _ => ", ",
+                        };
+                    }
+                    if (next.Length > 0 && char.IsUpper(next[0]))
+                        next = char.ToLower(next[0]) + next[1..];
+                    if (prefix == AbilityPrefix.Continuation)
+                    {
+                        if (next.StartsWith("this card ", StringComparison.Ordinal))
+                            next = next[10..];
+                        else if (next.StartsWith("this card's ", StringComparison.Ordinal))
+                            next = next[12..];
+                    }
+                    result += connector + next;
+                }
+            }
+            else
+            {
+                result = "";
+            }
+
+            // Append post-conditions as new sentences
+            if (postConditions.Count > 0)
+            {
+                var postTexts = postConditions.Select(c => c.ConditionText).ToList();
+                if (!string.IsNullOrEmpty(result))
+                {
+                    result = result.TrimEnd('.') + ". " + string.Join(". ", postTexts);
                 }
                 else
                 {
-                    connector = prefix switch
-                    {
-                        AbilityPrefix.Continuation => ", and ",
-                        AbilityPrefix.Subject => " ",
-                        _ => ", ",
-                    };
+                    result = string.Join(". ", postTexts);
                 }
-                if (next.Length > 0 && char.IsUpper(next[0]))
-                    next = char.ToLower(next[0]) + next[1..];
-                // For continuations, strip redundant "this card" subject
-                if (prefix == AbilityPrefix.Continuation)
-                {
-                    if (next.StartsWith("this card ", StringComparison.Ordinal))
-                        next = next[10..];
-                    else if (next.StartsWith("this card's ", StringComparison.Ordinal))
-                        next = next[12..];
-                }
-                result += connector + next;
             }
+
             sentenceTexts.Add(result);
         }
 

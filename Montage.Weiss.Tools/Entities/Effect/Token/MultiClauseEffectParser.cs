@@ -186,6 +186,20 @@ public static class MultiClauseEffectParser
             }
         }
 
+        // Step 4: After all abilities, try matching post-conditions (e.g. X is equal to...)
+        var postConditionMatch = registry.ConditionListRegistry.Match(remainingText.TrimStart().AsMemory());
+        if (postConditionMatch != null)
+        {
+            var postCondList = postConditionMatch.Translate(registry);
+            var postConds = postCondList.Where(c => c.Type == ConditionType.PostCondition).ToList();
+            if (postConds.Count > 0)
+            {
+                conditions.AddRange(postConds);
+                remainingText = remainingText.TrimStart()[postConditionMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
+                Log.Debug("ParseSentence: post-condition matched, remaining='{Remaining}'", remainingText);
+            }
+        }
+
         Log.Debug("ParseSentence: done. {CondCount} conditions, {AbilCount} abilities, remaining='{Remaining}'",
             conditions.Count, abilities.Count, remainingText);
 
@@ -235,12 +249,13 @@ public static class MultiClauseEffectParser
         protectedInput = Regex.Replace(protectedInput, @"〔[^〕]+〕", m => m.Value.Replace("。", "\0"));
         // Protect `。` before `『』` — nested ability text belongs to the preceding sentence
         protectedInput = Regex.Replace(protectedInput, @"。(?=『[^』]+』)", m => "\0");
-        // Protect `。` before variable definitions: パワーを＋X。Xは...に等しい。
-        protectedInput = Regex.Replace(protectedInput, @"。(?=[ＸＹXY]は[^。]*に等しい)", m => "\0");
         protectedInput = Regex.Replace(protectedInput, @"コストを払ってよい。", m => m.Value.Replace("。", "\0"));
         // Protect `。` before `そうしたら` — cascade/clause connectors (after specific patterns like コストを払ってよい)
         protectedInput = Regex.Replace(protectedInput, @"。(?=そうしたら)", m => "\0");
         // Protect X/Y variable definitions: Ｘは...に等しい。Ｙは...に等しい。
+        // Protect X/Y variable definitions from sentence-splitting within the definition itself
+        // Note: The preceding 。before definitions is intentionally NOT protected so X is equal...
+        // becomes its own sentence, producing ". X is equal to..." format in output.
         protectedInput = Regex.Replace(protectedInput, @"[ＸＹXY]は[^。]*に等しい。", m => m.Value.Replace("。", "\0"));
         // Protect parenthetical notes: (CXのレベルは0として扱う), (ダメージキャンセルは発生する)
         protectedInput = Regex.Replace(protectedInput, @"（[^）]+）", m => m.Value.Replace("。", "\0"));
@@ -262,15 +277,38 @@ public static class MultiClauseEffectParser
 
     private static string BuildSentenceText(List<CardEffectCondition> conditions, List<CardEffectAbility> abilities)
     {
+        var mainConditions = conditions.Where(c => c.Type != ConditionType.PostCondition).ToList();
+        var postConditions = conditions.Where(c => c.Type == ConditionType.PostCondition).ToList();
+
         var parts = new List<string>();
-        parts.AddRange(conditions.Select(c => c.ConditionText));
+        parts.AddRange(mainConditions.Select(c => c.ConditionText));
         parts.AddRange(abilities.Select(a => a.AbilityText));
 
-        if (parts.Count == 0) return "";
+        string result;
+        if (parts.Count == 0)
+        {
+            result = "";
+        }
+        else
+        {
+            result = string.Join(", ", parts);
+            result = char.ToUpper(result[0]) + result[1..];
+        }
 
-        var result = string.Join(", ", parts);
-        result = char.ToUpper(result[0]) + result[1..];
-        if (!result.EndsWith('.') && !result.EndsWith(']') && !result.EndsWith('"'))
+        if (postConditions.Count > 0)
+        {
+            var postText = string.Join(". ", postConditions.Select(c => c.ConditionText));
+            if (!string.IsNullOrEmpty(result))
+            {
+                result = result.TrimEnd('.') + ". " + postText;
+            }
+            else
+            {
+                result = postText;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(result) && !result.EndsWith('.') && !result.EndsWith(']') && !result.EndsWith('"'))
             result += ".";
         return result;
     }

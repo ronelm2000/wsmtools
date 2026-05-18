@@ -194,8 +194,12 @@ public static class MultiClauseEffectParser
         return new ParsedSentence(conditions, abilities, text, remaining);
     }
 
-    // Prefixes that should be skipped before matching (conjunctions + subject prefixes + duration prefixes)
-    // IMPORTANT: Longer prefixes must come before shorter ones to avoid partial matches
+    // Prefixes that should be skipped before matching (conjunctions + duration + あなたは ONLY)
+    // IMPORTANT: Subject prefixes like 自分の, 相手の, このカードは are NOT included because
+    // every ability token already encodes them in its regex. Step 1 direct match handles them.
+    // EXCEPTION: あなたは must remain because tokens use あなたの (possessive の) which differs
+    // from あなたは (topic は). Without stripping あなたは, token regexes with ^(?:あなたの|自分の)?
+    // fail to match (は ≠ の).
     public static readonly string[] SkippablePrefixes =
     [
         // Duration prefixes (longest first)
@@ -207,7 +211,7 @@ public static class MultiClauseEffectParser
         "そのアタック中、", "そのアタック中",
         "そのターン中、", "そのターン中",
         "このターン中、", "このターン中",
-        // Conjunctions
+        // Conjunctions / Continuation particles
         "そうでないなら、", "そうでないなら",
         "そうでなければ、", "そうでなければ",
         "そうしなければ、", "そうしなければ",
@@ -215,12 +219,11 @@ public static class MultiClauseEffectParser
         "その後、", "その後",
         "そして、", "そして",
         "し、", "し", "て、", "て",
-        // Subject prefixes (longer first)
-        "他のあなたの", "他の",
-        "このカードは", "このカードが",
-        "あなたは", "あなたの", "自分の",
-        "相手は", "相手の",
-        "次の",
+        // Topic marker あなたは and possessive 自分の are kept because:
+        // - あなたは differs from あなたの used in token regexes (は ≠ の)
+        // - 自分の is not included in all token regexes (e.g. PutTopCardToWaitingRoomToken
+        //   starts with ^山札の上から, expecting 自分の to be stripped first)
+        "あなたは", "自分の",
     ];
 
     public static List<ParsedSentence> Parse(

@@ -537,7 +537,7 @@ public class TranslatorServiceTests
         ], Assert.Fail);
     }
 
-    public static IEnumerable<object[]> TranslateCsvCrossCheckAllData()
+    public static IEnumerable<TestDataRow<(string serial, string jpEffect, string enEffect, string labels)>> TranslateCsvCrossCheckAllData()
     {
         var resourcesDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Resources"));
         List<string> csvFilePaths = [
@@ -567,8 +567,12 @@ public class TranslatorServiceTests
 
             foreach (var row in rows)
             {
-                var serialWithSource = $"{csvFile}:{row.Serial}";
-                yield return [serialWithSource, row.JpEffect, row.EnEffect, row.Labels];
+                var effectID = row.JpEffect.GetHashCode();
+                yield return new ((row.Serial, row.JpEffect, row.EnEffect, row.Labels))
+                {
+                    TestCategories= new[] { "CI", row.Serial },
+                    DisplayName = $"CSV-Cross-Check#{row.Serial}#{effectID}"
+                };
             }
         }
     }

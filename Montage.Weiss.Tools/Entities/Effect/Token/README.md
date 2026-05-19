@@ -25,6 +25,23 @@ There are four categories of tokens, distinguished by their generic type paramet
 | **Condition Tokens** | `CardTextToken<List<CardEffectCondition>>` | `Token/Condition/` | Parse conditional clauses (when, if, during) |
 | **Reminder Text Tokens** | `CardTextToken<string>` | `Token/ReminderText/` | Parse parenthetical reminder text |
 
+## Out-Of-Scope Guidelines
+
+### Names and Traits
+
+- **Names and Traits are NOT translated** at this time
+- They will need a stub method for future translation efforts
+- When a CSV has a translated English name, **change the CSV entry to a JP name**
+- Names should be preserved in their original Japanese form in the output
+
+### Example
+
+```csharp
+// Correct behavior: JP name in English quotes
+this card's name is "カード名"
+```
+
+
 ## Regex Conventions
 
 ### Mandatory Rules

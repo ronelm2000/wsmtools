@@ -217,3 +217,7 @@ private CardColor HandleColorCorrections(string serial, Exception innerException
 ```
 
 After adding a correction, verify with `dotnet build` and `dotnet test --filter TestCategory!=Manual`.
+
+## Translation Tokens
+
+For guidelines specific to card text token parsing and translation, see [`Token/README.md`](Montage.Weiss.Tools/Entities/Effect/Token/README.md).

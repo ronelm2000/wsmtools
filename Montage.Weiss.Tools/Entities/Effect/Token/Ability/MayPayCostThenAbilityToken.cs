@@ -16,6 +16,13 @@ internal class MayPayCostThenAbilityToken : CardTextToken<List<CardEffectAbility
         var parsed = MultiClauseEffectParser.ParseSentence(effectText, registry, MultiClauseEffectParser.DefaultPrefixMap);
         var abilityParts = parsed.Abilities.Select(a => a.AbilityText).ToList();
 
+        // Include post-conditions (e.g., X is equal to...) in the output
+        var postConds = parsed.Conditions.Where(c => c.Type == ConditionType.PostCondition).ToList();
+        if (postConds.Count > 0)
+        {
+            abilityParts.AddRange(postConds.Select(c => c.ConditionText));
+        }
+
         Log.Debug("MayPayCostThenAbilityToken: parsed {Count} abilities: {Abilities}",
             abilityParts.Count, string.Join(" | ", abilityParts));
 

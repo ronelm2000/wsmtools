@@ -133,6 +133,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new CostPutTopOfStockToClockStockVariantToken());
         _effectListRegistry.Register(new CostPutBlueCharacterFromWaitingRoomToClockBottomToken());
         _effectListRegistry.Register(new ChooseCharacterFromWaitingRoomToken());
+        _effectListRegistry.Register(new LookAtDeckChooseCardRevealAddToHandRestToWrToken());
         _effectListRegistry.Register(new LookAtTopCardsToken());
         _effectListRegistry.Register(new ChooseFromLookedAndPutOnTopToken());
         _effectListRegistry.Register(new ChooseCardsToken());

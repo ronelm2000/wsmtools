@@ -22,6 +22,8 @@ internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
                 $"X is equal to the number of {ExtractTrait(description)} characters put this way",
             _ when description.Contains("あなたの") && description.Contains("キャラの枚数") =>
                 $"X is equal to the number of your {ExtractTrait(description)} characters{FormatMultiplier(description)}",
+            _ when description.Contains("相手の") && description.Contains("キャラの枚数") =>
+                $"X is equal to the number of characters your opponent has",
             _ => description
         };
         return

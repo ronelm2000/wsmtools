@@ -11,7 +11,6 @@ internal class ChooseCharacterBoostAndGiveAbilityToken : CardTextToken<List<Card
         var power = int.Parse(match.Groups[2].Value);
         var nestedJapanese = match.Groups[3].Value;
         var nestedEnglish = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese) ?? nestedJapanese;
-        nestedEnglish = nestedEnglish.TrimEnd('.');
 
         var countText = count == 1 ? "1" : $"{count}";
         var charText = count == 1 ? "character" : "characters";

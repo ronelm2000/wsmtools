@@ -329,7 +329,12 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         if (sentenceTexts.Count == 0) return "";
 
         var trimmed = sentenceTexts.Select(s => {
-            if (s.Length >= 2 && s[^1] == '.' && (s[^2] == '"' || s[^2] == ']')) return s;
+            if (s.Length >= 2)
+            {
+                var lastTwo = s[^2..];
+                if (lastTwo is ".\"" or ".]") return s;
+            }
+            if (s.Length >= 2 && s[^1] == '.' && s[^2] == ']') return s;
             return s.TrimEnd('.');
         }).ToList();
         var joined = string.Join(". ", trimmed);

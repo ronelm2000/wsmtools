@@ -9,7 +9,7 @@ internal class MayPayCostThenAbilityToken : CardTextToken<List<CardEffectAbility
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var effectText = match.Groups["effect"].Value.Trim();
+        var effectText = match.Groups["effect"].Value.Trim().TrimStart('、');
 
         Log.Debug("MayPayCostThenAbilityToken: parsing effectText='{Text}'", effectText);
 

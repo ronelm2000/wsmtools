@@ -130,7 +130,26 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
         if (TryMatchAbility(registry, trimmed, out var abilityResult))
             return abilityResult;
 
-        // Try ParseSentence before effect match — handles condition+ability combos correctly
+        // Try multi-sentence Parse first, then single-sentence ParseSentence
+        var multiParsed = MultiClauseEffectParser.Parse(trimmed, registry);
+        if (multiParsed.Count > 1)
+        {
+            var parts = new List<string>();
+            foreach (var p in multiParsed)
+            {
+                if (p.Abilities.Count > 0 || p.Conditions.Count > 0)
+                    parts.Add(p.Text);
+            }
+            if (parts.Count > 0)
+            {
+                var joined = string.Join(" ", parts.Select(s => s.TrimEnd('.')));
+                joined = char.ToUpper(joined[0]) + joined[1..];
+                if (!joined.EndsWith('.')) joined += ".";
+                return joined;
+            }
+        }
+
+        // Try ParseSentence for single-sentence text
         var parsed = MultiClauseEffectParser.ParseSentence(trimmed, registry);
         if (parsed.Abilities.Count > 0 || parsed.Conditions.Count > 0)
         {
@@ -187,7 +206,10 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
             {
                 var restResult = TryTranslateNested(registry, remaining);
                 if (restResult != null)
-                    result += " " + restResult;
+                {
+                    var separator = result.EndsWith('.') ? " " : ". ";
+                    result += separator + restResult;
+                }
             }
             return true;
         }

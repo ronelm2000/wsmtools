@@ -62,7 +62,7 @@ internal class ActEffectToken : CardTextToken<CardEffect>
             backupPower = backupMatch.Groups[1].Value;
             backupLevel = backupMatch.Groups[2].Value;
             var stockCost = backupMatch.Groups[3].Success ? $"({backupMatch.Groups[3].Value}) " : "";
-            abilityEnglish = $"Backup {backupPower}, Level {backupLevel} [{stockCost}Put this card in your hand to your waiting room]";
+            abilityEnglish = $"[{stockCost}Put this card in your hand to your waiting room]";
             costEnglish = "";
             parsedList = [];
             tokenLog.Add("Abil:BackupPrefix");

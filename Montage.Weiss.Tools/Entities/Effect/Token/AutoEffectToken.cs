@@ -143,7 +143,8 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             for (int i = 1; i < costTexts.Count; i++)
             {
                 var sep = i == 1 && Regex.IsMatch(costTexts[0], @"^\(\d+\)$") ? " " : " & ";
-                costEnglish += sep + costTexts[i];
+                var nextText = CapitalizeFirstAlpha(costTexts[i]);
+                costEnglish += sep + nextText;
             }
             costEnglish = CapitalizeFirstAlpha(costEnglish);
         }
@@ -292,7 +293,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                             _ => ", ",
                         };
                     }
-                    if (next.Length > 0 && char.IsUpper(next[0]))
+                    if (next.Length > 0 && char.IsUpper(next[0]) && next[0] != 'X')
                         next = char.ToLower(next[0]) + next[1..];
                     if (prefix == AbilityPrefix.Continuation)
                     {

@@ -24,7 +24,7 @@ internal class LookAtTopCardsToken : CardTextToken<List<CardEffectAbility>>
         var displayCount = count.Replace("Ｘ", "X");
         var fullText = span.ToString();
         var isOpponent = fullText.Contains("相手の山札") && !fullText.Contains("あなたは自分の山札");
-        var deckOwner = isOpponent ? "opponent's" : "your";
+        var deckOwner = isOpponent ? "your opponent's" : "your";
         var followUp = match.Groups["follow"].Value;
 
         string followUpText = string.Empty;

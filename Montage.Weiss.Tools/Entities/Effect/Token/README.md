@@ -299,6 +299,79 @@ Reminder text tokens parse parenthetical clarifications.
    - Verify translation output matches expected English
    - Add to CSV cross-check if applicable
 
+### When Modifying an Existing Token's Output
+
+Changing a token's translated output (e.g., fixing wording, adding atomic decomposition, changing a character) requires a **cross-referencing audit** to keep all test data consistent. Shuffling passing/failing unit tests without updating their expected values defeats the purpose of the test suite.
+
+#### Audit checklist
+
+For every modified token, run these searches **before** and **after** the change:
+
+1. **CSV test data** — grep both `effects_550.csv` and `expansion_494_effects.csv` for the old and new output strings. The CSVs are the authoritative source of truth; token output should match CSV expectations, not the reverse, unless the CSV contains an unambiguous error.
+
+   ```
+   grep -i "old text" Montage.Weiss.Tools.Test/Resources/*.csv
+   grep -i "new text" Montage.Weiss.Tools.Test/Resources/*.csv
+   ```
+
+2. **Unit test assertions** — grep `TranslatorServiceTests.cs` for the old expected string. Update any assertion that hard-codes the old output.
+
+   ```
+   grep -n "old text" Montage.Weiss.Tools.Test/TranslatorServiceTests.cs
+   ```
+
+3. **Sibling tokens** — search for tokens whose regex overlaps with the modified token. If two tokens match the same Japanese input, they must produce consistent English wording for equivalent concepts.
+
+   - Check `Condition/` for similar regex patterns (e.g., multiple CX-existence tokens should all use `"there is a CX"` or all use `"a CX is"`, not a mix).
+   - The first-registered token wins at match time; any token registered later with a subset of the same pattern is dead code and should be removed.
+
+4. **Glyph consistency** — when the change involves a specific character (multiplication sign `×` vs ASCII `x`, full-width `Ｘ` vs half-width `X`, etc.), verify that the character in the token code matches the character in all CSV files and unit tests.
+
+   Use a hex dump to confirm:
+   ```python
+   python3 -c "
+   with open('file.csv', 'rb') as f:
+       content = f.read()
+   idx = content.find(b'search term')
+   print(content[idx:idx+20].hex())
+   "
+   ```
+
+5. **Full test pass** — run both the CSV cross-check and the individual unit tests after the change:
+
+   ```bash
+   dotnet test --filter "FullyQualifiedName~Translate_CSV_CrossCheckAll"
+   dotnet test --filter "TestCategory=CI"
+   ```
+
+   The CSV count should not regress unless the CSV data was the source of the inconsistency and was updated intentionally.
+
+#### Example: modifying the `×` character
+
+| Step | Command | What to check |
+|------|---------|---------------|
+| 1 | `grep "level x500\|level ×500" *.csv` | Which CSVs use ASCII `x` vs `×`? |
+| 2 | `grep "level x500\|level ×500" *Tests.cs` | Do unit tests use the same character? |
+| 3 | Check sibling tokens | Do all Assist tokens use the same glyph? |
+| 4 | Hex-verify | `0x78` = ASCII `x`, `0xD7` = `×` |
+| 5 | Full test pass | CSV count must not regress |
+
+#### Example: changing `CxWithTriggerIconInCxAreaConditionToken` wording
+
+The no‑icon branch of `CxWithTriggerIconInCxAreaConditionToken` was changed from `"a CX is in your CX area"` to `"there is a CX in your CX area"`. The audit revealed:
+
+1. CSV `expansion_494_effects.csv:173` already used `"there is a CX"` → no CSV change needed.
+2. New token `CxAreaHasCxConditionToken` had `"a CX is"` — inconsistent → updated to `"there is a CX"`.
+3. Unit tests did not reference this string → no change needed.
+4. New token `CxExistsConditionToken` was dead code (its input is a subset of `CxWithTriggerIconInCxAreaConditionToken`'s pattern) → removed.
+
+#### Common pitfalls
+
+- **Dead code from overlapping regex**: A new token with a narrower regex that is a strict subset of an earlier-registered token's regex will never match. Remove it.
+- **Baked-in `if` / `When` prefixes**: Condition tokens must NOT include `"if"`, `"When"`, `"During"` etc. in their `ConditionText`. These prefixes are prepended by `CardEffectConditionExtensions.AggregateToString` based on `ConditionType`. Baking them in produces double-prefix output like `"If if there is a CX"`.
+- **Trailing period**: `JoinAbilityPartsFromSentences` appends a trailing `.` to ability text when absent. If a unit test asserts `AbilityText` without a trailing period, it must be updated to include it.
+- **Single-character glyphs**: `×` (U+00D7, multiplication sign), `x` (U+0078, ASCII x), and `Ｘ` (U+FF38, full-width X) look nearly identical in some fonts but are distinct code points. Use byte-level inspection to confirm them.
+
 ### Documentation Template for Class Files
 
 Every token class must include XML documentation following this template:

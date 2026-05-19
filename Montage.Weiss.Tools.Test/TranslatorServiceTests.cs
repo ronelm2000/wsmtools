@@ -171,7 +171,7 @@ public class TranslatorServiceTests
         var effect = tree.Effects[0] as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.AreEqual("Assist", effect.Labels[0]);
-        Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level x500", effect.AbilityText);
+        Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level ×500.", effect.AbilityText);
         Assert.IsTrue(effect.EffectText.Contains("[CONT] Assist"));
     }
 
@@ -186,7 +186,7 @@ public class TranslatorServiceTests
         var effect = tree.Effects[0] as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.AreEqual("Assist", effect.Labels[0]);
-        Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level x1500", effect.AbilityText);
+        Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level ×1500.", effect.AbilityText);
         Assert.IsTrue(effect.EffectText.Contains("[CONT] Assist"));
     }
 

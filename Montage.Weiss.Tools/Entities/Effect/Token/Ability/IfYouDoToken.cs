@@ -6,12 +6,12 @@ internal class IfYouDoToken : CardTextToken<List<CardEffectAbility>>
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
-        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility
             {
-                AbilityText = "If you do"
+                AbilityText = "If you do",
+                Prefix = AbilityPrefix.IfYouDo
             }
         ];
     }

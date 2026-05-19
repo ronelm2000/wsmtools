@@ -43,12 +43,13 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         // Strip brackets for effect text formatting — they'll be re-added by labelPrefix.
         var formatLabels = labels.Select(l => l.Trim('[', ']')).ToArray();
 
-        // Handle "加速 " (Accelerate) keyword prefix
+        // Handle keyword prefixes (加速=Accelerate, アンコール=Encore)
         var hasAccelerate = mainText.StartsWith("加速", StringComparison.Ordinal);
         if (hasAccelerate)
         {
             mainText = Regex.Replace(mainText, @"^加速\s*", "");
         }
+        var hasEncore = !hasAccelerate && mainText.StartsWith("アンコール", StringComparison.Ordinal);
 
         // Extract cost if present: ［...］
         var costMatch = Regex.Match(mainText, @"^［(?<cost>.+?)］\s*(?<rest>.+)$");
@@ -167,6 +168,8 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         var finalLabels = labels;
         if (hasAccelerate)
             finalLabels = [.. finalLabels, "Accelerate"];
+        if (hasEncore)
+            finalLabels = [.. finalLabels, "Encore"];
 
         return new AutoCardEffect
         {
@@ -256,6 +259,11 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                 for (int i = 1; i < abilities.Count; i++)
                 {
                     var prefix = abilities[i].Prefix;
+                    if (prefix == AbilityPrefix.IfYouDo)
+                    {
+                        result += ". If you do,";
+                        continue;
+                    }
                     string connector;
                     var next = abilities[i].AbilityText;
                     if (prefix == AbilityPrefix.And)

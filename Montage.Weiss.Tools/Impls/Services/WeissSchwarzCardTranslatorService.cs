@@ -228,6 +228,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new PutToStockToken());
         _effectListRegistry.Register(new IfYouDoToken());
         _effectListRegistry.Register(new PutBottomOfStockToWaitingRoomToken());
+        _effectListRegistry.Register(new PutThatCharacterToStockToken());
         _effectListRegistry.Register(new MoveToOpenPositionToken());
         _effectListRegistry.Register(new ShuffleDeckToken());
         _effectListRegistry.Register(new BackupPrefixToken());

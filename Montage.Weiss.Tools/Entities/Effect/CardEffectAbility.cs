@@ -29,7 +29,7 @@ public record CardEffectAbility : ICardAbility
             AbilityPrefix.Otherwise => ". Otherwise, ",
             AbilityPrefix.AfterThat => ". After that, ",
             AbilityPrefix.Continuation => ", and ",
-            AbilityPrefix.Subject => " ",
+            AbilityPrefix.Subject => ", ",
             _ => ", ",
         };
         return new CardEffectAbility

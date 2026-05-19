@@ -289,7 +289,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                         connector = prefix switch
                         {
                             AbilityPrefix.Continuation => ", and ",
-                            AbilityPrefix.Subject => " ",
+                            AbilityPrefix.Subject => ", ",
                             _ => ", ",
                         };
                     }

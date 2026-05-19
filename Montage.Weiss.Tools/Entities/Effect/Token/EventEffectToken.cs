@@ -1,5 +1,21 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
+/// <summary>
+/// Matches event-type effects (no <c>【自】</c>/<c>【永】</c>/<c>【起】</c> prefix).
+/// Splits input by sentence boundaries, matches leading conditions per sentence,
+/// then matches ability tokens on the remaining text. Conditions are aggregated
+/// via <see cref="CardEffectConditionExtensions.AggregateToString"/>.
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>あなたは自分のキャラを1枚選び、そのターン中、次の能力を与える。『...』</c></para>
+/// <para><b>Regex:</b> ^(?&lt;labels&gt;(?:【[^】]+】)*)\s*(?&lt;mainText&gt;.+)$</para>
+/// <para><b>Captures:</b></para>
+/// <list type="bullet">
+///   <item><description>labels: Zero or more 【label】 prefixes (e.g., 【経験】)</description></item>
+///   <item><description>mainText: The effect body after labels</description></item>
+/// </list>
+/// <para><b>Output:</b> Full English effect text with labels, conditions, and abilities joined.</para>
+/// </remarks>
 internal class EventEffectToken : CardTextToken<CardEffect>
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<EventEffectToken>();
@@ -46,7 +62,10 @@ internal class EventEffectToken : CardTextToken<CardEffect>
                     Log.Debug("EventEffectToken: matched condition at start consumed={consumed} text=[{text}]", consumed, t[..consumed]);
                     var condList = condFunc(registry);
                     conditions.AddRange(condList);
-                    sentenceParts.AddRange(condList.Select(c => c.ConditionText));
+                    var aggregatedCondition = conditions.AggregateToString();
+                    sentenceParts.Clear();
+                    if (!string.IsNullOrEmpty(aggregatedCondition))
+                        sentenceParts.Add(aggregatedCondition);
                     remainingText = t[consumed..].TrimStart('、', '。', ' ', '\t');
                 }
                 else
@@ -106,8 +125,12 @@ internal class EventEffectToken : CardTextToken<CardEffect>
         }
 
         var effectText = abilityEnglish;
-        if (!string.IsNullOrEmpty(effectText) && !effectText.EndsWith('.'))
-            effectText += ".";
+        if (!string.IsNullOrEmpty(effectText))
+        {
+            var trimmed = effectText.TrimEnd('"');
+            if (!trimmed.EndsWith('.'))
+                effectText += ".";
+        }
 
         Log.Debug("EventEffectToken: final effectText=[{effectText}] abilityEnglish=[{ability}] labels={labels}", effectText, abilityEnglish, labels);
 

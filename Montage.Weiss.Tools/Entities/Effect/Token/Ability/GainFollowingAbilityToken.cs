@@ -321,5 +321,104 @@ internal class GainFollowingAbilityTokenWithParticleWa : CardTextToken<List<Card
     }
 }
 
+/// <summary>
+/// Matches standalone "<c>次の能力を得る。『...』</c>" clauses (no leading <c>し、</c>).
+/// Used after prefixes like <c>そのターン中、このカードは</c> have been stripped.
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>次の能力を得る。『【永】 あなたの[[shot.gif]]の効果で与えるダメージを＋1。』</c></para>
+/// <para><b>Regex:</b> ^次の能力を得る。『(?&lt;nested&gt;.+)』</para>
+/// <para><b>Captures:</b></para>
+/// <list type="bullet">
+///   <item><description>nested: Inner quoted ability text</description></item>
+/// </list>
+/// <para><b>Output:</b> <c>get the following ability. "[CONT] ..."</c></para>
+/// </remarks>
+internal class GainStandaloneFollowingAbilityToken : CardTextToken<List<CardEffectAbility>>
+{
+    public override Regex Matcher => new(@"^次の能力を得る。『(?<nested>.+)』(?:\.|,|、|。)?");
+
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
+    {
+        var match = Matcher.Match(span.ToString());
+        var nestedJapanese = match.Groups["nested"].Value;
+        var nestedEnglish = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese) ?? nestedJapanese;
+        return
+        [
+            new CardEffectAbility
+            {
+                AbilityText = $"get the following ability. \"{nestedEnglish}\""
+            }
+        ];
+    }
+}
+
+/// <summary>
+/// Matches "<c>(その後、)?あなたのキャラすべてに...次の能力を与える。『...』</c>" clauses.
+/// Used for granting abilities to all characters, optionally after "その後、".
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>その後、あなたのキャラすべてに、そのターン中、次の能力を与える。『【自】 このカードがアタックした時、...』</c></para>
+/// <para><b>Regex:</b> ^(?:その後、)?あなたのキャラすべてに、そのターン中、次の能力を与える。『(?&lt;nested&gt;.+)』</para>
+/// <para><b>Captures:</b></para>
+/// <list type="bullet">
+///   <item><description>nested: Inner quoted ability text</description></item>
+/// </list>
+/// <para><b>Output:</b> <c>all of your characters get the following ability until end of turn. "[AUTO] ..."</c></para>
+/// </remarks>
+internal class AfterThatAllCharactersGetAbilityToken : CardTextToken<List<CardEffectAbility>>
+{
+    public override Regex Matcher => new(@"^(?:その後、)?あなたのキャラすべてに、そのターン中、次の能力を与える。『(?<nested>.+)』(?:\.|,|、|。)?");
+
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
+    {
+        var match = Matcher.Match(span.ToString());
+        var nestedJapanese = match.Groups["nested"].Value;
+        var nestedEnglish = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese) ?? nestedJapanese;
+        return
+        [
+            new CardEffectAbility
+            {
+                AbilityText = $"all of your characters get the following ability until end of turn. \"{nestedEnglish}\""
+            }
+        ];
+    }
+}
+
+/// <summary>
+/// Matches "<c>(そのターン中、)?(?:このカードは)?次の能力を得る。『...』</c>" clauses.
+/// Variant that captures an optional duration prefix before "次の能力を得る".
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>そのターン中、このカードは次の能力を得る。『【自】 ...』</c></para>
+/// <para><b>Regex:</b> ^(?:そのターン中、)?(?:このカードは)?次の能力を得る。『(?&lt;nested&gt;.+)』</para>
+/// <para><b>Captures:</b></para>
+/// <list type="bullet">
+///   <item><description>nested: Inner quoted ability text</description></item>
+/// </list>
+/// <para><b>Output:</b> <c>this card gets the following ability until end of turn. "[AUTO] ..."</c> (with duration) / <c>get the following ability. "[AUTO] ..."</c> (without duration)</para>
+/// </remarks>
+internal class GainFollowingAbilityWithDurationToken : CardTextToken<List<CardEffectAbility>>
+{
+    public override Regex Matcher => new(@"^(?:そのターン中、)?(?:このカードは)?次の能力を得る。『(?<nested>.+)』(?:\.|,|、|。)?");
+
+    public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
+    {
+        var match = Matcher.Match(span.ToString());
+        var nestedJapanese = match.Groups["nested"].Value;
+        var nestedEnglish = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese) ?? nestedJapanese;
+        var hasDuration = match.Value.Contains("そのターン中");
+        return
+        [
+            new CardEffectAbility
+            {
+                AbilityText = hasDuration
+                    ? $"this card gets the following ability until end of turn. \"{nestedEnglish}\""
+                    : $"get the following ability. \"{nestedEnglish}\""
+            }
+        ];
+    }
+}
+
 
 

@@ -1,5 +1,18 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
+/// <summary>
+/// Matches "for each CX among those cards" per-CX iteration clauses.
+/// Handles the sub-action pattern <c>次の行動を行う。『...』</c> by translating the inner text.
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>それらのカードのCX1枚につき、次の行動を行う。『あなたは自分の控え室の...』</c></para>
+/// <para><b>Regex:</b> ^それらのカードのCX1枚につき、?(?&lt;remaining&gt;.+)$</para>
+/// <para><b>Captures:</b></para>
+/// <list type="bullet">
+///   <item><description>remaining: Text after the per-CX prefix, including any sub-action block</description></item>
+/// </list>
+/// <para><b>Output:</b> <c>For each CX revealed among those cards, ...</c></para>
+/// </remarks>
 internal class ForEachCxToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^それらのカードのCX1枚につき、?(?<remaining>.+)$");
@@ -29,6 +42,19 @@ internal class ForEachCxToken : CardTextToken<List<CardEffectAbility>>
     {
         var result = new List<CardEffectAbility>();
         var remainingText = text;
+
+        // Handle "perform the following action" sub-ability pattern: 次の行動を行う。『...』
+        var actionMatch = Regex.Match(remainingText, @"^次の行動を行う。『(.+)』");
+        if (actionMatch.Success)
+        {
+            var inner = actionMatch.Groups[1].Value;
+            var innerResult = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, inner);
+            if (innerResult != null)
+            {
+                result.Add(new CardEffectAbility { AbilityText = innerResult });
+            }
+            return result;
+        }
 
         while (!string.IsNullOrWhiteSpace(remainingText))
         {

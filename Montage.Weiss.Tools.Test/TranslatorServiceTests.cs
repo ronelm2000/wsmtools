@@ -537,16 +537,10 @@ public class TranslatorServiceTests
 
     public static IEnumerable<TestDataRow<(string serial, string jpEffect, string enEffect, string labels)>> TranslateCsvCrossCheckAllData()
     {
-        var resourcesDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Resources"));
-        List<string> csvFilePaths = [
-            "effects_550.csv",
-            "expansion_494_effects.csv"
-            ];
-        var csvFiles = csvFilePaths
-            .Select(fileName => Path.Combine(resourcesDirectory, fileName))
-            .ToList();
+        var translationsDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Resources", "Translations"));
+        var csvFiles = Directory.GetFiles(translationsDirectory, "*.csv").ToList();
 
-        Assert.IsTrue(csvFiles.Count > 0, $"No cross-check CSV files found in: {resourcesDirectory}");
+        Assert.IsTrue(csvFiles.Count > 0, $"No cross-check CSV files found in: {translationsDirectory}");
 
         foreach (var csvPath in csvFiles)
         {

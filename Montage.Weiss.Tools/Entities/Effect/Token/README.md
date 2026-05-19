@@ -307,11 +307,11 @@ Changing a token's translated output (e.g., fixing wording, adding atomic decomp
 
 For every modified token, run these searches **before** and **after** the change:
 
-1. **CSV test data** — grep **all** CSV files under `Montage.Weiss.Tools.Test/Resources/` for the old and new output strings. New expansion packs are added as new CSV files, so a blanket `*.csv` glob catches everything.
+1. **CSV test data** — grep **all** CSV files under `Montage.Weiss.Tools.Test/Resources/Translations/` for the old and new output strings. New expansion packs are added as new CSV files in this directory, so a blanket `*.csv` glob catches everything.
 
    ```
-   grep -i "old text" Montage.Weiss.Tools.Test/Resources/*.csv
-   grep -i "new text" Montage.Weiss.Tools.Test/Resources/*.csv
+   grep -i "old text" Montage.Weiss.Tools.Test/Resources/Translations/*.csv
+   grep -i "new text" Montage.Weiss.Tools.Test/Resources/Translations/*.csv
    ```
 
    The CSVs are the authoritative source of truth; token output should match CSV expectations, not the reverse, unless the CSV contains an unambiguous error.

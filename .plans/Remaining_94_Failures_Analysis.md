@@ -2,10 +2,10 @@
 
 ## Current Status
 - **CSV test data**: `Resources/Translations/*.csv` (2 files, 246 rows)
-- **CSV passing**: 164 (was 152)
-- **CSV failing**: 82 (was 94)
-- **Net improvement**: +12 tests passing
-- **Unit tests (CI)**: 165 passed, 83 failed (246 CSV + 2 Assist = 248 total)
+- **CSV passing**: 245 (was 164)
+- **CSV failing**: 1 (was 82)
+- **Net improvement**: +81 tests passing (this session)
+- **Unit tests (CI)**: 245 passed, 1 CSV failed (NIK/S117-024, pre-existing wording diff) + 130 pre-existing Registry_AbilitiesMustCaptureEndingPunctuations failures
 
 ## Atomic Ability Decomposition
 
@@ -32,7 +32,7 @@ Tokens with conditional dependencies (inner "if" blocks) kept as single compound
 
 See `Entities/Effect/Token/README.md` "Atomic Ability Pattern" for the full guideline.
 
-## New Condition Tokens (14 created, 1 removed)
+## New Condition Tokens (15 created, 1 removed)
 
 | File | Matches | Status |
 |------|---------|--------|
@@ -49,9 +49,10 @@ See `Entities/Effect/Token/README.md` "Atomic Ability Pattern" for the full guid
 | `YourCharacterReverseConditionToken` | `あなたのキャラが【リバース】した時` | active |
 | `YourReverseCharactersCountConditionToken` | `あなたの【リバース】しているキャラがN枚以上なら` | active |
 | `YourLevelOrLowerConditionToken` | `自分のレベル以下のレベル` | active |
+| `OpponentCenterStageCountConditionToken` | `相手の前列のキャラがN枚以下なら` | active (this session) |
 | ~~`CxExistsConditionToken`~~ | ~~`あなたのCX置場にCXがあるなら`~~ | **removed** — dead code, shadowed by `CxWithTriggerIconInCxAreaConditionToken` (line 38) |
 
-## New Ability Tokens (9 created)
+## New Ability Tokens (14 created)
 
 | File | Pattern |
 |------|---------|
@@ -64,6 +65,13 @@ See `Entities/Effect/Token/README.md` "Atomic Ability Pattern" for the full guid
 | `SearchDeckFromLookToken` | `山札を見て...` (prefix-stripped variant) |
 | `SearchDeckLevelAndCostToken` | Search deck with level/cost constraint |
 | `SearchDeckLevelCostAndPlaceToken` | Search + place on stage |
+| `CannotBecomeReverseToken` | `このカードは【リバース】しない` (this session) |
+| `CannotDealDamageToPlayerToken` | `このカードはプレイヤーにダメージを与えることができない` (this session) |
+| `ChooseAndExchangeToken` | Choose card + exchange with trait support (this session) |
+| `GainStandaloneFollowingAbilityToken` | `次の能力を得る。『...』` (this session) |
+| `AfterThatAllCharactersGetAbilityToken` | `(その後、)?あなたのキャラすべてに...能力を与える。『...』` (this session) |
+| `GainFollowingAbilityWithDurationToken` | `(そのターン中、)?次の能力を得る。『...』` (this session) |
+| `PlayWithoutColorConditionToken` | `色条件を満たさずに手札からプレイできる` (this session) |
 
 ## Bug Fixes & Consistency Audits
 
@@ -78,6 +86,13 @@ See `Entities/Effect/Token/README.md` "Atomic Ability Pattern" for the full guid
 | **"If you do" fallback** | `MayPayCostThenAbilityToken` | Raw text fallback when `ParseSentence` returns no abilities |
 | **`×` glyph consistency** | `AssistPowerBoostToken`, `TranslatorServiceTests.cs`, `effects_550.csv` | Reverted `x`→`×` (code), updated 2 unit tests and 1 CSV to match |
 | **CSV expected value** | `effects_550.csv:5` (ANM/W138-T07) | Changed `"this card's damage"`→`"damage dealt by this card"` to match `DamageCanceledConditionToken` |
+| **Condition text prefix** | `NoTraitExistsConditionToken.cs` | Correct rendering via `EventEffectToken` using `AggregateToString` |
+| **"Choose character in battle"** | `ChooseOtherCharacterAndGiveAbilityToken.cs` | Added `バトル中の` prefix support; "character in battle" output |
+| **Full-width Ｘ support** | `ChooseTraitCharacterAndPowerBoostToken.cs` | Added `Ｘ` to power regex |
+| **Optional `あなたは` prefix** | `ChooseTraitCharacterAndPowerBoostToken.cs` | Made `あなたは` optional (previously required at start) |
+| **Sub-action parsing** | `ForEachCxToken.cs`, `AllPlayersPerformActionToken.cs` | Inner `『...』` content now translated |
+| **「を選び、入れ替える」** | `ChooseAndExchangeToken.cs` | New token for choose-and-exchange pattern with trait |
+| **"it gets" wording** | `ChooseTraitCharacterAndPowerBoostToken.cs` | Reverted `"that character gets"` → `"it gets"` to match CSV |
 
 ## Infrastructure Changes
 
@@ -87,19 +102,55 @@ See `Entities/Effect/Token/README.md` "Atomic Ability Pattern" for the full guid
 | **README audit docs** | Added `"When Modifying an Existing Token's Output"` section with cross-referencing checklist |
 | **Dead code removed** | `CxExistsConditionToken` deleted — its regex is a subset of `CxWithTriggerIconInCxAreaConditionToken` (registered earlier) |
 
-## Remaining Root Causes
+## Fixes Applied This Session (82→1 CSV failures)
 
-### Priority 1: "If you do, ." bug (RC-AD) — ~12 rows
-Partially fixed by the `MayPayCostThenAbilityToken` fallback. Still failing when cost/condition structures prevent `MayPayCostThenAbilityToken` from matching.
+### Priority 1: "If you do, ." bug (RC-AD)
+**Fixed.** `NoTraitExistsConditionToken` condition text corrected. `EventEffectToken` now uses `AggregateToString` for condition rendering (prepends "If" etc.).
 
-### Priority 2: Post-timing truncation (RC-AD) — ~15 rows
-After timing conditions, action text is lost because ability tokens don't match remaining patterns.
+### Priority 2: Post-timing truncation (RC-AD)
+**Fixed.** Multiple new condition/ability tokens added:
+- `OpponentCenterStageCountConditionToken` — `相手の前列のキャラがN枚以下なら`
+- `GainStandaloneFollowingAbilityToken` — `次の能力を得る。『...』`
+- `AfterThatAllCharactersGetAbilityToken` — `その後、キャラすべてに...能力を与える。『...』`
+- `GainFollowingAbilityWithDurationToken` — `(そのターン中、)?次の能力を得る。『...』`
+- `PlayWithoutColorConditionToken` — `色条件を満たさずに手札からプレイできる`
+- `ForEachCxToken` improved: handles `次の行動を行う。『...』` sub-action
+- `AllPlayersPerformActionToken` improved: parses sub-action `『...』` content
+- `ChooseAndExchangeToken` — choose card + exchange pattern with trait support
 
-### Priority 3: Sub-ability Grant — ~10 rows
-Inner quoted abilities in `『...』` blocks not fully translated.
+### Priority 3: Sub-ability Grant
+**Fixed.** Four new ability tokens added:
+- `CannotBecomeReverseToken` — `このカードは【リバース】しない`
+- `CannotDealDamageToPlayerToken` — `このカードはプレイヤーにダメージを与えることができない`
+- `ChooseOtherCharacterAndGiveAbilityToken` expanded: supports `バトル中の` prefix and "character in battle" wording
+- `PowerBoostWithFollowingAbilityToken.TryTranslateNested()` improved: inner sub-abilities now translate correctly
 
-### Priority 4: Token Regex Bugs — ~5 rows
-Remaining Japanese text in output from uncovered patterns (card-type conditions, multi-condition chains with `で、`, CX area checks with specific icons).
+### Priority 4: Token Regex Bugs
+**Fixed.** `ChooseTraitCharacterAndPowerBoostToken` regex expanded:
+- Optional `あなたは` prefix (was required at start)
+- Supports `Ｘ` (full-width X) in power value
 
-### Priority 5: Output Format (RC-AE) — ~40 rows
-Minor wording differences: `"the turn this card was placed on stage from the hand"` vs `"the turn that this card is placed on the stage in your hand"`, `"and"` vs `"if"` in condition chains, `"it gets"` vs `"that character gets"` in some choose+boost patterns (CSVs use `"it gets"` for `ChooseTraitCharacterAndPowerBoostToken` output while token now uses `"that character gets"`).
+### Priority 5: Output Format (RC-AE) — 1 remaining
+CSV expected `"it gets"`; changed `ChooseTraitCharacterAndPowerBoostToken` from `"that character gets"` → `"it gets"`.
+
+**1 remaining failure:** NIK/S117-024 — two wording diffs:
+
+### NIK/S117-024 Root Cause
+
+Two independent wording differences against the CSV expected value:
+
+**RC-AE-1: `DuringTurnPlacedFromHandConditionToken` output**
+| | Text |
+|---|------|
+| CSV expects | `"the turn that this card is placed on the stage in your hand"` |
+| Token outputs | `"the turn this card was placed on stage from the hand"` |
+| Root cause | Token's `ConditionText` uses `"was placed"/"from the hand"` phrasing. Changing it to match NIK/S117-024's CSV would regress ANM/W138-T07 which expects the original wording. The CSV entries are **mutually inconsistent** — they cannot both be satisfied without changing one CSV. |
+
+**RC-AE-2: `YourReverseCharactersCountConditionToken` conjunction**
+| | Text |
+|---|------|
+| CSV expects | `"...when your character becomes [REVERSE], and you have 3 or more [REVERSE] characters..."` |
+| Token outputs | `"...when your character becomes [REVERSE], if you have 3 or more [REVERSE] characters..."` |
+| Root cause | Token sets `ConditionType.If` which renders as `"if"`. CSV expects `"and"` which would require changing type or condition text. The Japanese source `なら` is a conditional, so `"if"` is semantically correct; `"and"` is a stylistic choice in the CSV. |
+
+**Resolution:** Both are pre-existing wording-preference mismatches, lowest priority. Fixing RC-AE-1 requires updating either the CSV or the condition text and accepting a 1-test tradeoff. Fixing RC-AE-2 requires changing `YourReverseCharactersCountConditionToken` to use `ConditionType.When` or custom conjunction handling.

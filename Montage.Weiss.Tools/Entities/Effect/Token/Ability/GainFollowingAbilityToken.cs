@@ -336,7 +336,7 @@ internal class GainFollowingAbilityTokenWithParticleWa : CardTextToken<List<Card
 /// </remarks>
 internal class GainStandaloneFollowingAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^次の能力を得る。『(?<nested>.+)』(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^次の能力を得る。『(?<nested>.+?)』(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -368,7 +368,7 @@ internal class GainStandaloneFollowingAbilityToken : CardTextToken<List<CardEffe
 /// </remarks>
 internal class AfterThatAllCharactersGetAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:その後、)?あなたのキャラすべてに、そのターン中、次の能力を与える。『(?<nested>.+)』(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:その後、)?あなたのキャラすべてに、そのターン中、次の能力を与える。『(?<nested>.+?)』(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -400,7 +400,7 @@ internal class AfterThatAllCharactersGetAbilityToken : CardTextToken<List<CardEf
 /// </remarks>
 internal class GainFollowingAbilityWithDurationToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:そのターン中、)?(?:このカードは)?次の能力を得る。『(?<nested>.+)』(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:そのターン中、)?(?:このカードは)?次の能力を得る。『(?<nested>.+?)』(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

@@ -252,10 +252,11 @@ public static class MultiClauseEffectParser
         protectedInput = Regex.Replace(protectedInput, @"コストを払ってよい。", m => m.Value.Replace("。", "\0"));
         // Protect `。` before `そうしたら` — cascade/clause connectors (after specific patterns like コストを払ってよい)
         protectedInput = Regex.Replace(protectedInput, @"。(?=そうしたら)", m => "\0");
-        // Protect X/Y variable definitions: Ｘは...に等しい。Ｙは...に等しい。
-        // Protect X/Y variable definitions from sentence-splitting within the definition itself
-        // Note: The preceding 。before definitions is intentionally NOT protected so X is equal...
-        // becomes its own sentence, producing ". X is equal to..." format in output.
+        // Protect X/Y variable definitions: 。Xは...に等しい。
+        // First, protect the 。before X/Y definitions so they stay with their preceding ability sentence.
+        // This enables PostCondition matching in ParseSentence to find them after ability consumption.
+        protectedInput = Regex.Replace(protectedInput, @"。[XＸYＹ]は[^。]*に等しい", m => m.Value.Replace("。", "\0"));
+        // Then protect the 。inside the definition itself (trailing 。)
         protectedInput = Regex.Replace(protectedInput, @"[ＸＹXY]は[^。]*に等しい。", m => m.Value.Replace("。", "\0"));
         // Protect parenthetical notes: (CXのレベルは0として扱う), (ダメージキャンセルは発生する)
         protectedInput = Regex.Replace(protectedInput, @"（[^）]+）", m => m.Value.Replace("。", "\0"));
@@ -280,19 +281,28 @@ public static class MultiClauseEffectParser
         var mainConditions = conditions.Where(c => c.Type != ConditionType.PostCondition).ToList();
         var postConditions = conditions.Where(c => c.Type == ConditionType.PostCondition).ToList();
 
-        var parts = new List<string>();
-        parts.AddRange(mainConditions.Select(c => c.ConditionText));
-        parts.AddRange(abilities.Select(a => a.AbilityText));
+        var conditionPart = mainConditions.Count > 0 ? mainConditions.AggregateToString() : "";
+        var abilityParts = abilities.Select(a => a.AbilityText).ToList();
 
         string result;
-        if (parts.Count == 0)
+        if (!string.IsNullOrEmpty(conditionPart) && abilityParts.Count > 0)
         {
-            result = "";
+            result = $"{conditionPart}, {abilityParts[0]}";
+            for (int i = 1; i < abilityParts.Count; i++)
+                result += $", {abilityParts[i]}";
+        }
+        else if (!string.IsNullOrEmpty(conditionPart))
+        {
+            result = conditionPart;
+        }
+        else if (abilityParts.Count > 0)
+        {
+            result = string.Join(", ", abilityParts);
+            result = char.ToUpper(result[0]) + result[1..];
         }
         else
         {
-            result = string.Join(", ", parts);
-            result = char.ToUpper(result[0]) + result[1..];
+            result = "";
         }
 
         if (postConditions.Count > 0)

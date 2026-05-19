@@ -14,16 +14,15 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class DealDamageToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手に[XＸ]\s*ダメージを与える(?:。[XＸ]\s*はそのカードのレベル＋1\s*に等しい(?:\.|,|、|。)?)?(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^相手に[XＸ]\s*ダメージを与える(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
-        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility
             {
-                AbilityText = "deal X damage to your opponent. X is equal to that sent card's level +1"
+                AbilityText = "deal X damage to your opponent"
             }
         ];
     }
@@ -34,24 +33,22 @@ internal class DealDamageToken : CardTextToken<List<CardEffectAbility>>
 /// </summary>
 /// <remarks>
 /// <para><b>Expected Input:</b> <c>相手にＸダメージを与える。Ｘはそのキャラのソウルに等しい。</c></para>
-/// <para><b>Regex:</c> ^相手に[XＸ]\s*ダメージを与える。[XＸ]\s*はそのキャラのソウルに等しい(?:\.|,|、|。)?</para>
+/// <para><b>Regex:</c> ^相手に[XＸ]\s*ダメージを与える(?:\.|,|、|。)?</para>
 /// <para><b>Captures:</b> None (fixed pattern)</para>
-/// <para><b>Output:</b> <c>deal X damage to your opponent. X is equal to that character's soul</c></para>
+/// <para><b>Output:</b> <c>deal X damage to your opponent</c></para>
 /// <para><b>Scope Expansion:</b> To support variations, add alternative patterns for:
 /// - Different X definitions (レベルに等しい, コストに等しい)</para>
 /// </remarks>
 internal class DealVariableDamageToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手に[XＸ]\s*ダメージを与える。[XＸ]\s*はそのキャラのソウルに等しい(?:\.|,|、|。)?");
-
+    public override Regex Matcher => new(@"^相手に[XＸ]\s*ダメージを与える(?:\.|,|、|。)?");
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
-        var match = Matcher.Match(span.ToString());
         return
         [
             new CardEffectAbility
             {
-                AbilityText = "deal X damage to your opponent. X is equal to that character's soul"
+                AbilityText = "deal X damage to your opponent"
             }
         ];
     }

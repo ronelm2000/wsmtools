@@ -126,19 +126,20 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
             }
         }
 
-        // Try ability match before effect match for nested contexts
+        // Try ability match (index-0 via Match API)
         if (TryMatchAbility(registry, trimmed, out var abilityResult))
             return abilityResult;
 
-        // Try effect match as fallback (handles multi-clause effects)
-        if (TryMatchEffect(registry, trimmed, out var effectResult))
-            return effectResult;
-
+        // Try ParseSentence before effect match — handles condition+ability combos correctly
         var parsed = MultiClauseEffectParser.ParseSentence(trimmed, registry);
         if (parsed.Abilities.Count > 0 || parsed.Conditions.Count > 0)
         {
             return parsed.Text;
         }
+
+        // Try effect match as last resort (may match EventEffectToken which is lossy for nested contexts)
+        if (TryMatchEffect(registry, trimmed, out var effectResult))
+            return effectResult;
 
         var blockSplit = Regex.Split(trimmed, @"』\s*『");
         if (blockSplit.Length > 1)
@@ -175,11 +176,28 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
 
     private static bool TryMatchAbility(ITokenRegistry registry, string japanese, out string? result)
     {
-        if (registry.EffectListRegistry.TryFindFirstMatch(japanese, out var abilFunc, out _, out var abilConsumed) && abilFunc != null)
+        // Skip known lead-in prefixes before matching (same as ParseSentence)
+        var trimmed = japanese.TrimStart();
+        string? pendingDuration = null;
+        foreach (var prefix in MultiClauseEffectParser.SkippablePrefixes)
         {
-            var abils = abilFunc(registry);
+            if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                if (MultiClauseEffectParser.DefaultPrefixMap.Prefixes.TryGetValue(prefix, out var p)
+                    && p == AbilityPrefix.Subject)
+                {
+                }
+                trimmed = trimmed[prefix.Length..].TrimStart('、', ' ', '\t');
+                break;
+            }
+        }
+
+        var matchResult = registry.EffectListRegistry.Match(trimmed.AsMemory());
+        if (matchResult != null)
+        {
+            var abils = matchResult.Translate(registry);
             result = string.Join(", ", abils.Select(a => a.AbilityText));
-            var remaining = japanese[abilConsumed..].TrimStart();
+            var remaining = trimmed[matchResult.Match.Length..].TrimStart('、', '。', ' ', '\t');
             if (!string.IsNullOrEmpty(remaining))
             {
                 var restResult = TryTranslateNested(registry, remaining);
@@ -194,11 +212,12 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
 
     private static bool TryMatchEffect(ITokenRegistry registry, string japanese, out string? result)
     {
-        if (registry.EffectRegistry.TryFindFirstMatch(japanese, out var effectFunc, out _, out var consumed) && effectFunc != null)
+        var matchResult = registry.EffectRegistry.Match(japanese.AsMemory());
+        if (matchResult != null)
         {
-            var effect = effectFunc(registry);
+            var effect = matchResult.Translate(registry);
             result = effect.EffectText;
-            var remaining = japanese[consumed..].TrimStart();
+            var remaining = japanese[matchResult.Match.Length..].TrimStart('、', '。', ' ', '\t');
             if (!string.IsNullOrEmpty(remaining))
             {
                 var restResult = TryTranslateNested(registry, remaining);

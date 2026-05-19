@@ -27,6 +27,7 @@ internal class BrainstormEffectToken : CardTextToken<CardEffect>
                 if (t.Length == 0)
                     break;
 
+                // Try matching abilities first
                 if (registry.EffectListRegistry.TryFindFirstMatch(t, out var abilFunc, out var matchIndex, out var consumed) && abilFunc != null)
                 {
                     if (matchIndex > 0)
@@ -41,6 +42,19 @@ internal class BrainstormEffectToken : CardTextToken<CardEffect>
                 }
                 else
                 {
+                    // Try matching post-conditions (e.g. X is equal to...)
+                    var condMatch = registry.ConditionListRegistry.Match(t.AsMemory());
+                    if (condMatch != null)
+                    {
+                        var condList = condMatch.Translate(registry);
+                        var postConds = condList.Where(c => c.Type == ConditionType.PostCondition).ToList();
+                        if (postConds.Count > 0)
+                        {
+                            abilityParts.AddRange(postConds.Select(c => c.ConditionText));
+                            remainingText = t[condMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
+                            continue;
+                        }
+                    }
                     remainingText = t.Length > 1 ? t[1..] : "";
                 }
             }

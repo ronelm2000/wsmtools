@@ -12,14 +12,16 @@ internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
         {
             _ when description.Contains("公開されたカードのレベル") =>
                 "X is equal to the level of the revealed card",
-            _ when description.Contains("そのカードのレベル＋1") =>
+            _ when Regex.IsMatch(description, @"そのカードのレベル[＋+]\d*") =>
                 "X is equal to that sent card's level +1",
             _ when description.Contains("そのキャラのソウル") =>
                 "X is equal to that character's soul",
+            _ when Regex.IsMatch(description, @"そのキャラのレベル[×x]\d+") =>
+                $"X is equal to that character's level {Regex.Match(description, @"[×x]\d+").Value}",
             _ when description.Contains("それらのカードの") =>
                 $"X is equal to the number of {ExtractTrait(description)} characters put this way",
             _ when description.Contains("あなたの") && description.Contains("キャラの枚数") =>
-                $"X is equal to the number of {ExtractTrait(description)} characters",
+                $"X is equal to the number of {ExtractTrait(description)} characters you have{FormatMultiplier(description)}",
             _ => description
         };
         return
@@ -36,5 +38,11 @@ internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
     {
         var match = System.Text.RegularExpressions.Regex.Match(text, @"《(.+?)》");
         return match.Success ? $"<<{match.Groups[1].Value}>>" : "?";
+    }
+
+    private static string FormatMultiplier(string description)
+    {
+        var multiplierMatch = Regex.Match(description, @"[×x]\d+$");
+        return multiplierMatch.Success ? $" {multiplierMatch.Value}" : "";
     }
 }

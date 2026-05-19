@@ -12,7 +12,7 @@ internal class PutToStockToken : CardTextToken<List<CardEffectAbility>>
         [
             new CardEffectAbility
             {
-                AbilityText = may ? "you may put this card to your stock" : "put this card to your stock"
+                AbilityText = may ? "you may put it to your stock" : "put it to your stock"
             }
         ];
     }

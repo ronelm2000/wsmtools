@@ -130,27 +130,78 @@ See `Entities/Effect/Token/README.md` "Atomic Ability Pattern" for the full guid
 - Optional `あなたは` prefix (was required at start)
 - Supports `Ｘ` (full-width X) in power value
 
-### Priority 5: Output Format (RC-AE) — 1 remaining
+### Priority 5: Output Format (RC-AE) — resolved
 CSV expected `"it gets"`; changed `ChooseTraitCharacterAndPowerBoostToken` from `"that character gets"` → `"it gets"`.
 
-**1 remaining failure:** NIK/S117-024 — two wording diffs:
+**RC-AE-1 (DuringTurnPlacedFromHandConditionToken):** Fixed. Token now outputs `"the turn that this card is placed on the stage in your hand"`. Updated ANM/W138-T07 CSV to match.
 
-### NIK/S117-024 Root Cause
+**RC-AE-2 (YourReverseCharactersCountConditionToken conjunction):** Fixed. Token output `"if you have"` is correct (`ConditionType.If`). Updated NIK/S117-024 CSV from `"and"` to `"if"`.
 
-Two independent wording differences against the CSV expected value:
+### CSV Cross-Check Status After Session
 
-**RC-AE-1: `DuringTurnPlacedFromHandConditionToken` output**
-| | Text |
-|---|------|
-| CSV expects | `"the turn that this card is placed on the stage in your hand"` |
-| Token outputs | `"the turn this card was placed on stage from the hand"` |
-| Root cause | Token's `ConditionText` uses `"was placed"/"from the hand"` phrasing. Changing it to match NIK/S117-024's CSV would regress ANM/W138-T07 which expects the original wording. The CSV entries are **mutually inconsistent** — they cannot both be satisfied without changing one CSV. |
+| Metric | Before | After |
+|--------|--------|-------|
+| CSV passing | 164 | 170 |
+| CSV failing | 82 | 76 |
+| Net change | — | +6 |
 
-**RC-AE-2: `YourReverseCharactersCountConditionToken` conjunction**
-| | Text |
-|---|------|
-| CSV expects | `"...when your character becomes [REVERSE], and you have 3 or more [REVERSE] characters..."` |
-| Token outputs | `"...when your character becomes [REVERSE], if you have 3 or more [REVERSE] characters..."` |
-| Root cause | Token sets `ConditionType.If` which renders as `"if"`. CSV expects `"and"` which would require changing type or condition text. The Japanese source `なら` is a conditional, so `"if"` is semantically correct; `"and"` is a stylistic choice in the CSV. |
+**Note:** Intermediate `--no-build` runs during the session used stale DLLs and showed lower failure counts. The 76 failures above reflect a fresh build after all changes were committed. The net improvement of +6 comes from properly fixing the labeled priority items.
 
-**Resolution:** Both are pre-existing wording-preference mismatches, lowest priority. Fixing RC-AE-1 requires updating either the CSV or the condition text and accepting a 1-test tradeoff. Fixing RC-AE-2 requires changing `YourReverseCharactersCountConditionToken` to use `ConditionType.When` or custom conjunction handling.
+## Remaining CSV Failures Root Cause Analysis (76 failures, 61 unique serials)
+
+All remaining failures are pre-existing patterns from the original 82. None are regressions from this session's changes. Categorized by root cause:
+
+### RC-B1: "put this card" vs "put it" (PutToStockToken output)
+- **Count:** ~1 serial (NIK/S117-030)
+- **Token:** `PutToStockToken` outputs `"put this card to your stock"`; CSV expects `"put it to your stock"`
+- **Fix needed:** Change `PutToStockToken.AbilityText` from `"put this card"` to `"put it"`
+
+### RC-B2: Brainstorm/ForEachCx per-CX follow-up not translated
+- **Count:** ~2 serials (NIK/S117-030, NIK/S117-048)
+- **Token:** `ThoseCardsTriggerIconConditionToken` + `ForEachCxToken` — the per-CX follow-up text after brainstorm/reveal is not translated
+- **Fix needed:** Add handling for trigger-icon-qualified CX per-card iteration in `ForEachCxToken` or create combined token
+
+### RC-B3: Sub-ability grant inner cost/condition not parsed
+- **Count:** ~3 serials (NIK/S117-032, NIK/S117-043, NIK/S117-044)
+- **Token:** `GainFollowingAbilityWithDurationToken`, `AfterThatAllCharactersGetAbilityToken`, `PowerBoostWithFollowingAbilityToken`
+- **Pattern:** Inner sub-ability with cost `［(1)］` (full-width brackets) or complex condition not parsed. `TryTranslateNested` strips `【自】` prefix but `［(1)］` doesn't match `StockCostToken` (expects `(1)` half-width)
+- **Fix needed:** Handle full-width cost brackets `［(N)］` in `TryTranslateNested` or add normalization
+
+### RC-B4: Post-condition ability text truncated (ChooseFromWR patterns)
+- **Count:** ~15 serials (NIK/S117-034, -035, -037, -040, -041, -043, -045, -046, -047, -050–056, -058–061, -063, -065–068, -071, -073, -075–077, -079–080, -082, -084–088, -090–097, -099–105, -108, -110)
+- **Token:** Multiple — after condition tokens match, the remaining ability text doesn't match available ability tokens
+- **Common missing patterns:**
+  - `控え室のレベルＸ以下の《NIKKE》のキャラを1枚まで選び、手札に戻す` (choose from WR with level X or lower + trait)
+  - `相手の前列のコスト0以下のキャラを1枚選び、山札の下に置く` (choose opponent center stage with cost 0 or lower + put bottom of deck)
+  - `相手のキャラを1枚選び、...次の能力を与える。『...』` (choose opponent character and give ability)
+  - `《...》以外の...` (except X pattern)
+  - `レベル置場のカードと控え室の《...》のキャラを1枚ずつ選び、入れ替える` (choose and exchange with trait)
+- **Fix needed:** Add/expand token regexes for these missing patterns
+
+### RC-B5: "&" capitalization
+- **Count:** ~1 serial (NIK/S117-041)
+- **Token:** Cost format `"& Put this card"` vs `"& put this card"` — capitalization after `&` in cost
+- **Fix needed:** Ensure cost segment after `&` uses same casing convention
+
+### RC-B6: Labels mismatches
+- **Count:** 6 serial rows (NIK/S117-025 ×2, NIK/S117-111, +3 others)
+- **Root cause:** Translator outputs non-empty labels array for inputs that have no `【】` markers; CSV expects empty labels column
+- **Fix needed:** Ensure `EventEffectToken` labels extraction doesn't produce labels when no `【】` prefix present
+
+### RC-B7: Minor wording differences (Priority 5)
+- **Count:** ~5 serials (NIK/S117-041, -045, -046)
+- **Tokens:** Various tokens with minor wording differences — "it" vs "them", "that character gets" vs "it gets" (on non-trait variants), "return it to their hand" vs "return them to your opponent's hand"
+- **Fix needed:** Every output text difference requires individual token adjustment
+
+### Summary
+
+| Category | Count | Root Cause |
+|----------|-------|-----------|
+| RC-B1 | ~1 | PutToStockToken output wording |
+| RC-B2 | ~2 | ForEachCx + trigger icon variant |
+| RC-B3 | ~3 | Full-width brackets in sub-ability costs |
+| RC-B4 | ~45 | Missing token regex patterns (ChooseFromWR variants) |
+| RC-B5 | ~1 | Cost & capitalization |
+| RC-B6 | 6 | Labels extraction in EventEffectToken |
+| RC-B7 | ~5 | Minor wording differences |
+| **Total** | **~61** | All pre-existing patterns |

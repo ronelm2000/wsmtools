@@ -161,7 +161,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                 abilityForEffect = char.ToLower(abilityForEffect[0]) + abilityForEffect[1..];
             }
             effectText += $" {abilityForEffect}";
-            if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith('"'))
+            if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith('"') && !abilityForEffect.EndsWith(']'))
                 effectText += ".";
         }
 
@@ -316,7 +316,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         if (sentenceTexts.Count == 0) return "";
 
         var trimmed = sentenceTexts.Select(s => {
-            if (s.Length >= 2 && s[^1] == '.' && s[^2] == '"') return s;
+            if (s.Length >= 2 && s[^1] == '.' && (s[^2] == '"' || s[^2] == ']')) return s;
             return s.TrimEnd('.');
         }).ToList();
         var joined = string.Join(". ", trimmed);

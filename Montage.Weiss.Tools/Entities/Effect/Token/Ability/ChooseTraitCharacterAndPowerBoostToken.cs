@@ -16,7 +16,7 @@ internal class ChooseTraitCharacterAndPowerBoostToken : CardTextToken<List<CardE
         [
             new CardEffectAbility
             {
-                AbilityText = $"choose {count} of your {otherText}<<{trait}>> characters, and that character gets +{power} power until end of turn"
+                AbilityText = $"choose {count} of your {otherText}<<{trait}>> characters, and it gets +{power} power until end of turn"
             }
         ];
     }

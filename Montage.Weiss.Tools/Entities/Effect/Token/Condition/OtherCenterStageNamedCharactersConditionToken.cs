@@ -7,14 +7,14 @@ internal class OtherCenterStageNamedCharactersConditionToken : CardTextToken<Lis
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var name1 = Regex.Replace(match.Groups[1].Value, @"[\u201c\u201d\u0022]", "");
-        var name2 = Regex.Replace(match.Groups[2].Value, @"[\u201c\u201d\u0022]", "");
+        var name1 = match.Groups[1].Value;
+        var name2 = match.Groups[2].Value;
         return
         [
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = $"you have another {name1} and {name2} in your center stage",
+                ConditionText = $"you have another \"{name1}\" and \"{name2}\" in your center stage",
                 Conjunction = ConditionConjunction.And
             }
         ];

@@ -87,6 +87,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new DrawPhaseStartConditionToken());
         _conditionListRegistry.Register(new NoColorCardsInLevelConditionToken());
         _conditionListRegistry.Register(new XEqualsConditionToken());
+        _conditionListRegistry.Register(new IfAddedToHandConditionToken());
+        _conditionListRegistry.Register(new IfCxAmongThoseCardsConditionToken());
 
         // Register ability tokens (most to least specific)
         _effectListRegistry.Register(new StockCostWithPutCardFromHandToWaitingRoomToken());
@@ -229,6 +231,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new IfYouDoToken());
         _effectListRegistry.Register(new PutBottomOfStockToWaitingRoomToken());
         _effectListRegistry.Register(new PutThatCharacterToStockToken());
+        _effectListRegistry.Register(new ChooseOpponentCharWithLevelHigherAndPutToMemoryToken());
+        _effectListRegistry.Register(new ChooseOpponentCenterStageLevelXOrLowerCharToWrToken());
         _effectListRegistry.Register(new MoveToOpenPositionToken());
         _effectListRegistry.Register(new ShuffleDeckToken());
         _effectListRegistry.Register(new BackupPrefixToken());

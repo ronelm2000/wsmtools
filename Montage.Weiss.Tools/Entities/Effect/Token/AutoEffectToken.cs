@@ -110,7 +110,9 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 
         // Use MultiClauseEffectParser.Parse for multi-sentence condition + ability parsing
         var parsedList = MultiClauseEffectParser.Parse(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
-        var allConditions = parsedList.SelectMany(p => p.Conditions).ToList();
+        // Only first sentence's conditions are used globally; subsequent sentences
+        // have per-sentence conditions handled in JoinAbilityPartsFromSentences
+        var allConditions = parsedList.Count > 0 ? parsedList[0].Conditions : [];
 
         // Log warnings for any sentence with unmatched remaining text
         foreach (var p in parsedList)
@@ -176,7 +178,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             Labels = finalLabels,
             PreConditionText = string.Empty,
             PostConditionText = string.Empty,
-            ConditionText = conditionEnglish,
+            ConditionText = conditions.AggregateToString(),
             Condition = conditions,
             CostText = costEnglish,
             Cost = costAbilities,
@@ -245,6 +247,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
     internal static string JoinAbilityPartsFromSentences(List<ParsedSentence> sentences)
     {
         var sentenceTexts = new List<string>();
+        bool isFirstSentence = true;
         foreach (var ps in sentences)
         {
             var abilities = ps.Abilities;
@@ -252,10 +255,20 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 
             if (abilities.Count == 0 && postConditions.Count == 0) continue;
 
+            // For sentences after the first, include per-sentence main conditions
+            string perSentenceCondition = "";
+            if (!isFirstSentence)
+            {
+                var mainConds = ps.Conditions.Where(c => c.Type != ConditionType.PostCondition).ToList();
+                if (mainConds.Count > 0)
+                    perSentenceCondition = mainConds.AggregateToString() + ", ";
+            }
+            isFirstSentence = false;
+
             string result;
             if (abilities.Count > 0)
             {
-                result = abilities[0].AbilityText;
+                result = perSentenceCondition + abilities[0].AbilityText;
                 for (int i = 1; i < abilities.Count; i++)
                 {
                     var prefix = abilities[i].Prefix;

@@ -15,19 +15,20 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 /// </remarks>
 internal class BattleOpponentLevelConditionToken : CardTextToken<List<CardEffectCondition>>
 {
-    public override Regex Matcher => new(@"^このカードのバトル相手のレベルが (\d+ 以下 |0 以下| 相手のレベルより高い)");
+    public override Regex Matcher => new(@"^このカードのバトル相手のレベルが\s*(?:\d+\s*以下|0\s*以下|相手のレベルより高い)なら");
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
         if (match.Success)
         {
-            var condition = match.Groups[1].Value;
-            var conditionText = condition switch
+            var matchedValue = match.Value;
+            var conditionText = matchedValue switch
             {
-                "0 以下" => "If this card's battle opponent is level 0 or lower",
-                "相手のレベルより高い" => "If this card's battle opponent's level is higher than your level",
-                _ => $"If this card's battle opponent is level {condition}"
+                _ when matchedValue.Contains("0") && matchedValue.Contains("以下") => "this card's battle opponent is level 0 or lower",
+                _ when Regex.IsMatch(matchedValue, @"\d+\s*以下") => $"this card's battle opponent is level {Regex.Match(matchedValue, @"\d+").Value} or lower",
+                _ when matchedValue.Contains("相手のレベルより高い") => "the level of this card's battle opponent is higher than your opponent's level",
+                _ => "this card's battle opponent's level is higher"
             };
             return
             [

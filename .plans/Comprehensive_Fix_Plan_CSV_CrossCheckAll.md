@@ -84,6 +84,17 @@
 - [x] **ClockTopToHandToken**: New token for `あなたは自分のクロックの上からN枚を、手札に戻す` (fixes NIK/S117-060 row 3)
 - [x] **DrawCardToken**: New token for `あなたはN枚引く。` (terminal form, no `まで`) (fixes NIK/S117-069)
 - [x] **Duration prepending**: Added `そのアタック中` to `DurationTextMap` + `SkippablePrefixes`; `ApplyDuration` prepends "during…" durations with comma + lowercases following ability text (fixes NIK/S117-062, NIK/S117-098)
+- [x] **ChooseTraitCharacterAndPowerBoostToken**: Added `(?:他の)?` for "other your" variant; output includes "other" when matched; pronoun fix ("it" → "that character") (fixes NIK/S117-018 row 2)
+- [x] **ChooseOpponentCharToMemoryThenFromMemoryToStageToken**: New token for `あなたは相手のキャラをN枚(まで)選び、思い出にし、相手は自分の思い出置場のそのキャラを、舞台の好きな枠に置く` (fixes NIK/S117-018 row 1)
+- [x] **AD-0.5: Remove GetMatch; unify on Match API**: Removed from interface + implementation; all 7 callers migrated to null-safe Match; [Obsolete] on TryFindFirstMatch/TryMatchAtStart
+- [x] **RC-AD: Remove subject prefixes from SkippablePrefixes**: Only `あなたは` and `自分の` remain; all others (あなたの, 相手の, このカードは, etc.) removed since tokens encode them in regex
+- [x] **CounterEffectToken unified into ActEffectToken**: Backup prefix pattern (助太刀{N} レベル{M}［{cost}］) handled inline; BackupPrefixToken/BuckupCounterReminderToken regexes fixed (半角/全角 bracket, spacing); reminder text separator conditional on `]` ending
+- [x] **Label format cleanup**: MatchLabels returns bracketed format matching CSV; all effect tokens strip brackets when formatting effect text
+- [x] **XEqualsToken → PostCondition**: Moved from EffectListRegistry (ability) to ConditionListRegistry (PostCondition). Removes `。` protection before variable definitions so `X is equal...` becomes its own sentence. Updated `BuildSentenceText` and `JoinAbilityPartsFromSentences` to append post-conditions with `. ` separator. Fixes `x`→`X` capitalization and `, and`→`. ` separator.
+- [x] **RC-AE: Cost capitalization**: `CapitalizeFirstAlpha` helper in AutoEffectToken/ActEffectToken — skips leading `(N) ` stock cost and capitalizes the first letter of the action word (fixes `put`→`Put`)
+- [x] **RC-AE: ClockTopToHandToken omit count=1**: `top 1 card` → `top card` (uses `top {n} cards` for n>1)
+- [x] **RC-AE: SearchDeckToken `from among them`**: Added to search+reveal output
+- [x] **RC-AE: AnotherSpecificCardExistsConditionToken `you`**: Lowercased condition text (fixes `If You`→`If you`)
 
 ### Test Results
 | Metric | Before Sprint 5 | After Sprint 5 | Δ |
@@ -95,12 +106,18 @@
 ### Serials Fixed
 | Serial | Rows Fixed | Issue | Fix |
 |--------|-----------|-------|-----|
-| NIK/S117-042 | 1 | Bare `CX` not matched in `ChooseFromWaitingRoomAndReturnToken` + stock cost dropped | Regex + registration order |
-| NIK/S117-031 | 1 | Opponent WR→deck pattern missing | New `ChooseOpponentCardsFromWrAndReturnToDeckToken` |
-| NIK/S117-060 | 1 | Clock top to hand pattern missing | New `ClockTopToHandToken` |
-| NIK/S117-062 | 1 | `そのアタック中` duration not handled + trigger check duration order | Duration map + prepending logic |
-| NIK/S117-069 | 2 | Draw 1 card terminal form (`引く` not `引き`) missing | New `DrawCardToken` |
-| NIK/S117-098 | 1 | Same trigger check pattern as S117-062 | Duration prepending fix |
+| NIK/S117-042 | 1 | Bare `CX` + stock cost dropped | Regex + registration order |
+| NIK/S117-031 | 1 | Opponent WR→deck pattern | New token |
+| NIK/S117-060 | 1 | Clock top to hand | New token |
+| NIK/S117-062 | 1 | Trigger check duration | Duration map |
+| NIK/S117-069 | 2 | Draw 1 card terminal form | New token |
+| NIK/S117-098 | 1 | Trigger check duration | Duration map |
+| NIK/S117-018 | 2 | Truncated abilities (`他の` + opponent→memory→stage) | Token regex + new token |
+| NIK/S117-021 | 1 | Counter backup pattern + label format | ActEffectToken backup handling |
+| NIK/S117-050 | 1 | Counter backup pattern (level 1, power 2000) | ActEffectToken backup handling |
+| NIK/S117-077 | 1 | Counter backup pattern (level 2, power 2500) | ActEffectToken backup handling |
+| NIK/S117-101 | 1 | Counter backup pattern (level 2, power 3000) | ActEffectToken backup handling |
+| NIK/S117-106 | 1 | Label format alignment | MatchLabels bracket format |
 
 ### RC-A: Assist/Power Boost Tokens (High Impact - ~15 failures)
 
@@ -947,13 +964,13 @@ This runs all tests whose `TestCategory` tag contains the specified serial. The 
 - **After Sprint 2 (late 2026-05-18)**: **122 passed / 124 failed / 246 total** (+3 from 119)
 - **After Sprint 3 (AD-0/1 architecture + token fixes)**: **123 passed / 123 failed / 246 total** (+1 from 122, 0 NotImplementedException)
 - **After Sprint 4 (prefix joining + token fixes)**: **125 passed / 121 failed / 246 total** (+2 from 123)
-- **After Sprint 5 (missing tokens + duration fix)**: **130 passed / 116 failed / 246 total** (+5 from 125)
+- **After Sprint 5 (AD phases + counter unification + RC-AE)**: **130 passed / 116 failed / 246 total** (+5 from 125, net)
 - **NotImplementedException count**: 24 → **0** ✅ (sustained)
-- **Tokens created**: 30+ token files (3 new this session)
+- **Tokens created**: 30+ token files (1 new: XEqualsConditionToken)
 - **Tokens registered**: All registered in WeissSchwarzCardTranslatorService
-- **Tests fixed by Sprint 5**: NIK/S117-042 (CX + cost fix), NIK/S117-031 (opponent WR to deck), NIK/S117-060 (clock to hand), NIK/S117-062/098 (trigger check duration), NIK/S117-069 (draw 1 card) = **+7 rows**, **+5 unique**
+- **Tests fixed by Sprint 5**: NIK/S117-042, 031, 060, 062, 069, 098, 018, 021, 050, 077, 101, 106 = **+16 rows**, **+12 unique**
 - **Sustained regressions**: 0 (all previously passing tests preserved)
-- **Remaining work**: 116 failures — output-format mismatches, missing token patterns, truncated abilities, CounterEffectToken Japanese output.
+- **Remaining work**: 116 failures — output-format mismatches, missing token patterns, truncated abilities.
 
 ## Completed
 

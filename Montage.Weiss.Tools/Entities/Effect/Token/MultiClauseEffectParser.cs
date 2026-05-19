@@ -248,6 +248,8 @@ public static class MultiClauseEffectParser
         var protectedInput = Regex.Replace(input, @"『[^』]+』", m => m.Value.Replace("。", "\0"));
         protectedInput = Regex.Replace(protectedInput, @"〔[^〕]+〕", m => m.Value.Replace("。", "\0"));
         // Protect `。` before `『』` — nested ability text belongs to the preceding sentence
+        // Also protect `。` before `』` (inside 『』 blocks, content may have its own 。)
+        protectedInput = Regex.Replace(protectedInput, @"。」|。』", m => m.Value.Replace("。", "\0"));
         protectedInput = Regex.Replace(protectedInput, @"。(?=『[^』]+』)", m => "\0");
         protectedInput = Regex.Replace(protectedInput, @"コストを払ってよい。", m => m.Value.Replace("。", "\0"));
         // Protect `。` before `そうしたら` — cascade/clause connectors (after specific patterns like コストを払ってよい)

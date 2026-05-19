@@ -176,28 +176,13 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
 
     private static bool TryMatchAbility(ITokenRegistry registry, string japanese, out string? result)
     {
-        // Skip known lead-in prefixes before matching (same as ParseSentence)
-        var trimmed = japanese.TrimStart();
-        string? pendingDuration = null;
-        foreach (var prefix in MultiClauseEffectParser.SkippablePrefixes)
-        {
-            if (trimmed.StartsWith(prefix, StringComparison.Ordinal))
-            {
-                if (MultiClauseEffectParser.DefaultPrefixMap.Prefixes.TryGetValue(prefix, out var p)
-                    && p == AbilityPrefix.Subject)
-                {
-                }
-                trimmed = trimmed[prefix.Length..].TrimStart('、', ' ', '\t');
-                break;
-            }
-        }
-
-        var matchResult = registry.EffectListRegistry.Match(trimmed.AsMemory());
+        // Only try index-0 match. Prefix skipping with duration tracking is handled by ParseSentence.
+        var matchResult = registry.EffectListRegistry.Match(japanese.TrimStart().AsMemory());
         if (matchResult != null)
         {
             var abils = matchResult.Translate(registry);
             result = string.Join(", ", abils.Select(a => a.AbilityText));
-            var remaining = trimmed[matchResult.Match.Length..].TrimStart('、', '。', ' ', '\t');
+            var remaining = japanese.TrimStart()[matchResult.Match.Length..].TrimStart('、', '。', ' ', '\t');
             if (!string.IsNullOrEmpty(remaining))
             {
                 var restResult = TryTranslateNested(registry, remaining);

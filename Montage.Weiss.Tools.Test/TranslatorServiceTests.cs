@@ -555,7 +555,8 @@ public class TranslatorServiceTests
             using var reader = new StreamReader(csvPath);
             var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                MissingFieldFound = null
+                MissingFieldFound = null,
+                BadDataFound = null
             };
             using var csv = new CsvReader(reader, config);
             var rows = csv.GetRecords<EffectCsvRow>()

@@ -108,6 +108,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new WhenYouUseActConditionToken());
         _conditionListRegistry.Register(new YourAttackPhaseStartConditionToken());
         _conditionListRegistry.Register(new NoRestCharacterInCenterStageConditionToken());
+        _conditionListRegistry.Register(new CatchAllConditionToken());
 
         // Register ability tokens (most to least specific)
         _effectListRegistry.Register(new StockCostWithPutCardFromHandToWaitingRoomToken());

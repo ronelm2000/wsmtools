@@ -1,3 +1,5 @@
+using Montage.Weiss.Tools.Entities.Effect.Token.Ability;
+
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 public record LeadInPrefixMap(
@@ -192,7 +194,10 @@ public static class MultiClauseEffectParser
 
             if (!prefixSkipped)
             {
-                Log.Debug("ParseSentence: no prefix to skip nor fallback match, breaking. remaining='{Remaining}'", trimmed);
+                Log.Debug("ParseSentence: no prefix to skip nor fallback match, using CatchAllAbilityToken. remaining='{Remaining}'", trimmed);
+                var sentinelAbilities = new CatchAllAbilityToken().Translate(registry, trimmed.AsMemory());
+                abilities.AddRange(sentinelAbilities);
+                remainingText = "";
                 break;
             }
         }

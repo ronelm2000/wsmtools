@@ -17,6 +17,7 @@ public record CardEffectCondition
     public required ConditionType Type { get; init; }
     public required string ConditionText { get; init; }
     public ConditionConjunction Conjunction { get; init; } = ConditionConjunction.And;
+    public bool IsUnmatched { get; init; } = false;
 }
 
 public static class CardEffectConditionExtensions {

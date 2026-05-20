@@ -174,6 +174,34 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         if (hasEncore)
             finalLabels = [.. finalLabels, "Encore"];
 
+        var abilities = parsedList.SelectMany(p => p.Abilities).ToList();
+        var unmatchedConditions = conditions.Where(c => c.IsUnmatched).ToList();
+        var unmatchedAbilities = abilities.Where(a => a.IsUnmatched).ToList();
+        var unmatchedCosts = costAbilities.Where(a => a.IsUnmatched).ToList();
+
+        if (unmatchedConditions.Count > 0 || unmatchedAbilities.Count > 0 || unmatchedCosts.Count > 0)
+        {
+            var result = new AutoCardEffect
+            {
+                Labels = finalLabels,
+                PreConditionText = string.Empty,
+                PostConditionText = string.Empty,
+                ConditionText = conditions.AggregateToString(),
+                Condition = conditions,
+                CostText = costEnglish,
+                Cost = costAbilities,
+                Abilities = abilities,
+                AbilityText = abilityEnglish,
+                EffectText = effectText,
+                TokenLog = tokenLog
+            };
+            Log.Debug("AutoEffectToken: full result = {@Result}", result);
+            throw new NotImplementedException(
+                $"Unrecognized [condition(s): {string.Join(" / ", unmatchedConditions.Select(c => c.ConditionText))}]" +
+                $"[ability(ies): {string.Join(" / ", unmatchedAbilities.Select(a => a.AbilityText))}]" +
+                $"[cost(s): {string.Join(" / ", unmatchedCosts.Select(a => a.AbilityText))}]");
+        }
+
         return new AutoCardEffect
         {
             Labels = finalLabels,
@@ -183,7 +211,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             Condition = conditions,
             CostText = costEnglish,
             Cost = costAbilities,
-            Abilities = parsedList.SelectMany(p => p.Abilities).ToList(),
+            Abilities = abilities,
             AbilityText = abilityEnglish,
             EffectText = effectText,
             TokenLog = tokenLog

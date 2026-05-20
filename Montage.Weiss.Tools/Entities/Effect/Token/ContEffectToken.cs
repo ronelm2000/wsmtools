@@ -103,12 +103,35 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith('"') && !abilityForEffect.Contains("get the following abilities"))
             effectText += ".";
 
+        var abilities = parsedList.SelectMany(p => p.Abilities).ToList();
+        var unmatchedConditions = conditions.Where(c => c.IsUnmatched).ToList();
+        var unmatchedAbilities = abilities.Where(a => a.IsUnmatched).ToList();
+
+        if (unmatchedConditions.Count > 0 || unmatchedAbilities.Count > 0)
+        {
+            var result = new ContCardEffect
+            {
+                Labels = labels.ToArray(),
+                ConditionText = conditionEnglish,
+                Condition = conditions,
+                Abilities = abilities,
+                AbilityText = abilityEnglish,
+                EffectText = effectText,
+                TokenLog = tokenLog
+            };
+            Log.Debug("ContEffectToken: full result = {@Result}", result);
+            throw new NotImplementedException(
+                $"Unrecognized [condition(s): {string.Join(" / ", unmatchedConditions.Select(c => c.ConditionText))}]" +
+                (unmatchedConditions.Count > 0 && unmatchedAbilities.Count > 0 ? " | " : "") +
+                $"[ability(ies): {string.Join(" / ", unmatchedAbilities.Select(a => a.AbilityText))}]");
+        }
+
         return new ContCardEffect
         {
             Labels = labels.ToArray(),
             ConditionText = conditionEnglish,
             Condition = conditions,
-            Abilities = parsedList.SelectMany(p => p.Abilities).ToList(),
+            Abilities = abilities,
             AbilityText = abilityEnglish,
             EffectText = effectText,
             TokenLog = tokenLog

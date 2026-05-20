@@ -20,6 +20,7 @@ public record CardEffectAbility : ICardAbility
 {
     public virtual required string AbilityText { get; init; }
     public AbilityPrefix Prefix { get; init; } = AbilityPrefix.And;
+    public bool IsUnmatched { get; init; } = false;
 
     public static CardEffectAbility operator +(CardEffectAbility a, CardEffectAbility b)
     {

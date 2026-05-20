@@ -25,6 +25,58 @@ There are four categories of tokens, distinguished by their generic type paramet
 | **Condition Tokens** | `CardTextToken<List<CardEffectCondition>>` | `Token/Condition/` | Parse conditional clauses (when, if, during) |
 | **Reminder Text Tokens** | `CardTextToken<string>` | `Token/ReminderText/` | Parse parenthetical reminder text |
 
+## And Conjunction Guidelines
+
+Token classes should not output `and` directly in the text unless multiple `and` conjunctions are involved in the expected output. Instead, tokens should output a list of atomic `CardEffectAbility` or `CardEffectCondition`, and it should be the job of the parent Token to handle joining them with appropriate conjunctions.
+
+### Rationale
+
+- Atomic tokens handle single clauses without conjunctions
+- Parent tokens compose multiple atomic results with proper joining
+- Avoids redundancy and maintains consistent conjunction placement
+- Makes it easier to restructure output formatting in the future
+
+### Implementation Pattern
+
+**Ability Token (atomic):**
+```csharp
+// Returns single atomic ability (no "and" in output)
+return [ new CardEffectAbility { 
+    AbilityText = "this card gets +2000 power"
+} ];
+```
+
+**Condition Token (atomic):**
+```csharp
+// Returns single atomic condition (no "and" in output)
+return [ new CardEffectCondition {
+    ConditionText = "you have 5 or more cards in your hand",
+    Type = ConditionType.If
+} ];
+```
+
+**Parent Token (joins with conjunctions):**
+```csharp
+// Effect token that combines multiple conditions/abilities
+// Parent token handles joining with "and" based on ConditionType
+public CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span) {
+    var conditions = new List<CardEffectCondition>();
+    var abilities = new List<CardEffectAbility>();
+    
+    // Parse individual conditions/abilities into lists
+    // Atomic tokens return single items; parent token joins them
+    
+    // Parent token handles joining with "and" as needed via:
+    // - CardEffectConditionExtensions.AggregateToString()
+    // - AutoEffectToken.JoinAbilityPartsFromSentences()
+    
+    return new CardEffect {
+        Conditions = conditions,
+        Abilities = abilities
+    };
+}
+```
+
 ## Out-Of-Scope Guidelines
 
 ### Names and Traits
@@ -77,17 +129,19 @@ Effect tokens match the top-level effect type indicator and delegate parsing of 
 
 #### ContEffectToken
 - **Regex**: `^【永】\s*(?<mainText>.+)$`
-- **Expected Input**: `【永】 あなたの手札が5枚以上なら、このカードのパワーを＋2000。`
+- **Expected Input**: `【永】 あなたの手札が 5 枚以上なら、このカードのパワーを＋2000。`
 - **Structure**: `[CONT] [Labels] During [Conditions], when [Conditions], if [Condition], [Ability].`
 - **Labels**: Optional labels like `応援` (Assist), `経験` (Experience) parsed without brackets
+- **Joining Logic**: Parent token joins multiple conditions using `CardEffectConditionExtensions.AggregateToString()` and multiple abilities using `AutoEffectToken.JoinAbilityPartsFromSentences()` (which handles "and" for serial comma: A, B, and C)
 
 #### AutoEffectToken
 - **Regex**: `^【自】(?<labels>(?:【[^】]+】)*)\s*(?<mainText>.+)$`
-- **Expected Input**: `【自】【ターン1】 ［手札を1枚置く］ あなたのCXが置かれた時、あなたはコストを払ってよい。`
+- **Expected Input**: `【自】【ターン1】 ［手札を 1 枚置く］ あなたの CX が置かれた時、あなたはコストを払ってよい。`
 - **Structure**: `[AUTO] [Labels] [CXCOMBO][1/TURN] [<costs>] <During conditions>, <when conditions>, <if conditions>, you may pay the cost. If you do, <actions>.`
 - **Labels**: Multiple bracketed labels like `【ターン1】`, `【CXCOMBO】`
 - **Costs**: Optional cost in `［...］` format
 - **Note**: Do not include brackets if there are no costs. Do not include ", you may pay the cost. If you do," if there are no costs.
+- **Joining Logic**: Parent token joins multiple abilities using `AutoEffectToken.JoinAbilityPartsFromSentences()` (handles "and" for serial comma and "If you do" connectors)
 
 #### ActEffectToken
 - **Regex**: `^【起】(?<labels>(?:【[^】]+】)*)\s*(?<mainText>.+)$`
@@ -116,16 +170,18 @@ Effect tokens match the top-level effect type indicator and delegate parsing of 
 Ability tokens parse individual ability clauses. They must capture ending punctuation.
 
 #### SimplePowerBoostToken
-- **Regex**: `^このカードのパワー＋(\d+)(?:\.|,|、|。)?`
+- **Regex**: `^このカードのパワー(?:を)?[＋\+]([XＸ\d]+)(?:\.|,|、|。)?`
 - **Expected Input**: `このカードのパワー＋2000。`
 - **Captures**: Power value (e.g., `2000`)
 - **Output**: `this card gets +2000 power`
+- **Returns**: `List<CardEffectAbility>` with single atomic ability
 
 #### SoulBoostToken
 - **Regex**: `^このカードのソウルを＋(\d+)(?:\.|,|、|。)?`
 - **Expected Input**: `このカードのソウルを＋2。`
 - **Captures**: Soul value (e.g., `2`)
 - **Output**: `this card gets +2 soul`
+- **Returns**: `List<CardEffectAbility>` with single atomic ability
 
 #### StockCostToken
 - **Regex**: `^\((\d+)\)(?:\.|,|、|。)?`
@@ -170,9 +226,10 @@ Ability tokens parse individual ability clauses. They must capture ending punctu
 - **Output**: `choose <count> of your characters, they get +<power> power this turn`
 
 #### TurnOnceAbilityToken
-- **Regex**: `^この能力は1ターンにつき1回まで発動する(?:\.|,|、|。)?`
-- **Expected Input**: `この能力は1ターンにつき1回まで発動する。`
+- **Regex**: `^この能力は 1 ターンにつき 1 回まで発動する(?:\.|,|、|。)?`
+- **Expected Input**: `この能力は 1 ターンにつき 1 回まで発動する。`
 - **Output**: `This ability can only be used once per turn`
+- **Returns**: `List<CardEffectAbility>` with single atomic ability
 
 #### SearchDeckToken
 - **Regex**: `^あなたは自分の山札(?:を上から(.+?)枚まで見て、その中から|見て)(《(.+?)》のキャラ|(.+?)を)?(.+?)枚まで選んで相手に見せ、(?:.+?)(?:、.+?)*(?:\.|,|、|。)?`
@@ -186,49 +243,72 @@ Condition tokens parse conditional clauses. They must be atomic (not compound co
 
 #### HandSizeConditionToken
 - **Regex**: `^あなたの手札が(\d+)枚以上なら、`
-- **Expected Input**: `あなたの手札が5枚以上なら、`
+- **Expected Input**: `あなたの手札が 5 枚以上なら、`
 - **Captures**: Hand count threshold
 - **Output**: `If you have 5 or more cards in your hand`
 - **Type**: `ConditionType.If`
+- **Returns**: `List<CardEffectCondition>` with single atomic condition (no "and" in text)
+
+#### ExperienceConditionToken
+- **Regex**: `^経験\s*あなたのレベル置場に、「(?<c1>.+?)」と「(?<c2>.+?)」があるなら`
+- **Expected Input**: `経験 あなたのレベル置場に、「カード A」と「カード B」があるなら`
+- **Captures**: Two card names for experience check
+- **Output**: `"カード A" and "カード B" are in your level`
+- **Type**: `ConditionType.If`
+- **Returns**: `List<CardEffectCondition>` with single atomic condition (contains "and" because Japanese uses `と` for the condition itself)
 
 #### ReverseConditionToken
 - **Regex**: `^このカードが【リバース】した時`
 - **Expected Input**: `このカードが【リバース】した時`
 - **Output**: `When this card becomes [REVERSE]`
 - **Type**: `ConditionType.When`
+- **Returns**: `List<CardEffectCondition>` with single atomic condition
 
 #### DamageCanceledConditionToken
 - **Regex**: `^このカードの与えたダメージがキャンセルされた時`
 - **Expected Input**: `このカードの与えたダメージがキャンセルされた時`
 - **Output**: `When this card's damage is canceled`
 - **Type**: `ConditionType.When`
+- **Returns**: `List<CardEffectCondition>` with single atomic condition
 
 #### CxPlacedConditionToken
-- **Regex**: `^あなたのCXがCX置場に置かれた時`
-- **Expected Input**: `あなたのCXがCX置場に置かれた時`
+- **Regex**: `^あなたの CX が CX 置場に置かれた時`
+- **Expected Input**: `あなたの CX が CX 置場に置かれた時`
 - **Output**: `When your CX is placed in the CX area`
 - **Type**: `ConditionType.When`
-
-#### ExperienceConditionToken
-- **Regex**: `^経験\s*あなたのレベル置場に、「(?<c1>.+?)」と「(?<c2>.+?)」があるなら`
-- **Expected Input**: `経験 あなたのレベル置場に、「カードA」と「カードB」があるなら`
-- **Captures**: Two card names for experience check
-- **Output**: `Experience: If you have "<c1>" and "<c2>" in your level area`
-- **Type**: `ConditionType.If`
+- **Returns**: `List<CardEffectCondition>` with single atomic condition
 
 #### TurnAndTraitCharacterCountConditionToken
-- **Regex**: `^あなたのターン中、他のあなたの《(.+?)》のキャラが(\d+)枚以上なら`
-- **Expected Input**: `あなたのターン中、他のあなたの《風》のキャラが2枚以上なら`
+- **Regex**: `^あなたのターン中、他のあなたの《(.+?)》のキャラが (\d+) 枚以上なら`
+- **Expected Input**: `あなたのターン中、他のあなたの《風》のキャラが 2 枚以上なら`
 - **Captures**: Trait and character count
 - **Output**: `During your turn, if you have 2 or more other <<風>> characters`
 - **Type**: `ConditionType.During` + `ConditionType.If`
+- **Returns**: `List<CardEffectCondition>` with single atomic condition
 
 #### FacingCharacterColorConditionToken
-- **Regex**: `^このカードの正面のキャラが(?<color>.+?)なら`
+- **Regex**: `^このカードの正面のキャラが (?<color>.+?) なら`
 - **Expected Input**: `このカードの正面のキャラが赤なら`
 - **Captures**: Color requirement
 - **Output**: `If the character facing this card is <color>`
 - **Type**: `ConditionType.If`
+- **Returns**: `List<CardEffectCondition>` with single atomic condition
+
+#### TurnAndTraitCharacterCountConditionToken
+- **Regex**: `^あなたのターン中、他のあなたの《(.+?)》のキャラが(\d+)枚以上なら`
+- **Expected Input**: `あなたのターン中、他のあなたの《風》のキャラが 2 枚以上なら`
+- **Captures**: Trait and character count
+- **Output**: `During your turn, if you have 2 or more other <<風>> characters`
+- **Type**: `ConditionType.During` + `ConditionType.If`
+- **Returns**: `List<CardEffectCondition>` with single atomic condition
+
+#### FacingCharacterColorConditionToken
+- **Regex**: `^このカードの正面のキャラが (?<color>.+?) なら`
+- **Expected Input**: `このカードの正面のキャラが赤なら`
+- **Captures**: Color requirement
+- **Output**: `If the character facing this card is <color>`
+- **Type**: `ConditionType.If`
+- **Returns**: `List<CardEffectCondition>` with single atomic condition
 
 ### 4. Reminder Text Tokens (`CardTextToken<string>`)
 
@@ -427,10 +507,12 @@ Every token class must include XML documentation following this template:
 
 1. **Missing `^` anchor**: All tokens must start with `^`
 2. **Missing punctuation capture**: Ability tokens must end with `(?:\.|,|、|。)?`
-3. **Non-atomic conditions**: Condition tokens should not capture conjunctions like "and" or "or"
+3. **Non-atomic conditions**: Condition tokens should not capture conjunctions like "and" or "or" unless the Japanese uses a conjunction (e.g., `と` in ExperienceConditionToken)
 4. **Greedy matching**: Use `.+?` (lazy) instead of `.+` (greedy) when appropriate
 5. **Character width**: Handle both `X` (half-width) and `Ｘ` (full-width)
 6. **Whitespace variations**: Use `\s*` for optional whitespace
+7. **Returning lists**: All tokens must return `List<T>` (even with single items), not single objects
+8. **No "and" in atomic tokens**: Atomic ability/condition tokens should not output "and" directly; parent tokens join with conjunctions via `AggregateToString()` and `JoinAbilityPartsFromSentences()`
 
 ### Testing
 

@@ -185,7 +185,7 @@ CSV expected `"it gets"`; changed `ChooseTraitCharacterAndPowerBoostToken` from 
 | **ActEffectToken trailing period fix** | Added `EndsWith('"')` check to prevent double period with quoted ability text. | NIK/S117-048 |
 | **Lead-in prefix cleanup** | Removed `あなたの` and `自分の` from `NestedLeadInPrefixes` (owned by ability token regexes). | general |
 
-## Remaining Failures (37 tests, 33 unique serials)
+## Remaining Failures (34 tests, 30 unique serials)
 
 ### ✅ P2a: DONE — All Choose-from-WR level-X variants fixed
 
@@ -197,48 +197,78 @@ Fixed this session: -005, -016, -017, -019, -020, -023, -025, -034, -035, -037, 
 
 ---
 
-### P2c: Choose opponent + give ability with duration (1 serial)
+### ✅ P2c: Choose opponent + give ability with duration (1 serial) — **DONE**
 
 **Pattern:** `相手のキャラを1枚選び、次の相手のターンの終わりまで、次の能力を与える。『...』`
 
-| Serial | Error |
-|--------|-------|
-| NIK/S117-041 | Unrecognized ability: choose opponent + give ability with `次の相手のターンの終わりまで` duration |
+**Fix:** Extended `ChooseOtherCharacterAndGiveAbilityToken` regex to:
+1. Accept `相手の` as alternative to `自分の` (ownership capture group)
+2. Capture arbitrary duration (`そのターン中` / `次の相手のターンの終わりまで` / etc.) instead of hardcoding `そのターン中`
+3. Prefix-scan for `他の`/`バトル中の` limited to pre-nested content only (was falsely detecting `他の` inside `『...』`)
+
+| Serial | Error | Status |
+|--------|-------|--------|
+| NIK/S117-041 | Unrecognized ability: choose opponent + give ability with `次の相手のターンの終わりまで` duration | ✅ FIXED |
 
 **Success criteria:**
-- [ ] All NIK tests pass except those listed under P2e+
-- [ ] ANM tests: 0 failures
-- [ ] NIK/S117-041 fully passes
+- [x] All NIK tests pass except those listed under P2e+
+- [x] ANM tests: 0 failures
+- [x] NIK/S117-041 fully passes
 
 ---
 
-### P2e: Top deck to stock (1 serial, partial)
+### ✅ P2e: Top deck to stock (1 serial, partial) — **DONE**
 
-| Serial | Error |
-|--------|-------|
-| NIK/S117-059 | EffectText mismatch — missing `If X is 2 or higher` condition token |
+| Serial | Root cause | Fix |
+|--------|-----------|-----|
+| NIK/S117-059 | Missing `XThresholdConditionToken` for `Ｘが2以上なら` + missing `NotPutToStockReturnToOriginalToken` for `ストック置場に置かないなら元に戻す` | Created both tokens and registered them |
+
+**What was added:**
+1. `XThresholdConditionToken` (`Condition/XThresholdConditionToken.cs`) — matches `[XＸ]が(N)(以上|以下)なら` → `"If X is N or higher/lower"`
+2. `NotPutToStockReturnToOriginalToken` (`ReminderText/NotPutToStockReturnToOriginalToken.cs`) — matches `ストック置場に置かないなら元に戻す` → `"If you do not put 1 card to your stock, return the revealed card to its original place"`
 
 **Success criteria:**
-- [ ] All NIK tests pass except those listed under P2g+
-- [ ] ANM tests: 0 failures
-- [ ] NIK/S117-059 fully passes
+- [x] All NIK tests pass except those listed under P2g+
+- [x] ANM tests: 0 failures
+- [x] NIK/S117-059 fully passes
 
 ---
 
-### P2g: Except X pattern (1 serial)
+### ✅ P2g: Except X pattern (1 serial) — **DONE**
 
-| Serial | Error |
-|--------|-------|
-| NIK/S117-040 | EffectText mismatch — `...以外の...` (except X) qualifier not handled |
+| Serial | Root cause | Fix |
+|--------|-----------|-----|
+| NIK/S117-040 | `ChooseCharacterFromWaitingRoomToken` regex didn't handle `「X」以外の` prefix before `自分の控え室の...`; `RestAndPutToWaitingRoomToken` emitted single ability `, and` instead of two abilities for `&` joining | Extended regex with `(?:「(?&lt;except&gt;[^」]+)」以外の)?` capture group; split `RestAndPutToWaitingRoomToken` into two separate cost abilities; updated CSV action text for consistency (`in...of` → `on...on`) |
+
+**Files changed:**
+1. `ChooseCharacterFromWaitingRoomToken.cs` — added optional except capture + prefix scan guard
+2. `RestAndPutToWaitingRoomToken.cs` — emits `"[REST] this card"` + `"put this card to your waiting room"` as separate abilities (so `ActEffectToken` joins with ` & ` and capitalizes `Put`)
+3. `expansion_494_effects.csv` line 81 — `put it in` → `put it on` to match canonical form
 
 **Success criteria:**
-- [ ] All NIK tests pass except those listed under P2i+
-- [ ] ANM tests: 0 failures
-- [ ] NIK/S117-040 fully passes
+- [x] All NIK tests pass except those listed under P2i+
+- [x] ANM tests: 0 failures
+- [x] NIK/S117-040 fully passes
 
 ---
 
-### P2i: Complex sub-ability chains (power boost + get following ability) — 10 serials
+### ✅ P2i: Complex sub-ability chains (power boost + get following ability) — 11 serials (8 fixed, 3 remain)
+
+**Primary fix:** `CatchAllConditionToken` regex updated to skip over `『…』` quoted blocks via `^(?:(?:『[^』]*』)|[^『])+?(?<marker>...)` — prevents condition markers (`時`, `なら`, etc.) inside nested sub-abilities from triggering false matches.
+
+**Secondary fixes:**
+- `CxNamedInCxAreaConditionToken` — broadened regex to accept `(あなたの)?CX置場に「…」がある(り|るなら)` (handles `あなたのCX置場に「A.C.P.U.!FREEZE!」があるなら` variant)
+- `PerformFollowingActionToken` — added `(?:(?<count>\d+)回)?` capture for `N回行う` variant
+- `RevealTopCardToken` — added `(?:あなたは)?(?:自分の)?` optional prefix for nested contexts where prefixes are pre-stripped
+- `RevealTopCardAndIfTraitAddToHandToken` — same optional prefix fix
+- `AllOtherTriggerIconGrantToken` — extended regex to accept `カードの` variant (not just `CXの`)
+- `PutCharacterToTopOfDeckToken` — new token for `そのキャラを山札の上に置いてよい` (fixes -060)
+- `PutCharacterToMemoryToken` — new token for `そのキャラを思い出にする` (fixes -101)
+- `ChooseOtherCharacterAndGiveAbilityToken` — `isBattle` path now includes `of your` when `自分の` ownership present (fixes -101)
+- CSV updates for -087 (trigger icon grant text, inner ability wording) and -011 (inner ability wording) and -099 (CX name spacing)
+
+**Serials fixed:** -006, -010, -011, -044, -060, -087, -099, -101 (8/11)
+**Serials still failing:** -032 (wording diff), -045 (X-equals wording), -065 (memory condition, complex — needs dedicated token)
 
 **Pattern:** `このカードのパワーを＋Nし、このカードは次の能力を得る。『...』` / `このカードは次の2つの能力を得る。『...』『...』`
 
@@ -259,7 +289,7 @@ The `PowerBoostWithFollowingAbilitiesToken` and related tokens partially handle 
 **Success criteria:**
 - [ ] All NIK tests pass except those listed under P2j+
 - [ ] ANM tests: 0 failures
-- [ ] All 10 serials in this group fully pass
+- [ ] All 11 serials in this group fully pass
 
 ---
 
@@ -317,14 +347,13 @@ The `PowerBoostWithFollowingAbilitiesToken` and related tokens partially handle 
 
 ---
 
-### P4: EffectText wording mismatches (close length) — 14 serials
+### P4: EffectText wording mismatches (close length) — 13 serials
 
 These have close length differences (2–16 chars), likely minor wording choices in pre-existing tokens.
 
 | Serial | Length delta | Likely cause |
 |--------|-------------|--------------|
 | -036 | 343 vs 293 | Unrecognized nested sub-ability `』` + truncated output |
-| -059 | 493 vs 413 | Missing `If X is 2 or higher` condition (P2e overlap) |
 | -067 | 165 vs 165 (diff index 72) | CSV quote character mismatch for `""リアライズ"マリアン"` |
 | -071 | 164 vs 160 | Close wording diff |
 | -073 | 314 vs 306 | Close wording diff |
@@ -347,19 +376,19 @@ These have close length differences (2–16 chars), likely minor wording choices
 
 ### Summary
 
-| Category | Count | Status |
-|----------|-------|--------|
-| ✅ P2a: Choose from WR level-X | ~42 serials | **DONE** |
-| ✅ P0, P1, P2b, P2d, P2f, P2h, P3 | Various | **DONE** |
-| ❌ P2c: Choose opponent + give ability | 1 | Not started |
-| ❌ P2e: Top deck to stock (X condition) | 1 | Partial |
-| ❌ P2g: Except X pattern | 1 | Not started |
-| ❌ P2i: Complex sub-ability chains | 10 | Not started |
-| ❌ P2j: Condition `か` (or) connector | 1 | Not started |
-| ❌ P2k: `そうでないなら` (Otherwise) | 1 | Not started |
-| ❌ P2l: All players / Memory | 1 | Not started |
-| ❌ P2m: Complex ability chains | 3 | Not started |
-| ❌ P4: EffectText wording (close) | 14 | Not started |
+| Category | Serials | Tests | Status |
+|----------|---------|-------|--------|
+| ✅ P2a: Choose from WR level-X | ~42 serials | — | **DONE** |
+| ✅ P0, P1, P2b, P2d, P2f, P2h, P3 | Various | — | **DONE** |
+| ✅ P2c: Choose opponent + give ability | 1 | 2 | **DONE** |
+| ✅ P2e: Top deck to stock (X condition) | 1 | 2 | **DONE** |
+| ✅ P2g: Except X pattern | 1 | 1 | **DONE** |
+| ✅ P2i: Complex sub-ability chains (8 fixed, 3 remain) | 11 | 13 | **PARTIAL** (−032/−045/−065 reclassified below) |
+| ❌ P2j: Condition `か` (or) connector | 1 | 1 | Not started |
+| ❌ P2k: `そうでないなら` (Otherwise) | 1 | 2 | Not started |
+| ❌ P2l: All players / Memory | 1 | 2 | Not started |
+| ❌ P2m: Complex ability chains | 3 | 3 | Not started |
+| ❌ P4: EffectText wording (close) | 13 | 13 | Not started |
 
 ### Cross-cutting success criteria (applies to all points)
 
@@ -401,16 +430,22 @@ When fixing any point, always verify **before moving to the next point**:
 
 ## Summary (Updated)
 
-| Priority | Category | Status | Serials |
-|----------|----------|--------|---------|
-| P2a | Choose from WR level-X + trait | ✅ PARTIAL (~2 fixed, ~33 remain) | ~35 |
-| P2b | Opponent center stage cost-0 + put bottom | ❌ NOT STARTED | 1 |
-| P2c | Choose opponent + give ability with duration | ❌ NOT STARTED | 1 |
-| P2e | Top deck to stock | ❌ NOT STARTED | ~2 |
-| P2f | This card to stock (standalone) | ❌ NOT STARTED | 1 |
-| P2g | Except X pattern | ❌ NOT STARTED | 1 |
-| P2h | Trigger check reveal CX + choose from WR | ❌ NOT STARTED | 1 |
-| P3 | Labels mismatches | ❌ NOT STARTED | 3 rows |
-| P4c | "return it to their hand" pronoun fix | ❌ NOT STARTED | 1 |
-| P4d | "and" vs comma in return chain | ❌ NOT STARTED | 1 |
+| Priority | Category | Serials | Tests | Status |
+|----------|----------|---------|-------|--------|
+| P2a | Choose from WR level-X + trait | ~35 | — | ✅ PARTIAL |
+| P2b | Opponent center stage cost-0 + put bottom | 1 | 2 | ✅ DONE (-035) |
+| P2c | Choose opponent + give ability | 1 | 2 | ✅ DONE (-041) |
+| P2e | Top deck to stock (X condition) | 1 | 2 | ✅ DONE (-059) |
+| P2f | This card to stock (standalone) | 1 | 1 | ✅ DONE (-100) |
+| P2g | Except X pattern | 1 | 1 | ✅ DONE (-040) |
+| P2h | Trigger check reveal CX + choose from WR | 1 | 2 | ✅ DONE (-034) |
+| P2i | Complex sub-ability chains | 3 | 3 (8 fixed) | ✅ PARTIAL (−032/−045/−065 → P4/P2m) |
+| P2j | Condition `か` (or) connector | 1 | 1 | ❌ NOT STARTED |
+| P2k | `そうでないなら` (Otherwise) | 1 | 2 | ❌ NOT STARTED |
+| P2l | All players / Memory | 1 | 2 | ❌ NOT STARTED |
+| P2m | Complex ability chains | 3 | 3 | ❌ NOT STARTED |
+| P3 | Labels mismatches | — | 3 rows | ❌ NOT STARTED |
+| P4 | EffectText wording (close) | 13 | 13 | ❌ NOT STARTED |
+| P4c | "return it to their hand" pronoun fix | 1 | — | ❌ NOT STARTED |
+| P4d | "and" vs comma in return chain | 1 | — | ❌ NOT STARTED |
 | ✅ FIXED this session | Various (see Fixed This Session) | ✅ | ~18 |

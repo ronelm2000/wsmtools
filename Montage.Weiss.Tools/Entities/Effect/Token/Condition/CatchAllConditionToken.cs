@@ -6,7 +6,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 /// </summary>
 /// <remarks>
 /// <para><b>Expected Input:</b> Any text ending with <c>なら</c>, <c>時</c>, <c>たび</c>, <c>限り</c>, or <c>場合</c> followed by <c>、</c> or end of string.</para>
-/// <para><b>Regex:</c> ^.+?(?&lt;marker&gt;なら|時|たび|限り|場合)(?:、|$)</para>
+/// <para><b>Regex:</b> ^(?:(?:『[^』]*』)|[^『])+?(?&lt;marker&gt;なら|時|たび|限り|場合)(?:、|$)</para>
+/// <para><b>Note:</b> Skips over <c>『...』</c> quoted blocks to avoid matching condition markers inside sub-ability text.</para>
 /// <para><b>Captures:</b></para>
 /// <list type="bullet">
 ///   <item><description>marker: The condition-ending marker used to infer <see cref="ConditionType"/></description></item>
@@ -23,7 +24,7 @@ internal class CatchAllConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<CatchAllConditionToken>();
 
-    public override Regex Matcher => new(@"^.+?(?<marker>なら|時|たび|限り|場合)(?:、|$)");
+    public override Regex Matcher => new(@"^(?:(?:『[^』]*』)|[^『])+?(?<marker>なら|時|たび|限り|場合)(?:、|$)");
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

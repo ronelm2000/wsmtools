@@ -87,6 +87,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new DrawPhaseStartConditionToken());
         _conditionListRegistry.Register(new NoColorCardsInLevelConditionToken());
         _conditionListRegistry.Register(new XEqualsConditionToken());
+        _conditionListRegistry.Register(new XThresholdConditionToken());
         _conditionListRegistry.Register(new IfAddedToHandConditionToken());
         _conditionListRegistry.Register(new IfCxAmongThoseCardsConditionToken());
         _conditionListRegistry.Register(new OtherCenterStageNamedCharactersConditionToken());
@@ -195,8 +196,10 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ReturnMultipleToHandToken());
         _effectListRegistry.Register(new PutCharacterToBottomOfDeckToken());
         _effectListRegistry.Register(new PutCharacterToBottomOfOpponentDeckToken());
+        _effectListRegistry.Register(new PutCharacterToTopOfDeckToken());
         _effectListRegistry.Register(new PutCharacterToClockToken());
         _effectListRegistry.Register(new PutThisCardToMemoryToken());
+        _effectListRegistry.Register(new PutCharacterToMemoryToken());
         _effectListRegistry.Register(new PutThisCardToStockToken());
         _effectListRegistry.Register(new PlaceOnStageToken());
         _effectListRegistry.Register(new ReturnThisCardToStageAsRestToken());
@@ -321,6 +324,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _reminderTextRegistry.Register(new CxLevelZeroToken());
         _reminderTextRegistry.Register(new ReturnToOriginalPositionToken());
         _reminderTextRegistry.Register(new ReturnToOriginalPositionOtherwiseToken());
+        _reminderTextRegistry.Register(new NotPutToStockReturnToOriginalToken());
         _reminderTextRegistry.Register(new DamageMayBeCanceledToken());
         _reminderTextRegistry.Register(new BackupCounterReminderToken());
         _reminderTextRegistry.Register(new EncoreReminderPart1Token());

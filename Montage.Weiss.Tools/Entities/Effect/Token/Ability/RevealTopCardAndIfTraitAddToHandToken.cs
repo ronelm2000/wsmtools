@@ -4,8 +4,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// Matches reveal-top-card effects with trait-conditional add-to-hand (no discard follow-up).
 /// </summary>
 /// <remarks>
-/// <para><b>Expected Input:</b> <c>自分の山札の上から1枚を公開する。そのカードが《NIKKE》のキャラなら手札に加える。</c></para>
-/// <para><b>Regex:</b> ^自分の山札の上から1枚を公開する。そのカードが《(.+?)》のキャラなら手札に加える(?:\.|,|、|。)?</para>
+/// <para><b>Expected Input:</b> <c>あなたは自分の山札の上から1枚を公開する。そのカードが《NIKKE》のキャラなら手札に加える。</c></para>
+/// <para><b>Regex:</b> ^(?:あなたは)?(?:自分の)?山札の上から1枚を公開する。そのカードが《(.+?)》のキャラなら手札に加える(?:\.|,|、|。)?</para>
 /// <para><b>Captures:</b></para>
 /// <list type="bullet">
 ///   <item><description>Group 1: Trait name (e.g., "NIKKE")</description></item>
@@ -14,7 +14,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class RevealTopCardAndIfTraitAddToHandToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^自分の山札の上から1枚を公開する。そのカードが《(.+?)》のキャラなら手札に加える(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたは)?(?:自分の)?山札の上から1枚を公開する。そのカードが《(.+?)》のキャラなら手札に加える(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

@@ -26,9 +26,13 @@ internal class ChooseCharacterAndBoostToken : CardTextToken<List<CardEffectAbili
         [
             new CardEffectAbility
             {
+                AbilityText = $"choose {count} of your characters"
+            },
+            new CardEffectAbility
+            {
                 AbilityText = count == 1
-                    ? $"choose {count} of your characters, and that character gets +{power} power until end of turn"
-                    : $"choose {count} of your characters, and those characters get +{power} power until end of turn"
+                    ? $"that character gets +{power} power until end of turn"
+                    : $"those characters get +{power} power until end of turn"
             }
         ];
     }

@@ -126,7 +126,7 @@ internal class ActEffectToken : CardTextToken<CardEffect>
                 abilityForEffect = char.ToUpper(abilityForEffect[0]) + abilityForEffect[1..];
             effectText += $" {abilityForEffect}";
         }
-        if (!effectText.TrimEnd().EndsWith(".") && !effectText.EndsWith("]"))
+        if (!effectText.TrimEnd().EndsWith(".") && !effectText.EndsWith("]") && !effectText.EndsWith("\""))
             effectText += ".";
 
         return new ActCardEffect {

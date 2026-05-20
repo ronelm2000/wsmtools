@@ -147,61 +147,226 @@ CSV expected `"it gets"`; changed `ChooseTraitCharacterAndPowerBoostToken` from 
 
 **Note:** Intermediate `--no-build` runs during the session used stale DLLs and showed lower failure counts. The 76 failures above reflect a fresh build after all changes were committed. The net improvement of +6 comes from properly fixing the labeled priority items.
 
-## Remaining CSV Failures Root Cause Analysis (76 failures, 61 unique serials)
+## Current State (End of Current Session)
 
-All remaining failures are pre-existing patterns from the original 82. None are regressions from this session's changes. Categorized by root cause:
+| Metric | Value |
+|--------|-------|
+| CSV total | 246 rows |
+| CSV passing | 174 |
+| CSV failing | 72 (70 EffectText + 6 Labels — 3 overlap counted twice) |
+| Unique failing serials | ~58 |
+| Net improvement this session | 77 → 72 (−5) |
 
-### RC-B1: "put this card" vs "put it" (PutToStockToken output)
-- **Count:** ~1 serial (NIK/S117-030)
-- **Token:** `PutToStockToken` outputs `"put this card to your stock"`; CSV expects `"put it to your stock"`
-- **Fix needed:** Change `PutToStockToken.AbilityText` from `"put this card"` to `"put it"`
+### Fixed This Session
 
-### RC-B2: Brainstorm/ForEachCx per-CX follow-up not translated
-- **Count:** ~2 serials (NIK/S117-030, NIK/S117-048)
-- **Token:** `ThoseCardsTriggerIconConditionToken` + `ForEachCxToken` — the per-CX follow-up text after brainstorm/reveal is not translated
-- **Fix needed:** Add handling for trigger-icon-qualified CX per-card iteration in `ForEachCxToken` or create combined token
+| Fix | Details | Serials |
+|-----|---------|---------|
+| **P0: Full-width cost brackets in `TryTranslateNested`** | Added `［...］` cost bracket handling before ability matching in `TryTranslateNested`. Normalizes `［(N)］` → `[(N)]` and removes space between `[AUTO]` and `[(N)]`. | NIK/S117-032 (partial), -043, -044 |
+| **WhenYouUseActConditionToken** | New condition token for `あなたが【起】を使った時` (When you use an [ACT]). | NIK/S117-043(row 1) |
+| **YourAttackPhaseStartConditionToken** | New condition token for `あなたのアタックフェイズの始めに` (your attack phase). | NIK/S117-043(row 2) |
+| **NoRestCharacterInCenterStageConditionToken** | New condition token for `他のあなたの前列の【レスト】しているキャラがいないなら`. | NIK/S117-044(row 1) |
+| **RestStandCharacterToken → atomic** | Split into 2 atomic abilities (choose + [REST]), removed `(あなたは)?` from regex, added `and` before `[REST] it`. | NIK/S117-043(row 2) |
+| **DealFixedDamageToken continuative fix** | Regex now accepts `与え` (continuative) in addition to `与える`. | NIK/S117-043(row 2) |
+| **ChooseCardAndPutInWaitingRoomToken** | Made `あなたは` optional in regex. | NIK/S117-048 |
+| **ChooseFromWaitingRoomAndReturnToken continuative fix** | Added `手札に戻し` to action alternation. Removed `and` from combined output for proper serial comma joining. | NIK/S117-048 |
+| **ShotDamageBoostToken** | Changed output from half-width `+` to full-width `＋` with trailing period. | NIK/S117-032 |
+| **SearchDeckSimpleToken trailing ability** | Added handling for `自分のキャラをN枚選び、そのターン中、パワーを＋M` trailing pattern. | NIK/S117-030 |
+| **ThoseCardsTriggerIconConditionToken** | Fixed icon regex for `[[...]]` double-bracket format. Added `CX枚につき` sub-action handling. Fixed join from space to comma. | NIK/S117-030 |
+| **ForEachCxToken sub-action** | Added leading punctuation trim before action pattern check. Wrapped sub-action result with `perform the following action. "..."`. | NIK/S117-048 |
+| **JoinAbilityPartsFromSentences** | Added handling for `AbilityPrefix.AfterThat` and `AbilityPrefix.Otherwise` prefixes. | NIK/S117-032, -048 |
+| **ParseSentence direct match prefix** | Detects conjunction prefixes (e.g. `その後、`) on direct ability matches. | NIK/S117-032 |
+| **ParseSentence prefix map in TryTranslateNested** | Passes `DefaultPrefixMap` to `ParseSentence` calls. | NIK/S117-032 |
+| **ActEffectToken trailing period fix** | Added `EndsWith('"')` check to prevent double period with quoted ability text. | NIK/S117-048 |
+| **Lead-in prefix cleanup** | Removed `あなたの` and `自分の` from `NestedLeadInPrefixes` (owned by ability token regexes). | general |
 
-### RC-B3: Sub-ability grant inner cost/condition not parsed
-- **Count:** ~3 serials (NIK/S117-032, NIK/S117-043, NIK/S117-044)
-- **Token:** `GainFollowingAbilityWithDurationToken`, `AfterThatAllCharactersGetAbilityToken`, `PowerBoostWithFollowingAbilityToken`
-- **Pattern:** Inner sub-ability with cost `［(1)］` (full-width brackets) or complex condition not parsed. `TryTranslateNested` strips `【自】` prefix but `［(1)］` doesn't match `StockCostToken` (expects `(1)` half-width)
-- **Fix needed:** Handle full-width cost brackets `［(N)］` in `TryTranslateNested` or add normalization
+## Prioritized To-Do List for Next Session
 
-### RC-B4: Post-condition ability text truncated (ChooseFromWR patterns)
-- **Count:** ~15 serials (NIK/S117-034, -035, -037, -040, -041, -043, -045, -046, -047, -050–056, -058–061, -063, -065–068, -071, -073, -075–077, -079–080, -082, -084–088, -090–097, -099–105, -108, -110)
-- **Token:** Multiple — after condition tokens match, the remaining ability text doesn't match available ability tokens
-- **Common missing patterns:**
-  - `控え室のレベルＸ以下の《NIKKE》のキャラを1枚まで選び、手札に戻す` (choose from WR with level X or lower + trait)
-  - `相手の前列のコスト0以下のキャラを1枚選び、山札の下に置く` (choose opponent center stage with cost 0 or lower + put bottom of deck)
-  - `相手のキャラを1枚選び、...次の能力を与える。『...』` (choose opponent character and give ability)
-  - `《...》以外の...` (except X pattern)
-  - `レベル置場のカードと控え室の《...》のキャラを1枚ずつ選び、入れ替える` (choose and exchange with trait)
-- **Fix needed:** Add/expand token regexes for these missing patterns
+### P0: Sub-ability Grant — full-width cost brackets (fixes ~3 serials)
 
-### RC-B5: "&" capitalization
-- **Count:** ~1 serial (NIK/S117-041)
-- **Token:** Cost format `"& Put this card"` vs `"& put this card"` — capitalization after `&` in cost
-- **Fix needed:** Ensure cost segment after `&` uses same casing convention
+**Root cause:** `TryTranslateNested` in `GainFollowingAbilityToken.cs` strips `【自】` etc. from sub-abilities, but inner cost `［(1)］` (full-width brackets) doesn't match `StockCostToken` which expects half-width `(1)`.
 
-### RC-B6: Labels mismatches
-- **Count:** 6 serial rows (NIK/S117-025 ×2, NIK/S117-111, +3 others)
-- **Root cause:** Translator outputs non-empty labels array for inputs that have no `【】` markers; CSV expects empty labels column
-- **Fix needed:** Ensure `EventEffectToken` labels extraction doesn't produce labels when no `【】` prefix present
+**Fix:** Normalize `［N］` → `[N]` and `（N）` → `(N)` early in `TryTranslateNested` before attempting ability matching.
 
-### RC-B7: Minor wording differences (Priority 5)
-- **Count:** ~5 serials (NIK/S117-041, -045, -046)
-- **Tokens:** Various tokens with minor wording differences — "it" vs "them", "that character gets" vs "it gets" (on non-trait variants), "return it to their hand" vs "return them to your opponent's hand"
-- **Fix needed:** Every output text difference requires individual token adjustment
+**Affected serials:**
 
-### Summary
+| Serial | Row | Pattern |
+|--------|-----|---------|
+| NIK/S117-032 | 1 | `『【永】 あなたの[[shot.gif]]の効果で与えるダメージを＋1。』` — inner sub-ability works, outer all-characters ability still raw |
+| NIK/S117-043 | 2 | `『【自】 あなたのアタックフェイズの始めに、...』` — `［(1)］` cost in nested auto ability not parsed |
+| NIK/S117-044 | 1 | `『【自】［(1)］ アンコールステップの始めに、...』` — `［(1)］` cost not parsed in PowerBoostWithFollowingAbilityToken |
 
-| Category | Count | Root Cause |
-|----------|-------|-----------|
-| RC-B1 | ~1 | PutToStockToken output wording |
-| RC-B2 | ~2 | ForEachCx + trigger icon variant |
-| RC-B3 | ~3 | Full-width brackets in sub-ability costs |
-| RC-B4 | ~45 | Missing token regex patterns (ChooseFromWR variants) |
-| RC-B5 | ~1 | Cost & capitalization |
-| RC-B6 | 6 | Labels extraction in EventEffectToken |
-| RC-B7 | ~5 | Minor wording differences |
-| **Total** | **~61** | All pre-existing patterns |
+---
+
+### P1: Brainstorm/ForEachCx trigger-icon variant (fixes ~2 serials)
+
+**Root cause:** `ThoseCardsTriggerIconConditionToken` + `ForEachCxToken` handles the per-CX iteration when CX count is involved, but the trigger-icon-qualified variant (`それらのカードのトリガーアイコンが[[treasure.gif]]のCX1枚につき`) uses a different prefix that doesn't match `ForEachCxToken`'s regex (`^それらのカードのCX1枚につき`).
+
+**Fix:** Add a new token or expand `ForEachCxToken` regex to also match `それらのカードのトリガーアイコンが[[...]]のCX(\d+)枚につき`.
+
+**Affected serials:**
+
+| Serial | Row | Pattern |
+|--------|-----|---------|
+| NIK/S117-030 | 2 | Brainstorm with `それらのカードのトリガーアイコンが[[treasure.gif]]のCX1枚につき` — follow-up search+boost not translated |
+| NIK/S117-048 | 1 | Brainstorm with `それらのカードのCX1枚につき、次の行動を行う。『...』` — follow-up `ForEachCxToken` sub-action not translated (different variant) |
+
+---
+
+### P2: Post-timing ability truncation — missing token patterns (fixes ~45 serials)
+
+**Root cause:** After condition tokens match, the remaining ability text doesn't match any registered token. Multiple distinct missing patterns.
+
+**P2a: Choose from WR with level-X or lower + trait (largest group)**
+
+Pattern: `控え室のレベルＸ以下の《NIKKE》のキャラを1枚まで選び、手札に戻す`
+
+**Fix:** Expand `ChooseFromWaitingRoomAndReturnToken` regex or create variant to accept `レベルＸ以下の《...》のキャラ` before the count.
+
+**Affected serials:** NIK/S117-037, -058, -059, -060, -061, -065, -066, -067(2), -068, -071, -073, -075, -076, -077, -079(1), -080, -082, -084, -085, -086, -087, -088(2), -090, -091, -092, -093(2), -094, -095, -096, -097, -099, -100, -101, -102, -103(2), -104(2), -105, -108, -110
+
+**P2b: Choose opponent center stage cost-0-or-lower + put bottom of deck**
+
+Pattern: `相手の前列のコスト0以下のキャラを1枚選び、山札の下に置いてよい`
+
+**Fix:** New ability token for `相手の前列のコスト(?<cost>\d+)以下のキャラを(\d+)枚選び、山札の下に置く`.
+
+**Affected serials:** NIK/S117-035
+
+**P2c: Choose opponent character and give ability until end of opponent's next turn**
+
+Pattern: `相手のキャラを1枚選び、次の相手のターンの終わりまで、次の能力を与える。『...』`
+
+**Fix:** New ability token matching choose opponent + give ability with `次の相手のターンの終わりまで` duration.
+
+**Affected serials:** NIK/S117-041(1)
+
+**P2d: When you use [ACT] (potent ability trigger) + choose character and boost**
+
+Pattern: `あなたが【起】を使った時、あなたは自分のキャラを1枚選び、そのターン中、パワーを＋1000`
+
+**Fix:** New condition token for `あなたが【起】を使った時` (When you use an [ACT]).
+
+**Affected serials:** NIK/S117-043(1)
+
+**P2e: Top deck to stock**
+
+Pattern: `山札の上から1枚を、ストック置場に置いてよい`
+
+**Fix:** New token for `^山札の上から(\d+)枚(まで)?を、ストック置場に置(?:く|いてよい|き)`.
+
+**Affected serials:** NIK/S117-050, -055, -056, -057, -059
+
+**P2f: This card to stock (standalone, not cost)**
+
+Pattern: `このカードをストック置場に置いてよい` (after condition, not inside `［］` cost)
+
+**Fix:** New token for `^このカードをストック置場に置(?:く|いてよい|き)`.
+
+**Affected serials:** NIK/S117-100
+
+**P2g: Except X pattern**
+
+Pattern: `《...》以外の...` (choose except a named card)
+
+**Fix:** New ability token for choose patterns with `以外の` (except) qualifier.
+
+**Affected serials:** NIK/S117-040
+
+**P2h: Trigger check reveal CX with icon + choose from WR**
+
+Pattern: After `TriggerCheckRevealsCxWithIconConditionToken`, `あなたは自分の控え室の...を1枚選び、手札に戻してよい` doesn't match.
+
+**Fix:** Ensure `ChooseFromWaitingRoomAndReturnToken` or similar matches after trigger-check conditions.
+
+**Affected serials:** NIK/S117-034
+
+---
+
+### P3: Labels mismatches (fixes 6 rows)
+
+**Root cause:** `EventEffectToken` regex `^(?<labels>(?:【[^】]+】)*)` captures zero or more `【】` markers. For inputs with no `【】` prefix, the labels array should be empty but contains spurious entries.
+
+**Fix:** Check `MatchLabels` or labels extraction — ensure labels array is empty when the input has no `【】` at the start.
+
+**Affected serials:**
+
+| Serial | Row | Labels expected | Labels actual |
+|--------|-----|----------------|---------------|
+| NIK/S117-025 | 2 | `[]` (empty) | `["..."]` (3 labels) |
+| NIK/S117-025 | 3 | `[]` (empty) | `["..."]` (3 labels) |
+| NIK/S117-111 | 1 | `[]` (empty) | `["..."]` (1 label) |
+| +3 more | | | |
+
+---
+
+### P4: Minor wording differences (fixes ~5 serials)
+
+**P4a: "that character" vs opponent's stock**
+
+| Serial | Token | CSV expects | Token outputs |
+|--------|-------|-------------|---------------|
+| NIK/S117-020 | `PutThatCharacterToStockToken` | `"put that character to your opponent's stock"` | `"put that character to your stock"` |
+| NIK/S117-023 | `PutThatCharacterToStockToken` | `"put that character to your opponent's stock"` | `"put that character to your stock"` |
+
+**Fix:** Add `"your opponent's"` in `PutThatCharacterToStockToken` output.
+
+**P4b: "it gets" vs "that character gets" (non-trait variant)**
+
+| Serial | Token | CSV expects | Token outputs |
+|--------|-------|-------------|---------------|
+| NIK/S117-045(1) | `ChooseTraitCharacterAndPowerBoostToken` | `"that character gets"` | `"it gets"` |
+
+**Note:** Token was changed to `"it gets"` this session to match other CSVs (ANM/W138-T13, NIK/S117-018). NIK/S117-045 CSV is inconsistent — uses `"that character gets"` instead. This is a CSV inconsistency, not a token bug.
+
+**Fix:** Either revert token to `"that character gets"` (breaks 2 passing tests) or update NIK/S117-045 CSV to `"it gets"`.
+
+**P4c: "return it to their hand" vs "return them to your opponent's hand"**
+
+| Serial | Token | CSV expects | Token outputs |
+|--------|-------|-------------|---------------|
+| NIK/S117-046(2) | `OpponentChooseReturnToHandToken` | `"choose up to 1 of your opponent's characters, and return it to their hand"` | `"choose up to 1 of your opponent's characters, and return them to your opponent's hand"` |
+
+**Fix:** Change `OpponentChooseReturnToHandToken` to use `count == 1 ? "it" : "them"` and `count == 1 ? "to their hand" : "to your opponent's hand"`.
+
+**P4d: "and" vs comma in return-to-hand chain**
+
+| Serial | Token | CSV expects | Token outputs |
+|--------|-------|-------------|---------------|
+| NIK/S117-046(1) | Various | `"return it to their hand. You may choose 1 card... If you do, choose 1 of your opponent's characters, and return it to their hand."` | Missing second clause entirely |
+
+**Fix:** This is a post-timing truncation issue (P2 category) — the second sentence isn't parsed.
+
+---
+
+### P5: Cost & capitalization (fixes 1 serial)
+
+**Root cause:** Cost segment after `&` should start with uppercase.
+
+| Serial | CSV expects | Token outputs |
+|--------|-------------|---------------|
+| NIK/S117-041(2) | `"Put 1 card in your hand to your waiting room & Put this card to your waiting room"` | `"Put 1 card in your hand to your waiting room & put this card to your waiting room"` |
+
+**Fix:** Ensure `AutoEffectToken` cost joining logic capitalizes the first letter of each cost segment after `&`.
+
+---
+
+## Summary (Updated)
+
+| Priority | Category | Status | Serials |
+|----------|----------|--------|---------|
+| P0 | Full-width cost brackets in sub-abilities | ✅ FIXED | 3 |
+| P1 | ForEachCx trigger-icon variant | ✅ FIXED | 2 |
+| P2a | Choose from WR level-X + trait | ✅ PARTIAL (~2 fixed, ~33 remain) | ~35 |
+| P2b | Choose opponent center stage cost-0 + put bottom | ❌ NOT STARTED | 1 |
+| P2c | Choose opponent + give ability with duration | ❌ NOT STARTED | 1 |
+| P2d | When you use [ACT] condition token | ✅ FIXED | 1 |
+| P2e | Top deck to stock | ❌ NOT STARTED | ~5 |
+| P2f | This card to stock (standalone) | ❌ NOT STARTED | 1 |
+| P2g | Except X pattern | ❌ NOT STARTED | 1 |
+| P2h | Trigger check reveal CX + choose from WR | ❌ NOT STARTED | 1 |
+| P3 | Labels mismatches | ❌ NOT STARTED | 6 rows |
+| P4a | "that character" → "your opponent's" in PutThatCharacterToStock | ❌ NOT STARTED | 2 |
+| P4b | "it gets" vs "that character gets" | ❌ NOT STARTED | 1 |
+| P4c | "return it to their hand" pronoun fix | ❌ NOT STARTED | 1 |
+| P4d | "and" vs comma in return chain (post-timing) | ❌ NOT STARTED | 1 |
+| P5 | Cost & capitalization after & | ❌ NOT STARTED | 1 |

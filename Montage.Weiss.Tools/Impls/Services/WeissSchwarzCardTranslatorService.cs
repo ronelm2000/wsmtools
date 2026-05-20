@@ -96,6 +96,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new DeckCountConditionToken());
         _conditionListRegistry.Register(new CardLevelConditionToken());
         _conditionListRegistry.Register(new LevelThresholdConditionToken());
+        _conditionListRegistry.Register(new LevelIsConditionToken());
         _conditionListRegistry.Register(new CxAreaHasCxConditionToken());
         _conditionListRegistry.Register(new CxAreaCxWithIconConditionToken());
         _conditionListRegistry.Register(new CxAreaNamedConditionToken());
@@ -104,6 +105,9 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new YourReverseCharactersCountConditionToken());
         _conditionListRegistry.Register(new YourLevelOrLowerConditionToken());
         _conditionListRegistry.Register(new OpponentCenterStageCountConditionToken());
+        _conditionListRegistry.Register(new WhenYouUseActConditionToken());
+        _conditionListRegistry.Register(new YourAttackPhaseStartConditionToken());
+        _conditionListRegistry.Register(new NoRestCharacterInCenterStageConditionToken());
 
         // Register ability tokens (most to least specific)
         _effectListRegistry.Register(new StockCostWithPutCardFromHandToWaitingRoomToken());
@@ -122,6 +126,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new PowerBoostPerOtherNikkeToken());
         _effectListRegistry.Register(new PowerBoostPerOpponentRestToken());
         _effectListRegistry.Register(new PowerBoostPerTraitCharacterToken());
+        _effectListRegistry.Register(new ShotDamageBoostToken());
         _effectListRegistry.Register(new ChooseTraitCharacterAndPowerBoostToken());
         _effectListRegistry.Register(new BrainstormToken());
         _effectListRegistry.Register(new RevealTopCardsToken());
@@ -162,6 +167,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new SearchDeckForCxAndExchangeToken());
         _effectListRegistry.Register(new SearchDeckFromLookToken());
         _effectListRegistry.Register(new SearchDeckSimpleToken());
+        _effectListRegistry.Register(new SearchDeckForNamedCardToken());
         _effectListRegistry.Register(new SearchDeckToken());
         _effectListRegistry.Register(new SearchDeckLevelAndCostToken());
         _effectListRegistry.Register(new SearchDeckLevelCostAndPlaceToken());
@@ -227,6 +233,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new HandLevelMinusToken());
         _effectListRegistry.Register(new AllZonesTriggerIconGainToken());
         _effectListRegistry.Register(new PerformTriggerIconEffectAbilityToken());
+        _effectListRegistry.Register(new PerformFollowingActionToken());
         _effectListRegistry.Register(new CannotPlayEventsOrBackupFromHandToken());
         _effectListRegistry.Register(new AllTraitCharactersBoostToken());
         _effectListRegistry.Register(new AllOtherTraitCharactersBoostToken());
@@ -399,7 +406,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
             var effectText = effect.EffectText.TrimEnd('.');
             if (!string.IsNullOrEmpty(effectText))
             {
-                var separator = effectText.EndsWith(']') ? " " : ". ";
+                var separator = effectText.EndsWith(']') || effectText.EndsWith('"') ? " " : ". ";
                 effect.EffectText = effectText + separator + "(" + reminderTextEnglish + ")";
             }
             else

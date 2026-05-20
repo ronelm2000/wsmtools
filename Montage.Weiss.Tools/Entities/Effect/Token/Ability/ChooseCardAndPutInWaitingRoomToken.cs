@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ChooseCardAndPutInWaitingRoomToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^あなたは自分の手札を(\d+)枚選び、控え室に置(?:いて|き|く)(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたは)?自分の手札を(\d+)枚選び、控え室に置(?:いて|き|く)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

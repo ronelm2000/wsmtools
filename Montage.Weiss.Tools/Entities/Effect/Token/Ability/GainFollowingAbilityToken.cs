@@ -78,7 +78,6 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
     private static readonly string[] NestedLeadInPrefixes =
     [
         "あなたは",
-        "あなたの",
         "自分の",
         "そうしたら、",
         "そうしたら",
@@ -114,24 +113,39 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
             var strippedResult = TryTranslateNested(registry, prefixStripped);
             if (strippedResult != null)
             {
+                var space = strippedResult.StartsWith('[') ? "" : " ";
                 var typePrefix = effectType switch
                 {
-                    "自" => "[AUTO] ",
-                    "永" => "[CONT] ",
-                    "起" => "[ACT] ",
-                    "カウンター" => "[COUNTER] ",
+                    "自" => "[AUTO]",
+                    "永" => "[CONT]",
+                    "起" => "[ACT]",
+                    "カウンター" => "[COUNTER]",
                     _ => ""
                 };
-                return typePrefix + strippedResult;
+                var sep = strippedResult.StartsWith("[") ? "" : " ";
+                return typePrefix + sep + strippedResult;
             }
         }
 
-        // Try ability match (index-0 via Match API)
-        if (TryMatchAbility(registry, trimmed, out var abilityResult))
-            return abilityResult;
+        // Handle cost brackets ［...］ prefix (e.g. ［(1)］)
+        var costBracketMatch = Regex.Match(trimmed, @"^［(.+?)］\s*(.*)$");
+        if (costBracketMatch.Success)
+        {
+            var costContent = costBracketMatch.Groups[1].Value;
+            var restAfterCost = costBracketMatch.Groups[2].Value;
+            var costResult = TryTranslateNested(registry, costContent);
+            var restResult = TryTranslateNested(registry, restAfterCost);
+            if (costResult != null || restResult != null)
+            {
+                var costPart = costResult ?? costContent;
+                var restPart = restResult ?? "";
+                var separator = costPart.StartsWith("[") ? "" : " ";
+                return $"[{costPart}]{separator}{restPart}".TrimEnd();
+            }
+        }
 
-        // Try multi-sentence Parse first, then single-sentence ParseSentence
-        var multiParsed = MultiClauseEffectParser.Parse(trimmed, registry);
+        // Try condition+ability parsing via ParseSentence first (handles conditions before abilities)
+        var multiParsed = MultiClauseEffectParser.Parse(trimmed, registry, MultiClauseEffectParser.DefaultPrefixMap);
         if (multiParsed.Count > 1)
         {
             var parts = new List<string>();
@@ -142,19 +156,26 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
             }
             if (parts.Count > 0)
             {
-                var joined = string.Join(" ", parts.Select(s => s.TrimEnd('.')));
+                var joined = string.Join(". ", parts.Select(s => s.TrimEnd('.')));
                 joined = char.ToUpper(joined[0]) + joined[1..];
                 if (!joined.EndsWith('.')) joined += ".";
                 return joined;
             }
         }
 
-        // Try ParseSentence for single-sentence text
-        var parsed = MultiClauseEffectParser.ParseSentence(trimmed, registry);
+        var parsed = MultiClauseEffectParser.ParseSentence(trimmed, registry, MultiClauseEffectParser.DefaultPrefixMap);
         if (parsed.Abilities.Count > 0 || parsed.Conditions.Count > 0)
         {
-            return parsed.Text;
+            if (parsed.Conditions.Count > 0)
+                return parsed.Text;
+            if (parsed.Abilities.Count == 1)
+                return parsed.Abilities[0].AbilityText;
+            return AutoEffectToken.JoinAbilityPartsFromSentences([parsed]);
         }
+
+        // Try ability match (index-0 via Match API) — for pure-ability text with no conditions
+        if (TryMatchAbility(registry, trimmed, out var abilityResult))
+            return abilityResult;
 
         // Try effect match as last resort (may match EventEffectToken which is lossy for nested contexts)
         if (TryMatchEffect(registry, trimmed, out var effectResult))

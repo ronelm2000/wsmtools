@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class DealFixedDamageToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手に(?<amount>\d+)ダメージ(?:を(?<times>\d+)回)?を与える(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^相手に(?<amount>\d+)ダメージ(?:を(?<times>\d+)回)?を与え(?:る)?(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

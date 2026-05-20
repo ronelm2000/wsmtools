@@ -278,6 +278,21 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                         result += ". If you do,";
                         continue;
                     }
+                    if (prefix == AbilityPrefix.AfterThat)
+                    {
+                        result = result.TrimEnd('.');
+                        result += " After that, ";
+                        var afterThatText = abilities[i].AbilityText;
+                        if (afterThatText.Length > 0 && char.IsUpper(afterThatText[0]) && afterThatText[0] != 'X')
+                            afterThatText = char.ToLower(afterThatText[0]) + afterThatText[1..];
+                        result += afterThatText;
+                        continue;
+                    }
+                    if (prefix == AbilityPrefix.Otherwise)
+                    {
+                        result += ". Otherwise,";
+                        continue;
+                    }
                     string connector;
                     var next = abilities[i].AbilityText;
                     if (prefix == AbilityPrefix.And)
@@ -289,7 +304,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                         connector = prefix switch
                         {
                             AbilityPrefix.Continuation => ", and ",
-                            AbilityPrefix.Subject => ", ",
+                            AbilityPrefix.Subject => (i == abilities.Count - 1) ? ", and " : ", ",
                             _ => ", ",
                         };
                     }

@@ -119,12 +119,23 @@ public static class MultiClauseEffectParser
             if (abilMatch != null)
             {
                 var abilList = abilMatch.Translate(registry);
+                // Detect conjunction prefixes (e.g. その後、) in the matched text
+                var detectedPrefix = AbilityPrefix.And;
+                foreach (var (pattern, p) in (prefixMap ?? DefaultPrefixMap).Prefixes)
+                {
+                    if (p == AbilityPrefix.And || p == AbilityPrefix.Subject) continue;
+                    if (trimmed.StartsWith(pattern, StringComparison.Ordinal))
+                    {
+                        detectedPrefix = p;
+                        break;
+                    }
+                }
                 foreach (var abil in abilList)
                 {
                     var finalText = pendingDuration != null ? ApplyDuration(abil.AbilityText, pendingDuration) : abil.AbilityText;
-                    Log.Debug("ParseSentence: ability '{Token}' with pending duration '{Duration}' -> '{FinalText}'",
-                        abilMatch.Match.Token, pendingDuration, finalText);
-                    abilities.Add(abil with { AbilityText = finalText });
+                    Log.Debug("ParseSentence: ability '{Token}' with pending duration '{Duration}' and prefix '{Prefix}' -> '{FinalText}'",
+                        abilMatch.Match.Token, pendingDuration, detectedPrefix, finalText);
+                    abilities.Add(abil with { AbilityText = finalText, Prefix = detectedPrefix });
                 }
                 pendingDuration = null;
                 Log.Debug("ParseSentence: ability matched by '{Token}', consumed {Len} chars, remaining='{Remaining}'",
@@ -291,7 +302,13 @@ public static class MultiClauseEffectParser
         {
             result = $"{conditionPart}, {abilityParts[0]}";
             for (int i = 1; i < abilityParts.Count; i++)
-                result += $", {abilityParts[i]}";
+            {
+                var nextAbility = abilityParts[i];
+                if (nextAbility.Length > 0 && char.IsUpper(nextAbility[0]) && nextAbility[0] != 'X')
+                    nextAbility = char.ToLower(nextAbility[0]) + nextAbility[1..];
+                var connector = (i == abilityParts.Count - 1) ? ", and " : ", ";
+                result += connector + nextAbility;
+            }
         }
         else if (!string.IsNullOrEmpty(conditionPart))
         {

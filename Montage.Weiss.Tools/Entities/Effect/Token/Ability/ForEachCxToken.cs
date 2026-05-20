@@ -44,14 +44,14 @@ internal class ForEachCxToken : CardTextToken<List<CardEffectAbility>>
         var remainingText = text;
 
         // Handle "perform the following action" sub-ability pattern: 次の行動を行う。『...』
-        var actionMatch = Regex.Match(remainingText, @"^次の行動を行う。『(.+)』");
+        var actionMatch = Regex.Match(remainingText.TrimStart('、', ' ', '\t'), @"^次の行動を行う。『(.+)』");
         if (actionMatch.Success)
         {
             var inner = actionMatch.Groups[1].Value;
             var innerResult = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, inner);
             if (innerResult != null)
             {
-                result.Add(new CardEffectAbility { AbilityText = innerResult });
+                result.Add(new CardEffectAbility { AbilityText = $"perform the following action. \"{innerResult}\"" });
             }
             return result;
         }
@@ -62,16 +62,12 @@ internal class ForEachCxToken : CardTextToken<List<CardEffectAbility>>
             if (trimmed.Length == 0)
                 break;
 
-            if (registry.EffectListRegistry.TryFindFirstMatch(trimmed, out var abilFunc, out var matchIndex, out var consumed) && abilFunc != null)
+            var abilMatch = registry.EffectListRegistry.Match(trimmed.AsMemory());
+            if (abilMatch != null)
             {
-                if (matchIndex > 0)
-                {
-                    remainingText = trimmed[matchIndex..];
-                    continue;
-                }
-                var abilList = abilFunc(registry);
+                var abilList = abilMatch.Translate(registry);
                 result.AddRange(abilList);
-                remainingText = trimmed[consumed..].TrimStart('、', '。', ' ', '\t');
+                remainingText = trimmed[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
             }
             else
             {
@@ -84,6 +80,9 @@ internal class ForEachCxToken : CardTextToken<List<CardEffectAbility>>
 
     private static string JoinAbilityParts(List<string> parts)
     {
-        return string.Join(" ", parts.Where(p => !string.IsNullOrEmpty(p)));
+        if (parts.Count == 0) return "";
+        if (parts.Count == 1) return parts[0];
+        var allButLast = string.Join(", ", parts.Take(parts.Count - 1));
+        return $"{allButLast}, and {parts[^1]}";
     }
 }

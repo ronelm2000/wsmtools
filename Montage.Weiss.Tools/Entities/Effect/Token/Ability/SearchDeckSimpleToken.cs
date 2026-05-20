@@ -11,9 +11,28 @@ internal class SearchDeckSimpleToken : CardTextToken<List<CardEffectAbility>>
         var count = match.Groups["count"].Value.Replace("Ｘ", "X");
         var rest = match.Groups["rest"].Value;
 
-        var additional = rest.Contains("シャッフル") ? ", and shuffle your deck" : "";
+        var additional = "";
+        var hasShuffle = rest.Contains("シャッフル");
         if (rest.Contains("手札に加え"))
-            additional = ", put it to your hand" + additional;
+            additional = ", put it to your hand";
+
+        // Handle trailing choose + power boost: 自分のキャラをN枚選び、そのターン中、パワーを＋N
+        var powerBoostMatch = System.Text.RegularExpressions.Regex.Match(rest, @"自分のキャラを(\d+)枚選び、そのターン中、パワーを[＋\+](\d+)");
+        var hasPowerBoost = powerBoostMatch.Success;
+
+        if (hasShuffle)
+        {
+            var shuffleConnector = hasPowerBoost ? ", shuffle your deck" : ", and shuffle your deck";
+            additional += shuffleConnector;
+        }
+
+        if (hasPowerBoost)
+        {
+            var charCount = powerBoostMatch.Groups[1].Value;
+            var power = powerBoostMatch.Groups[2].Value;
+            var sbConnector = hasShuffle && !hasPowerBoost ? "" : ", and";
+            additional += $", choose {charCount} of your characters, and that character gets +{power} power until end of turn";
+        }
 
         return
         [

@@ -15,7 +15,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class RestStandCharacterToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(.+?)の【スタンド】している(.+?)を1枚選び、【レスト】し");
+    public override Regex Matcher => new(@"^(相手|あなた)の【スタンド】している(.+?)を1枚選び、【レスト】(?:し|する)(?:てよい)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -38,7 +38,11 @@ internal class RestStandCharacterToken : CardTextToken<List<CardEffectAbility>>
             [
                 new CardEffectAbility
                 {
-                    AbilityText = $"Choose 1 of {ownerText} [STAND] {descText}, [REST] it"
+                    AbilityText = $"choose 1 of {ownerText} [STAND] {descText}"
+                },
+                new CardEffectAbility
+                {
+                    AbilityText = $"[REST] it"
                 }
             ];
         }

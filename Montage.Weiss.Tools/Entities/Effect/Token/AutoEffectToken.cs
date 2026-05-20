@@ -298,12 +298,14 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             if (abilities.Count > 0)
             {
                 result = perSentenceCondition + abilities[0].AbilityText;
+                bool isAfterIfYouDo = false;
                 for (int i = 1; i < abilities.Count; i++)
                 {
                     var prefix = abilities[i].Prefix;
                     if (prefix == AbilityPrefix.IfYouDo)
                     {
                         result += ". If you do,";
+                        isAfterIfYouDo = true;
                         continue;
                     }
                     if (prefix == AbilityPrefix.AfterThat)
@@ -323,7 +325,12 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                     }
                     string connector;
                     var next = abilities[i].AbilityText;
-                    if (prefix == AbilityPrefix.And)
+                    if (isAfterIfYouDo)
+                    {
+                        connector = " ";
+                        isAfterIfYouDo = false;
+                    }
+                    else if (prefix == AbilityPrefix.And)
                     {
                         connector = (i == abilities.Count - 1) ? ", and " : ", ";
                     }
@@ -376,7 +383,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             if (s.Length >= 2)
             {
                 var lastTwo = s[^2..];
-                if (lastTwo is ".\"" or ".]") return s;
+                if (lastTwo is ".\"" or ".]" or "\".") return s;
             }
             if (s.Length >= 2 && s[^1] == '.' && s[^2] == ']') return s;
             return s.TrimEnd('.');

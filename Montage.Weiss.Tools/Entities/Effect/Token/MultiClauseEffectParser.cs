@@ -142,7 +142,7 @@ public static class MultiClauseEffectParser
                 pendingDuration = null;
                 Log.Debug("ParseSentence: ability matched by '{Token}', consumed {Len} chars, remaining='{Remaining}'",
                     abilMatch.Match.Token, abilMatch.Match.Length, trimmed[abilMatch.Match.Length..]);
-                remainingText = trimmed[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
+                remainingText = trimmed[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t', '』');
                 continue;
             }
 
@@ -181,7 +181,7 @@ public static class MultiClauseEffectParser
                         pendingDuration = null;
                         Log.Debug("ParseSentence: after prefix skip, matched by '{Token}', remaining='{Remaining}'",
                             abilMatch.Match.Token, remainingText[abilMatch.Match.Length..]);
-                        remainingText = remainingText[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
+                        remainingText = remainingText[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t', '』');
                         prefixSkipped = true;
                         break;
                     }
@@ -194,6 +194,20 @@ public static class MultiClauseEffectParser
 
             if (!prefixSkipped)
             {
+                // Check for post-conditions (e.g. X is equal to...) before falling through to CatchAllAbilityToken
+                var postCheck = registry.ConditionListRegistry.Match(trimmed.AsMemory());
+                if (postCheck != null)
+                {
+                    var postCondList = postCheck.Translate(registry);
+                    var postConds = postCondList.Where(c => c.Type == ConditionType.PostCondition).ToList();
+                    if (postConds.Count > 0)
+                    {
+                        conditions.AddRange(postConds);
+                        remainingText = trimmed[postCheck.Match.Length..].TrimStart('、', '。', ' ', '\t');
+                        Log.Debug("ParseSentence: post-condition matched in ability loop, remaining='{Remaining}'", remainingText);
+                        break;
+                    }
+                }
                 Log.Debug("ParseSentence: no prefix to skip nor fallback match, using CatchAllAbilityToken. remaining='{Remaining}'", trimmed);
                 var sentinelAbilities = new CatchAllAbilityToken().Translate(registry, trimmed.AsMemory());
                 abilities.AddRange(sentinelAbilities);

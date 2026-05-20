@@ -44,6 +44,7 @@ internal class ActEffectToken : CardTextToken<CardEffect>
                 var abils = m.Translate(registry);
                 costAbilities.AddRange(abils);
                 tokenLog.Add($"Cost:{m.Match.Token}");
+
                 costRemaining = t[m.Match.Length..].TrimStart('、', ' ', '\t');
             }
         }
@@ -84,7 +85,8 @@ internal class ActEffectToken : CardTextToken<CardEffect>
                 for (int i = 1; i < costTexts.Count; i++)
                 {
                     var sep = i == 1 && Regex.IsMatch(costTexts[0], @"^\(\d+\)$") ? " " : " & ";
-                    costEnglish += sep + costTexts[i];
+                    var nextText = AutoEffectToken.CapitalizeFirstAlpha(costTexts[i]);
+                    costEnglish += sep + nextText;
                 }
             }
             costEnglish = AutoEffectToken.CapitalizeFirstAlpha(costEnglish);

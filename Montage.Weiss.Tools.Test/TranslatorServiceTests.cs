@@ -33,7 +33,9 @@ public class TranslatorServiceTests
         "EncoreToken",
         "BackupPrefixToken",
         "IfYouDoToken",
-        "ChooseOtherCharacterAndGiveAbilityToken"
+        "ChooseOtherCharacterAndGiveAbilityToken",
+        "PowerBoostWithFollowingAbilitiesToken",
+
     ];
 
     public TestContext TestContext { get; set; }

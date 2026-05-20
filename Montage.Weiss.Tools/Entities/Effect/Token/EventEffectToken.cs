@@ -26,7 +26,7 @@ internal class EventEffectToken : CardTextToken<CardEffect>
     {
         var match = Matcher.Match(span.ToString());
         // Match: 経験 共鳴 
-        var labels = registry.MatchLabels(match.Value);
+        var labels = registry.MatchLabels(match.Groups["labels"]?.Value ?? "");
         var input = match.Groups["mainText"].Value;
         // Protect 。 inside or before 『』 blocks from being used as split points
         var protectedInput = Regex.Replace(input, @"。?『[^』]+』", m => m.Value.Replace("。", "\0"));
@@ -106,7 +106,16 @@ internal class EventEffectToken : CardTextToken<CardEffect>
             allAbilities.AddRange(sentenceAbilities);
             if (sentenceParts.Count > 0)
             {
-                var joined = string.Join(", ", sentenceParts);
+                string joined;
+                if (sentenceParts.Count > 1)
+                {
+                    var allButLast = string.Join(", ", sentenceParts.Take(sentenceParts.Count - 1));
+                    joined = $"{allButLast}, and {sentenceParts[^1]}";
+                }
+                else
+                {
+                    joined = sentenceParts[0];
+                }
                 if (translatedSentences.Count > 0)
                     joined = char.ToUpper(joined[0]) + joined[1..];
                 translatedSentences.Add(joined);

@@ -107,6 +107,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new OpponentCenterStageCountConditionToken());
         _conditionListRegistry.Register(new WhenYouUseActConditionToken());
         _conditionListRegistry.Register(new YourAttackPhaseStartConditionToken());
+        _conditionListRegistry.Register(new YourDrawPhaseStartConditionToken());
         _conditionListRegistry.Register(new NoRestCharacterInCenterStageConditionToken());
         _conditionListRegistry.Register(new CatchAllConditionToken());
 
@@ -118,6 +119,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new PowerBoostWithFollowingAbilitiesToken());
         _effectListRegistry.Register(new PowerBoostWithFollowingAbilityToken());
         _effectListRegistry.Register(new PowerBoostGainEncoreToken());
+        _effectListRegistry.Register(new PowerAndSoulBoostToken());
         _effectListRegistry.Register(new PowerBoostWithDurationToken());
         _effectListRegistry.Register(new GiveMultipleAbilitiesToken());
         _effectListRegistry.Register(new DuringBattleCannotPlayEventsOrBackupToken());
@@ -177,6 +179,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ChooseFromWaitingRoomAndReturnToDeckToken());
         _effectListRegistry.Register(new ChooseOpponentCardsFromWrAndReturnToDeckToken());
         _effectListRegistry.Register(new ChooseFromWaitingRoomAndReturnToken());
+        _effectListRegistry.Register(new ChooseYourOtherCenterStageLevel0OrLowerCharToWrToken());
         _effectListRegistry.Register(new ChooseOpponentCharToMemoryThenFromMemoryToStageToken());
         _effectListRegistry.Register(new ChooseOtherCharacterAndGiveAbilityToken());
         _effectListRegistry.Register(new AllCenterStageExceptThisCardGiveAbilityToken());
@@ -194,6 +197,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new PutCharacterToBottomOfOpponentDeckToken());
         _effectListRegistry.Register(new PutCharacterToClockToken());
         _effectListRegistry.Register(new PutThisCardToMemoryToken());
+        _effectListRegistry.Register(new PutThisCardToStockToken());
         _effectListRegistry.Register(new PlaceOnStageToken());
         _effectListRegistry.Register(new ReturnThisCardToStageAsRestToken());
         _effectListRegistry.Register(new MayPayCostThenAbilityToken());
@@ -291,6 +295,19 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new RestIfCxExistsToken());
         _effectListRegistry.Register(new CannotUseActUntilEndOfTurnToken());
         _effectListRegistry.Register(new PutTopXCardsToWrToken());
+        _effectListRegistry.Register(new ReverseThatCharacterToken());
+        _effectListRegistry.Register(new OpponentCenterStageCost0OrLowerToBottomOfDeckToken());
+        _effectListRegistry.Register(new ChooseClockCharToBottomOfDeckToken());
+        _effectListRegistry.Register(new ReturnAllWrToDeckAndShuffleToken());
+        _effectListRegistry.Register(new ChooseOpponentWrCardToTopOfDeckToken());
+        _effectListRegistry.Register(new TopDeckToStockToken());
+        _effectListRegistry.Register(new ChooseCharacterAndSoulBoostToken());
+        _effectListRegistry.Register(new ChooseBattleCharacterAndSoulBoostToken());
+        _effectListRegistry.Register(new ChooseWrLevelBelowAndPlaceOnStageToken());
+        _effectListRegistry.Register(new MoveOpponentCharacterToken());
+        _effectListRegistry.Register(new PutToStockInsteadOfWrToken());
+        _effectListRegistry.Register(new PlaceOnOpenPositionAndDealDamageToken());
+        _effectListRegistry.Register(new SearchDeckForCxToken());
         
         // Register effect type tokens (most to least specific)
         _effectRegistry.Register(new ContEffectToken());
@@ -351,39 +368,55 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
             reminderTextJapanese = reminderMatch.Groups["reminder"].Value;
             japaneseEffectText = japaneseEffectText.Replace(reminderMatch.Value, "").Trim();
 
-            // Split by 。and translate each sentence
-            var sentences = reminderTextJapanese.Split('。', StringSplitOptions.RemoveEmptyEntries);
-            var translated = new List<string>();
-            foreach (var sentence in sentences)
+            // Check if entire reminder is a trigger icon format (may span multiple sentences)
+            var iconFullMatch = Regex.Match(reminderTextJapanese, @"^\[\[(?<icon>[^\]]+?)\]\]：");
+            if (iconFullMatch.Success)
             {
-                var matchResult = _reminderTextRegistry.Match(sentence.AsMemory());
-                if (matchResult != null)
-                {
-                    var translatedSentence = matchResult.Translate(this);
-                    translated.Add(translatedSentence);
-                }
+                var icon = iconFullMatch.Groups["icon"].Value;
+                var iconName = TriggerIconHelper.GetIconName(icon);
+                var iconText = reminderTextJapanese.Substring(iconFullMatch.Length);
+                var english = TranslateTriggerIconReminderText(icon, iconName, iconText);
+                if (english != null)
+                    reminderTextEnglish = english;
                 else
+                    reminderTextEnglish = reminderTextJapanese;
+            }
+            else
+            {
+                // Split by 。and translate each sentence
+                var sentences = reminderTextJapanese.Split('。', StringSplitOptions.RemoveEmptyEntries);
+                var translated = new List<string>();
+                foreach (var sentence in sentences)
                 {
-                    // Try to translate trigger icon format: [[icon.gif]]：text to English
-                    var iconMatch = Regex.Match(sentence, @"^\[\[(?<icon>[^\]]+?)\]\]：");
-                    if (iconMatch.Success)
+                    var matchResult = _reminderTextRegistry.Match(sentence.AsMemory());
+                    if (matchResult != null)
                     {
-                        var icon = iconMatch.Groups["icon"].Value;
-                        var iconName = TriggerIconHelper.GetIconName(icon);
-                        var iconText = sentence.Substring(iconMatch.Length);
-                        var english = TranslateTriggerIconReminderText(icon, iconName, iconText);
-                        if (english != null)
-                            translated.Add(english);
-                        else
-                            translated.Add(sentence);
+                        var translatedSentence = matchResult.Translate(this);
+                        translated.Add(translatedSentence);
                     }
                     else
                     {
-                        translated.Add(sentence);
+                        // Try to translate trigger icon format: [[icon.gif]]：text to English
+                        var iconMatch = Regex.Match(sentence, @"^\[\[(?<icon>[^\]]+?)\]\]：");
+                        if (iconMatch.Success)
+                        {
+                            var icon = iconMatch.Groups["icon"].Value;
+                            var iconName = TriggerIconHelper.GetIconName(icon);
+                            var iconText = sentence.Substring(iconMatch.Length);
+                            var english = TranslateTriggerIconReminderText(icon, iconName, iconText);
+                            if (english != null)
+                                translated.Add(english);
+                            else
+                                translated.Add(sentence);
+                        }
+                        else
+                        {
+                            translated.Add(sentence);
+                        }
                     }
                 }
+                reminderTextEnglish = string.Join(". ", translated);
             }
-            reminderTextEnglish = string.Join(". ", translated);
         }
 
      // Debug output

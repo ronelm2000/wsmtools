@@ -18,7 +18,7 @@ internal class CostPutToStockAndSwapBottomToken : CardTextToken<List<CardEffectA
         [
             new CardEffectAbility
             {
-                AbilityText = "Put this card to your stock, and put the bottom card of your stock to your waiting room"
+                AbilityText = "put this card to your stock & Put the bottom card of your stock to your waiting room"
             }
         ];
     }

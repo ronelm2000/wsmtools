@@ -166,6 +166,12 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
         var parsed = MultiClauseEffectParser.ParseSentence(trimmed, registry, MultiClauseEffectParser.DefaultPrefixMap);
         if (parsed.Abilities.Count > 0 || parsed.Conditions.Count > 0)
         {
+            if (parsed.Conditions.Count > 0 && parsed.Abilities.Count == 0)
+            {
+                // Conditions-only with no abilities means this is a continuous (CONT) effect
+                // matched as a condition. Return the condition text directly without "If" prefix.
+                return string.Join(", ", parsed.Conditions.Select(c => c.ConditionText));
+            }
             if (parsed.Conditions.Count > 0)
                 return parsed.Text;
             if (parsed.Abilities.Count == 1)
@@ -287,6 +293,8 @@ internal class PowerBoostWithFollowingAbilitiesToken : CardTextToken<List<CardEf
 
         var nestedEnglish1 = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese1) ?? nestedJapanese1;
         var nestedEnglish2 = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese2) ?? nestedJapanese2;
+        if (!nestedEnglish1.EndsWith('.') && !nestedEnglish1.EndsWith('"') && !nestedEnglish1.EndsWith(']') && nestedEnglish1.Contains(' '))
+            nestedEnglish1 += ".";
 
         return
         [

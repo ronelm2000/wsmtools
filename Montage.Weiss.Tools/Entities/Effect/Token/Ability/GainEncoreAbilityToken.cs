@@ -45,7 +45,7 @@ internal class PowerBoostGainEncoreToken : CardTextToken<List<CardEffectAbility>
         [
             new CardEffectAbility
             {
-                AbilityText = $"this card gets +{power} power and \"[AUTO] Encore [{costEnglish}]\""
+                AbilityText = $"this card gets +{power} power and \"[AUTO] Encore [{costEnglish}]\"."
             }
         ];
     }
@@ -77,7 +77,7 @@ internal class GainEncoreAbilityToken : CardTextToken<List<CardEffectAbility>>
         [
             new CardEffectAbility
             {
-                AbilityText = $"This card gets \"[AUTO] Encore [{costEnglish}]\""
+                AbilityText = $"This card gets \"[AUTO] Encore [{costEnglish}]\"."
             }
         ];
     }

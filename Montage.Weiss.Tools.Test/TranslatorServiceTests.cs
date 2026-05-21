@@ -10,6 +10,7 @@ using Montage.Card.API.Helpers;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities.Effect;
 using Montage.Weiss.Tools.Entities.Effect.Token;
+using Montage.Weiss.Tools.Exceptions;
 using Montage.Weiss.Tools.Impls.Services;
 using Serilog;
 
@@ -467,7 +468,10 @@ public class TranslatorServiceTests
     public void Translate_ContEffect_NonExistentConditionMustCrash()
     {
         var japanese = "【永】 あなたのターン中、他のあなたadded_textの《不存在》のキャラが4枚以上なら、このカードのパワーを＋5000。";
-        Assert.ThrowsExactly<NotImplementedException>(() => _service.TranslateEffect(japanese));
+        var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
+        Assert.IsNotNull(ex.Tree);
+        Assert.AreEqual(1, ex.Tree.Effects.Count);
+        Assert.IsInstanceOfType<ContCardEffect>(ex.Tree.Effects[0]);
     }
 
     [TestMethod]
@@ -475,7 +479,10 @@ public class TranslatorServiceTests
     public void Translate_ContEffect_NonExistentAbilityMustCrash()
     {
         var japanese = "【永】 あなたのターン中、他のあなたadded_textの《不存在》のキャラが4枚以上なら、このカードのadded_textパワーを＋5000。";
-        Assert.ThrowsExactly<NotImplementedException>(() => _service.TranslateEffect(japanese));
+        var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
+        Assert.IsNotNull(ex.Tree);
+        Assert.AreEqual(1, ex.Tree.Effects.Count);
+        Assert.IsInstanceOfType<ContCardEffect>(ex.Tree.Effects[0]);
     }
 
     [TestMethod]
@@ -483,7 +490,10 @@ public class TranslatorServiceTests
     public void Translate_AutoEffect_NonExistentConditionMustCrash()
     {
         var japanese = "【自】 あなたがこのカードの『non_existent_label』を使った時、あなたは自分の山札の上から1枚を公開する。そのカードが《風》のキャラなら手札に加え、あなたは自分の手札を1枚選び、控え室に置く。（そうでないなら元に戻す）";
-        Assert.ThrowsExactly<NotImplementedException>(() => _service.TranslateEffect(japanese));
+        var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
+        Assert.IsNotNull(ex.Tree);
+        Assert.AreEqual(1, ex.Tree.Effects.Count);
+        Assert.IsInstanceOfType<AutoCardEffect>(ex.Tree.Effects[0]);
     }
 
     [TestMethod]
@@ -491,7 +501,10 @@ public class TranslatorServiceTests
     public void Translate_AutoEffect_NonExistentAbilityMustCrash()
     {
         var japanese = "【自】 あなたがこのカードの『助太刀』を使った時、あなたは自分の山札の上から1枚枚枚枚枚を公開する。そのカードが《風》のキャラなら手札に加え、あなたは自分の手札を1枚選び、控え室に置く。（そうでないなら元に戻す）";
-        Assert.ThrowsExactly<NotImplementedException>(() => _service.TranslateEffect(japanese));
+        var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
+        Assert.IsNotNull(ex.Tree);
+        Assert.AreEqual(1, ex.Tree.Effects.Count);
+        Assert.IsInstanceOfType<AutoCardEffect>(ex.Tree.Effects[0]);
     }
 
     [TestMethod]

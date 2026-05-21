@@ -38,6 +38,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new CxWithTriggerIconInCxAreaConditionToken());
         _conditionListRegistry.Register(new YourCxWithTriggerIconTriggeredConditionToken());
         _conditionListRegistry.Register(new CxPlacedConditionToken());
+        _conditionListRegistry.Register(new CardPlacedFromHandOrAttackConditionToken());
         _conditionListRegistry.Register(new CardPlacedFromHandConditionToken());
         _conditionListRegistry.Register(new CardPlacedFromHandOrMemoryConditionToken());
         _conditionListRegistry.Register(new CardPlacedFromHandToCxAreaConditionToken());
@@ -286,6 +287,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new OpponentPutToClockToken());
         _effectListRegistry.Register(new OpponentChooseReturnToHandToken());
         _effectListRegistry.Register(new OpponentDeckToWrAndWrToDeckToken());
+        _effectListRegistry.Register(new ChooseMemoryCardsAndPutOthersToWrToken());
         _effectListRegistry.Register(new AllPlayersPerformActionToken());
         _effectListRegistry.Register(new AllCharactersSoulBoostTurnToken());
         _effectListRegistry.Register(new DealVariableDamageToken());

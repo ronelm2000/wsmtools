@@ -32,6 +32,13 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<AutoEffectToken>();
 
+    private static readonly Dictionary<string, string> NonBracketLabelMap = new()
+    {
+        { "応援", "Assist" },
+        { "経験", "Experience" },
+        { "記憶", "Memory" },
+    };
+
     public override Regex Matcher => new(@"^【自】(?<labels>(?:【[^】]+】)*)\s*(?<mainText>.+)$");
 
     public override CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
@@ -41,7 +48,25 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         var mainText = match.Groups["mainText"].Value.Trim();
         // MatchLabels now returns bracketed format (e.g. "[CXCOMBO]") for CSV comparison.
         // Strip brackets for effect text formatting — they'll be re-added by labelPrefix.
-        var formatLabels = labels.Select(l => l.Trim('[', ']')).ToArray();
+        var formatLabels = labels.Select(l => l.Trim('[', ']')).ToList();
+
+        // Handle non-bracketed labels (e.g. 記憶, 応援, 経験) — stored inline in effect text
+        var nonBracketLabels = new List<string>();
+        while (true)
+        {
+            var labelMatch = Regex.Match(mainText, @"^(?<label>\S+?)\s+(?<rest>.+)$");
+            if (labelMatch.Success)
+            {
+                var label = labelMatch.Groups["label"].Value;
+                if (NonBracketLabelMap.TryGetValue(label, out var englishLabel))
+                {
+                    nonBracketLabels.Add(englishLabel);
+                    mainText = labelMatch.Groups["rest"].Value.Trim();
+                    continue;
+                }
+            }
+            break;
+        }
 
         // Handle keyword prefixes (加速=Accelerate, アンコール=Encore)
         var hasAccelerate = mainText.StartsWith("加速", StringComparison.Ordinal);
@@ -149,9 +174,10 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             costEnglish = CapitalizeFirstAlpha(costEnglish);
         }
 
-        var labelPrefix = formatLabels.Length > 0 ? $"[{string.Join("][", formatLabels)}]" : "";
+        var labelPrefix = formatLabels.Count > 0 ? $"[{string.Join("][", formatLabels)}]" : "";
+        var nonBracketPrefix = nonBracketLabels.Count > 0 ? $" {string.Join(" ", nonBracketLabels)}" : "";
         var accelerateInsert = hasAccelerate ? " Accelerate" : "";
-        var effectText = $"[AUTO]{accelerateInsert}{labelPrefix}";
+        var effectText = $"[AUTO]{accelerateInsert}{labelPrefix}{nonBracketPrefix}";
         if (!string.IsNullOrEmpty(costEnglish))
             effectText += $"{(hasAccelerate ? " " : "")}[{costEnglish}]";
         if (!string.IsNullOrEmpty(conditionEnglish))
@@ -169,6 +195,8 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         }
 
         var finalLabels = labels;
+        if (nonBracketLabels.Count > 0)
+            finalLabels = [.. finalLabels, .. nonBracketLabels];
         if (hasAccelerate)
             finalLabels = [.. finalLabels, "Accelerate"];
         if (hasEncore)
@@ -297,7 +325,24 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             string result;
             if (abilities.Count > 0)
             {
-                result = perSentenceCondition + abilities[0].AbilityText;
+                var firstPrefix = abilities[0].Prefix;
+                var firstText = abilities[0].AbilityText;
+                if (firstPrefix == AbilityPrefix.Otherwise)
+                {
+                    if (firstText.Length > 0 && char.IsUpper(firstText[0]) && firstText[0] != 'X')
+                        firstText = char.ToLower(firstText[0]) + firstText[1..];
+                    result = perSentenceCondition + "Otherwise, " + firstText;
+                }
+                else if (firstPrefix == AbilityPrefix.AfterThat)
+                {
+                    if (firstText.Length > 0 && char.IsUpper(firstText[0]) && firstText[0] != 'X')
+                        firstText = char.ToLower(firstText[0]) + firstText[1..];
+                    result = perSentenceCondition + "After that, " + firstText;
+                }
+                else
+                {
+                    result = perSentenceCondition + firstText;
+                }
                 bool isAfterIfYouDo = false;
                 for (int i = 1; i < abilities.Count; i++)
                 {
@@ -320,7 +365,10 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                     }
                     if (prefix == AbilityPrefix.Otherwise)
                     {
-                        result += ". Otherwise,";
+                        var otherwiseText = abilities[i].AbilityText;
+                        if (otherwiseText.Length > 0 && char.IsUpper(otherwiseText[0]) && otherwiseText[0] != 'X')
+                            otherwiseText = char.ToLower(otherwiseText[0]) + otherwiseText[1..];
+                        result += $". Otherwise, {otherwiseText}";
                         continue;
                     }
                     string connector;
@@ -386,10 +434,15 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                 if (lastTwo is ".\"" or ".]" or "\".") return s;
             }
             if (s.Length >= 2 && s[^1] == '.' && s[^2] == ']') return s;
-            return s.TrimEnd('.');
+            var t = s.TrimEnd('.');
+            // Capitalize each sentence for proper multi-sentence output
+            if (t.Length > 0 && char.IsLower(t[0]) && t[0] != 'X')
+                t = char.ToUpper(t[0]) + t[1..];
+            return t;
         }).ToList();
         var joined = string.Join(". ", trimmed);
-        joined = char.ToUpper(joined[0]) + joined[1..];
+        if (joined.Length > 0 && char.IsLower(joined[0]) && joined[0] != 'X')
+            joined = char.ToUpper(joined[0]) + joined[1..];
         if (!joined.EndsWith('.') && !joined.EndsWith(']') && !joined.EndsWith('"'))
             joined += ".";
         return joined;

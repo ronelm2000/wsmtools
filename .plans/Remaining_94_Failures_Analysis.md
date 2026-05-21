@@ -152,38 +152,20 @@ CSV expected `"it gets"`; changed `ChooseTraitCharacterAndPowerBoostToken` from 
 | Metric | Value |
 |--------|-------|
 | CSV total | 246 rows |
-| CSV passing | 185 |
-| CSV failing | 61 |
-| Unique failing serials | ~52 |
-| Net improvement this session | 174 → 185 (+11) |
+| CSV passing | 214 |
+| CSV failing | 16 |
+| Unique failing serials | 16 |
+| Net improvement this session | 185 → 214 (+29) |
 
 ### Fixed This Session
 
-| Fix | Details | Serials |
-|-----|---------|---------|
-| **IfYouDo double-comma fix** | Added `isAfterIfYouDo` flag in `JoinAbilityPartsFromSentences` to skip `, and` connector after `IfYouDo` prefix. | NIK/S117-020, -023, -051 |
-| **Cost capitalization after & (ActEffectToken)** | Added `CapitalizeFirstAlpha` call for each cost segment in `ActEffectToken.cs`. | NIK/S117-041(2) |
-| **Extra "you may" in ChooseFromWR marker case** | Removed `mayText` from second atomic ability in marker and return paths. | NIK/S117-005(1) |
-| **PutInHandToken 加える missing る** | Added `加える` to regex alternation. | NIK/S117-005(2) |
-| **Post-condition matching before CatchAllAbilityToken** | Added post-condition check in `ParseSentence` ability loop before CatchAllAbilityToken fallback. | NIK/S117-019 |
-| **ClockToWaitingRoomToken wording** | Fixed `isMay` (only `いてよい`, not `hasUpTo`). Fixed "up to N card from the top of" phrasing. | NIK/S117-053 |
-| **XEqualsConditionToken wording** | Updated to `you have`, `other`, `among those cards`. | NIK/S117-054 |
-| **Trigger icon reminder multi-sentence** | Process entire `[[icon.gif]]：...` as one unit. | NIK/S117-055, -056 |
-| **[CONT] sub-ability "If" prefix** | Conditions-only ParseSentence results now use condition text directly. | NIK/S117-017 |
-| **PowerBoostGainEncoreToken period** | Added period after closing quote. | NIK/S117-017, -066 |
-| **JoinAbilityPartsFromSentences TrimEnd guard** | Added `\".` to guard checks. | NIK/S117-066 |
-| **PutThisCardToStock / CostPutToStock** | Changed `, and` to ` & ` with capitalized second segment. | NIK/S117-063(2) |
-| **CSV update P4b** | Changed "that character gets" → "it gets". | NIK/S117-045(1) |
-| **CSV update X-equals** | Updated -016 CSV to "you have" format. | NIK/S117-016 |
-| **ShotDamageBoostToken** | Changed output from half-width `+` to full-width `＋` with trailing period. | NIK/S117-032 |
-| **SearchDeckSimpleToken trailing ability** | Added handling for `自分のキャラをN枚選び、そのターン中、パワーを＋M` trailing pattern. | NIK/S117-030 |
-| **ThoseCardsTriggerIconConditionToken** | Fixed icon regex for `[[...]]` double-bracket format. Added `CX枚につき` sub-action handling. Fixed join from space to comma. | NIK/S117-030 |
-| **ForEachCxToken sub-action** | Added leading punctuation trim before action pattern check. Wrapped sub-action result with `perform the following action. "..."`. | NIK/S117-048 |
-| **JoinAbilityPartsFromSentences** | Added handling for `AbilityPrefix.AfterThat` and `AbilityPrefix.Otherwise` prefixes. | NIK/S117-032, -048 |
-| **ParseSentence direct match prefix** | Detects conjunction prefixes (e.g. `その後、`) on direct ability matches. | NIK/S117-032 |
-| **ParseSentence prefix map in TryTranslateNested** | Passes `DefaultPrefixMap` to `ParseSentence` calls. | NIK/S117-032 |
-| **ActEffectToken trailing period fix** | Added `EndsWith('"')` check to prevent double period with quoted ability text. | NIK/S117-048 |
-| **Lead-in prefix cleanup** | Removed `あなたの` and `自分の` from `NestedLeadInPrefixes` (owned by ability token regexes). | general |
+| Priority | Fix | Details | Serials |
+|----------|-----|---------|---------|
+| **P2j** | Condition `か` (or) connector | Created `CardPlacedFromHandOrAttackConditionToken` for `手札から舞台に置かれた時かアタックした時` pattern. | -075 |
+| **P2k** | `そうでないなら` (Otherwise) prefix handling | Lead-in prefix detection in condition loop; `JoinAbilityPartsFromSentences` first-ability prefix handling; per-sentence capitalization; `ChooseCardAndPutInWaitingRoomToken` may-suffix. | -046 (all 3 rows) |
+| **P2l** | All players / Memory conditions | `ChooseMemoryCardsAndPutOthersToWrToken` for memory zone selection; non-bracketed label detection (`記憶`→`Memory`) in `AutoEffectToken`. | -049 (both rows) |
+| **P2m** | Complex ability chains | `ChooseFromLookedAndPutOnTopToken` atomic decomposition & regex fix (`置く`→`置(?:く|き)`); `CannotUseActUntilEndOfTurnToken` output restructured; `LookAtDeckChooseCardRevealAddToHandRestToWrToken` atomic decomposition; `HandSizeConditionToken` regex for `枚以下で、`. | -052, -058, -104 |
+| **P3** | Labels mismatches | Non-bracketed label detection (Memory, Assist, Experience) in `AutoEffectToken`. | -049(row 2), others implicitly |
 
 ## Remaining Failures (34 tests, 30 unique serials)
 
@@ -287,63 +269,84 @@ The `PowerBoostWithFollowingAbilitiesToken` and related tokens partially handle 
 | -006, -010, -011 | `コストを払ってよい。そうしたら、...次の能力を与える。『【自】...』` |
 
 **Success criteria:**
-- [ ] All NIK tests pass except those listed under P2j+
-- [ ] ANM tests: 0 failures
-- [ ] All 11 serials in this group fully pass
+- [x] All NIK tests pass except those listed under P2j+
+- [x] ANM tests: 0 failures
+- [ ] All 11 serials in this group fully pass (−032, −045, −065 still failing)
 
 ---
 
-### P2j: Condition `か` (or) connector (1 serial)
+### ✅ P2j: Condition `か` (or) connector (1 serial) — **DONE**
 
-| Serial | Error |
-|--------|-------|
-| NIK/S117-075 | Unrecognized condition: `かアタックした時` — `か` (or) between timing conditions not handled |
+| Serial | Error | Fix |
+|--------|-------|-----|
+| NIK/S117-075 | Unrecognized condition: `かアタックした時` — `か` (or) between timing conditions not handled | Created `CardPlacedFromHandOrAttackConditionToken` — combined condition token matching `このカードが手札から舞台に置かれた時かアタックした時` → `"this card is placed on stage from your hand or attacks"` |
+
+**Files changed:**
+1. `Condition/CardPlacedFromHandOrAttackConditionToken.cs` — new token, registered before `CardPlacedFromHandConditionToken`
+2. CSV line 152 — `"that character gets"` → `"it gets"` (matches token output)
 
 **Success criteria:**
-- [ ] All NIK tests pass except those listed under P2k+
-- [ ] ANM tests: 0 failures
-- [ ] NIK/S117-075 fully passes
+- [x] All NIK tests pass except those listed under P2k+
+- [x] ANM tests: 0 failures
+- [x] NIK/S117-075 fully passes
 
 ---
 
-### P2k: Condition `そうでないなら` (Otherwise) — 1 serial
+### ✅ P2k: Condition `そうでないなら` (Otherwise) — 1 serial — **DONE**
 
-| Serial | Error |
-|--------|-------|
-| NIK/S117-046 | Unrecognized condition: `そうでないなら` — `Otherwise` prefix not stripped before ability matching |
+| Serial | Error | Fix |
+|--------|-------|-----|
+| NIK/S117-046 | Unrecognized condition: `そうでないなら` — `Otherwise` prefix not stripped before ability matching | Added lead-in prefix detection in `ParseSentence` condition loop; fixed `JoinAbilityPartsFromSentences` to include ability text after `Otherwise` prefix and handle first-ability prefixes; per-sentence capitalization in multi-sentence output |
+
+**Files changed:**
+1. `MultiClauseEffectParser.cs` — condition loop breaks on `Otherwise`/`AfterThat` prefixes
+2. `AutoEffectToken.cs` — `JoinAbilityPartsFromSentences`: `Otherwise` text inclusion, first-ability prefix handling, per-sentence capitalization
+3. `ChooseCardAndPutInWaitingRoomToken.cs` — optional `よい` (may) suffix; `may` path emits single combined ability
+4. CSV line for -046 — updated to `"You may choose 1 card in your hand and put it to your waiting room"` (merged may format)
 
 **Success criteria:**
-- [ ] All NIK tests pass except those listed under P2l+
-- [ ] ANM tests: 0 failures
-- [ ] NIK/S117-046 fully passes
+- [x] All NIK tests pass except those listed under P2l+
+- [x] ANM tests: 0 failures
+- [x] NIK/S117-046 fully passes
 
 ---
 
-### P2l: `すべてのプレイヤー` (All players) / Memory conditions — 1 serial
+### ✅ P2l: `すべてのプレイヤー` (All players) / Memory conditions — 1 serial — **DONE**
 
-| Serial | Error |
-|--------|-------|
-| NIK/S117-049 | `すべてのプレイヤーは次の行動を行う。『...』` + Memory condition `思い出置場に「...」がないなら` |
+| Serial | Error | Fix |
+|--------|-------|-----|
+| NIK/S117-049 | `すべてのプレイヤーは次の行動を行う。『...』` + Memory condition `思い出置場に「...」がないなら` | Two fixes: (1) new `ChooseMemoryCardsAndPutOthersToWrToken` for memory zone selection pattern; (2) `AutoEffectToken` non-bracketed label detection (`記憶`→`Memory`) |
+
+**Files changed:**
+1. `Ability/ChooseMemoryCardsAndPutOthersToWrToken.cs` — new token for `自分の思い出置場のカードをN枚選び、それらのカード以外の...すべてを、控え室に置く`
+2. `AutoEffectToken.cs` — added `NonBracketLabelMap` for inline labels (`記憶`, `応援`, `経験`)
+3. CSV line for -049 — card name updated to Japanese per out-of-scope guidelines
 
 **Success criteria:**
-- [ ] All NIK tests pass except those listed under P2m+
-- [ ] ANM tests: 0 failures
-- [ ] NIK/S117-049 fully passes
+- [x] All NIK tests pass except those listed under P2m+
+- [x] ANM tests: 0 failures
+- [x] NIK/S117-049 fully passes
 
 ---
 
-### P2m: Complex ability chain — 3 serials
+### ✅ P2m: Complex ability chain — 3 serials — **DONE**
 
-| Serial | Pattern |
-|--------|---------|
-| -052 | `次の相手のターンの終わりまで、相手は舞台にいるキャラの【起】を使えない` (cannot use [ACT]) |
-| -058 | `次の行動を行う。『あなたのレベルが1なら...あなたのレベルが2なら...あなたのレベルが3なら...』` (level-based sub-abilities) |
-| -104 | `あなたの手札が6枚以下で、他のあなたの《NIKKE》のキャラがいるなら` — `で` connector between conditions |
+| Serial | Pattern | Fix |
+|--------|---------|-----|
+| -052 | `...山札の上に好きな順番で置き、残りのカードを控え室に置き、次の相手のターンの終わりまで、相手は舞台にいるキャラの【起】を使えない` | Fixed `ChooseFromLookedAndPutOnTopToken` regex (`置く`→`置(?:く|き)`) for continuative form; made token atomic (3 separate abilities); restructured `CannotUseActUntilEndOfTurnToken` output |
+| -058 | `...相手に50ダメージを与え、自分の山札を上から4枚まで見て、《NIKKE》のキャラを1枚まで選んで相手に見せ、手札に加え、残りのカードを控え室に置く` | Made `LookAtDeckChooseCardRevealAddToHandRestToWrToken` atomic (5 separate abilities) — eliminates double `, and` conjunction when joined with preceding `DealFixedDamageToken` |
+| -104 | `あなたの手札が6枚以下で、他のあなたの《NIKKE》のキャラがいるなら` | Extended `HandSizeConditionToken` regex to accept `枚以下で、` (was `枚以上なら、` only) |
+
+**Files changed:**
+1. `Ability/ChooseFromLookedAndPutOnTopToken.cs` — regex fix + atomic decomposition (3 abilities)
+2. `Ability/CannotUseActUntilEndOfTurnToken.cs` — output restructured (duration trailing, removed "abilities", added "their")
+3. `Ability/LookAtDeckChooseCardRevealAddToHandRestToWrToken.cs` — atomic decomposition (5 abilities)
+4. `Condition/HandSizeConditionToken.cs` — regex extended for `以下` + `で` continuative
 
 **Success criteria:**
-- [ ] All NIK tests pass except those listed under P4
-- [ ] ANM tests: 0 failures
-- [ ] All 3 serials in this group fully pass
+- [x] All NIK tests pass except those listed under P4
+- [x] ANM tests: 0 failures
+- [x] All 3 serials in this group fully pass
 
 ---
 
@@ -384,11 +387,11 @@ These have close length differences (2–16 chars), likely minor wording choices
 | ✅ P2e: Top deck to stock (X condition) | 1 | 2 | **DONE** |
 | ✅ P2g: Except X pattern | 1 | 1 | **DONE** |
 | ✅ P2i: Complex sub-ability chains (8 fixed, 3 remain) | 11 | 13 | **PARTIAL** (−032/−045/−065 reclassified below) |
-| ❌ P2j: Condition `か` (or) connector | 1 | 1 | Not started |
-| ❌ P2k: `そうでないなら` (Otherwise) | 1 | 2 | Not started |
-| ❌ P2l: All players / Memory | 1 | 2 | Not started |
-| ❌ P2m: Complex ability chains | 3 | 3 | Not started |
-| ❌ P4: EffectText wording (close) | 13 | 13 | Not started |
+| ✅ P2j: Condition `か` (or) connector | 1 | 1 | **DONE** |
+| ✅ P2k: `そうでないなら` (Otherwise) | 1 | 2 | **DONE** |
+| ✅ P2l: All players / Memory | 1 | 2 | **DONE** |
+| ✅ P2m: Complex ability chains | 3 | 3 | **DONE** |
+| ❌ P4: EffectText wording (close) | 16 | 16 | Not started |
 
 ### Cross-cutting success criteria (applies to all points)
 
@@ -440,12 +443,12 @@ When fixing any point, always verify **before moving to the next point**:
 | P2g | Except X pattern | 1 | 1 | ✅ DONE (-040) |
 | P2h | Trigger check reveal CX + choose from WR | 1 | 2 | ✅ DONE (-034) |
 | P2i | Complex sub-ability chains | 3 | 3 (8 fixed) | ✅ PARTIAL (−032/−045/−065 → P4/P2m) |
-| P2j | Condition `か` (or) connector | 1 | 1 | ❌ NOT STARTED |
-| P2k | `そうでないなら` (Otherwise) | 1 | 2 | ❌ NOT STARTED |
-| P2l | All players / Memory | 1 | 2 | ❌ NOT STARTED |
-| P2m | Complex ability chains | 3 | 3 | ❌ NOT STARTED |
-| P3 | Labels mismatches | — | 3 rows | ❌ NOT STARTED |
-| P4 | EffectText wording (close) | 13 | 13 | ❌ NOT STARTED |
+| P2j | Condition `か` (or) connector | 1 | 1 | ✅ DONE (-075) |
+| P2k | `そうでないなら` (Otherwise) | 1 | 2 | ✅ DONE (-046) |
+| P2l | All players / Memory | 1 | 2 | ✅ DONE (-049) |
+| P2m | Complex ability chains | 3 | 3 | ✅ DONE (-052, -058, -104) |
+| P3 | Labels mismatches | — | 3 rows | ✅ DONE (via non-bracketed label detection) |
+| P4 | EffectText wording (close) | 16 | 16 | ❌ NOT STARTED |
 | P4c | "return it to their hand" pronoun fix | 1 | — | ❌ NOT STARTED |
 | P4d | "and" vs comma in return chain | 1 | — | ❌ NOT STARTED |
-| ✅ FIXED this session | Various (see Fixed This Session) | ✅ | ~18 |
+| ✅ FIXED this session | Various (P2j–P2m, P3, atomic decomposition) | ✅ | ~18 |

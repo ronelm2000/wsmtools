@@ -85,6 +85,18 @@ public static class MultiClauseEffectParser
             var trimmed = remainingText.TrimStart();
             if (trimmed.Length == 0) break;
 
+            // Before matching conditions, check for Otherwise/AfterThat prefixes
+            // that should break into the ability loop instead of being consumed as conditions.
+            var activeMap = prefixMap ?? DefaultPrefixMap;
+            bool isLeadInPrefix = activeMap.Prefixes.Any(p =>
+                p.Value is AbilityPrefix.Otherwise or AbilityPrefix.AfterThat &&
+                trimmed.StartsWith(p.Key, StringComparison.Ordinal));
+            if (isLeadInPrefix)
+            {
+                Log.Debug("ParseSentence: detected lead-in prefix, breaking to ability loop. trimmed='{Trimmed}'", trimmed);
+                break;
+            }
+
             var condMatch = registry.ConditionListRegistry.Match(trimmed.AsMemory());
             if (condMatch != null)
             {

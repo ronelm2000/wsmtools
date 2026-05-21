@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class AllCenterStageExceptThisCardGiveAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカード以外のあなたの前列のキャラすべてに、そのターン中、次の能力を与える。『(.+)』");
+    public override Regex Matcher => new(@"^このカード以外のあなたの前列のキャラすべてに、そのターン中、次の能力を与える。『(.+)』(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

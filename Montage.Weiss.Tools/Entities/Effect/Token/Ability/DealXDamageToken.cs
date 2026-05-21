@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class DealXDamageToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手にXダメージを与える。Xはそのキャラのソウルに等しい");
+    public override Regex Matcher => new(@"^相手にXダメージを与える。Xはそのキャラのソウルに等しい(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

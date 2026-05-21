@@ -12,7 +12,7 @@ internal class PowerBoostWithDurationToken : CardTextToken<List<CardEffectAbilit
         { "次の相手のターンの終了時まで", " until the end of your opponent's next turn" },
     };
 
-    public override Regex Matcher => new(@"^(?:(?<duration>そのターン中|このターン中|次の相手のターンの終わりまで|次の相手のターンの終了時まで)、)?このカードのパワーを[＋\+](?<power>\d+)");
+    public override Regex Matcher => new(@"^(?:(?<duration>そのターン中|このターン中|次の相手のターンの終わりまで|次の相手のターンの終了時まで)、)?このカードのパワーを[＋\+](?<power>\d+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -39,6 +39,21 @@ internal class PowerBoostWithDurationToken : CardTextToken<List<CardEffectAbilit
     }
 }
 
+/// <summary>
+/// Matches "power boost and gain following ability" clauses.
+/// Emits Oxford comma before "and the following ability" and ensures the nested English text ends with a period.
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>このカードのパワーを＋4500し、このカードは次の能力を得る。『…』</c></para>
+/// <para><b>Regex:</b> ^(?:(?&lt;duration&gt;そのターン中|このターン中|次の相手のターンの終わりまで|次の相手のターンの終了時まで)、)?このカードのパワーを[＋\+](?&lt;power&gt;\d+)し、このカードは次の能力を得る。『(?&lt;nested&gt;.+)』</para>
+/// <para><b>Captures:</b></para>
+/// <list type="bullet">
+///   <item><description>Group "duration": Optional duration prefix</description></item>
+///   <item><description>Group "power": Power boost amount (e.g., "4500")</description></item>
+///   <item><description>Group "nested": Inner quoted ability text</description></item>
+/// </list>
+/// <para><b>Output:</b> <c>this card gets +{power} power, and the following ability{duration}. "{nestedEnglish}"</c></para>
+/// </remarks>
 internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
     private static readonly Dictionary<string, string> DurationMap = new()
@@ -66,11 +81,13 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
 
         var nestedEnglish = TryTranslateNested(registry, nestedJapanese) ?? nestedJapanese;
 
+        if (!nestedEnglish.EndsWith('.') && !nestedEnglish.EndsWith('"'))
+            nestedEnglish += ".";
         return
         [
             new CardEffectAbility
             {
-                AbilityText = $"this card gets +{power} power and the following ability{durationText}. \"{nestedEnglish}\""
+                AbilityText = $"this card gets +{power} power, and the following ability{durationText}. \"{nestedEnglish}\""
             }
         ];
     }

@@ -10,7 +10,7 @@ internal class ConditionalAbilityToken : CardTextToken<List<CardEffectAbility>>
     // Match conditional ability patterns where a condition precedes an ability action.
     // Only matches patterns starting with specific pronouns to avoid over-matching.
     // Pattern: その/この/あなたの[condition]なら、[ability]
-    public override Regex Matcher => new(@"^(?:その|この|あなたの)(?<condition>.+?)なら、(?<ability>.+)$");
+    public override Regex Matcher => new(@"^(?:その|この|あなたの)(?<condition>.+?)なら、(?<ability>.+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

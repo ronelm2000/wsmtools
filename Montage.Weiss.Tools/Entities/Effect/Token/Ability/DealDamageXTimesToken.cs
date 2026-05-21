@@ -14,7 +14,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class DealDamageXTimesToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手に1ダメージを(\d+)回与える");
+    public override Regex Matcher => new(@"^相手に1ダメージを(\d+)回与える(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

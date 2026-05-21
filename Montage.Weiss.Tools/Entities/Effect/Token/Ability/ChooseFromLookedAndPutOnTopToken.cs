@@ -25,7 +25,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class ChooseFromLookedAndPutOnTopToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^カードを(\d+)枚(まで)?選び、山札の上に(?:好きな順番で)?置き、残りのカードを控え室に置(?:く|き)(?:、|\.|,|、|。)?");
+    public override Regex Matcher => new(@"^カードを(\d+)枚(まで)?選び、山札の上に(?:好きな順番で)?置き、残りのカードを控え室に置(?:く|き)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

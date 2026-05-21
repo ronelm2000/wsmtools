@@ -4,7 +4,7 @@ internal class CannotBeChosenAbilityToken : CardTextToken<List<CardEffectAbility
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<CannotBeChosenAbilityToken>();
 
-    public override Regex Matcher => new(@"^このカードは相手の効果に選ばれない。?");
+    public override Regex Matcher => new(@"^このカードは相手の効果に選ばれない(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

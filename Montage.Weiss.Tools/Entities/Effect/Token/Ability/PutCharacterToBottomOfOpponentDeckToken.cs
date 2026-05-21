@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class PutCharacterToBottomOfOpponentDeckToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^あなたはそのキャラを山札の下に置いてよい");
+    public override Regex Matcher => new(@"^あなたはそのキャラを山札の下に置いてよい(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

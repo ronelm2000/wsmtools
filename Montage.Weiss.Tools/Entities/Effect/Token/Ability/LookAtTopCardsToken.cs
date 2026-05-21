@@ -45,7 +45,8 @@ internal class LookAtTopCardsToken : CardTextToken<List<CardEffectAbility>>
         [
             new CardEffectAbility
             {
-                AbilityText = $"look at up to {displayCount} cards from the top of {deckOwner} deck{followUpText}"
+                AbilityText = $"look at up to {displayCount} cards from the top of {deckOwner} deck{followUpText}",
+                Prefix = AbilityPrefix.And
             }
         ];
     }

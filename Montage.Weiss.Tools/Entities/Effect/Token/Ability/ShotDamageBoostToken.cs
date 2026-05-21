@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ShotDamageBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:あなたの)?\[\[(?<icon>.+?\.gif)\]\]の効果で与えるダメージを[＋\+](?<amount>\d+)(?:\.|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたの)?\[\[(?<icon>.+?\.gif)\]\]の効果で与えるダメージを[＋\+](?<amount>\d+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

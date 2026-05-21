@@ -23,7 +23,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class GiveEncoreToOpponentCharactersToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手の(?:すべてのキャラに|キャラすべてに)、(?:\s)?『\【自\】\s*アンコール\s*［(.+?)］』を与える");
+    public override Regex Matcher => new(@"^相手の(?:すべてのキャラに|キャラすべてに)、(?:\s)?『\【自\】\s*アンコール\s*［(.+?)］』を与える(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

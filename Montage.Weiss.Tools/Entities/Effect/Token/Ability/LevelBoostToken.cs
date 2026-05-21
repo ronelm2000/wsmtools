@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class LevelBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:そのターン中、)?レベルを[＋\+](?<level>\d+)");
+    public override Regex Matcher => new(@"^(?:そのターン中、)?レベルを[＋\+](?<level>\d+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

@@ -15,6 +15,9 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token;
 ///   <item><description>mainText: The effect body after labels</description></item>
 /// </list>
 /// <para><b>Output:</b> Full English effect text with labels, conditions, and abilities joined.</para>
+/// <para><b>Condition→Ability Join:</b> When a sentence has a leading condition, the first ability
+/// is joined with <c>", "</c> (not <c>", and "</c>) to avoid spurious conjunction. Subsequent abilities
+/// within the same sentence use standard serial comma (<c>", and "</c> before the last).</para>
 /// </remarks>
 internal class EventEffectToken : CardTextToken<CardEffect>
 {
@@ -107,10 +110,28 @@ internal class EventEffectToken : CardTextToken<CardEffect>
             if (sentenceParts.Count > 0)
             {
                 string joined;
+                var hasCondition = conditions.Count > 0;
                 if (sentenceParts.Count > 1)
                 {
-                    var allButLast = string.Join(", ", sentenceParts.Take(sentenceParts.Count - 1));
-                    joined = $"{allButLast}, and {sentenceParts[^1]}";
+                    if (hasCondition)
+                    {
+                        var conditionPart = sentenceParts[0];
+                        var abilityParts = sentenceParts.Skip(1).ToList();
+                        if (abilityParts.Count > 1)
+                        {
+                            var allButLastAbility = string.Join(", ", abilityParts.Take(abilityParts.Count - 1));
+                            joined = $"{conditionPart}, {allButLastAbility}, and {abilityParts[^1]}";
+                        }
+                        else
+                        {
+                            joined = $"{conditionPart}, {abilityParts[0]}";
+                        }
+                    }
+                    else
+                    {
+                        var allButLast = string.Join(", ", sentenceParts.Take(sentenceParts.Count - 1));
+                        joined = $"{allButLast}, and {sentenceParts[^1]}";
+                    }
                 }
                 else
                 {

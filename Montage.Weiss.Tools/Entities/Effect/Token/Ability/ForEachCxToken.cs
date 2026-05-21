@@ -15,7 +15,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class ForEachCxToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^それらのカードのCX1枚につき、?(?<remaining>.+)$");
+    public override Regex Matcher => new(@"^それらのカードのCX1枚につき、?(?<remaining>.+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

@@ -14,7 +14,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class PlacedFromHandPowerBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカードが手札から舞台に置かれた時、そのターン中、このカードのパワーを＋(\d+|X)");
+    public override Regex Matcher => new(@"^このカードが手札から舞台に置かれた時、そのターン中、このカードのパワーを＋(\d+|X)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

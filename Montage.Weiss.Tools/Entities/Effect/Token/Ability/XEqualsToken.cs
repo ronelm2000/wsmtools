@@ -20,7 +20,7 @@ internal class XEqualsToken : CardTextToken<List<CardEffectAbility>>
             _ when description.Contains("それらのカードの") =>
                 $"X is equal to the number of {ExtractTrait(description)} characters put this way",
             _ when description.Contains("あなたの") && description.Contains("キャラの枚数") =>
-                $"X is equal to the number of your {ExtractTrait(description)} characters",
+                $"X is equal to the number of your {(description.Contains("他の") ? "other " : "")}{ExtractTrait(description)} characters",
             _ => description
         };
         return

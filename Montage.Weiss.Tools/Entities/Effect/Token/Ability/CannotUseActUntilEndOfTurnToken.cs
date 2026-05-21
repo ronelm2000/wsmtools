@@ -18,7 +18,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class CannotUseActUntilEndOfTurnToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^次の相手のターンの終わりまで、相手は舞台にいるキャラの【起】を使えない");
+    public override Regex Matcher => new(@"^次の相手のターンの終わりまで、相手は舞台にいるキャラの【起】を使えない(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

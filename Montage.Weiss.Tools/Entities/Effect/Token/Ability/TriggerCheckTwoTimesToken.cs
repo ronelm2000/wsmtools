@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class TriggerCheckTwoTimesToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^トリガーステップにトリガーチェックを2回行う");
+    public override Regex Matcher => new(@"^トリガーステップにトリガーチェックを2回行う(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

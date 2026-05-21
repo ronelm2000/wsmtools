@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class PutClockToWrOrStockToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^クロックの上から1枚を、控え室に置く(?:。|\.)?(?:そのカードを|控え室に置くかわりに)ストック置場に置いてよい");
+    public override Regex Matcher => new(@"^クロックの上から1枚を、控え室に置く(?:。|\.)?(?:そのカードを|控え室に置くかわりに)ストック置場に置いてよい(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

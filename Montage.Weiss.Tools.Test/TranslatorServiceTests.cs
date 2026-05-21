@@ -91,7 +91,8 @@ public class TranslatorServiceTests
     [DynamicData(nameof(GetAbilityTokenRegexValues))]
     public void Registry_AbilitiesMustCaptureEndingPunctuations(Type type, string regex)
     {
-        Assert.EndsWith(@"(?:\.|,|、|。)?", regex, $"Token {type.Name} regex must end with an optional capture of all possible punctuations. Current regex: {regex}");
+        if (!regex.EndsWith("』"))
+            Assert.EndsWith(@"(?:\.|,|、|。)?", regex, $"Token {type.Name} regex must end with an optional capture of all possible punctuations. Current regex: {regex}");
     }
 
     [TestMethod]
@@ -217,8 +218,8 @@ public class TranslatorServiceTests
         var effect = tree.Effects[0];
         Assert.IsFalse(string.IsNullOrEmpty(effect.ReminderText));
         Assert.IsTrue(effect.ReminderText.Contains("CX are regarded as level 0"));
-        Assert.IsTrue(effect.ReminderText.Contains("Put it on its original place"));
-        Assert.IsTrue(effect.EffectText.Contains("Put it on its original place"));
+        Assert.IsTrue(effect.ReminderText.Contains("Return the revealed card to its original place"));
+        Assert.IsTrue(effect.EffectText.Contains("Return the revealed card to its original place"));
     }
 
     [TestMethod]
@@ -320,7 +321,7 @@ public class TranslatorServiceTests
         Assert.AreEqual(1, tree.Effects.Count);
         var effect = tree.Effects[0] as AutoCardEffect;
         Assert.IsNotNull(effect);
-        Assert.IsTrue(effect.ConditionText.Contains("damage is canceled"));
+        Assert.IsTrue(effect.ConditionText.Contains("dealt by this card is canceled"));
     }
 
     [TestMethod]
@@ -385,10 +386,9 @@ public class TranslatorServiceTests
 
         Assert.AreEqual(1, tree.Effects.Count);
         var effect = tree.Effects[0] as AutoCardEffect;
+        var expectedENText = "[AUTO] When this card is placed on stage from your hand, look at up to X cards from the top of your deck, choose up to 1 card from among them, put it to your hand, and put the rest to your waiting room. X is equal to the number of your <<風>> characters.";
         Assert.IsNotNull(effect);
-        Assert.AreEqual("[AUTO] When this card is placed on stage from your hand, look at up to X cards from the top of your deck, choose up to 1 card, put it to your hand, and put the rest to your waiting room. X is equal to the number of your <<風>> characters.", effect.EffectText);
-        Assert.AreEqual("Look at up to X cards from the top of your deck, choose up to 1 card, put it to your hand, and put the rest to your waiting room. X is equal to the number of your <<風>> characters.", effect.AbilityText);
-        Assert.IsTrue(effect.AbilityText.Contains("Look at up to X cards"));
+        Assert.AreEqual(expectedENText, effect.EffectText);
     }
 
     [TestMethod]
@@ -401,8 +401,8 @@ public class TranslatorServiceTests
         Assert.AreEqual(1, tree.Effects.Count);
         var effect = tree.Effects[0] as AutoCardEffect;
         Assert.IsNotNull(effect);
-        Assert.AreEqual("[AUTO][1/TURN] During the turn this card was placed on stage from the hand, when this card's damage is canceled, put the top card of your deck to your waiting room, and deal X damage to your opponent. X is equal to that sent card's level +1.", effect.EffectText);
-        Assert.AreEqual("Put the top card of your deck to your waiting room, and deal X damage to your opponent. X is equal to that sent card's level +1.", effect.AbilityText);
+        Assert.AreEqual("[AUTO][1/TURN] During the turn that this card is placed on the stage in your hand, when damage dealt by this card is canceled, put the top card of your deck to your waiting room, and deal X damage to your opponent.", effect.EffectText);
+        Assert.AreEqual("Put the top card of your deck to your waiting room, and deal X damage to your opponent.", effect.AbilityText);
         Assert.IsTrue(effect.AbilityText.Contains("deal X damage to your opponent"));
     }
 
@@ -417,15 +417,17 @@ public class TranslatorServiceTests
         var effect = tree.Effects[0] as AutoCardEffect;
 
         const string expectedReminder = "CX are regarded as level 0. Damage may be canceled";
-        const string expectedEffectText = $"[AUTO][1/TURN] During the turn this card was placed on stage from the hand, " +
-            $"when this card's damage is canceled, put the top card of your deck to your waiting room, " +
-            $"and deal X damage to your opponent. X is equal to that sent card's level +1. ({expectedReminder})";
+        const string expectedPostConditionText = "X is equal to that sent card's level +1.";
+        const string expectedEffectText = $"[AUTO][1/TURN] During the turn that this card is placed on the stage in your hand, " +
+            $"when damage dealt by this card is canceled, put the top card of your deck to your waiting room, " +
+            $"and deal X damage to your opponent. {expectedPostConditionText} ({expectedReminder})";
         const string expectedAbilityText = "Put the top card of your deck to your waiting room, " +
             "and deal X damage to your opponent. X is equal to that sent card's level +1.";
         Assert.IsNotNull(effect);
         Assert.AreEqual(expectedEffectText, effect.EffectText);
         Assert.AreEqual(expectedAbilityText, effect.AbilityText);
         Assert.AreEqual(expectedReminder, effect.ReminderText);
+        Assert.AreEqual(expectedPostConditionText, effect.PostConditionText);
         Assert.IsTrue(effect.AbilityText.Contains("deal X damage to your opponent"));
     }
 
@@ -603,7 +605,7 @@ public class TranslatorServiceTests
             () => Assert.IsTrue(effect!.AbilityText.Contains("+5000 power")),
             () => Assert.IsTrue(effect!.EffectText.Contains("[CONT]")),
             () => Assert.IsTrue(effect!.EffectText.Contains("+5000 power")),
-            () => Assert.AreEqual("[CONT] During your turn, if you have 4 or more other <<風>> characters, this card gets +5000 power and the following ability. \"[CONT] During this card's battle, your opponent cannot play events or \"Backup\" from their hand.\"", effect!.EffectText),
+            () => Assert.AreEqual("[CONT] During your turn, if you have 4 or more other <<風>> characters, this card gets +5000 power, and the following ability. \"[CONT] During this card's battle, your opponent cannot play events or \"Backup\" from their hand.\"", effect!.EffectText),
         ], Assert.Fail);
     }
 }

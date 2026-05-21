@@ -48,6 +48,7 @@ public static class CardEffectConditionExtensions {
             {
                 ConditionType.When => "When",
                 ConditionType.If => "If",
+                ConditionType.LocationIf => "If",
                 ConditionType.During => "During",
                 ConditionType.At => "At",
                 ConditionType.For => "For each",
@@ -96,6 +97,13 @@ public enum ConditionType
     /// If conditions are the default condition, and can occur after "When" conditions. These can also occur between actions if additional conditions are involved.
     /// </summary>
     If,
+    /// <summary>
+    /// Location-based If conditions (e.g., "this card is in your memory", "this card is in your center stage").
+    /// Treated as "If" prefix but grouped separately from standard If conditions in <see cref="CardEffectConditionExtensions.AggregateToString"/>
+    /// so they form their own group before standard If conditions. Enables ordering like
+    /// "If this card is in your memory, when X is placed, if your level is N or higher".
+    /// </summary>
+    LocationIf,
     /// <summary>
     /// During conditions are dependent on turn progression, such as "During your turn", or "During your opponent's turn".
     /// </summary>

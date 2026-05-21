@@ -7,7 +7,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
     // Matches: あなたは自分の控え室の (【レベルX以下の】《...》の)?キャラを...枚選び、手札に戻す
     // Also matches: あなたは自分の控え室のトリガーアイコンが...の CX を...枚選び、手札に戻す
     // Also matches: あなたは自分の控え室の CX を...枚選び、手札に戻す (bare CX without trigger icon)
-    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?(?:自分の)?控え室の(?:(?:(?:レベル(?<level>[Ｘ\d]+)以下の)?《(.+?)》の)?キャラ|トリガーアイコンが\[\[(.+?)\]\]のCX|CX)を(\d+)枚(?:まで)?選び、(?<action>手札に戻してよい|手札に戻す|手札に戻し|このカードの下にマーカーとして表向きに置いてよい)");
+    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?(?:自分の)?控え室の(?:(?:(?:レベル(?<level>[Ｘ\d]+)以下の)?《(.+?)》の)?キャラ|トリガーアイコンが\[\[(.+?)\]\]のCX|CX)を(\d+)枚(?:まで)?選び、(?<action>手札に戻してよい|手札に戻す|手札に戻し|このカードの下にマーカーとして表向きに置いてよい)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

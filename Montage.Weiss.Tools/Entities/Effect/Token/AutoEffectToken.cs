@@ -27,6 +27,11 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token;
 /// - Different effect type indicators (【自動】)
 /// - Different cost formats (ASCII brackets [...])
 /// - Different label formats</para>
+/// <para><b>Formatting details:</b></para>
+/// <list type="bullet">
+///   <item><description>Non-bracket labels (e.g., "Memory", "Assist") are separated from the cost bracket <c>[cost]</c> by a space.</description></item>
+///   <item><description><c>PostConditionText</c> is built from all <see cref="ConditionType.PostCondition"/> conditions, joined in order with <c>". "</c>.</description></item>
+/// </list>
 /// </remarks>
 internal class AutoEffectToken : CardTextToken<CardEffect>
 {
@@ -179,7 +184,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         var accelerateInsert = hasAccelerate ? " Accelerate" : "";
         var effectText = $"[AUTO]{accelerateInsert}{labelPrefix}{nonBracketPrefix}";
         if (!string.IsNullOrEmpty(costEnglish))
-            effectText += $"{(hasAccelerate ? " " : "")}[{costEnglish}]";
+            effectText += $"{(hasAccelerate || nonBracketLabels.Count > 0 ? " " : "")}[{costEnglish}]";
         if (!string.IsNullOrEmpty(conditionEnglish))
             effectText += $" {conditionEnglish},";
         if (!string.IsNullOrEmpty(abilityEnglish))
@@ -207,13 +212,18 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         var unmatchedAbilities = abilities.Where(a => a.IsUnmatched).ToList();
         var unmatchedCosts = costAbilities.Where(a => a.IsUnmatched).ToList();
 
+        var postConditions = conditions.Where(c => c.Type == ConditionType.PostCondition).ToList();
+        var postConditionText = postConditions.Count > 0
+            ? string.Join(" ", postConditions.Select(c => c.ConditionText.TrimEnd('.') + "."))
+            : string.Empty;
+
         if (unmatchedConditions.Count > 0 || unmatchedAbilities.Count > 0 || unmatchedCosts.Count > 0)
         {
             var result = new AutoCardEffect
             {
                 Labels = finalLabels,
                 PreConditionText = string.Empty,
-                PostConditionText = string.Empty,
+                PostConditionText = postConditionText,
                 ConditionText = conditions.AggregateToString(),
                 Condition = conditions,
                 CostText = costEnglish,
@@ -234,7 +244,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         {
             Labels = finalLabels,
             PreConditionText = string.Empty,
-            PostConditionText = string.Empty,
+            PostConditionText = postConditionText,
             ConditionText = conditions.AggregateToString(),
             Condition = conditions,
             CostText = costEnglish,

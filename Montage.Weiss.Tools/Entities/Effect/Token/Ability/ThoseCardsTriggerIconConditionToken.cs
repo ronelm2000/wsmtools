@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ThoseCardsTriggerIconConditionToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^それらのカードのトリガーアイコンが(?<icon>\[\[.+?\]\])の(?:(?<cxcount>CX(?:\d+)?枚につき)、(?:次の行動を行う。『(?<inner>.+)』)?)?(?<remaining>.+)$");
+    public override Regex Matcher => new(@"^それらのカードのトリガーアイコンが(?<icon>\[\[.+?\]\])の(?:(?<cxcount>CX(?:\d+)?枚につき)、(?:次の行動を行う。『(?<inner>.+)』)?)?(?<remaining>.+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

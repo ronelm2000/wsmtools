@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class RestIfCxExistsToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^それらのカードにCXがあるなら、このカードを【レスト】する");
+    public override Regex Matcher => new(@"^それらのカードにCXがあるなら、このカードを【レスト】する(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

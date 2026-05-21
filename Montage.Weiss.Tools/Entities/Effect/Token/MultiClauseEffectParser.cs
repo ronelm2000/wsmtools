@@ -147,9 +147,10 @@ public static class MultiClauseEffectParser
                 foreach (var abil in abilList)
                 {
                     var finalText = pendingDuration != null ? ApplyDuration(abil.AbilityText, pendingDuration) : abil.AbilityText;
+                    var prefix = abil.Prefix != AbilityPrefix.And ? abil.Prefix : detectedPrefix;
                     Log.Debug("ParseSentence: ability '{Token}' with pending duration '{Duration}' and prefix '{Prefix}' -> '{FinalText}'",
-                        abilMatch.Match.Token, pendingDuration, detectedPrefix, finalText);
-                    abilities.Add(abil with { AbilityText = finalText, Prefix = detectedPrefix });
+                        abilMatch.Match.Token, pendingDuration, prefix, finalText);
+                    abilities.Add(abil with { AbilityText = finalText, Prefix = prefix });
                 }
                 pendingDuration = null;
                 Log.Debug("ParseSentence: ability matched by '{Token}', consumed {Len} chars, remaining='{Remaining}'",
@@ -326,18 +327,19 @@ public static class MultiClauseEffectParser
         var postConditions = conditions.Where(c => c.Type == ConditionType.PostCondition).ToList();
 
         var conditionPart = mainConditions.Count > 0 ? mainConditions.AggregateToString() : "";
-        var abilityParts = abilities.Select(a => a.AbilityText).ToList();
 
         string result;
-        if (!string.IsNullOrEmpty(conditionPart) && abilityParts.Count > 0)
+        if (!string.IsNullOrEmpty(conditionPart) && abilities.Count > 0)
         {
-            result = $"{conditionPart}, {abilityParts[0]}";
-            for (int i = 1; i < abilityParts.Count; i++)
+            result = $"{conditionPart}, {abilities[0].AbilityText}";
+            for (int i = 1; i < abilities.Count; i++)
             {
-                var nextAbility = abilityParts[i];
+                var nextAbility = abilities[i].AbilityText;
                 if (nextAbility.Length > 0 && char.IsUpper(nextAbility[0]) && nextAbility[0] != 'X')
                     nextAbility = char.ToLower(nextAbility[0]) + nextAbility[1..];
-                var connector = (i == abilityParts.Count - 1) ? ", and " : ", ";
+                var connector = (i == abilities.Count - 1 && abilities[i].Prefix != AbilityPrefix.Continuation) ? ", and " : ", ";
+                if (abilities[i - 1].Prefix == AbilityPrefix.Continuation)
+                    connector = ", and ";
                 result += connector + nextAbility;
             }
         }
@@ -345,9 +347,19 @@ public static class MultiClauseEffectParser
         {
             result = conditionPart;
         }
-        else if (abilityParts.Count > 0)
+        else if (abilities.Count > 0)
         {
-            result = string.Join(", ", abilityParts);
+            result = abilities[0].AbilityText;
+            for (int i = 1; i < abilities.Count; i++)
+            {
+                var nextAbility = abilities[i].AbilityText;
+                if (nextAbility.Length > 0 && char.IsUpper(nextAbility[0]) && nextAbility[0] != 'X')
+                    nextAbility = char.ToLower(nextAbility[0]) + nextAbility[1..];
+                var connector = (i == abilities.Count - 1 && abilities[i].Prefix != AbilityPrefix.Continuation) ? ", and " : ", ";
+                if (abilities[i - 1].Prefix == AbilityPrefix.Continuation)
+                    connector = ", and ";
+                result += connector + nextAbility;
+            }
             result = char.ToUpper(result[0]) + result[1..];
         }
         else

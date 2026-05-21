@@ -16,7 +16,7 @@ internal class PowerBoostGainEncoreToken : CardTextToken<List<CardEffectAbility>
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<PowerBoostGainEncoreToken>();
 
-    public override Regex Matcher => new(@"^このカードのパワーを[＋\+](?<power>\d+)し、このカードは『\【自\】\s*アンコール\s*［(?<cost>.+?)］』を得る");
+    public override Regex Matcher => new(@"^このカードのパワーを[＋\+](?<power>\d+)し、このカードは『\【自\】\s*アンコール\s*［(?<cost>.+?)］』を得る(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -53,7 +53,7 @@ internal class PowerBoostGainEncoreToken : CardTextToken<List<CardEffectAbility>
 
 internal class GainEncoreAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^このカードは『\【自\】\s*アンコール\s*［(?<cost>.+?)］』を得る");
+    public override Regex Matcher => new(@"^このカードは『\【自\】\s*アンコール\s*［(?<cost>.+?)］』を得る(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

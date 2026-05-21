@@ -10,7 +10,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class SearchLevel0OrLowerToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^自分の山札を見てレベル0以下のキャラを1枚まで選び");
+    public override Regex Matcher => new(@"^自分の山札を見てレベル0以下のキャラを1枚まで選び(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

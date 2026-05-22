@@ -126,7 +126,7 @@ internal class ContEffectToken : CardTextToken<CardEffect>
                 $"Unrecognized [condition(s): {string.Join(" / ", unmatchedConditions.Select(c => c.ConditionText))}]" +
                 (unmatchedConditions.Count > 0 && unmatchedAbilities.Count > 0 ? " | " : "") +
                 $"[ability(ies): {string.Join(" / ", unmatchedAbilities.Select(a => a.AbilityText))}]",
-                new CardEffectTree { Effects = [result] });
+                result);
         }
 
         return new ContCardEffect

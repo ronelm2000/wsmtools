@@ -7,7 +7,7 @@ using Montage.Weiss.Tools.Entities.Effect.Token.ReminderText;
 namespace Montage.Weiss.Tools.Impls.Services;
 
 /// <summary>
-/// Provides a service for converting effect text into <see cref="CardEffectTree"/>.
+/// Provides a service for converting effect text into <see cref="CardEffect"/>.
 /// </summary>
 public class WeissSchwarzCardTranslatorService : ITokenRegistry
 {
@@ -363,7 +363,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         }).ToArray();
     }
 
-   public CardEffectTree TranslateEffect(string japaneseEffectText)
+   public CardEffect TranslateEffect(string japaneseEffectText)
     {
         // Extract reminder text (full-width parentheses at end)
         var reminderMatch = Regex.Match(japaneseEffectText, @"（(?<reminder>[^）]+)）\s*$");
@@ -456,10 +456,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
             }
         }
 
-       return new CardEffectTree
-        {
-            Effects = [effect]
-        };
+       return effect;
     }
 
  private static string? TranslateTriggerIconReminderText(string icon, string iconName, string japaneseText)

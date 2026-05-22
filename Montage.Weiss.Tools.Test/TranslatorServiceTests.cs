@@ -122,8 +122,7 @@ public class TranslatorServiceTests
         var japanese = "【永】 あなたの手札が5枚以上なら、このカードのパワーを＋2000。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as ContCardEffect;
+        var effect = tree as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.AreEqual("If you have 5 or more cards in your hand", effect.ConditionText);
         Assert.AreEqual("This card gets +2000 power.", effect.AbilityText);
@@ -155,8 +154,7 @@ public class TranslatorServiceTests
         var japanese = "【永】 あなたのターン中、他のあなたの《風》のキャラが2枚以上なら、このカードのパワーを＋4000。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as ContCardEffect;
+        var effect = tree as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.AreEqual("During your turn, if you have 2 or more other <<風>> characters", effect.ConditionText);
         Assert.AreEqual("This card gets +4000 power.", effect.AbilityText);
@@ -171,8 +169,7 @@ public class TranslatorServiceTests
         var japanese = "【永】 応援 このカードの前のあなたのキャラすべてに、パワーを＋Ｘ。Ｘはそのキャラのレベル×500に等しい。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as ContCardEffect;
+        var effect = tree as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.AreEqual("Assist", effect.Labels[0]);
         Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level ×500.", effect.AbilityText);
@@ -186,8 +183,7 @@ public class TranslatorServiceTests
         var japanese = "【永】 応援 このカードの前のあなたのキャラすべてに、パワーを＋Ｘ。Ｘはそのキャラのレベル×1500に等しい。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as ContCardEffect;
+        var effect = tree as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.AreEqual("Assist", effect.Labels[0]);
         Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level ×1500.", effect.AbilityText);
@@ -201,8 +197,7 @@ public class TranslatorServiceTests
         var japanese = "【自】［手札を1枚控え室に置く］ あなたのCXがCX置場に置かれた時、あなたはコストを払ってよい。そうしたら、あなたは自分の山札の上から1枚を公開し、自分の控え室のレベルＸ以下のキャラを1枚選び、手札に戻す。Ｘは公開されたカードのレベルに等しい。（CXのレベルは0として扱う）";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0];
+        var effect = tree;
         Assert.IsFalse(string.IsNullOrEmpty(effect.ReminderText));
         Assert.IsTrue(effect.ReminderText.Contains("CX are regarded as level 0"));
         Assert.IsTrue(effect.EffectText.Contains("CX are regarded as level 0"));
@@ -215,8 +210,7 @@ public class TranslatorServiceTests
         var japanese = "【自】［手札を1枚控え室に置く］ あなたのCXがCX置場に置かれた時、あなたはコストを払ってよい。そうしたら、あなたは自分の山札の上から1枚を公開し、自分の控え室のレベルＸ以下のキャラを1枚選び、手札に戻す。Ｘは公開されたカードのレベルに等しい。（CXのレベルは0として扱う。公開したカードは元に戻す）";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0];
+        var effect = tree;
         Assert.IsFalse(string.IsNullOrEmpty(effect.ReminderText));
         Assert.IsTrue(effect.ReminderText.Contains("CX are regarded as level 0"));
         Assert.IsTrue(effect.ReminderText.Contains("Return the revealed card to its original place"));
@@ -230,8 +224,7 @@ public class TranslatorServiceTests
         var japanese = "【永】 あなたの手札が5枚以上なら、このカードのパワーを＋2000。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0];
+        var effect = tree;
         Assert.AreEqual(string.Empty, effect.ReminderText);
     }
 
@@ -242,8 +235,7 @@ public class TranslatorServiceTests
         var japanese = "【永】 あなたのキャラすべてに、ソウルを＋2。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as ContCardEffect;
+        var effect = tree as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.IsTrue(effect.AbilityText.Contains("+2 soul"));
     }
@@ -255,8 +247,7 @@ public class TranslatorServiceTests
         var japanese = "【永】 あなたのキャラすべてに、パワーを＋1000し、ソウルを＋1。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as ContCardEffect;
+        var effect = tree as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.IsTrue(effect.AbilityText.Contains("+1000 power and +1 soul"));
     }
@@ -268,8 +259,7 @@ public class TranslatorServiceTests
         var japanese = "集中 あなたは自分の山札の上から3枚をめくり、控え室に置く。あなたは自分の控え室のレベルＸ以下の《風》のキャラを1枚選び、手札に戻す。Ｘはそれらのカードの《風》のキャラの枚数に等しい。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0];
+        var effect = tree;
         Assert.IsTrue(effect.EffectText.Contains("Brainstorm"));
     }
 
@@ -280,8 +270,7 @@ public class TranslatorServiceTests
         var japanese = "【自】 このカードが【リバース】した時、このカードのバトル相手のレベルが0以下なら、あなたはそのキャラを山札の下に置いてよい。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as AutoCardEffect;
+        var effect = tree as AutoCardEffect;
         Assert.IsNotNull(effect);
         Assert.IsTrue(effect.ConditionText.Contains("[REVERSE]"));
     }
@@ -293,8 +282,7 @@ public class TranslatorServiceTests
         var japanese = "【自】【ターン1】 このカードが手札から舞台に置かれたターン中、このカードの与えたダメージがキャンセルされた時、あなたは自分の山札の上から1枚を、控え室に置き、相手にＸダメージを与える。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as AutoCardEffect;
+        var effect = tree as AutoCardEffect;
         Assert.IsNotNull(effect);
         Assert.IsTrue(effect.EffectText.Contains("[1/TURN]"));
     }
@@ -306,8 +294,7 @@ public class TranslatorServiceTests
         var japanese = "【自】 このカードが【リバース】した時、このカードのバトル相手のレベルが0以下なら、あなたはそのキャラを山札の下に置いてよい。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as AutoCardEffect;
+        var effect = tree as AutoCardEffect;
         Assert.IsNotNull(effect);
         Assert.IsTrue(effect.ConditionText.Contains("level 0 or lower"));
     }
@@ -319,8 +306,7 @@ public class TranslatorServiceTests
         var japanese = "【自】【ターン1】 このカードが手札から舞台に置かれたターン中、このカードの与えたダメージがキャンセルされた時、あなたは自分の山札の上から1枚を、控え室に置き、相手にＸダメージを与える。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as AutoCardEffect;
+        var effect = tree as AutoCardEffect;
         Assert.IsNotNull(effect);
         Assert.IsTrue(effect.ConditionText.Contains("dealt by this card is canceled"));
     }
@@ -332,8 +318,7 @@ public class TranslatorServiceTests
         var japanese = "【永】 他のあなたの《風》のキャラが2枚以上なら、このカードのパワーを＋2000。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as ContCardEffect;
+        var effect = tree as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.IsTrue(effect.ConditionText.Contains("<<風>> characters"));
     }
@@ -345,8 +330,7 @@ public class TranslatorServiceTests
         var japanese = "【自】 このカードが手札から舞台に置かれた時、あなたは自分のクロックの上から1枚までを、控え室に置き、そのターン中、このカードのパワーを＋3000。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as AutoCardEffect;
+        var effect = tree as AutoCardEffect;
         Assert.IsNotNull(effect);
         Assert.IsTrue(effect.AbilityText.Contains("clock to your waiting room"));
     }
@@ -358,8 +342,7 @@ public class TranslatorServiceTests
         var japanese = "【自】 このカードが手札から舞台に置かれた時、あなたは自分のクロックの上から1枚までを、控え室に置き、そのターン中、このカードのパワーを＋3000。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as AutoCardEffect;
+        var effect = tree as AutoCardEffect;
         Assert.IsNotNull(effect);
         Assert.IsNotEmpty(effect!.TokenLog);
     }
@@ -372,8 +355,7 @@ public class TranslatorServiceTests
         var japanese = "【起】［手札を1枚控え室に置き、このカードを控え室に置く］ あなたは自分の控え室の《NIKKE》のキャラを1枚選び、手札に戻す。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as ActCardEffect;
+        var effect = tree as ActCardEffect;
         Assert.IsNotNull(effect);
         Assert.IsNotEmpty(effect!.TokenLog);
     }
@@ -385,8 +367,7 @@ public class TranslatorServiceTests
         var japanese = "【自】 このカードが手札から舞台に置かれた時、あなたは自分の山札を上からＸ枚まで見て、カードを1枚まで選び、手札に加え、残りのカードを控え室に置く。Ｘはあなたの《風》のキャラの枚数に等しい。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as AutoCardEffect;
+        var effect = tree as AutoCardEffect;
         var expectedENText = "[AUTO] When this card is placed on stage from your hand, look at up to X cards from the top of your deck, choose up to 1 card from among them, put it to your hand, and put the rest to your waiting room. X is equal to the number of your <<風>> characters.";
         Assert.IsNotNull(effect);
         Assert.AreEqual(expectedENText, effect.EffectText);
@@ -399,8 +380,7 @@ public class TranslatorServiceTests
         var japanese = "【自】【ターン1】 このカードが手札から舞台に置かれたターン中、このカードの与えたダメージがキャンセルされた時、あなたは自分の山札の上から1枚を、控え室に置き、相手にＸダメージを与える。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as AutoCardEffect;
+        var effect = tree as AutoCardEffect;
         Assert.IsNotNull(effect);
         Assert.AreEqual("[AUTO][1/TURN] During the turn that this card is placed on the stage in your hand, when damage dealt by this card is canceled, put the top card of your deck to your waiting room, and deal X damage to your opponent.", effect.EffectText);
         Assert.AreEqual("Put the top card of your deck to your waiting room, and deal X damage to your opponent.", effect.AbilityText);
@@ -414,8 +394,7 @@ public class TranslatorServiceTests
         var japanese = "【自】【ターン1】 このカードが手札から舞台に置かれたターン中、このカードの与えたダメージがキャンセルされた時、あなたは自分の山札の上から1枚を、控え室に置き、相手にＸダメージを与える。Ｘはそのカードのレベル＋1に等しい。（CXのレベルは0として扱う。ダメージキャンセルは発生する）";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as AutoCardEffect;
+        var effect = tree as AutoCardEffect;
 
         const string expectedReminder = "CX are regarded as level 0. Damage may be canceled";
         const string expectedPostConditionText = "X is equal to that sent card's level +1.";
@@ -439,8 +418,7 @@ public class TranslatorServiceTests
         var japanese = "【永】 あなたのターン中、他のあなたの《風》のキャラが4枚以上なら、このカードのパワーを＋5000。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as ContCardEffect;
+        var effect = tree as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.AreEqual("During your turn, if you have 4 or more other <<風>> characters", effect.ConditionText);
         Assert.IsTrue(effect.AbilityText.Contains("+5000 power"));
@@ -456,8 +434,7 @@ public class TranslatorServiceTests
         var japanese = "【永】 あなたのターン中、他のあなたの《風》のキャラが4枚以上なら、このカードのパワーを＋5000。";
         var tree = _service.TranslateEffect(japanese);
 
-        Assert.AreEqual(1, tree.Effects.Count);
-        var effect = tree.Effects[0] as ContCardEffect;
+        var effect = tree as ContCardEffect;
 
         Assert.IsNotEmpty(effect!.TokenLog);
     }
@@ -469,9 +446,8 @@ public class TranslatorServiceTests
     {
         var japanese = "【永】 あなたのターン中、他のあなたadded_textの《不存在》のキャラが4枚以上なら、このカードのパワーを＋5000。";
         var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
-        Assert.IsNotNull(ex.Tree);
-        Assert.AreEqual(1, ex.Tree.Effects.Count);
-        Assert.IsInstanceOfType<ContCardEffect>(ex.Tree.Effects[0]);
+        Assert.IsNotNull(ex.Effect);
+        Assert.IsInstanceOfType<ContCardEffect>(ex.Effect);
     }
 
     [TestMethod]
@@ -480,9 +456,8 @@ public class TranslatorServiceTests
     {
         var japanese = "【永】 あなたのターン中、他のあなたadded_textの《不存在》のキャラが4枚以上なら、このカードのadded_textパワーを＋5000。";
         var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
-        Assert.IsNotNull(ex.Tree);
-        Assert.AreEqual(1, ex.Tree.Effects.Count);
-        Assert.IsInstanceOfType<ContCardEffect>(ex.Tree.Effects[0]);
+        Assert.IsNotNull(ex.Effect);
+        Assert.IsInstanceOfType<ContCardEffect>(ex.Effect);
     }
 
     [TestMethod]
@@ -491,9 +466,8 @@ public class TranslatorServiceTests
     {
         var japanese = "【自】 あなたがこのカードの『non_existent_label』を使った時、あなたは自分の山札の上から1枚を公開する。そのカードが《風》のキャラなら手札に加え、あなたは自分の手札を1枚選び、控え室に置く。（そうでないなら元に戻す）";
         var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
-        Assert.IsNotNull(ex.Tree);
-        Assert.AreEqual(1, ex.Tree.Effects.Count);
-        Assert.IsInstanceOfType<AutoCardEffect>(ex.Tree.Effects[0]);
+        Assert.IsNotNull(ex.Effect);
+        Assert.IsInstanceOfType<AutoCardEffect>(ex.Effect);
     }
 
     [TestMethod]
@@ -502,9 +476,8 @@ public class TranslatorServiceTests
     {
         var japanese = "【自】 あなたがこのカードの『助太刀』を使った時、あなたは自分の山札の上から1枚枚枚枚枚を公開する。そのカードが《風》のキャラなら手札に加え、あなたは自分の手札を1枚選び、控え室に置く。（そうでないなら元に戻す）";
         var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
-        Assert.IsNotNull(ex.Tree);
-        Assert.AreEqual(1, ex.Tree.Effects.Count);
-        Assert.IsInstanceOfType<AutoCardEffect>(ex.Tree.Effects[0]);
+        Assert.IsNotNull(ex.Effect);
+        Assert.IsInstanceOfType<AutoCardEffect>(ex.Effect);
     }
 
     [TestMethod]
@@ -512,43 +485,32 @@ public class TranslatorServiceTests
     [DynamicData(nameof(TranslateCsvCrossCheckAllData))]
     public void Translate_CSV_CrossCheckAll(string serial, string jpEffect, string enEffect, string labels)
     {
-        CardEffectTree tree;
-        try
-        {
-            tree = _service.TranslateEffect(jpEffect);
-        }
-        catch (Exception ex)
-        {
-            Assert.Fail($"[{serial}] Translation threw {ex.GetType().Name}: {ex.Message}");
-            return;
-        }
-
-        Assert.IsTrue(tree.Effects.Count > 0, $"[{serial}] No translated effects were returned");
+        var tree = _service.TranslateEffect(jpEffect);
 
         var expected = enEffect.Trim();
-        var actual = tree.Effects[0].EffectText.Trim();
+        var actual = tree.EffectText.Trim();
         var expectedLabels = string.IsNullOrEmpty(labels)
             ? Array.Empty<string>()
             : labels.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-        if (jpEffect.StartsWith("【自】") && tree.Effects[0] is not AutoCardEffect)
+        if (jpEffect.StartsWith("【自】") && tree is not AutoCardEffect)
         {
-            Log.Warning("[{serial}] resolves to {effectType} and needs to unify its function to AutoCardEffect.", serial, tree.Effects[0].GetType().Name);
+            Log.Warning("[{serial}] resolves to {effectType} and needs to unify its function to AutoCardEffect.", serial, tree.GetType().Name);
         }
-        else if (jpEffect.StartsWith("【永】") && tree.Effects[0] is not ContCardEffect)
+        else if (jpEffect.StartsWith("【永】") && tree is not ContCardEffect)
         {
-            Log.Warning("[{serial}] resolves to {effectType} and needs to unify its function to ContCardEffect.", serial, tree.Effects[0].GetType().Name);
+            Log.Warning("[{serial}] resolves to {effectType} and needs to unify its function to ContCardEffect.", serial, tree.GetType().Name);
         }
-        else if (jpEffect.StartsWith("【起】") && tree.Effects[0] is not ActCardEffect)
+        else if (jpEffect.StartsWith("【起】") && tree is not ActCardEffect)
         {
-            Log.Warning("[{serial}] resolves to {effectType} and needs to unify its function to ActCardEffect.", serial, tree.Effects[0].GetType().Name);
+            Log.Warning("[{serial}] resolves to {effectType} and needs to unify its function to ActCardEffect.", serial, tree.GetType().Name);
         }
 
-        Log.Debug("Full Effect: {@effect}", tree.Effects[0]);
+        Log.Debug("Full Effect: {@effect}", tree);
 
         MultiAssert.AllAreTrue([
             () => Assert.AreEqual(expected, actual, $"[{serial}] EffectText mismatch{Environment.NewLine}Expected: {expected}{Environment.NewLine}Actual: {actual}"),
-            () => CollectionAssert.AreEqual(expectedLabels, tree.Effects[0].Labels, $"[{serial}]{Environment.NewLine}Expected: {string.Join(", ", expectedLabels)}{Environment.NewLine}Actual: {string.Join(", ", tree.Effects[0].Labels)}{Environment.NewLine}Labels mismatched")
+            () => CollectionAssert.AreEqual(expectedLabels, tree.Labels, $"[{serial}]{Environment.NewLine}Expected: {string.Join(", ", expectedLabels)}{Environment.NewLine}Actual: {string.Join(", ", tree.Labels)}{Environment.NewLine}Labels mismatched")
         ], Assert.Fail);
     }
 
@@ -609,9 +571,8 @@ public class TranslatorServiceTests
         ContCardEffect? effect = null;
 
         MultiAssert.AllAreTrue([
-            () => Assert.AreEqual(1, tree.Effects.Count),
             () => {
-                effect = tree.Effects[0] as ContCardEffect;
+                effect = tree as ContCardEffect;
                 Assert.IsNotNull(effect);
             },
             () => Assert.AreEqual("During your turn, if you have 4 or more other <<風>> characters", effect!.ConditionText),

@@ -240,7 +240,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                 $"Unrecognized [condition(s): {string.Join(" / ", unmatchedConditions.Select(c => c.ConditionText))}]" +
                 $"[ability(ies): {string.Join(" / ", unmatchedAbilities.Select(a => a.AbilityText))}]" +
                 $"[cost(s): {string.Join(" / ", unmatchedCosts.Select(a => a.AbilityText))}]",
-                new CardEffectTree { Effects = [result] });
+                result);
         }
 
         return new AutoCardEffect

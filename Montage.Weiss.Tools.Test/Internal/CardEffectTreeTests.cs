@@ -70,33 +70,26 @@ public class CardEffectTreeTests
     [TestMethod]
     public void EffectParseException_IsNotImplementedException()
     {
-        var tree = new CardEffectTree { Effects = [] };
-        var ex = new TranslationNotImplementedException("test", tree);
+        var effect = new EventCardEffect { Labels = [], EffectText = "", AbilityText = "", Abilities = [] };
+        var ex = new TranslationNotImplementedException("test", effect);
         Assert.IsInstanceOfType<NotImplementedException>(ex);
     }
 
     [TestMethod]
-    public void EffectParseException_CarriesTree()
+    public void EffectParseException_CarriesEffect()
     {
-        var tree = new CardEffectTree
+        var effect = new ContCardEffect
         {
-            Effects =
-            [
-                new ContCardEffect
-                {
-                    Labels = [],
-                    EffectText = "[CONT] test",
-                    AbilityText = "test",
-                    ConditionText = "",
-                    Condition = [],
-                    Abilities = []
-                }
-            ]
+            Labels = [],
+            EffectText = "[CONT] test",
+            AbilityText = "test",
+            ConditionText = "",
+            Condition = [],
+            Abilities = []
         };
-        var ex = new TranslationNotImplementedException("test", tree);
-        Assert.AreSame(tree, ex.Tree);
-        Assert.AreEqual(1, ex.Tree.Effects.Count);
-        Assert.IsInstanceOfType<ContCardEffect>(ex.Tree.Effects[0]);
+        var ex = new TranslationNotImplementedException("test", effect);
+        Assert.AreSame(effect, ex.Effect);
+        Assert.IsInstanceOfType<ContCardEffect>(ex.Effect);
     }
 
     [TestMethod]

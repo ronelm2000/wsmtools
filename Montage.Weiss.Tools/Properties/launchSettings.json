@@ -127,6 +127,10 @@
     "Update Chain Chronicles w/ YYT": {
       "commandName": "Project",
       "commandLineArgs": "update S48 yyt"
+    },
+    "Parse Summer Pockets Anime": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://ws-tcg.com/cardlist/search/?expansion=548 --with translations"
     }
   }
 }

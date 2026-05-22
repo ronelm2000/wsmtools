@@ -1,5 +1,11 @@
+using System.Text.Json.Serialization;
+
 namespace Montage.Weiss.Tools.Entities.Effect;
 
+[JsonDerivedType(typeof(AutoCardEffect), "Auto")]
+[JsonDerivedType(typeof(ActCardEffect), "Act")]
+[JsonDerivedType(typeof(ContCardEffect), "Cont")]
+[JsonDerivedType(typeof(EventCardEffect), "Event")]
 public abstract record CardEffect
 {
     public abstract string Type { get; }

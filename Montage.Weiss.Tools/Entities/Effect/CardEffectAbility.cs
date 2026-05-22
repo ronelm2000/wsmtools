@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Montage.Weiss.Tools.Entities.Effect;
 
 public enum AbilityPrefix
@@ -16,6 +18,9 @@ public enum AbilityPrefix
     Subject,
 }
 
+[JsonDerivedType(typeof(UnmatchedAbility), "Unmatched")]
+[JsonDerivedType(typeof(ConditionalCardEffectAbility), "Conditional")]
+[JsonDerivedType(typeof(CardEffectAbility), "Plain")]
 public record CardEffectAbility : ICardAbility
 {
     public virtual required string AbilityText { get; init; }

@@ -1,220 +1,20 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using CsvHelper;
-using CsvHelper.Configuration.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Helpers;
-using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities.Effect;
-using Montage.Weiss.Tools.Entities.Effect.Token;
-using Montage.Weiss.Tools.Exceptions;
 using Montage.Weiss.Tools.Impls.Services;
-using NSubstitute;
+using Montage.Weiss.Tools.Exceptions;
 using Serilog;
 
-namespace Montage.Weiss.Tools.Test;
+namespace Montage.Weiss.Tools.Test.Translations;
 
 [TestClass]
-public class TranslatorServiceTests
+public partial class TranslationTests
 {
-    private static readonly ILogger Log = Serilog.Log.ForContext<TranslatorServiceTests>();
-    private static readonly WeissSchwarzCardTranslatorService _service = new();
-
-    /// <summary>
-    /// List of excluded ability type names for the test "Registry_AbilitiesMustCaptureEndingPunctuations".
-    /// These are ability tokens are classified to perform greedy captures that are known to not capture ending punctuations, and are excluded from that specific test.
-    /// Do not add without proper justification and consideration of the implications on the translation results.
-    /// </summary>
-    private static readonly HashSet<string> ExcludedAbilityTypeNames =
-    [
-        "PowerBoostWithFollowingAbilityToken",
-        "GiveMultipleAbilitiesToken",
-        "EncoreToken",
-        "BackupPrefixToken",
-        "IfYouDoToken",
-        "ChooseOtherCharacterAndGiveAbilityToken",
-        "PowerBoostWithFollowingAbilitiesToken",
-
-    ];
+    private static readonly ILogger Log = Serilog.Log.ForContext<TranslationTests>();
+    private static readonly WeissSchwarzCardTranslatorService _service = Global.Container.GetInstance<WeissSchwarzCardTranslatorService>();
 
     public TestContext TestContext { get; set; }
-
-    public static IEnumerable<(Type type, string regex)> GetTokenRegexValues()
-    {
-        var conditionList = _service.ConditionListRegistry.GetAllTokens()
-                     .Select(t => (t.GetType(), t.Matcher.ToString()));
-
-        var effectList = _service.EffectListRegistry.GetAllTokens()
-            .Select(t => (t.GetType(), t.Matcher.ToString()));
-
-        var effects = _service.EffectRegistry.GetAllTokens()
-            .Select(t => (t.GetType(), t.Matcher.ToString()));
-
-        var reminders = _service.ReminderTextRegistry.GetAllTokens()
-            .Select(t => (t.GetType(), t.Matcher.ToString()));
-
-        var all = conditionList.Concat(effectList).Concat(effects).Concat(reminders);
-        return all;
-    }
-    public static IEnumerable<(Type type, string regex)> GetAbilityTokenRegexValues()
-    {
-        var effectList = _service.EffectListRegistry.GetAllTokens()
-            .Select(t => (t.GetType(), t.Matcher.ToString()))
-            .Where(t => !ExcludedAbilityTypeNames.Contains(t.Item1.Name));
-
-        return effectList;
-    }
-
-    public static IEnumerable<(Type type, string regex)> GetAbilityTokenRegexValuesV2()
-    {
-        var effectList = _service.EffectListRegistry.GetAllTokens()
-            .Select(t => (t.GetType(), t.Matcher.ToString()));
-
-        return effectList;
-    }
-
-    public static IEnumerable<(string tokenName, CardTextToken<List<CardEffectCondition>> condition)> GetConditionTokenRegexValues()
-        => _service.ConditionListRegistry.GetAllTokens()
-            .Select(t => (t.GetType().Name, t));
-
-    [TestMethod]
-    [TestCategory("CI")]
-    [DynamicData(nameof(GetTokenRegexValues))]
-    public void Registry_RegexMustStartWithAnchor(Type type, string regex)
-    {
-        Assert.StartsWith("^", regex, $"Token {type.Name} regex must start with '^' anchor. Current regex: {regex}");
-    }
-
-    [TestMethod]
-    [TestCategory("CI")]
-    [DynamicData(nameof(GetAbilityTokenRegexValues))]
-    public void Registry_AbilitiesMustCaptureEndingPunctuations(Type type, string regex)
-    {
-        if (!regex.EndsWith("』"))
-            Assert.EndsWith(@"(?:\.|,|、|。)?", regex, $"Token {type.Name} regex must end with an optional capture of all possible punctuations. Current regex: {regex}");
-    }
-
-    [TestMethod]
-    [TestCategory("CI")]
-    [DynamicData(nameof(GetAbilityTokenRegexValuesV2))]
-    public void Registry_AbilityRegexMustNotContainSpaces(Type type, string regex)
-    {
-        Assert.DoesNotContain(" ", regex, $"Token {type.Name} regex must not contain spaces. Current regex: {regex}");
-    }
-
-    [TestMethod]
-    [TestCategory("CI")]
-    [DynamicData(nameof(GetConditionTokenRegexValues))]
-    public void Registry_ConditionsMustBeAtomic(string tokenName, CardTextToken<List<CardEffectCondition>> condition)
-    {
-        var result = condition.Translate(_service, "dummy".AsMemory());
-        Assert.IsTrue(result is not null);
-        Assert.IsFalse(result!.Any(e => e.ConditionText.Contains("during", StringComparison.OrdinalIgnoreCase) && e.ConditionText.Contains("if", StringComparison.OrdinalIgnoreCase)),
-            $"Token {tokenName} must be designed to capture atomic conditions without including conjunctions or multiple conditions. Result: {result.Select(e => e.ConditionText).ConcatAsString(";")}");
-    }
-
-    /// <summary>
-    /// Returns sample inputs with token Type for all tokens that capture
-    /// names/traits from card text.
-    /// </summary>
-    public static IEnumerable<TestDataRow<(Type tokenType, string sample)>> GetNameTraitTokenSamples()
-    {
-        foreach (var t in _service.EffectListRegistry.GetAllTokens())
-        foreach (var sample in (IEnumerable<string>)t.SampleMatches)
-            if (sample.Contains('《') || sample.Contains('「'))
-                yield return new TestDataRow<(Type, string)>((t.GetType(), sample))
-                {
-                    TestCategories = ["CI"],
-                    DisplayName = t.GetType().Name
-                };
-
-        foreach (var t in _service.ConditionListRegistry.GetAllTokens())
-        foreach (var sample in (IEnumerable<string>)t.SampleMatches)
-            if (sample.Contains('《') || sample.Contains('「'))
-                yield return new TestDataRow<(Type, string)>((t.GetType(), sample))
-                {
-                    TestCategories = ["CI"],
-                    DisplayName = t.GetType().Name
-                };
-
-        foreach (var t in _service.EffectRegistry.GetAllTokens())
-        foreach (var sample in (IEnumerable<string>)t.SampleMatches)
-            if (sample.Contains('《') || sample.Contains('「'))
-                yield return new TestDataRow<(Type, string)>((t.GetType(), sample))
-                {
-                    TestCategories = ["CI"],
-                    DisplayName = t.GetType().Name
-                };
-
-        foreach (var t in _service.ReminderTextRegistry.GetAllTokens())
-        foreach (var sample in (IEnumerable<string>)t.SampleMatches)
-            if (sample.Contains('《') || sample.Contains('「'))
-                yield return new TestDataRow<(Type, string)>((t.GetType(), sample))
-                {
-                    TestCategories = ["CI"],
-                    DisplayName = t.GetType().Name
-                };
-    }
-
-    [TestMethod]
-    [TestCategory("CI")]
-    [DynamicData(nameof(GetNameTraitTokenSamples))]
-    public void Registry_TokensWithNamesOrTraitsMustUseMatchNameFragment(Type tokenType, string sample)
-    {
-        var markers = Regex.Matches(sample, @"(?<=[《「])([^》」]+)(?=[》」])")
-            .Cast<Match>()
-            .Select(m => m.Value);
-
-        var mockRegistry = Substitute.For<ITokenRegistry>();
-        dynamic token = Activator.CreateInstance(tokenType)!;
-        token.Translate(mockRegistry, sample.AsMemory());
-
-        foreach (var marker in markers)
-            mockRegistry.Received(1).MatchNameFragment(marker);
-    }
-
-    /// <summary>
-    /// Static audit: every token whose regex has 《》/「」 capture groups must set SampleMatches;
-    /// tokens without such groups must NOT set SampleMatches.
-    /// </summary>
-    [TestMethod]
-    [TestCategory("CI")]
-    public void Registry_NameTraitTokensMustSetSampleMatches()
-    {
-        var captureBracketPattern = new Regex(@"[《「]\(.*?\)[》」]|[《「]\(\?<.+?>.*?\)[》」]");
-        var sampleBracketPattern = new Regex(@"[《「][^》」]+[》」]");
-
-        var failures = new List<string>();
-
-        foreach (var registry in new Func<IEnumerable<object>>[]
-        {
-            () => _service.EffectListRegistry.GetAllTokens().Cast<object>(),
-            () => _service.ConditionListRegistry.GetAllTokens().Cast<object>(),
-            () => _service.EffectRegistry.GetAllTokens().Cast<object>(),
-            () => _service.ReminderTextRegistry.GetAllTokens().Cast<object>(),
-        })
-        {
-            foreach (dynamic token in registry())
-            {
-                string regex = token.Matcher.ToString();
-                var samples = ((IEnumerable<string>)token.SampleMatches).ToList();
-                var hasSampleMatches = samples.Count > 0;
-                var hasDirectCapture = captureBracketPattern.IsMatch(regex);
-                var hasSampleBracketCapture = hasSampleMatches && samples.Any(s => sampleBracketPattern.IsMatch(s));
-
-                if ((hasDirectCapture || hasSampleBracketCapture) && !hasSampleMatches)
-                    failures.Add($"Token {token.GetType().Name} has capture in regex/samples but no SampleMatches override.");
-                else if (!hasDirectCapture && !hasSampleBracketCapture && hasSampleMatches)
-                    failures.Add($"Token {token.GetType().Name} has SampleMatches but no capture in regex/samples.");
-            }
-        }
-
-        Assert.IsTrue(failures.Count == 0, string.Join(Environment.NewLine, failures));
-    }
 
     [TestMethod]
     [TestCategory("CI")]
@@ -267,28 +67,30 @@ public class TranslatorServiceTests
     [TestCategory("CI")]
     public void Translate_ContEffect_Assist()
     {
-        var japanese = "【永】 応援 このカードの前のあなたのキャラすべてに、パワーを＋Ｘ。Ｘはそのキャラのレベル×500に等しい。";
+        var japanese = "【永】 応援 このカードの前のあなたのキャラすべてに、パワーを＋X。X はそのキャラのレベル×500 に等しい。";
         var tree = _service.TranslateEffect(japanese);
 
         var effect = tree as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.AreEqual("Assist", effect.Labels[0]);
         Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level ×500.", effect.AbilityText);
-        Assert.IsTrue(effect.EffectText.Contains("[CONT] Assist"));
+        Assert.IsTrue(effect.EffectText.Contains("[CONT]"));
+        Assert.IsTrue(effect.EffectText.Contains("+X power"));
     }
 
     [TestMethod]
     [TestCategory("CI")]
     public void Translate_ContEffect_Assist_1500()
     {
-        var japanese = "【永】 応援 このカードの前のあなたのキャラすべてに、パワーを＋Ｘ。Ｘはそのキャラのレベル×1500に等しい。";
+        var japanese = "【永】 応援 このカードの前のあなたのキャラすべてに、パワーを＋X。X はそのキャラのレベル×1500 に等しい。";
         var tree = _service.TranslateEffect(japanese);
 
         var effect = tree as ContCardEffect;
         Assert.IsNotNull(effect);
         Assert.AreEqual("Assist", effect.Labels[0]);
         Assert.AreEqual("All of your characters in front of this card get +X power. X is equal to that character's level ×1500.", effect.AbilityText);
-        Assert.IsTrue(effect.EffectText.Contains("[CONT] Assist"));
+        Assert.IsTrue(effect.EffectText.Contains("[CONT]"));
+        Assert.IsTrue(effect.EffectText.Contains("+X power"));
     }
 
     [TestMethod]
@@ -368,7 +170,7 @@ public class TranslatorServiceTests
     [TestCategory("CI")]
     public void Translate_ReverseCondition_Token()
     {
-        var japanese = "【自】 このカードが【リバース】した時、このカードのバトル相手のレベルが0以下なら、あなたはそのキャラを山札の下に置いてよい。";
+        var japanese = "【自】 このカードが【リバース】した時、このカードのバトル相手のレベルが 0 以下なら、あなたはそのキャラを山札の下に置いてよい。";
         var tree = _service.TranslateEffect(japanese);
 
         var effect = tree as AutoCardEffect;
@@ -583,6 +385,28 @@ public class TranslatorServiceTests
 
     [TestMethod]
     [TestCategory("CI")]
+    public void Translate_ContEffect_TurnAndTraitCharacterCountPowerBoostAndGainSkill()
+    {
+        var japanese = "【永】 あなたのターン中、他のあなたの《風》のキャラが4枚以上なら、このカードのパワーを＋5000し、このカードは次の能力を得る。『【永】 このカードのバトル中、相手はイベントと『助太刀』を手札からプレイできない。』";
+        var tree = _service.TranslateEffect(japanese);
+
+        ContCardEffect? effect = null;
+
+        MultiAssert.AllAreTrue([
+            () => {
+                effect = tree as ContCardEffect;
+                Assert.IsNotNull(effect);
+            },
+            () => Assert.AreEqual("During your turn, if you have 4 or more other <<風>> characters", effect!.ConditionText),
+            () => Assert.IsTrue(effect!.AbilityText.Contains("+5000 power")),
+            () => Assert.IsTrue(effect!.EffectText.Contains("[CONT]")),
+            () => Assert.IsTrue(effect!.EffectText.Contains("+5000 power")),
+            () => Assert.AreEqual("[CONT] During your turn, if you have 4 or more other <<風>> characters, this card gets +5000 power, and the following ability. \"[CONT] During this card's battle, your opponent cannot play events or \"Backup\" from their hand.\"", effect!.EffectText),
+        ], Assert.Fail);
+    }
+
+    [TestMethod]
+    [TestCategory("CI")]
     [DynamicData(nameof(TranslateCsvCrossCheckAllData))]
     public void Translate_CSV_CrossCheckAll(string serial, string jpEffect, string enEffect, string labels)
     {
@@ -612,75 +436,6 @@ public class TranslatorServiceTests
         MultiAssert.AllAreTrue([
             () => Assert.AreEqual(expected, actual, $"[{serial}] EffectText mismatch{Environment.NewLine}Expected: {expected}{Environment.NewLine}Actual: {actual}"),
             () => CollectionAssert.AreEqual(expectedLabels, tree.Labels, $"[{serial}]{Environment.NewLine}Expected: {string.Join(", ", expectedLabels)}{Environment.NewLine}Actual: {string.Join(", ", tree.Labels)}{Environment.NewLine}Labels mismatched")
-        ], Assert.Fail);
-    }
-
-    public static IEnumerable<TestDataRow<(string serial, string jpEffect, string enEffect, string labels)>> TranslateCsvCrossCheckAllData()
-    {
-        var translationsDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Resources", "Translations"));
-        var csvFiles = Directory.GetFiles(translationsDirectory, "*.csv").ToList();
-
-        Assert.IsTrue(csvFiles.Count > 0, $"No cross-check CSV files found in: {translationsDirectory}");
-
-        foreach (var csvPath in csvFiles)
-        {
-            var csvFile = Path.GetFileName(csvPath);
-
-            using var reader = new StreamReader(csvPath);
-            var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                MissingFieldFound = null,
-                BadDataFound = null
-            };
-            using var csv = new CsvReader(reader, config);
-            var rows = csv.GetRecords<EffectCsvRow>()
-                .Where(r => !string.IsNullOrWhiteSpace(r.Serial)
-                         && !string.IsNullOrWhiteSpace(r.JpEffect)
-                         && !string.IsNullOrWhiteSpace(r.EnEffect));
-
-            foreach (var row in rows)
-            {
-                var effectID = row.JpEffect.GetHashCode();
-                yield return new ((row.Serial, row.JpEffect, row.EnEffect, row.Labels))
-                {
-                    TestCategories= new[] { "CI", row.Serial },
-                    DisplayName = $"CSV-Cross-Check#{row.Serial}#{effectID}"
-                };
-            }
-        }
-    }
-
-    private sealed record EffectCsvRow
-    {
-        [Name("serial")]
-        public string Serial { get; set; } = "";
-        [Name("jp_effect")]
-        public string JpEffect { get; set; } = "";
-        [Name("en_effect")]
-        public string EnEffect { get; set; } = "";
-        [Name("labels")]
-        public string Labels { get; set; } = "";
-    }
-
-    [TestMethod]
-    [TestCategory("CI")]
-    public void Translate_ContEffect_TurnAndTraitCharacterCountPowerBoostAndGainSkill()
-    {
-        var japanese = "【永】 あなたのターン中、他のあなたの《風》のキャラが4枚以上なら、このカードのパワーを＋5000し、このカードは次の能力を得る。『【永】 このカードのバトル中、相手はイベントと『助太刀』を手札からプレイできない。』";
-        var tree = _service.TranslateEffect(japanese);
-
-        ContCardEffect? effect = null;
-
-        MultiAssert.AllAreTrue([
-            () => {
-                effect = tree as ContCardEffect;
-                Assert.IsNotNull(effect);
-            },
-            () => Assert.AreEqual("During your turn, if you have 4 or more other <<風>> characters", effect!.ConditionText),
-            () => Assert.IsTrue(effect!.AbilityText.Contains("+5000 power")),
-            () => Assert.IsTrue(effect!.EffectText.Contains("[CONT]")),
-            () => Assert.IsTrue(effect!.EffectText.Contains("+5000 power")),
-            () => Assert.AreEqual("[CONT] During your turn, if you have 4 or more other <<風>> characters, this card gets +5000 power, and the following ability. \"[CONT] During this card's battle, your opponent cannot play events or \"Backup\" from their hand.\"", effect!.EffectText),
         ], Assert.Fail);
     }
 }

@@ -15,6 +15,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class PowerBoostPerOtherNikkeToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^他のあなたの《NIKKE》のキャラ1枚につき、このカードのパワーを＋(\d+)(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["他のあなたの《NIKKE》のキャラ1枚につき、このカードのパワーを＋3000。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -26,7 +27,7 @@ internal class PowerBoostPerOtherNikkeToken : CardTextToken<List<CardEffectAbili
             [
                 new CardEffectAbility
                 {
-                    AbilityText = $"This card gets +{power} power for each of your other <<NIKKE>> characters"
+                    AbilityText = $"This card gets +{power} power for each of your other <<{registry.MatchNameFragment("NIKKE")}>> characters"
                 }
             ];
         }

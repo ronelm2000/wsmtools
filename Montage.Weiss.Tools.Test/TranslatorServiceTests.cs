@@ -118,69 +118,76 @@ public class TranslatorServiceTests
     }
 
     /// <summary>
-    /// Returns sample inputs and the matching token for all tokens that capture
+    /// Returns sample inputs with token Type for all tokens that capture
     /// names/traits from card text.
     /// </summary>
-    public static IEnumerable<(string tokenName, string sample)> GetNameTraitTokenSamples()
+    public static IEnumerable<TestDataRow<(Type tokenType, string sample)>> GetNameTraitTokenSamples()
     {
-        var tokens = new (string Name, Func<ReadOnlyMemory<char>, Func<ITokenRegistry, object?>> Translate)[0]
-            .Concat(_service.EffectListRegistry.GetAllTokens().Select(t => (t.GetType().Name, (Func<ReadOnlyMemory<char>, Func<ITokenRegistry, object?>>)(s => r => t.Translate(r, s)))))
-            .Concat(_service.ConditionListRegistry.GetAllTokens().Select(t => (t.GetType().Name, (Func<ReadOnlyMemory<char>, Func<ITokenRegistry, object?>>)(s => r => t.Translate(r, s)))))
-            .Concat(_service.EffectRegistry.GetAllTokens().Select(t => (t.GetType().Name, (Func<ReadOnlyMemory<char>, Func<ITokenRegistry, object?>>)(s => r => t.Translate(r, s)))))
-            .Concat(_service.ReminderTextRegistry.GetAllTokens().Select(t => (t.GetType().Name, (Func<ReadOnlyMemory<char>, Func<ITokenRegistry, object?>>)(s => r => t.Translate(r, s)))));
-
-        foreach (var (name, translate) in tokens)
+        foreach (var t in _service.EffectListRegistry.GetAllTokens())
         {
-            var tokenObj = _service.EffectListRegistry.GetAllTokens()
-                .Concat<object>(_service.ConditionListRegistry.GetAllTokens())
-                .Concat(_service.EffectRegistry.GetAllTokens())
-                .Concat(_service.ReminderTextRegistry.GetAllTokens())
-                .First(t => t.GetType().Name == name);
+            var samples = (IEnumerable<string>)t.SampleMatches;
+            if (samples.Any())
+                foreach (var sample in samples)
+                    yield return new TestDataRow<(Type, string)>((t.GetType(), sample))
+                    {
+                        TestCategories = ["CI"],
+                        DisplayName = t.GetType().Name
+                    };
+        }
 
-            var sampleMatches = (System.Collections.IEnumerable)tokenObj.GetType().GetProperty("SampleMatches")!.GetValue(tokenObj)!;
-            var samples = sampleMatches.Cast<string>();
-            foreach (var sample in samples)
-                yield return (name, sample);
+        foreach (var t in _service.ConditionListRegistry.GetAllTokens())
+        {
+            var samples = (IEnumerable<string>)t.SampleMatches;
+            if (samples.Any())
+                foreach (var sample in samples)
+                    yield return new TestDataRow<(Type, string)>((t.GetType(), sample))
+                    {
+                        TestCategories = ["CI"],
+                        DisplayName = t.GetType().Name
+                    };
+        }
+
+        foreach (var t in _service.EffectRegistry.GetAllTokens())
+        {
+            var samples = (IEnumerable<string>)t.SampleMatches;
+            if (samples.Any())
+                foreach (var sample in samples)
+                    yield return new TestDataRow<(Type, string)>((t.GetType(), sample))
+                    {
+                        TestCategories = ["CI"],
+                        DisplayName = t.GetType().Name
+                    };
+        }
+
+        foreach (var t in _service.ReminderTextRegistry.GetAllTokens())
+        {
+            var samples = (IEnumerable<string>)t.SampleMatches;
+            if (samples.Any())
+                foreach (var sample in samples)
+                    yield return new TestDataRow<(Type, string)>((t.GetType(), sample))
+                    {
+                        TestCategories = ["CI"],
+                        DisplayName = t.GetType().Name
+                    };
         }
     }
 
     [TestMethod]
     [TestCategory("CI")]
     [DynamicData(nameof(GetNameTraitTokenSamples))]
-    public void Registry_TokensWithNamesOrTraitsMustUseMatchNameFragment(string tokenName, string sample)
+    public void Registry_TokensWithNamesOrTraitsMustUseMatchNameFragment(Type tokenType, string sample)
     {
-        var markers = Regex.Matches(sample, @"★\w+★")
+        var markers = Regex.Matches(sample, @"(?<=[《「])([^》」]+)(?=[》」])")
             .Cast<Match>()
             .Select(m => m.Value)
             .ToList();
 
         Assert.IsTrue(markers.Count > 0,
-            $"Sample '{sample}' for token {tokenName} must contain a marker like ★TESTTRAIT★ or ★TESTNAME★");
+            $"Sample '{sample}' for {tokenType.Name} must contain a 《》 or 「」 value");
 
         var mockRegistry = Substitute.For<ITokenRegistry>();
-
-        var matched = false;
-        foreach (var registry in new object[] { _service.EffectListRegistry, _service.ConditionListRegistry, _service.EffectRegistry, _service.ReminderTextRegistry })
-        {
-            var getAllTokens = registry.GetType().GetMethod("GetAllTokens")!;
-            var tokens = ((System.Collections.IEnumerable)getAllTokens.Invoke(registry, null)!).Cast<object>().ToList();
-            foreach (var t in tokens)
-            {
-                var type = t.GetType();
-                var matcher = (Regex)type.GetProperty("Matcher")!.GetValue(t)!;
-                if (type.Name == tokenName && matcher.Match(sample).Success)
-                {
-                    var translate = type.GetMethod("Translate")!;
-                    translate.Invoke(t, [mockRegistry, sample.AsMemory()]);
-                    matched = true;
-                    break;
-                }
-            }
-            if (matched) break;
-        }
-
-        Assert.IsTrue(matched,
-            $"Could not find token {tokenName} that matches sample '{sample}'");
+        dynamic token = Activator.CreateInstance(tokenType)!;
+        token.Translate(mockRegistry, sample.AsMemory());
 
         foreach (var marker in markers)
             mockRegistry.Received(1).MatchNameFragment(marker);
@@ -194,43 +201,31 @@ public class TranslatorServiceTests
     [TestCategory("CI")]
     public void Registry_NameTraitTokensMustSetSampleMatches()
     {
-        // Matches 《》 or 「」 containing a capture group like (.+?) or (?<name>.+?)
         var captureBracketPattern = new Regex(@"[《「]\(.*?\)[》」]|[《「]\(\?<.+?>.*?\)[》」]");
-        // Also match patterns where the bracket is part of a wildcard capture group in the regex,
-        // e.g., 《★TESTTRAIT★》 appearing in the sample but the regex uses (.+?) wildcard.
-        // For that we check if the SAMPLE (not regex) contains 《》/「」 with marker text.
-        var sampleBracketPattern = new Regex(@"[《「]★\w+★[》」]");
-
-        var allTokens = _service.EffectListRegistry.GetAllTokens()
-            .Concat<object>(_service.ConditionListRegistry.GetAllTokens())
-            .Concat(_service.EffectRegistry.GetAllTokens())
-            .Concat(_service.ReminderTextRegistry.GetAllTokens());
+        var sampleBracketPattern = new Regex(@"[《「][^》」]+[》」]");
 
         var failures = new List<string>();
-        foreach (var tokenObj in allTokens)
+
+        foreach (var registry in new Func<IEnumerable<object>>[]
         {
-            var tokenType = tokenObj.GetType();
-            var regex = ((Regex)tokenType.GetProperty("Matcher")!.GetValue(tokenObj)!).ToString();
-
-            // Check if the regex has capture groups for 《》/「」 (e.g., 《(.+?)》, 「(?<name>.+?)」)
-            var hasDirectCapture = captureBracketPattern.IsMatch(regex);
-
-            var sampleMatches = (System.Collections.IEnumerable)tokenType.GetProperty("SampleMatches")!.GetValue(tokenObj)!;
-            var samples = sampleMatches.Cast<string>().ToList();
-            var hasSampleMatches = samples.Count > 0;
-
-            // Check if samples contain 《》/「」 with marker text (indicates wildcard capture)
-            var hasSampleBracketCapture = hasSampleMatches && samples.Any(s => sampleBracketPattern.IsMatch(s));
-
-            if ((hasDirectCapture || hasSampleBracketCapture) && !hasSampleMatches)
+            () => _service.EffectListRegistry.GetAllTokens().Cast<object>(),
+            () => _service.ConditionListRegistry.GetAllTokens().Cast<object>(),
+            () => _service.EffectRegistry.GetAllTokens().Cast<object>(),
+            () => _service.ReminderTextRegistry.GetAllTokens().Cast<object>(),
+        })
+        {
+            foreach (dynamic token in registry())
             {
-                // Exclude tokens that hardcode 《NIKKE》 (no dynamic capture)
-                if (!regex.Contains("《NIKKE》"))
-                    failures.Add($"Token {tokenType.Name} has 《》/「」 capture in its regex but no SampleMatches. Add a SampleMatches override with a test input.");
-            }
-            else if (!hasDirectCapture && !hasSampleBracketCapture && hasSampleMatches)
-            {
-                failures.Add($"Token {tokenType.Name} has SampleMatches but no 《》/「」 capture in its regex or samples. Remove the SampleMatches override.");
+                string regex = token.Matcher.ToString();
+                var samples = ((IEnumerable<string>)token.SampleMatches).ToList();
+                var hasSampleMatches = samples.Count > 0;
+                var hasDirectCapture = captureBracketPattern.IsMatch(regex);
+                var hasSampleBracketCapture = hasSampleMatches && samples.Any(s => sampleBracketPattern.IsMatch(s));
+
+                if ((hasDirectCapture || hasSampleBracketCapture) && !hasSampleMatches)
+                    failures.Add($"Token {token.GetType().Name} has capture in regex/samples but no SampleMatches override.");
+                else if (!hasDirectCapture && !hasSampleBracketCapture && hasSampleMatches)
+                    failures.Add($"Token {token.GetType().Name} has SampleMatches but no capture in regex/samples.");
             }
         }
 

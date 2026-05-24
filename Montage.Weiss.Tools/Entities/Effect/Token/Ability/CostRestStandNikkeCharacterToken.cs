@@ -11,6 +11,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class CostRestStandNikkeCharacterToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^他のあなたの【スタンド】している《NIKKE》のキャラを1枚【レスト】する(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["他のあなたの【スタンド】している《NIKKE》のキャラを1枚【レスト】する。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -18,7 +19,7 @@ internal class CostRestStandNikkeCharacterToken : CardTextToken<List<CardEffectA
         [
             new CardEffectAbility
             {
-                AbilityText = "[REST] 1 of your other [STAND] <<NIKKE>> characters"
+                AbilityText = $"[REST] 1 of your other [STAND] <<{registry.MatchNameFragment("NIKKE")}>> characters"
             }
         ];
     }

@@ -3,6 +3,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 internal class AnotherSpecificCardExistsConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^他のあなたの「(?<name>.+?)」がいるなら");
+    public override IEnumerable<string> SampleMatches => ["他のあなたの「★TESTNAME★」がいるなら"];
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

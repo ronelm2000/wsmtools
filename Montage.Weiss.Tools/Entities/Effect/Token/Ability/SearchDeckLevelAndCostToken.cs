@@ -27,10 +27,12 @@ internal class SearchDeckLevelAndCostToken : CardTextToken<List<CardEffectAbilit
 {
     public override Regex Matcher => new(@"^あなたは自分の山札を見て自分のレベル以下でコスト0以下の《(.+?)》のキャラを1枚まで選び、舞台の好きな枠に【レスト】して置き、その山札をシャッフルする(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["あなたは自分の山札を見て自分のレベル以下でコスト0以下の《★TESTTRAIT★》のキャラを1枚まで選び、舞台の好きな枠に【レスト】して置き、その山札をシャッフルする。"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups[1].Value;
+        var trait = registry.MatchNameFragment(match.Groups[1].Value);
         return
         [
             new CardEffectAbility

@@ -3,6 +3,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class AllOtherTraitCharactersBoostToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^他のあなたの《(.+?)》のキャラすべてに、パワーを＋(\d+)(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["他のあなたの《★TESTTRAIT★》のキャラすべてに、パワーを＋500。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

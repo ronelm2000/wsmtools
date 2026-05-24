@@ -18,10 +18,12 @@ internal class AssistPowerBoostToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^このカードの前のあなたの(?:《(.+?)》の)?キャラすべてに、パワーを＋(X|Ｘ|\d+)(?:。(X|Ｘ)はそのキャラのレベル×(\d+)に等しい)?(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["このカードの前のあなたの《★TESTTRAIT★》のキャラすべてに、パワーを＋500。"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups[1].Value;
+        var trait = match.Groups[1].Success ? registry.MatchNameFragment(match.Groups[1].Value) : "";
         var powerValue = match.Groups[2].Value;
         var hasLevelMultiplier = match.Groups[3].Success && match.Groups[4].Success;
         

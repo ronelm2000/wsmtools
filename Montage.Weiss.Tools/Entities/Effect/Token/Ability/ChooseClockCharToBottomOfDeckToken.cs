@@ -4,10 +4,12 @@ internal class ChooseClockCharToBottomOfDeckToken : CardTextToken<List<CardEffec
 {
     public override Regex Matcher => new(@"^(?:あなたは)?自分のクロック置場の《(.+?)》のキャラを(\d+)枚選び、山札の下に置いてよい(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["あなたは自分のクロック置場の《★TESTTRAIT★》のキャラを1枚選び、山札の下に置いてよい。"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups[1].Value;
+        var trait = registry.MatchNameFragment(match.Groups[1].Value);
         var count = int.Parse(match.Groups[2].Value);
         var countText = count == 1 ? $"1 <<{trait}>> character" : $"{count} <<{trait}>> characters";
         return

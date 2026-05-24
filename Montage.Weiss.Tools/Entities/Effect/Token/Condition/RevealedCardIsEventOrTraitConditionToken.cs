@@ -16,6 +16,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 internal class RevealedCardIsEventOrTraitConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^そのカードが《(.+?)》のキャラかイベントなら");
+    public override IEnumerable<string> SampleMatches => ["そのカードが《★TESTTRAIT★》のキャラかイベントなら"];
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

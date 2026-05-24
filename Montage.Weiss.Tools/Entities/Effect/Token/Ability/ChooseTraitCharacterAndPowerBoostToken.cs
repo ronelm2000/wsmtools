@@ -25,6 +25,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class ChooseTraitCharacterAndPowerBoostToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^(?:あなたは)?(?:他の)?自分の《(.+?)》のキャラを(\d+)枚選び、そのターン中、パワーを[＋\+]([Ｘ\d]+)(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["自分の《★TESTTRAIT★》のキャラを1枚選び、そのターン中、パワーを＋2000。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

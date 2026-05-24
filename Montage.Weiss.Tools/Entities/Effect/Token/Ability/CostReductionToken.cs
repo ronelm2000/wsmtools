@@ -4,10 +4,12 @@ internal class CostReductionToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^手札のこのカードをプレイするにあたり、あなたは自分の「(.+?)」を1枚選び、控え室に置いてよい。そうしたら、このカードをコスト0でプレイできる(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["手札のこのカードをプレイするにあたり、あなたは自分の「★TESTNAME★」を1枚選び、控え室に置いてよい。そうしたら、このカードをコスト0でプレイできる。"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var name = match.Groups[1].Value;
+        var name = registry.MatchNameFragment(match.Groups[1].Value);
         return
         [
             new CardEffectAbility

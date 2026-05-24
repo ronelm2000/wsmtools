@@ -20,6 +20,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class PowerBoostPerTraitCharacterToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^他のあなたの《(.+?)》のキャラ1枚につき、このカードのパワーを＋(\d+)(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["他のあなたの《★TESTTRAIT★》のキャラ1枚につき、このカードのパワーを＋2000。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

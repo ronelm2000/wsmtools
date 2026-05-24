@@ -18,6 +18,8 @@ internal class ChooseAndExchangeToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^(?:あなたは)?自分の(?<source1>レベル置場のカード(?:《.+?》)?)と(?:(?:控え室の)?(?<source2>.+?))を(?:\d+)枚ずつ選び、入れ替える(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["あなたは自分のレベル置場のカードと控え室の《★TESTTRAIT★》のキャラを1枚ずつ選び、入れ替える。"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
@@ -28,7 +30,7 @@ internal class ChooseAndExchangeToken : CardTextToken<List<CardEffectAbility>>
             new CardEffectAbility
             {
                 AbilityText = source2.Contains('《')
-                    ? $"Choose 1 card in your level and 1 <<{Regex.Match(source2, @"《(.+?)》").Groups[1].Value}>> character in your waiting room, and exchange them"
+                    ? $"Choose 1 card in your level and 1 <<{registry.MatchNameFragment(Regex.Match(source2, @"《(.+?)》").Groups[1].Value)}>> character in your waiting room, and exchange them"
                     : "Choose 1 card in your level and 1 card in your waiting room, and exchange them"
             }
         ];

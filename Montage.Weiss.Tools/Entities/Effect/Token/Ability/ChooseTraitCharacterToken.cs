@@ -3,6 +3,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class ChooseTraitCharacterToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^《(.+?)》のキャラを(Ｘ|\d+)枚まで選(?:び|んで)(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["《★TESTTRAIT★》のキャラを1枚まで選び。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

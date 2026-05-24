@@ -28,6 +28,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^[XＸ]\s*は\s*(?<description>.+?)\s*に等しい(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["Xはあなたの《★TESTTRAIT★》のキャラの枚数に等しい。"];
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

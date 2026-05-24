@@ -29,10 +29,12 @@ internal class SearchDeckFromLookToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^山札を見て《(.+?)》のキャラを(.+?)枚まで選んで相手に見せ、(?:.+?)(?:、.+?)*(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["山札を見て《★TESTTRAIT★》のキャラを1枚まで選んで相手に見せ、手札に加え、その山札をシャッフルする。"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups[1].Value;
+        var trait = registry.MatchNameFragment(match.Groups[1].Value);
         var count = match.Groups[2].Value.Replace("Ｘ", "X");
         var fullText = span.ToString();
 

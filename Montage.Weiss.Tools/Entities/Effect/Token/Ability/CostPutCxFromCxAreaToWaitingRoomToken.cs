@@ -4,10 +4,12 @@ internal class CostPutCxFromCxAreaToWaitingRoomToken : CardTextToken<List<CardEf
 {
     public override Regex Matcher => new(@"^あなたのCX置場の「(?<name>.+?)」を1枚控え室に置く(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["あなたのCX置場の「★TESTNAME★」を1枚控え室に置く。"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var name = match.Groups["name"].Value;
+        var name = registry.MatchNameFragment(match.Groups["name"].Value);
         return
         [
             new CardEffectAbility

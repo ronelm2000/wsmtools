@@ -3,6 +3,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class SearchDeckForNamedCardToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^山札を見て「(?<name>.+?)」を(?<count>.+?)枚まで選んで相手に見せ、(?<rest>.+)(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["山札を見て「★TESTNAME★」を1枚まで選んで相手に見せ、手札に加える。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

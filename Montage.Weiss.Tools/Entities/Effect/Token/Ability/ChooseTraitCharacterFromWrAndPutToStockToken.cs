@@ -15,6 +15,7 @@ internal class ChooseTraitCharacterFromWrAndPutToStockToken : CardTextToken<List
     // Matches: 、あなたは自分の控え室の《NIKKE》のキャラを 1 枚選び、ストック置場に置いてよい。
     // Also matches: 自分の控え室の《NIKKE》のキャラを 1 枚選び、ストック置場に置いてよい。 (without prefix)
     public override Regex Matcher => new(@"^[、,]?(?:あなたは)?自分の控え室の(《.+?》の)?キャラを(\d+)枚選び、ストック置場に置いてよい(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["自分の控え室の《★TESTTRAIT★》のキャラを1枚選び、ストック置場に置いてよい。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

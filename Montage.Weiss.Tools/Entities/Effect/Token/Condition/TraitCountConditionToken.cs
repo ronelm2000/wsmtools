@@ -3,6 +3,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 internal class TraitCountConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^あなたの《(?<trait>.+?)》のキャラが(?<count>\d+)枚以上なら");
+    public override IEnumerable<string> SampleMatches => ["あなたの《★TESTTRAIT★》のキャラが2枚以上なら"];
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

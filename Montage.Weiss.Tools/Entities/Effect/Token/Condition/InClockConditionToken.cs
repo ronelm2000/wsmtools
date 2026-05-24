@@ -3,6 +3,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 internal class InClockConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^あなたのクロック置場に「(?<name>.+?)」があるなら");
+    public override IEnumerable<string> SampleMatches => ["あなたのクロック置場に「★TESTNAME★」があるなら"];
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

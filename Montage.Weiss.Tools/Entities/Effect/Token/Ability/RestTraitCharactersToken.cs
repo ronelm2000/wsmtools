@@ -3,6 +3,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class RestTraitCharactersToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^あなたの《(.+?)》のキャラを(\d+)枚【レスト】する(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["あなたの《★TESTTRAIT★》のキャラを1枚【レスト】する。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

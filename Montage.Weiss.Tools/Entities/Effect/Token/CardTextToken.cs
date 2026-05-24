@@ -48,6 +48,14 @@ public abstract class CardTextToken<E>
     public abstract Regex Matcher { get; }
 
     /// <summary>
+    /// Example input strings that this token's <see cref="Matcher"/> should match.
+    /// Used by audit tests to verify <see cref="ITokenRegistry.MatchNameFragment"/> is called
+    /// for any extracted names or traits.
+    /// Token classes that capture names/traits from card text SHOULD override this.
+    /// </summary>
+    public virtual IEnumerable<string> SampleMatches => [];
+
+    /// <summary>
     /// Translates the matched Japanese text into the structured representation.
     /// </summary>
     /// <param name="registry">The token registry for nested parsing of conditions/abilities</param>

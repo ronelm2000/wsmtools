@@ -4,10 +4,12 @@ internal class FrontCharactersAllBoostToken : CardTextToken<List<CardEffectAbili
 {
     public override Regex Matcher => new(@"^このカードの前のあなたの(?:《(.+?)》の)?(?:(レベル(\d+)以上の)キャラすべて|キャラすべて)に、パワーを＋(\d+)(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["このカードの前のあなたの《★TESTTRAIT★》のキャラすべてに、パワーを＋500。"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups[1].Success ? match.Groups[1].Value : null;
+        var trait = match.Groups[1].Success ? registry.MatchNameFragment(match.Groups[1].Value) : null;
         var level = match.Groups[3].Success ? match.Groups[3].Value : null;
         var power = match.Groups[4].Value;
         var prefix = trait is not null

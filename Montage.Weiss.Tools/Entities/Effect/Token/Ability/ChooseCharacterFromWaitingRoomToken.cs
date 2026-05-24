@@ -23,6 +23,8 @@ internal class ChooseCharacterFromWaitingRoomToken : CardTextToken<List<CardEffe
 
     public override Regex Matcher => new(@"^(?:あなたは)?(?:「(?<except>[^」]+)」以外の)?自分の控え室のレベル(Ｘ|\d+)以下の(《.+?》の)?キャラを(\d+)枚(?:まで)?選び、(?<action>手札に戻す|舞台の好きな枠に置く)(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["あなたは自分の控え室のレベル0以下の《★TESTTRAIT★》のキャラを1枚選び、手札に戻す。"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
@@ -37,7 +39,7 @@ internal class ChooseCharacterFromWaitingRoomToken : CardTextToken<List<CardEffe
             span.ToString(), level, trait, count, action, exceptText);
 
         var countText = isUpTo ? $"up to {count}" : count;
-        var traitText = string.IsNullOrEmpty(trait) ? "" : $" <<{ExtractTrait(trait)}>>";
+        var traitText = string.IsNullOrEmpty(trait) ? "" : $" <<{ExtractTrait(registry, trait)}>>";
         var isReturnToHand = action == "手札に戻す";
         var actionText = isReturnToHand ? "return it to your hand" : "put it on any position on your stage";
 
@@ -54,9 +56,9 @@ internal class ChooseCharacterFromWaitingRoomToken : CardTextToken<List<CardEffe
         ];
     }
 
-    private static string ExtractTrait(string text)
+    private static string ExtractTrait(ITokenRegistry registry, string text)
     {
         var match = System.Text.RegularExpressions.Regex.Match(text, @"《(.+?)》");
-        return match.Success ? match.Groups[1].Value : "";
+        return match.Success ? registry.MatchNameFragment(match.Groups[1].Value) : "";
     }
 }

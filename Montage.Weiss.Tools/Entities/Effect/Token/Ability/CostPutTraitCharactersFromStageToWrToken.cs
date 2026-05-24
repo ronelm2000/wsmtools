@@ -17,6 +17,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class CostPutTraitCharactersFromStageToWrToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^あなたの舞台の《(.+?)》のキャラを(\d+)枚控え室に置き(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["あなたの舞台の《★TESTTRAIT★》のキャラを3枚控え室に置き。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

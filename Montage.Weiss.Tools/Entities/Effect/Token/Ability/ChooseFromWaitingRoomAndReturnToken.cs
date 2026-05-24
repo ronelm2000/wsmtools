@@ -9,6 +9,8 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
     // Also matches: あなたは自分の控え室の CX を...枚選び、手札に戻す (bare CX without trigger icon)
     public override Regex Matcher => new(@"^[、,]?(?:あなたは)?(?:自分の)?控え室の(?:(?:(?:レベル(?<level>[Ｘ\d]+)以下の)?《(.+?)》の)?キャラ|トリガーアイコンが\[\[(.+?)\]\]のCX|CX)を(\d+)枚(?:まで)?選び、(?<action>手札に戻してよい|手札に戻す|手札に戻し|このカードの下にマーカーとして表向きに置いてよい)(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["あなたは自分の控え室のレベル1以下の《★TESTTRAIT★》のキャラを1枚選び、手札に戻す。"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var input = span.ToString();
@@ -22,7 +24,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
         }
         
         var level = match.Groups["level"].Success ? match.Groups["level"].Value : null;
-        var trait = match.Groups[1].Value;
+        var trait = match.Groups[1].Success ? registry.MatchNameFragment(match.Groups[1].Value) : "";
         var triggerIcon = match.Groups[2].Value;
         // Strip .gif extension if present
         var triggerIconClean = triggerIcon.EndsWith(".gif", StringComparison.OrdinalIgnoreCase) 

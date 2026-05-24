@@ -19,6 +19,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class HandLevelMinusToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^あなたの手札の(?:(?:このカード)|「(?<name>.+?)」)のレベルを－(\d+)(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["あなたの手札の「★TESTNAME★」のレベルを－1。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

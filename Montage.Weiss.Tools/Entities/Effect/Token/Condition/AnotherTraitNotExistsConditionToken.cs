@@ -3,6 +3,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 internal class AnotherTraitNotExistsConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^他のあなたの《(?<trait>.+?)》のキャラが(?<count>\d+)枚以上で、他のあなたの「(?<name>.+?)」がいないなら");
+    public override IEnumerable<string> SampleMatches => ["他のあなたの《★TESTTRAIT★》のキャラが2枚以上で、他のあなたの「★TESTNAME★」がいないなら"];
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

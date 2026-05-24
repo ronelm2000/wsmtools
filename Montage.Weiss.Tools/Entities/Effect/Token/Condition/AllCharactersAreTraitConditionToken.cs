@@ -3,6 +3,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 internal class AllCharactersAreTraitConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^あなたのキャラすべてが《(?<trait>.+?)》なら");
+    public override IEnumerable<string> SampleMatches => ["あなたのキャラすべてが《★TESTTRAIT★》なら"];
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

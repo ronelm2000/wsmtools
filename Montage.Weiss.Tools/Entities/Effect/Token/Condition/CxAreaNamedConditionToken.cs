@@ -16,6 +16,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 internal class CxAreaNamedConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^あなたのCX置場に「(?<name>.+?)」があり");
+    public override IEnumerable<string> SampleMatches => ["あなたのCX置場に「★TESTNAME★」があり"];
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

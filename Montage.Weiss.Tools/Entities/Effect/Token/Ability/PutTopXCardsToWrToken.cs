@@ -15,6 +15,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class PutTopXCardsToWrToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^自分の山札の上から[XＸ]枚を、控え室に置いてよい。?[XＸ]はあなたの《(.+?)》のキャラの枚数に等しい(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["自分の山札の上からX枚を、控え室に置いてよい。Xはあなたの《★TESTTRAIT★》のキャラの枚数に等しい。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

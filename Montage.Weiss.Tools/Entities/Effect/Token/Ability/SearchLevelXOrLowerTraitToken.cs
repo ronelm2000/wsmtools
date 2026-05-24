@@ -15,6 +15,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class SearchLevelXOrLowerTraitToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^レベルX以下の《(.+?)》のキャラを1枚選び(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["レベルX以下の《★TESTTRAIT★》のキャラを1枚選び。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

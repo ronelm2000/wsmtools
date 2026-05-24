@@ -43,6 +43,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class LookAtDeckChooseCardRevealAddToHandRestToWrToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^(?:あなたは)?自分の山札を上から(Ｘ|\d+)枚まで見て、(.+?)を(\d+)枚まで選(?:んで相手に見せ|び)、手札に加え、残りのカードを控え室に置く(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["自分の山札を上から4枚まで見て、《★TESTTRAIT★》のキャラを1枚まで選んで相手に見せ、手札に加え、残りのカードを控え室に置く。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

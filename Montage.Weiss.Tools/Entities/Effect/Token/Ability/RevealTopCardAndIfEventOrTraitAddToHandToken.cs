@@ -15,6 +15,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class RevealTopCardAndIfEventOrTraitAddToHandToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^自分の山札の上から1枚を公開する。そのカードが《(.+?)》のキャラかイベントなら手札に加え、あなたは自分の手札を1枚選び、控え室に置く(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["自分の山札の上から1枚を公開する。そのカードが《★TESTTRAIT★》のキャラかイベントなら手札に加え、あなたは自分の手札を1枚選び、控え室に置く。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

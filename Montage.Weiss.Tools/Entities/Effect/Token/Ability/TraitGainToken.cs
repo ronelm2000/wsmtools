@@ -3,6 +3,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 internal class TraitGainToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^このカードは《(.+?)》を得る(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["このカードは《★TESTTRAIT★》を得る。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

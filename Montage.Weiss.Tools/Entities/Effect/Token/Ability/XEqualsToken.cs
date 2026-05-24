@@ -18,9 +18,9 @@ internal class XEqualsToken : CardTextToken<List<CardEffectAbility>>
             _ when description.Contains("そのキャラのソウル") =>
                 "X is equal to that character's soul",
             _ when description.Contains("それらのカードの") =>
-                $"X is equal to the number of {ExtractTrait(description)} characters put this way",
+                $"X is equal to the number of {ExtractTrait(description, registry)} characters put this way",
             _ when description.Contains("あなたの") && description.Contains("キャラの枚数") =>
-                $"X is equal to the number of your {(description.Contains("他の") ? "other " : "")}{ExtractTrait(description)} characters",
+                $"X is equal to the number of your {(description.Contains("他の") ? "other " : "")}{ExtractTrait(description, registry)} characters",
             _ => description
         };
         return
@@ -32,9 +32,9 @@ internal class XEqualsToken : CardTextToken<List<CardEffectAbility>>
         ];
     }
 
-    private static string ExtractTrait(string text)
+    private static string ExtractTrait(string text, ITokenRegistry registry)
     {
         var match = System.Text.RegularExpressions.Regex.Match(text, @"《(.+?)》");
-        return match.Success ? $"<<{match.Groups[1].Value}>>" : "?";
+        return match.Success ? $"<<{registry.MatchNameFragment(match.Groups[1].Value)}>>" : "?";
     }
 }

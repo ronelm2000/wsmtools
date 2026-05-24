@@ -20,7 +20,7 @@ internal class RevealedCardTypeConditionToken : CardTextToken<List<CardEffectCon
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups[1].Value;
+        var trait = registry.MatchNameFragment(match.Groups[1].Value);
         return
         [
             new CardEffectCondition

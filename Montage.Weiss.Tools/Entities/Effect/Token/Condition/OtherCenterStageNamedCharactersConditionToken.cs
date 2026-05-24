@@ -7,8 +7,8 @@ internal class OtherCenterStageNamedCharactersConditionToken : CardTextToken<Lis
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var name1 = match.Groups[1].Value;
-        var name2 = match.Groups[2].Value;
+        var name1 = registry.MatchNameFragment(match.Groups[1].Value);
+        var name2 = registry.MatchNameFragment(match.Groups[2].Value);
         return
         [
             new CardEffectCondition

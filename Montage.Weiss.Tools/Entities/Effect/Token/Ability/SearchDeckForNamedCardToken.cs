@@ -7,7 +7,7 @@ internal class SearchDeckForNamedCardToken : CardTextToken<List<CardEffectAbilit
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var name = match.Groups["name"].Value;
+        var name = registry.MatchNameFragment(match.Groups["name"].Value);
         var count = match.Groups["count"].Value.Replace("Ｘ", "X");
         var rest = match.Groups["rest"].Value;
 

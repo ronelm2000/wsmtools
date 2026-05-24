@@ -29,7 +29,7 @@ internal class ChooseTraitCharacterAndPowerBoostToken : CardTextToken<List<CardE
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups[1].Value;
+        var trait = registry.MatchNameFragment(match.Groups[1].Value);
         var count = int.Parse(match.Groups[2].Value);
         var power = match.Groups[3].Value.Replace('Ｘ', 'X');
         var hasOther = match.Value.Contains("他の", StringComparison.Ordinal);

@@ -60,8 +60,8 @@ internal class LookAtDeckChooseCardRevealAddToHandRestToWrToken : CardTextToken<
             _ when cardDesc.Contains("CX") => "CX",
             _ when Regex.Match(cardDesc, @"レベル(\d+)以下のキャラ") is Match lvlBelow && lvlBelow.Success => $"level {lvlBelow.Groups[1].Value} or lower character",
             _ when Regex.Match(cardDesc, @"レベル(\d+)以上のカード") is Match lvlAbove && lvlAbove.Success => $"level {lvlAbove.Groups[1].Value} or higher card",
-            _ when Regex.Match(cardDesc, @"《(.+?)》のキャラ") is Match m && m.Success => $"<<{m.Groups[1].Value}>> character",
-            _ when Regex.Match(cardDesc, @"《(.+?)》") is Match m && m.Success => $"<<{m.Groups[1].Value}>>",
+            _ when Regex.Match(cardDesc, @"《(.+?)》のキャラ") is Match m && m.Success => $"<<{registry.MatchNameFragment(m.Groups[1].Value)}>> character",
+            _ when Regex.Match(cardDesc, @"《(.+?)》") is Match m && m.Success => $"<<{registry.MatchNameFragment(m.Groups[1].Value)}>>",
             _ => cardDesc
         };
         var cardDescPlural = isPlural

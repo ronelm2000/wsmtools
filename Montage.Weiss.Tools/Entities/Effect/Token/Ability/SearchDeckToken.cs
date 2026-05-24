@@ -27,7 +27,7 @@ internal class SearchDeckToken : CardTextToken<List<CardEffectAbility>>
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups[3].Success ? match.Groups[3].Value : match.Groups[4].Value;
+        var trait = match.Groups[3].Success ? registry.MatchNameFragment(match.Groups[3].Value) : registry.MatchNameFragment(match.Groups[4].Value);
         var pickCount = match.Groups[5].Value.Replace("Ｘ", "X");
         
         var fullMatch = match.Groups[0].Value;
@@ -87,7 +87,7 @@ internal class SearchDeckWithTopLookToken : CardTextToken<List<CardEffectAbility
     {
         var match = Matcher.Match(span.ToString());
         var count = match.Groups[1].Value.Replace("Ｘ", "X");
-        var trait = match.Groups[2].Value;
+        var trait = registry.MatchNameFragment(match.Groups[2].Value);
         var pickCount = match.Groups[3].Value.Replace("Ｘ", "X");
         return
         [

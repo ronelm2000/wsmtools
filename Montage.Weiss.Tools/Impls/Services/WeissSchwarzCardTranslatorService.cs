@@ -340,6 +340,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
     public IComponentRegistry<CardEffect> EffectRegistry => _effectRegistry;
     public IComponentRegistry<string> ReminderTextRegistry => _reminderTextRegistry;
 
+    public string MatchNameFragment(string name) => name;
+
     public string[] MatchLabels(string value)
     {
         if (string.IsNullOrWhiteSpace(value))

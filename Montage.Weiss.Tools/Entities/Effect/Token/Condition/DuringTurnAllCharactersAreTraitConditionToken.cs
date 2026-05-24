@@ -7,7 +7,7 @@ internal class DuringTurnAllCharactersAreTraitConditionToken : CardTextToken<Lis
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups["trait"].Value;
+        var trait = registry.MatchNameFragment(match.Groups["trait"].Value);
         return
         [
             new CardEffectCondition

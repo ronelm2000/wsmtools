@@ -7,7 +7,7 @@ internal class AnotherSpecificCardExistsConditionToken : CardTextToken<List<Card
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var name = match.Groups["name"].Value;
+        var name = registry.MatchNameFragment(match.Groups["name"].Value);
         return
         [
             new CardEffectCondition

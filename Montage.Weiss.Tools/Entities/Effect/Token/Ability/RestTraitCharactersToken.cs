@@ -7,7 +7,7 @@ internal class RestTraitCharactersToken : CardTextToken<List<CardEffectAbility>>
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups[1].Value;
+        var trait = registry.MatchNameFragment(match.Groups[1].Value);
         var count = int.Parse(match.Groups[2].Value);
         return
         [

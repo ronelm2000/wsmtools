@@ -82,9 +82,22 @@ public CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span) 
 ### Names and Traits
 
 - **Names and Traits are NOT translated** at this time
-- They will need a stub method for future translation efforts
 - When a CSV has a translated English name, **change the CSV entry to a JP name**
 - Names should be preserved in their original Japanese form in the output
+
+### MatchNameFragment
+
+All tokens that extract a name (`「」`) or trait (`《》`) from card text MUST pass the captured value through `registry.MatchNameFragment(value)` instead of using the raw string directly. This is the centralized stub for future name/trait matching or normalization. Currently returns the input unchanged (identity function).
+
+```csharp
+// Correct: use registry.MatchNameFragment for names/traits
+var trait = registry.MatchNameFragment(match.Groups[1].Value);
+var name = registry.MatchNameFragment(match.Groups["name"].Value);
+
+// Wrong: raw string bypasses the registry
+var trait = match.Groups[1].Value;  // DON'T do this
+var name = match.Groups["name"].Value;  // DON'T do this
+```
 
 ### Example
 

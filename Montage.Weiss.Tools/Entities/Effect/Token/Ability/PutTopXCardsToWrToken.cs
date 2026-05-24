@@ -21,7 +21,7 @@ internal class PutTopXCardsToWrToken : CardTextToken<List<CardEffectAbility>>
         var match = Matcher.Match(span.ToString());
         if (match.Success)
         {
-            var trait = match.Groups[1].Value;
+            var trait = registry.MatchNameFragment(match.Groups[1].Value);
             return
             [
                 new CardEffectAbility

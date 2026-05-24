@@ -7,7 +7,7 @@ internal class TraitCountConditionToken : CardTextToken<List<CardEffectCondition
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups["trait"].Value;
+        var trait = registry.MatchNameFragment(match.Groups["trait"].Value);
         var count = match.Groups["count"].Value;
         return
         [

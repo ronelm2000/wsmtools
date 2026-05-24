@@ -33,7 +33,7 @@ internal class ChooseTraitCharacterFromWrAndPutToStockToken : CardTextToken<List
         var count = match.Groups[2].Value;
         Log.Debug("ChooseTraitCharacterFromWrAndPutToStockToken: trait='{Trait}', count={Count}", trait, count);
         
-        var traitText = string.IsNullOrEmpty(trait) ? "" : $"<<{ExtractTrait(trait)}>> ";
+        var traitText = string.IsNullOrEmpty(trait) ? "" : $"<<{ExtractTrait(trait, registry)}>> ";
         var countText = count == "1" ? "1" : count;
 
         return
@@ -45,9 +45,9 @@ internal class ChooseTraitCharacterFromWrAndPutToStockToken : CardTextToken<List
         ];
     }
 
-    private static string ExtractTrait(string text)
+    private static string ExtractTrait(string text, ITokenRegistry registry)
     {
         var match = System.Text.RegularExpressions.Regex.Match(text, @"《(.+?)》");
-        return match.Success ? match.Groups[1].Value : "";
+        return match.Success ? registry.MatchNameFragment(match.Groups[1].Value) : "";
     }
 }

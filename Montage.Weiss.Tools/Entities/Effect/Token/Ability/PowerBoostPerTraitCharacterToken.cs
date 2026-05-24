@@ -26,7 +26,7 @@ internal class PowerBoostPerTraitCharacterToken : CardTextToken<List<CardEffectA
         var match = Matcher.Match(span.ToString());
         if (match.Success)
         {
-            var trait = match.Groups[1].Value;
+            var trait = registry.MatchNameFragment(match.Groups[1].Value);
             var power = match.Groups[2].Value;
             return
             [

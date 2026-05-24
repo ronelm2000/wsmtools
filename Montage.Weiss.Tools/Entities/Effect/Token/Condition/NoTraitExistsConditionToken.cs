@@ -7,7 +7,7 @@ internal class NoTraitExistsConditionToken : CardTextToken<List<CardEffectCondit
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var trait = match.Groups[1].Value;
+        var trait = registry.MatchNameFragment(match.Groups[1].Value);
         var isOther = match.Value.StartsWith("他の");
         return
         [

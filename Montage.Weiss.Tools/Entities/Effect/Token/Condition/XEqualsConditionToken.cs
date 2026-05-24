@@ -44,9 +44,9 @@ internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
             _ when Regex.IsMatch(description, @"そのキャラのレベル[×x]\d+") =>
                 $"X is equal to that character's level {Regex.Match(description, @"[×x]\d+").Value}",
             _ when description.Contains("それらのカードの") =>
-                $"X is equal to the number of {ExtractTrait(description)} characters put this way",
+                $"X is equal to the number of {ExtractTrait(description, registry)} characters put this way",
             _ when description.Contains("あなたの") && description.Contains("キャラの枚数") =>
-                $"X is equal to the number of your {(description.Contains("他の") ? "other " : "")}{ExtractTrait(description)} characters{FormatMultiplier(description)}",
+                $"X is equal to the number of your {(description.Contains("他の") ? "other " : "")}{ExtractTrait(description, registry)} characters{FormatMultiplier(description)}",
             _ when description.Contains("相手の") && description.Contains("キャラの枚数") =>
                 $"X is equal to the number of characters your opponent has",
             _ when description.Contains("控え室に置かれたカードのレベルの合計") =>
@@ -63,10 +63,10 @@ internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
         ];
     }
 
-    private static string ExtractTrait(string text)
+    private static string ExtractTrait(string text, ITokenRegistry registry)
     {
         var match = System.Text.RegularExpressions.Regex.Match(text, @"《(.+?)》");
-        return match.Success ? $"<<{match.Groups[1].Value}>>" : "?";
+        return match.Success ? $"<<{registry.MatchNameFragment(match.Groups[1].Value)}>>" : "?";
     }
 
     private static string FormatMultiplier(string description)

@@ -81,6 +81,14 @@ public interface ITokenRegistry
     /// <param name="value">The label string to parse (e.g., "【R】【ターン1】")</param>
     /// <returns>Array of label values (e.g., ["R", "ターン1"])</returns>
     string[] MatchLabels(string value);
+
+    /// <summary>
+    /// Stub for future name/trait matching or normalization.
+    /// Currently returns the input string unchanged.
+    /// </summary>
+    /// <param name="name">The name or trait string extracted from card text</param>
+    /// <returns>The same name string (identity function for now)</returns>
+    string MatchNameFragment(string name);
 }
 
 /// <summary>

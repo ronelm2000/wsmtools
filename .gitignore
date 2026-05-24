@@ -456,3 +456,4 @@ $RECYCLE.BIN/
 # Agentic artifacts
 .claude/*
 .plans/*
+.opencode/*

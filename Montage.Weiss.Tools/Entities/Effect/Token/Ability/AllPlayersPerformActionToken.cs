@@ -17,6 +17,8 @@ internal class AllPlayersPerformActionToken : CardTextToken<List<CardEffectAbili
 {
     public override Regex Matcher => new(@"^すべてのプレイヤーは次の行動を行う。『(?<nested>.+?)』(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["すべてのプレイヤーは次の行動を行う。『あなたの思い出が5枚以上なら、あなたは自分の控え室のカードを1枚選び、手札に戻す。』"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
@@ -24,12 +26,14 @@ internal class AllPlayersPerformActionToken : CardTextToken<List<CardEffectAbili
         var baseText = "All players perform the following action";
         if (nestedJapanese != null)
         {
-            var nestedEnglish = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese) ?? nestedJapanese;
+            var nestedEffect = PowerBoostWithFollowingAbilityToken.TranslateNested(registry, nestedJapanese);
             return
             [
-                new CardEffectAbility
+                new NestedCardEffectAbility
                 {
-                    AbilityText = $"{baseText}. \"{nestedEnglish}\""
+                    AbilityText = $"{baseText}. \"{nestedEffect.EffectText}\"",
+                    NestedEffect = nestedEffect,
+                    IsUnmatched = nestedEffect.Abilities.Any(a => a.IsUnmatched)
                 }
             ];
         }

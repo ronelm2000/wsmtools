@@ -30,6 +30,8 @@ internal class ChooseOtherCharacterAndGiveAbilityToken : CardTextToken<List<Card
 
     public override Regex Matcher => new(@"^(?:あなたは)?(?:他の)?(?:(?<ownership>相手の|自分の))?(?:バトル中の)?キャラを(?<count>\d+)枚選び、(?:(?<duration>そのターン中|このターン中|次の相手のターンの終わりまで|次の相手のターンの終了時まで)、)?次の能力を与える。『(?<nested>.+)』");
 
+    public override IEnumerable<string> SampleMatches => ["あなたは相手のキャラを1枚選び、そのターン中、次の能力を与える。『【永】 このカードは相手の効果に選ばれない。』"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var input = span.ToString();
@@ -53,7 +55,7 @@ internal class ChooseOtherCharacterAndGiveAbilityToken : CardTextToken<List<Card
         Log.Debug("ChooseOtherCharacterAndGiveAbilityToken: count={Count}, nested='{Nested}', hasOther={HasOther}, isBattle={IsBattle}, isOpponent={IsOpponent}, duration='{Duration}'",
             count, nestedJapanese, hasOther, isBattle, isOpponent, durationGroup.Success ? durationGroup.Value : "none");
         
-        var nestedEnglish = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, nestedJapanese) ?? nestedJapanese;
+        var nestedEffect = PowerBoostWithFollowingAbilityToken.TranslateNested(registry, nestedJapanese);
 
         var countText = count == 1 ? "1" : count.ToString();
         var otherText = hasOther ? "other " : "";
@@ -80,14 +82,16 @@ internal class ChooseOtherCharacterAndGiveAbilityToken : CardTextToken<List<Card
             durationText = dur;
         }
 
-        var result = $"{choosePhrase}, and that character gets the following ability{durationText}. \"{nestedEnglish}\"";
+        var result = $"{choosePhrase}, and that character gets the following ability{durationText}. \"{nestedEffect.EffectText}\"";
         Log.Debug("ChooseOtherCharacterAndGiveAbilityToken: result='{Result}'", result);
 
         return
         [
-            new CardEffectAbility
+            new NestedCardEffectAbility
             {
-                AbilityText = result
+                AbilityText = result,
+                NestedEffect = nestedEffect,
+                IsUnmatched = nestedEffect.Abilities.Any(a => a.IsUnmatched)
             }
         ];
     }

@@ -4,6 +4,8 @@ internal class ThoseCardsTriggerIconConditionToken : CardTextToken<List<CardEffe
 {
     public override Regex Matcher => new(@"^それらのカードのトリガーアイコンが(?<icon>\[\[.+?\]\])の(?:(?<cxcount>CX(?:\d+)?枚につき)、(?:次の行動を行う。『(?<inner>.+)』)?)?(?<remaining>.+)(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["それらのカードのトリガーアイコンが[[soul.gif]]のCX1枚につき、次の行動を行う。『あなたは自分の控え室の《★TESTTRAIT★》のキャラを1枚選び、手札に戻す。』"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
@@ -22,17 +24,17 @@ internal class ThoseCardsTriggerIconConditionToken : CardTextToken<List<CardEffe
         // Handle sub-action pattern: 次の行動を行う。『...』
         if (innerAction != null)
         {
-            var innerResult = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, innerAction);
-            if (innerResult != null)
-            {
-                return
-                [
-                    new CardEffectAbility
-                    {
-                        AbilityText = $"{cxPhrase}, {innerResult}"
-                    }
-                ];
-            }
+            var innerEffect = PowerBoostWithFollowingAbilityToken.TranslateNested(registry, innerAction);
+            var innerText = innerEffect.EffectText;
+            return
+            [
+                new NestedCardEffectAbility
+                {
+                    AbilityText = $"{cxPhrase}, {innerText}",
+                    NestedEffect = innerEffect,
+                    IsUnmatched = innerEffect.Abilities.Any(a => a.IsUnmatched)
+                }
+            ];
         }
 
         // Parse the remaining text

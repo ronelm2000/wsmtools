@@ -17,6 +17,8 @@ internal class ForEachCxToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^それらのカードのCX1枚につき、?(?<remaining>.+)(?:\.|,|、|。)?");
 
+    public override IEnumerable<string> SampleMatches => ["それらのカードのCX1枚につき、次の行動を行う。『あなたは自分の山札の上から1枚を公開する。』"];
+
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
@@ -48,11 +50,13 @@ internal class ForEachCxToken : CardTextToken<List<CardEffectAbility>>
         if (actionMatch.Success)
         {
             var inner = actionMatch.Groups[1].Value;
-            var innerResult = PowerBoostWithFollowingAbilityToken.TryTranslateNested(registry, inner);
-            if (innerResult != null)
+            var innerEffect = PowerBoostWithFollowingAbilityToken.TranslateNested(registry, inner);
+            result.Add(new NestedCardEffectAbility
             {
-                result.Add(new CardEffectAbility { AbilityText = $"perform the following action. \"{innerResult}\"" });
-            }
+                AbilityText = $"perform the following action. \"{innerEffect.EffectText}\"",
+                NestedEffect = innerEffect,
+                IsUnmatched = innerEffect.Abilities.Any(a => a.IsUnmatched)
+            });
             return result;
         }
 

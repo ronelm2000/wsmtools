@@ -67,7 +67,6 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new AttackConditionToken());
         _conditionListRegistry.Register(new CxPhaseStartConditionToken());
         _conditionListRegistry.Register(new OpponentAttackPhaseStartConditionToken());
-        _conditionListRegistry.Register(new CannotBeChosenConditionToken());
         _conditionListRegistry.Register(new WhenBackupUsedConditionToken());
         _conditionListRegistry.Register(new CxNamedInCxAreaConditionToken());
         _conditionListRegistry.Register(new CxNamedPlacedConditionToken());

@@ -20,6 +20,7 @@ public enum AbilityPrefix
 
 [JsonDerivedType(typeof(UnmatchedAbility), "Unmatched")]
 [JsonDerivedType(typeof(ConditionalCardEffectAbility), "Conditional")]
+[JsonDerivedType(typeof(NestedCardEffectAbility), "NestedAbility")]
 [JsonDerivedType(typeof(CardEffectAbility), "Plain")]
 public record CardEffectAbility : ICardAbility
 {

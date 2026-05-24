@@ -34,6 +34,8 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         { "記憶", "Memory" },
     };
 
+    public override IEnumerable<string> SampleMatches => ["【永】 あなたのターン中、他のあなたの《風》のキャラが4枚以上なら、このカードのパワーを＋5000。"];
+
     public override Regex Matcher => new(@"^【永】\s*(?<mainText>.+)$");
 
     public override CardEffect Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
@@ -89,10 +91,20 @@ internal class ContEffectToken : CardTextToken<CardEffect>
 
         var conditionEnglish = conditions.AggregateToString();
         var abilityEnglish = AutoEffectToken.JoinAbilityPartsFromSentences(parsedList);
-        
+
         var effectText = "[CONT]";
         if (labels.Count > 0)
             effectText += $" {string.Join("][", labels)}";
+
+        // When ParseSentence matched only conditions (e.g. 【永】 このカードは相手の効果に選ばれない。
+        // matches CannotBeChosenConditionToken), there are no abilities. Use condition text
+        // directly as the ability text, stripped of "If/When/During" prefix.
+        if (string.IsNullOrEmpty(abilityEnglish) && conditions.Count > 0)
+        {
+            abilityEnglish = string.Join(", ", conditions.Select(c => c.ConditionText));
+            conditionEnglish = string.Empty;
+        }
+
         if (!string.IsNullOrEmpty(conditionEnglish))
             effectText += $" {conditionEnglish},";
         
@@ -105,8 +117,20 @@ internal class ContEffectToken : CardTextToken<CardEffect>
                 abilityForEffect = char.ToLower(abilityForEffect[0]) + abilityForEffect[1..];
         }
         effectText += $" {abilityForEffect}";
-        if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith('"') && !abilityForEffect.Contains("get the following abilities"))
+
+        // If the CONT effect has no conditions and the ability text is a label/title
+        // (all words start with uppercase, e.g. "Great Performance", "Assist"),
+        // strip the trailing period added by JoinAbilityPartsFromSentences.
+        if (conditions.Count == 0 && abilityForEffect.Length > 0)
+        {
+            var trimmed = abilityForEffect.TrimEnd('.');
+            if (trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries).All(w => w.Length > 0 && char.IsUpper(w[0])))
+                effectText = effectText.TrimEnd('.');
+        }
+        else if (!abilityForEffect.EndsWith('.') && !abilityForEffect.EndsWith('"') && !abilityForEffect.Contains("get the following abilities"))
+        {
             effectText += ".";
+        }
 
         var abilities = parsedList.SelectMany(p => p.Abilities).ToList();
         var unmatchedConditions = conditions.Where(c => c.IsUnmatched).ToList();

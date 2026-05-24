@@ -158,10 +158,13 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         conditions.AddRange(allConditions);
 
         // Log matched tokens
-        foreach (var c in allConditions)
-            tokenLog.Add($"Cond:{c.GetType().Name}");
-        foreach (var a in parsedList.SelectMany(p => p.Abilities))
-            tokenLog.Add($"Abil:{a.GetType().Name}");
+        foreach (var p in parsedList)
+        {
+            foreach (var n in p.ConditionTokenNames)
+                tokenLog.Add($"Cond:{n}");
+            foreach (var n in p.AbilityTokenNames)
+                tokenLog.Add($"Abil:{n}");
+        }
 
         var conditionEnglish = conditions.AggregateToString();
 

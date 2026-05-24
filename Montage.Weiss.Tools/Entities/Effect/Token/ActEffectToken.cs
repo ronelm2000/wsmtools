@@ -72,8 +72,13 @@ internal class ActEffectToken : CardTextToken<CardEffect>
         {
             parsedList = MultiClauseEffectParser.Parse(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
 
-            foreach (var a in parsedList.SelectMany(p => p.Abilities))
-                tokenLog.Add($"Abil:{a.GetType().Name}");
+            foreach (var p in parsedList)
+            {
+                foreach (var n in p.ConditionTokenNames)
+                    tokenLog.Add($"Cond:{n}");
+                foreach (var n in p.AbilityTokenNames)
+                    tokenLog.Add($"Abil:{n}");
+            }
 
             abilityEnglish = AutoEffectToken.JoinAbilityPartsFromSentences(parsedList);
 

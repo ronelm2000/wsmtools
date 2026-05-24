@@ -9,6 +9,8 @@ public record LeadInPrefixMap(
 public record ParsedSentence(
     List<CardEffectCondition> Conditions,
     List<CardEffectAbility> Abilities,
+    List<string> ConditionTokenNames,
+    List<string> AbilityTokenNames,
     string Text,
     string Remaining = "");
 
@@ -74,6 +76,8 @@ public static class MultiClauseEffectParser
     {
         var conditions = new List<CardEffectCondition>();
         var abilities = new List<CardEffectAbility>();
+        var conditionTokenNames = new List<string>();
+        var abilityTokenNames = new List<string>();
         var remainingText = sentence.Trim();
         string? pendingDuration = null;
 
@@ -102,6 +106,7 @@ public static class MultiClauseEffectParser
             {
                 var condList = condMatch.Translate(registry);
                 conditions.AddRange(condList);
+                conditionTokenNames.Add(condMatch.Match.Token);
                 Log.Debug("ParseSentence: condition matched by '{Token}', consumed {Len} chars, remaining='{Remaining}'",
                     condMatch.Match.Token, condMatch.Match.Length, trimmed[condMatch.Match.Length..]);
                 remainingText = trimmed[condMatch.Match.Length..].TrimStart('、', ' ', '\t');
@@ -144,6 +149,7 @@ public static class MultiClauseEffectParser
                         break;
                     }
                 }
+                abilityTokenNames.Add(abilMatch.Match.Token);
                 foreach (var abil in abilList)
                 {
                     var finalText = pendingDuration != null ? ApplyDuration(abil.AbilityText, pendingDuration) : abil.AbilityText;
@@ -184,6 +190,7 @@ public static class MultiClauseEffectParser
                     if (abilMatch != null)
                     {
                         var abilList = abilMatch.Translate(registry);
+                        abilityTokenNames.Add(abilMatch.Match.Token);
                         foreach (var abil in abilList)
                         {
                             var finalText = pendingDuration != null ? ApplyDuration(abil.AbilityText, pendingDuration) : abil.AbilityText;
@@ -216,6 +223,7 @@ public static class MultiClauseEffectParser
                     if (postConds.Count > 0)
                     {
                         conditions.AddRange(postConds);
+                        conditionTokenNames.Add(postCheck.Match.Token);
                         remainingText = trimmed[postCheck.Match.Length..].TrimStart('、', '。', ' ', '\t');
                         Log.Debug("ParseSentence: post-condition matched in ability loop, remaining='{Remaining}'", remainingText);
                         break;
@@ -224,6 +232,7 @@ public static class MultiClauseEffectParser
                 Log.Debug("ParseSentence: no prefix to skip nor fallback match, using CatchAllAbilityToken. remaining='{Remaining}'", trimmed);
                 var sentinelAbilities = new CatchAllAbilityToken().Translate(registry, trimmed.AsMemory());
                 abilities.AddRange(sentinelAbilities);
+                abilityTokenNames.Add(nameof(CatchAllAbilityToken));
                 remainingText = "";
                 break;
             }
@@ -238,6 +247,7 @@ public static class MultiClauseEffectParser
             if (postConds.Count > 0)
             {
                 conditions.AddRange(postConds);
+                conditionTokenNames.Add(postConditionMatch.Match.Token);
                 remainingText = remainingText.TrimStart()[postConditionMatch.Match.Length..].TrimStart('、', '。', ' ', '\t');
                 Log.Debug("ParseSentence: post-condition matched, remaining='{Remaining}'", remainingText);
             }
@@ -248,7 +258,7 @@ public static class MultiClauseEffectParser
 
         var remaining = remainingText.Trim();
         var text = BuildSentenceText(conditions, abilities);
-        return new ParsedSentence(conditions, abilities, text, remaining);
+        return new ParsedSentence(conditions, abilities, conditionTokenNames, abilityTokenNames, text, remaining);
     }
 
     // Prefixes that should be skipped before matching (conjunctions + duration + あなたは ONLY)

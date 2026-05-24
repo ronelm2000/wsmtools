@@ -76,10 +76,13 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         }
 
         var conditions = allConditions;
-        foreach (var c in allConditions)
-            tokenLog.Add($"Cond:{c.GetType().Name}");
-        foreach (var a in parsedList.SelectMany(p => p.Abilities))
-            tokenLog.Add($"Abil:{a.GetType().Name}");
+        foreach (var p in parsedList)
+        {
+            foreach (var n in p.ConditionTokenNames)
+                tokenLog.Add($"Cond:{n}");
+            foreach (var n in p.AbilityTokenNames)
+                tokenLog.Add($"Abil:{n}");
+        }
 
         Log.Debug("ContEffectToken: parsed {CondCount} conditions, {AbilCount} abilities from '{Rest}'",
             conditions.Count, parsedList.Sum(p => p.Abilities.Count), remainingText);

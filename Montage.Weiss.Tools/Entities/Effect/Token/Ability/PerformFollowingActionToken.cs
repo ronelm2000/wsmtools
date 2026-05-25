@@ -16,21 +16,24 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class PerformFollowingActionToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^次の行動を(?:(?<count>\d+)回)?行う。『(?<inner>.+?)』(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^次の行動を(?:(?<count>\d+)回)?行(?:う|ってよい)。『(?<inner>.+?)』(?:\.|,|、|。)?");
     public override IEnumerable<string> SampleMatches => ["次の行動を行う。『あなたは自分の控え室の《★TESTTRAIT★》のキャラを1枚選び、手札に戻す。』"];
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
-        var match = Matcher.Match(span.ToString());
+        var fullText = span.ToString();
+        var match = Matcher.Match(fullText);
         var inner = match.Groups["inner"].Value;
         var count = match.Groups["count"] is Group cg && cg.Success ? cg.Value : null;
+        var isOptional = fullText.Contains("行ってよい");
         var innerEffect = PowerBoostWithFollowingAbilityToken.TranslateNested(registry, inner);
-        var actionText = $"perform the following action. \"{innerEffect.EffectText}\"";
+        var verbText = isOptional ? "you may perform" : "perform";
+        var actionText = $"{verbText} the following action. \"{innerEffect.EffectText}\"";
         return
         [
             new NestedCardEffectAbility
             {
                 AbilityText = count != null
-                    ? $"perform the following action {count} times. \"{innerEffect.EffectText}\""
+                    ? $"{verbText} the following action {count} times. \"{innerEffect.EffectText}\""
                     : actionText,
                 NestedEffect = innerEffect,
                 IsUnmatched = innerEffect.Abilities.Any(a => a.IsUnmatched)

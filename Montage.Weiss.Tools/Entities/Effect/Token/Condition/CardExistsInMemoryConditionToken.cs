@@ -14,7 +14,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 /// </remarks>
 internal class CardExistsInMemoryConditionToken : CardTextToken<List<CardEffectCondition>>
 {
-    public override Regex Matcher => new(@"^思い出置場にこのカードがあり");
+    public override Regex Matcher => new(@"^思い出置場にこのカードがあ(?:り|る)(?:ます)?(?:なら)?");
+    public override IEnumerable<string> SampleMatches => ["思い出置場にこのカードがあり"];
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

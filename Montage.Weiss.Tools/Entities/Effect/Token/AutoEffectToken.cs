@@ -44,6 +44,7 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         { "応援", "Assist" },
         { "経験", "Experience" },
         { "記憶", "Memory" },
+        { "継承", "Inheritance" },
     };
 
     public override Regex Matcher => new(@"^【自】(?<labels>(?:【[^】]+】)*)\s*(?<mainText>.+)$");

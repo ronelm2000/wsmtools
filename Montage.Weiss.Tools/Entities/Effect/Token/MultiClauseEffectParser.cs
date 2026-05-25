@@ -43,6 +43,8 @@ public static class MultiClauseEffectParser
         { "そうでなければ", AbilityPrefix.Otherwise },
         { "そうしなければ、", AbilityPrefix.Otherwise },
         { "そうしなければ", AbilityPrefix.Otherwise },
+        { "ないなら、", AbilityPrefix.Otherwise },
+        { "ないなら", AbilityPrefix.Otherwise },
         { "その後、", AbilityPrefix.AfterThat },
         { "その後", AbilityPrefix.AfterThat },
         { "あなたは", AbilityPrefix.Subject },
@@ -80,6 +82,7 @@ public static class MultiClauseEffectParser
         var abilityTokenNames = new List<string>();
         var remainingText = sentence.Trim();
         string? pendingDuration = null;
+        AbilityPrefix? pendingPrefix = null;
 
         Log.Debug("ParseSentence: input='{Input}'", sentence);
 
@@ -104,6 +107,16 @@ public static class MultiClauseEffectParser
             var condMatch = registry.ConditionListRegistry.Match(trimmed.AsMemory());
             if (condMatch != null)
             {
+                // If CatchAllConditionToken would consume text containing ないなら as part of
+                // a continuation chain (し、ないなら), break — it's an Otherwise clause, not a condition.
+                if (condMatch.Match.Token == nameof(Condition.CatchAllConditionToken) &&
+                    trimmed.Length >= condMatch.Match.Length &&
+                    trimmed[..condMatch.Match.Length].Contains("し、ないなら"))
+                {
+                    Log.Debug("ParseSentence: CatchAllConditionToken matched 'し、ないなら' pattern, breaking to ability loop. trimmed='{Trimmed}'", trimmed);
+                    break;
+                }
+
                 var condList = condMatch.Translate(registry);
                 conditions.AddRange(condList);
                 conditionTokenNames.Add(condMatch.Match.Token);
@@ -139,14 +152,17 @@ public static class MultiClauseEffectParser
             {
                 var abilList = abilMatch.Translate(registry);
                 // Detect conjunction prefixes (e.g. その後、) in the matched text
-                var detectedPrefix = AbilityPrefix.And;
-                foreach (var (pattern, p) in (prefixMap ?? DefaultPrefixMap).Prefixes)
+                var detectedPrefix = pendingPrefix ?? AbilityPrefix.And;
+                if (pendingPrefix == null)
                 {
-                    if (p == AbilityPrefix.And || p == AbilityPrefix.Subject) continue;
-                    if (trimmed.StartsWith(pattern, StringComparison.Ordinal))
+                    foreach (var (pattern, p) in (prefixMap ?? DefaultPrefixMap).Prefixes)
                     {
-                        detectedPrefix = p;
-                        break;
+                        if (p == AbilityPrefix.And || p == AbilityPrefix.Subject) continue;
+                        if (trimmed.StartsWith(pattern, StringComparison.Ordinal))
+                        {
+                            detectedPrefix = p;
+                            break;
+                        }
                     }
                 }
                 abilityTokenNames.Add(abilMatch.Match.Token);
@@ -159,6 +175,7 @@ public static class MultiClauseEffectParser
                     abilities.Add(abil with { AbilityText = finalText, Prefix = prefix });
                 }
                 pendingDuration = null;
+                pendingPrefix = null;
                 Log.Debug("ParseSentence: ability matched by '{Token}', consumed {Len} chars, remaining='{Remaining}'",
                     abilMatch.Match.Token, abilMatch.Match.Length, trimmed[abilMatch.Match.Length..]);
                 remainingText = trimmed[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t', '』');
@@ -194,11 +211,13 @@ public static class MultiClauseEffectParser
                         foreach (var abil in abilList)
                         {
                             var finalText = pendingDuration != null ? ApplyDuration(abil.AbilityText, pendingDuration) : abil.AbilityText;
-                            Log.Debug("ParseSentence: after prefix skip, ability '{Token}' with duration '{Duration}' -> '{FinalText}'",
-                                abilMatch.Match.Token, pendingDuration, finalText);
-                            abilities.Add(abil with { AbilityText = finalText, Prefix = prefixType });
+                            var effectivePrefix = pendingPrefix ?? prefixType;
+                            Log.Debug("ParseSentence: after prefix skip, ability '{Token}' with duration '{Duration}' and prefix '{Prefix}' -> '{FinalText}'",
+                                abilMatch.Match.Token, pendingDuration, effectivePrefix, finalText);
+                            abilities.Add(abil with { AbilityText = finalText, Prefix = effectivePrefix });
                         }
                         pendingDuration = null;
+                        pendingPrefix = null;
                         Log.Debug("ParseSentence: after prefix skip, matched by '{Token}', remaining='{Remaining}'",
                             abilMatch.Match.Token, remainingText[abilMatch.Match.Length..]);
                         remainingText = remainingText[abilMatch.Match.Length..].TrimStart('、', '。', ' ', '\t', '』');
@@ -206,7 +225,11 @@ public static class MultiClauseEffectParser
                         break;
                     }
 
-                    // Still no match — skip prefix and continue outer loop
+                    // Still no match — save non-duration prefix for later use, skip prefix and continue outer loop
+                    if (pendingDuration == null && prefixType is AbilityPrefix.Otherwise or AbilityPrefix.AfterThat)
+                    {
+                        pendingPrefix = prefixType;
+                    }
                     prefixSkipped = true;
                     break;
                 }
@@ -282,6 +305,7 @@ public static class MultiClauseEffectParser
         "そうでないなら、", "そうでないなら",
         "そうでなければ、", "そうでなければ",
         "そうしなければ、", "そうしなければ",
+        "ないなら、", "ないなら",
         "そうしたら、", "そうしたら",
         "その後、", "その後",
         "そして、", "そして",

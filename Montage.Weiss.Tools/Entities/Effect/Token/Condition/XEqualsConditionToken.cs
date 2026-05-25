@@ -36,6 +36,10 @@ internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
         var description = match.Groups["description"] is Group g && g.Success ? g.Value : match.Value;
         var translated = description switch
         {
+            _ when Regex.IsMatch(description, @"この効果で公開されたカードのレベルの合計が偶数なら\d+、奇数なら\d+") =>
+                TranslateParityDescription(description),
+            _ when Regex.IsMatch(description, @"このカードのマーカーにカード名に「.+?」を含むキャラがあるなら\d+、ないなら\d+") =>
+                $"X is equal to {TranslateMarkerXDescription(description, registry)}",
             _ when description.Contains("公開されたカードのレベル") =>
                 "X is equal to the level of the revealed card",
             _ when Regex.IsMatch(description, @"そのカードのレベル[＋+]\d*") =>
@@ -62,6 +66,41 @@ internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
                 ConditionText = translated
             }
         ];
+    }
+
+    /// <summary>
+    /// Translates a marker-based X definition: "2 if there is a character with 'name' under this card's marker, or 1 if not".
+    /// Supports multiple named targets joined by <c>か</c> (e.g., "うみ" or "七海").
+    /// </summary>
+    private static string TranslateMarkerXDescription(string description, ITokenRegistry registry)
+    {
+        var ifMatch = Regex.Match(description, @"キャラがあるなら(\d+)");
+        var ifNotMatch = Regex.Match(description, @"ないなら(\d+)");
+        var ifValue = ifMatch.Success ? ifMatch.Groups[1].Value : "2";
+        var ifNotValue = ifNotMatch.Success ? ifNotMatch.Groups[1].Value : "1";
+        var names = new List<string>();
+        var nameMatches = Regex.Matches(description, @"「(.+?)」");
+        foreach (System.Text.RegularExpressions.Match m in nameMatches)
+        {
+            names.Add(registry.MatchNameFragment(m.Groups[1].Value));
+        }
+        var nameText = names.Count > 1
+            ? string.Join(" or ", names.Select(n => $"\"{n}\""))
+            : names.Count == 1 ? $"\"{names[0]}\"" : "?";
+        return $"{ifValue} if there is a character with {nameText} in its card name under this card's marker, or {ifNotValue} if not";
+    }
+
+    /// <summary>
+    /// Translates a parity-based X-definition: "2 if the total level is even, or 1 if it is odd".
+    /// Used when X depends on whether the sum of revealed card levels is even or odd.
+    /// </summary>
+    private static string TranslateParityDescription(string description)
+    {
+        var evenMatch = Regex.Match(description, @"偶数なら(\d+)");
+        var oddMatch = Regex.Match(description, @"奇数なら(\d+)");
+        var evenValue = evenMatch.Success ? evenMatch.Groups[1].Value : "2";
+        var oddValue = oddMatch.Success ? oddMatch.Groups[1].Value : "1";
+        return $"X is equal to {evenValue} if the total level of the cards revealed this way is even, or {oddValue} if it is odd";
     }
 
     private static string ExtractTrait(string text, ITokenRegistry registry)

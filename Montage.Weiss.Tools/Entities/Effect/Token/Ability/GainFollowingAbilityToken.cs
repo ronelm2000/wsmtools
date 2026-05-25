@@ -1,3 +1,5 @@
+using Montage.Weiss.Tools.Exceptions;
+
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class PowerBoostWithDurationToken : CardTextToken<List<CardEffectAbility>>
@@ -99,10 +101,20 @@ internal class PowerBoostWithFollowingAbilityToken : CardTextToken<List<CardEffe
 
     internal static CardEffect TranslateNested(ITokenRegistry registry, string japanese)
     {
-        var matchResult = registry.EffectRegistry.Match(japanese.Trim().AsMemory());
-        if (matchResult != null)
+        try
         {
-            return matchResult.Translate(registry);
+            var matchResult = registry.EffectRegistry.Match(japanese.Trim().AsMemory());
+            if (matchResult != null)
+            {
+                return matchResult.Translate(registry);
+            }
+        }
+        catch (TranslationNotImplementedException)
+        {
+            // Nested effect token (e.g. ContEffectToken) threw due to unmatched abilities.
+            // Don't propagate — return a fallback EventCardEffect so the outer token's
+            // Translate completes and its own IsUnmatched scan can fire with the correct
+            // outer partial tree (e.g. AutoCardEffect rather than just the inner Cont).
         }
 
         return new EventCardEffect

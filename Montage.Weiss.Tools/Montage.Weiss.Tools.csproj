@@ -70,6 +70,7 @@
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="CommandLineParser" />
+    <PackageReference Include="CsvHelper" />
     <PackageReference Include="FluentPath" />
     <PackageReference Include="Flurl.Http" />
     <PackageReference Include="Lamar" />

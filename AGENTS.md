@@ -221,3 +221,86 @@ After adding a correction, verify with `dotnet build` and `dotnet test --filter 
 ## Translation Tokens
 
 For guidelines specific to card text token parsing and translation, see [`Token/README.md`](Montage.Weiss.Tools/Entities/Effect/Token/README.md).
+
+## Failed Translation Patch Workflow
+
+When `TranslatePostProcessor` encounters unrecognized card text, it writes `./Export/failed_translation_report.json` and throws. To turn these failures into CSV test data, generate a **patch file** that maps each unmatched JP clause to its correct English translation.
+
+### 1. Locate the report
+
+```ps
+ls ./Export/failed_translation_report.json
+```
+
+### 2. Read the report
+
+Deserialize structure:
+
+```
+FailedTranslationReport
+  └─ FailedTranslationEntry[]
+       ├─ Serial          (card serial, e.g. "NIK/S117-001")
+       └─ FailedAbilityEntry[]
+            ├─ JapaneseText   (full JP effect text)
+            └─ Tree           (partial CardEffect with unmachted clauses)
+                 ├─ EffectText   (combined partial English + JP fragments)
+                 ├─ Abilities[]
+                 │    └─ UnmatchedAbility (when "$type":"Unmatched")
+                 │         ├─ AbilityText   (JP fragment that wasn't matched)
+                 │         └─ Suggestions[] (diagnostic hints like "ConditionEnding (Type.If)")
+                 └─ Condition[] (when tree is ContCardEffect / AutoCardEffect)
+                      └─ CardEffectCondition (when IsUnmatched: true)
+                           └─ ConditionText  (JP fragment)
+```
+
+### 3. Determine the correct English for each unmatched clause
+
+For each `UnmatchedAbility` (or unmatched `CardEffectCondition`):
+
+- Read the `Suggestions` array — it contains hints like `"ConditionEnding (Type.If)"`, `"StartsWith: subject prefix"`, `"Multi-clause: 2 clauses"`.
+- Cross-reference the JP fragment grammar pattern with existing tokens in:
+  - `Montage.Weiss.Tools/Entities/Effect/Token/Ability/` — ability tokens
+  - `Montage.Weiss.Tools/Entities/Effect/Token/Condition/` — condition tokens
+- Look at similar cards in existing CSV files (`Montage.Weiss.Tools.Test/Resources/Translations/*.csv`) for reference English wording.
+- Follow the `Token/README.md` conventions:
+  - Condition text: do NOT include `"If"`, `"When"`, `"During"` prefixes — the framework prepends these from `ConditionType`.
+  - Ability text: should be a full clause with proper casing (starts uppercase).
+  - Labels: use the same values as existing CSV entries (e.g., `Assist`, `CXCOMBO`, `Brainstorm`).
+  - **Names and Traits are NOT translated** — preserve Japanese names (`「」`) and traits (`《》`) as-is in the English output. Keep the Japanese corner brackets `「」` around names; do not convert them to ASCII double quotes. If an existing CSV has a translated name, change the CSV entry back to the JP name.
+
+### 4. Write the patch JSON
+
+```json
+{
+  "tokens": {
+    "相手の前列のキャラを1枚選び、そのターン中、パワーを－6000": "choose 1 of your opponent's characters in their center stage, and those characters get -6000 power.",
+    "jp_fragment_from_ability_or_condition": "correct english text"
+  },
+  "labels": {
+    "【自】 このカードが手札から舞台に置かれた時、相手の前列のキャラを1枚選び、そのターン中、パワーを－6000。": ["CXCOMBO"]
+  }
+}
+```
+
+- `tokens` keys are **clause-level JP fragments** from `UnmatchedAbility.AbilityText` or `CardEffectCondition.ConditionText`. Multiple effects may reuse the same fragment.
+- **Do not include trailing punctuation (period, comma) in `tokens` values.** The JP fragments in the report have already had their trailing punctuation stripped by the parser. Adding punctuation back in the patch value will duplicate it during `EffectText` reconstruction (e.g., `"text."` combined with a trailing `.` from the parent token → `"text.."`).
+- `labels` keys are the **full JP effect text** from `FailedAbilityEntry.JapaneseText`. The value is the label array for that specific entry.
+- **Omit entries with empty label arrays** — the CSV writer already produces an empty string for entries without labels. Explicitly setting `"effect": []` in the `labels` object is both unnecessary and risks overwriting labels that the partial tree correctly resolves.
+
+### 5. Generate the CSV
+
+```ps
+dotnet run --project Montage.Weiss.Tools --no-build -- debug generate-csv --patch path/to/patch.json
+```
+
+### 6. Place in test resources
+
+Move the CSV (default: `./Export/failed_translations_YYYYMMdd.csv`) into `Montage.Weiss.Tools.Test/Resources/Translations/`:
+- `expansion_{setId}_effects.csv` for expansion sets
+- `effects_{setId}.csv` for standalone sets (e.g., trial decks)
+
+### 7. Verify rows exist (they are expected to fail)
+
+```ps
+dotnet test --filter "TestCategory~<SERIAL_PREFIX>" --list-tests
+```

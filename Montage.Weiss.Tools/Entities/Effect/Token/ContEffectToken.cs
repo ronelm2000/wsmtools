@@ -1,5 +1,3 @@
-using Montage.Weiss.Tools.Exceptions;
-
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 /// <summary>
@@ -135,26 +133,6 @@ internal class ContEffectToken : CardTextToken<CardEffect>
         var abilities = parsedList.SelectMany(p => p.Abilities).ToList();
         var unmatchedConditions = conditions.Where(c => c.IsUnmatched).ToList();
         var unmatchedAbilities = abilities.Where(a => a.IsUnmatched).ToList();
-
-        if (unmatchedConditions.Count > 0 || unmatchedAbilities.Count > 0)
-        {
-            var result = new ContCardEffect
-            {
-                Labels = labels.ToArray(),
-                ConditionText = conditionEnglish,
-                Condition = conditions,
-                Abilities = abilities,
-                AbilityText = abilityEnglish,
-                EffectText = effectText,
-                TokenLog = tokenLog
-            };
-            Log.Debug("ContEffectToken: full result = {@Result}", result);
-            throw new TranslationNotImplementedException(
-                $"Unrecognized [condition(s): {string.Join(" / ", unmatchedConditions.Select(c => c.ConditionText))}]" +
-                (unmatchedConditions.Count > 0 && unmatchedAbilities.Count > 0 ? " | " : "") +
-                $"[ability(ies): {string.Join(" / ", unmatchedAbilities.Select(a => a.AbilityText))}]",
-                result);
-        }
 
         return new ContCardEffect
         {

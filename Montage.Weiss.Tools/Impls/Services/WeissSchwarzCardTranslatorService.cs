@@ -3,6 +3,7 @@ using Montage.Weiss.Tools.Entities.Effect.Token;
 using Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 using Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 using Montage.Weiss.Tools.Entities.Effect.Token.ReminderText;
+using Montage.Weiss.Tools.Exceptions;
 
 namespace Montage.Weiss.Tools.Impls.Services;
 
@@ -488,6 +489,23 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
             {
                 effect.EffectText = reminderTextEnglish;
             }
+        }
+
+        var unmatchedConditions = effect is IConditionalCardEffect cond
+            ? cond.Condition.Where(c => c.IsUnmatched).ToList()
+            : [];
+        var unmatchedAbilities = effect.Abilities.Where(a => a.IsUnmatched).ToList();
+        var unmatchedCosts = effect is ICostedCardEffect costed
+            ? costed.Cost.Where(a => a.IsUnmatched).ToList()
+            : [];
+
+        if (unmatchedConditions.Count > 0 || unmatchedAbilities.Count > 0 || unmatchedCosts.Count > 0)
+        {
+            throw new TranslationNotImplementedException(
+                $"Unrecognized [condition(s): {string.Join(" / ", unmatchedConditions.Select(c => c.ConditionText))}]" +
+                $"[ability(ies): {string.Join(" / ", unmatchedAbilities.Select(a => a.AbilityText))}]" +
+                $"[cost(s): {string.Join(" / ", unmatchedCosts.Select(a => a.AbilityText))}]",
+                effect);
         }
 
        return effect;

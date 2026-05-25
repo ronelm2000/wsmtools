@@ -1,5 +1,3 @@
-using Montage.Weiss.Tools.Exceptions;
-
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 /// <summary>
@@ -222,30 +220,6 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
         var postConditionText = postConditions.Count > 0
             ? string.Join(" ", postConditions.Select(c => c.ConditionText.TrimEnd('.') + "."))
             : string.Empty;
-
-        if (unmatchedConditions.Count > 0 || unmatchedAbilities.Count > 0 || unmatchedCosts.Count > 0)
-        {
-            var result = new AutoCardEffect
-            {
-                Labels = finalLabels,
-                PreConditionText = string.Empty,
-                PostConditionText = postConditionText,
-                ConditionText = conditions.AggregateToString(),
-                Condition = conditions,
-                CostText = costEnglish,
-                Cost = costAbilities,
-                Abilities = abilities,
-                AbilityText = abilityEnglish,
-                EffectText = effectText,
-                TokenLog = tokenLog
-            };
-            Log.Debug("AutoEffectToken: full result = {@Result}", result);
-            throw new TranslationNotImplementedException(
-                $"Unrecognized [condition(s): {string.Join(" / ", unmatchedConditions.Select(c => c.ConditionText))}]" +
-                $"[ability(ies): {string.Join(" / ", unmatchedAbilities.Select(a => a.AbilityText))}]" +
-                $"[cost(s): {string.Join(" / ", unmatchedCosts.Select(a => a.AbilityText))}]",
-                result);
-        }
 
         return new AutoCardEffect
         {

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Helpers;
 using Montage.Weiss.Tools.Entities.Effect;
@@ -381,6 +382,33 @@ public partial class TranslationTests
         var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
         Assert.IsNotNull(ex.Effect);
         Assert.IsInstanceOfType<AutoCardEffect>(ex.Effect);
+    }
+
+    /// <summary>
+    /// SMP/W137-075: 【自】 that grants an inner 【永】 ability.
+    /// Verifies that TranslateNested catches the inner ContEffectToken exception
+    /// and returns a fallback EventCardEffect, so the outer AutoEffectToken
+    /// completes and its IsUnmatched scan fires with the correct AutoCardEffect
+    /// partial tree preserving the full outer context.
+    /// </summary>
+    [TestMethod]
+    [TestCategory("Manual")]
+    public void Translate_AutoEffect_GrantContAbility_Misclassified()
+    {
+        var japanese = "【自】 このカードが手札から舞台に置かれた時、あなたは自分のクロック置場のキャラを1枚まで選び、控え室に置き、他のあなたの《サマポケ》のキャラが4枚以上なら、次の相手のターンの終わりまで、このカードは次の能力を得る。『【永】 このカードの正面のキャラのソウルを－1。』";
+        var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
+
+        Assert.IsNotNull(ex.Effect);
+        Assert.IsInstanceOfType<AutoCardEffect>(ex.Effect,
+            "Outer tree should be AutoCardEffect; the nested Cont failure is recorded as an unmatched ability inside it.");
+
+        var auto = (AutoCardEffect)ex.Effect;
+        Assert.IsTrue(auto.ConditionText.Contains("When this card is placed on stage from your hand"),
+            "Condition should preserve the auto trigger.");
+        Assert.IsTrue(auto.Abilities.Any(a => a.IsUnmatched),
+            "There should be at least one unmatched ability (the untranslated nested Cont effect).");
+        Assert.IsTrue(auto.EffectText.StartsWith("[AUTO]"),
+            "EffectText should start with [AUTO], not [CONT].");
     }
 
     [TestMethod]

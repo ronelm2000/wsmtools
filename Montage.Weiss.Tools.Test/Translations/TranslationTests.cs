@@ -418,6 +418,8 @@ public partial class TranslationTests
         var japanese = "【永】 あなたのターン中、他のあなたの《風》のキャラが4枚以上なら、このカードのパワーを＋5000し、このカードは次の能力を得る。『【永】 このカードのバトル中、相手はイベントと『助太刀』を手札からプレイできない。』";
         var tree = _service.TranslateEffect(japanese);
 
+        Log.Debug("TokenLog [{testname}]: {tokenLog}", TestContext.TestDisplayName, string.Join(";", tree.TokenLog));
+
         ContCardEffect? effect = null;
 
         MultiAssert.AllAreTrue([

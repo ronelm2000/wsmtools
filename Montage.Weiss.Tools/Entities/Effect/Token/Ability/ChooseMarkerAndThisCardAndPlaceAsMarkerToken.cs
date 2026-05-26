@@ -11,7 +11,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// <list type="bullet">
 ///   <item><description>count: Marker count to transfer (e.g., "1")</description></item>
 /// </list>
-/// <para><b>Output:</b> <c>you may choose [up to] N marker under this card and this card, and put them face-up under that character as markers in any order. After that, put the remaining markers to your waiting room[ and put the top card of your deck to your stock].</c></para>
+/// <para><b>Output:</b> <c>choose [up to] N marker under this card and this card, and put them face-up under the character placed on that stage as markers in any order. If you do, put the remaining markers in your waiting room[ and put the top card of your deck to your stock].</c></para>
 /// </remarks>
 internal class ChooseMarkerAndThisCardAndPlaceAsMarkerToken : CardTextToken<List<CardEffectAbility>>
 {
@@ -35,7 +35,7 @@ internal class ChooseMarkerAndThisCardAndPlaceAsMarkerToken : CardTextToken<List
         [
             new CardEffectAbility
             {
-                AbilityText = $"you may choose {countText} marker under this card and this card, and put them face-up under that character as markers in any order. After that, put the remaining markers to your waiting room{stockText}"
+                AbilityText = $"choose {countText} marker under this card and this card, and put them face-up under the character placed on that stage as markers in any order. If you do, put the remaining markers in your waiting room{stockText}"
             }
         ];
     }

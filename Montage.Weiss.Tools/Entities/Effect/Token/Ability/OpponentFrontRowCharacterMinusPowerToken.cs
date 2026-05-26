@@ -25,7 +25,7 @@ internal class OpponentFrontRowCharacterMinusPowerToken : CardTextToken<List<Car
         [
             new CardEffectAbility
             {
-                AbilityText = $"choose 1 of your opponent's characters in their center stage, and that character gets -{power} power until end of turn"
+                AbilityText = $"choose 1 of your opponent's center stage characters, and that character gets -{power} power until end of turn"
             }
         ];
     }

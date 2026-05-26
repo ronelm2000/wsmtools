@@ -1,5 +1,17 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
+/// <summary>
+/// Matches "all opponent front row characters get -power" clauses.
+/// </summary>
+/// <remarks>
+/// <para><b>Expected Input:</b> <c>相手の前列のキャラすべてに、そのターン中、パワーをー500。</c></para>
+/// <para><b>Regex:</b> ^相手の前列のキャラすべてに、そのターン中、パワーを[ー－\-](\d+)(?:\.|,|、|。)?</para>
+/// <para><b>Captures:</b></para>
+/// <list type="bullet">
+///   <item><description>Group 1: Power reduction value</description></item>
+/// </list>
+/// <para><b>Output:</b> <c>all of your opponent's center stage characters get -{power} power until end of turn</c></para>
+/// </remarks>
 internal class AllOpponentFrontRowCharactersMinusPowerToken : CardTextToken<List<CardEffectAbility>>
 {
     public override Regex Matcher => new(@"^相手の前列のキャラすべてに、そのターン中、パワーを[ー－\-](\d+)(?:\.|,|、|。)?");
@@ -13,7 +25,7 @@ internal class AllOpponentFrontRowCharactersMinusPowerToken : CardTextToken<List
         [
             new CardEffectAbility
             {
-                AbilityText = $"all of your opponent's characters in their center stage get -{power} power until end of turn"
+                AbilityText = $"all of your opponent's center stage characters get -{power} power until end of turn"
             }
         ];
     }

@@ -395,7 +395,7 @@ public partial class TranslationTests
     [TestCategory("Manual")]
     public void Translate_AutoEffect_GrantContAbility_Misclassified()
     {
-        var japanese = "【自】 このカードが手札から舞台に置かれた時、あなたは自分のクロック置場のキャラを1枚まで選び、控え室に置き、他のあなたの《サマポケ》のキャラが4枚以上なら、次の相手のターンの終わりまで、このカードは次の能力を得る。『【永】 このカードの正面のキャラのソウルを－1。』";
+        var japanese = "【自】 このカードが手札から舞台に置かれた時、あなたは自分のクロック置場のキャラを1枚まで選び、控え室に置き、他のあなたの《サマポケ》のキャラが4枚以上なら、次の相手のターンの終わりまで、このカードは次の能力を得る。『【永】 このカードの正面のキャラキャラキャラのソウルを－1。』";
         var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
 
         Assert.IsNotNull(ex.Effect);

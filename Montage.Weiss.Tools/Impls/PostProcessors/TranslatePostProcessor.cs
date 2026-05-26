@@ -71,6 +71,7 @@ public class TranslatePostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISki
             var translatedEffects = new List<string>();
             var cardEffects = new List<CardEffect>();
             var cardFailures = new List<FailedAbilityEntry>();
+            var seenFailedTexts = new HashSet<string>();
 
             foreach (var effectText in card.Effect)
             {
@@ -83,11 +84,14 @@ public class TranslatePostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISki
                 catch (TranslationNotImplementedException ex)
                 {
                     Log.Warning("Translation failed for {serial} effect {text}", card.Serial, effectText);
-                    cardFailures.Add(new FailedAbilityEntry
+                    if (seenFailedTexts.Add(effectText))
                     {
-                        JapaneseText = effectText,
-                        Tree = ex.Effect
-                    });
+                        cardFailures.Add(new FailedAbilityEntry
+                        {
+                            JapaneseText = effectText,
+                            Tree = ex.Effect
+                        });
+                    }
                     translatedEffects.Add(effectText);
                 }
             }
@@ -105,11 +109,16 @@ public class TranslatePostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISki
         {
             var report = new FailedTranslationReport
             {
-                FailedTranslations = failuresByCard.Select(kvp => new FailedTranslationEntry
-                {
-                    Serial = kvp.Key,
-                    Abilities = kvp.Value
-                }).ToList()
+                FailedTranslations = failuresByCard
+                    .SelectMany(kvp => kvp.Value.Select(f => (Serial: kvp.Key, f.JapaneseText, f.Tree)))
+                    .GroupBy(t => t.JapaneseText, StringComparer.Ordinal)
+                    .Select(g => new FailedTranslationEntry
+                    {
+                        JapaneseText = g.Key,
+                        Tree = g.First().Tree,
+                        Serials = g.Select(t => t.Serial).Distinct().ToList()
+                    })
+                    .ToList()
             };
 
             var json = JsonSerializer.Serialize(report, ReportJsonOptions);
@@ -118,11 +127,11 @@ public class TranslatePostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISki
             await Path.Get(exportDir.FullPath, "failed_translation_report.json")
                        .WriteStringAsync(json, cancellationToken);
 
-            var innerExceptions = failuresByCard
-                .SelectMany(kvp => kvp.Value.Select(f =>
+            var innerExceptions = report.FailedTranslations
+                .SelectMany(fte => fte.Serials.Select(s =>
                     new TranslationNotImplementedException(
-                        $"Failed to translate effect for {kvp.Key}: {f.JapaneseText}",
-                        f.Tree)))
+                        $"Failed to translate effect for {s}: {fte.JapaneseText}",
+                        fte.Tree)))
                 .ToList();
 
             throw new TranslationFailedException(
@@ -139,8 +148,9 @@ public record FailedTranslationReport
 
 public record FailedTranslationEntry
 {
-    public required string Serial { get; init; }
-    public required List<FailedAbilityEntry> Abilities { get; init; }
+    public required string JapaneseText { get; init; }
+    public required CardEffect Tree { get; init; }
+    public required List<string> Serials { get; init; }
 }
 
 public record FailedAbilityEntry

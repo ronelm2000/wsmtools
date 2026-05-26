@@ -12,7 +12,13 @@ public record ConditionalCardEffectAbility : CardEffectAbility, IConditionalCard
     public required List<CardEffectCondition> Condition { get; init; }
     public required override string AbilityText
     {
-        get => $"{Condition.AggregateToString()}, {ActualAbilityText}".Trim();
+        get
+        {
+            var condText = Condition.AggregateToString();
+            if (ActualAbilityText.StartsWith(condText, StringComparison.Ordinal))
+                return ActualAbilityText;
+            return $"{condText}, {ActualAbilityText}".Trim();
+        }
         init => ActualAbilityText = value;
     }
 }

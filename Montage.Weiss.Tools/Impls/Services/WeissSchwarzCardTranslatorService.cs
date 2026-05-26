@@ -106,6 +106,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new CardInMemoryNamedConditionToken());
         _conditionListRegistry.Register(new CardExistsInMemoryConditionToken());
         _conditionListRegistry.Register(new BattleOpponentLevelConditionToken());
+        _conditionListRegistry.Register(new TurnEndConditionToken());
         _conditionListRegistry.Register(new DrawPhaseStartConditionToken());
         _conditionListRegistry.Register(new NoColorCardsInLevelConditionToken());
         _conditionListRegistry.Register(new IfThatCardIsLevelOrLowerCharacterOrToken());
@@ -123,7 +124,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new DeckCountConditionToken());
         _conditionListRegistry.Register(new CardLevelConditionToken());
         _conditionListRegistry.Register(new LevelThresholdConditionToken());
-        _conditionListRegistry.Register(new CompoundClockPickerAndTraitCountConditionToken());
+        // _conditionListRegistry.Register(new CompoundClockPickerAndTraitCountConditionToken()); // Replaced by ChooseClockCharAndPutToWaitingRoomAbilityToken + ConditionalAbilityToken
         _conditionListRegistry.Register(new LevelIsConditionToken());
         _conditionListRegistry.Register(new CxAreaHasCxConditionToken());
         _conditionListRegistry.Register(new CxAreaCxWithIconConditionToken());
@@ -181,6 +182,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new RevealTopCardIfTraitAddToHandToken());
         _effectListRegistry.Register(new ClockToWaitingRoomSimpleToken());
         _effectListRegistry.Register(new ClockToWaitingRoomToken());
+        _effectListRegistry.Register(new ChooseClockCharAndPutToWaitingRoomAbilityToken());
         _effectListRegistry.Register(new PutCardFromHandAndThisToBottomToken());
         _effectListRegistry.Register(new PutCardFromHandToWaitingRoomToken());
         _effectListRegistry.Register(new CostPutTriggerCxFromHandToWaitingRoomToken());
@@ -239,6 +241,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new OpponentChooseCxAndShuffleToken());
         _effectListRegistry.Register(new RevealToOpponentToken());
         _effectListRegistry.Register(new ConditionalPutInHandToken());
+        _effectListRegistry.Register(new LoseTraitToken());
+        _effectListRegistry.Register(new GetFollowingAbilitiesToken());
         _effectListRegistry.Register(new ConditionalAbilityToken());
         _effectListRegistry.Register(new ChooseCardAndPutInWaitingRoomToken());
         _effectListRegistry.Register(new PutInHandToken());

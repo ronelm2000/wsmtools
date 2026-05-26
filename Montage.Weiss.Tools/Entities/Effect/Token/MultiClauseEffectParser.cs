@@ -111,9 +111,10 @@ public static class MultiClauseEffectParser
                 // a continuation chain (し、ないなら), break — it's an Otherwise clause, not a condition.
                 if (condMatch.Match.Token == nameof(Condition.CatchAllConditionToken) &&
                     trimmed.Length >= condMatch.Match.Length &&
-                    trimmed[..condMatch.Match.Length].Contains("し、ないなら"))
+                    (trimmed[..condMatch.Match.Length].Contains("し、ないなら") ||
+                     trimmed[..condMatch.Match.Length].Contains("選び、")))  // verb chain e.g. clock-pick + condition
                 {
-                    Log.Debug("ParseSentence: CatchAllConditionToken matched 'し、ないなら' pattern, breaking to ability loop. trimmed='{Trimmed}'", trimmed);
+                    Log.Debug("ParseSentence: CatchAllConditionToken matched compound ability pattern, breaking to ability loop. trimmed='{Trimmed}'", trimmed);
                     break;
                 }
 
@@ -168,11 +169,20 @@ public static class MultiClauseEffectParser
                 abilityTokenNames.Add(abilMatch.Match.Token);
                 foreach (var abil in abilList)
                 {
-                    var finalText = pendingDuration != null ? ApplyDuration(abil.AbilityText, pendingDuration) : abil.AbilityText;
                     var prefix = abil.Prefix != AbilityPrefix.And ? abil.Prefix : detectedPrefix;
-                    Log.Debug("ParseSentence: ability '{Token}' with pending duration '{Duration}' and prefix '{Prefix}' -> '{FinalText}'",
-                        abilMatch.Match.Token, pendingDuration, prefix, finalText);
-                    abilities.Add(abil with { AbilityText = finalText, Prefix = prefix });
+                    if (pendingDuration != null)
+                    {
+                        var finalText = ApplyDuration(abil.AbilityText, pendingDuration);
+                        Log.Debug("ParseSentence: ability '{Token}' with pending duration '{Duration}' and prefix '{Prefix}' -> '{FinalText}'",
+                            abilMatch.Match.Token, pendingDuration, prefix, finalText);
+                        abilities.Add(abil with { AbilityText = finalText, Prefix = prefix });
+                    }
+                    else
+                    {
+                        Log.Debug("ParseSentence: ability '{Token}' with prefix '{Prefix}' -> '{FinalText}'",
+                            abilMatch.Match.Token, prefix, abil.AbilityText);
+                        abilities.Add(abil with { Prefix = prefix });
+                    }
                 }
                 pendingDuration = null;
                 pendingPrefix = null;

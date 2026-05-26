@@ -259,7 +259,11 @@ internal class GainFollowingAbilityTokenWithParticleWa : CardTextToken<List<Card
 /// <list type="bullet">
 ///   <item><description>nested: Inner quoted ability text</description></item>
 /// </list>
-/// <para><b>Output:</b> <c>get the following ability. "[CONT] ..."</c></para>
+/// <para><b>Output:</b> <c>this card gets the following ability. "[CONT] ..."</c></para>
+/// <para><b>Note:</b> Output changed from "get" to "this card gets" to support direct use inside
+/// <see cref="ConditionalAbilityToken"/> sub-translation where no outer parser strips the subject.
+/// In the normal parser flow, "this card" is stripped by
+/// <see cref="AutoEffectToken.JoinAbilityPartsFromSentences"/> on Continuation prefixes.</para>
 /// </remarks>
 internal class GainStandaloneFollowingAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
@@ -276,7 +280,7 @@ internal class GainStandaloneFollowingAbilityToken : CardTextToken<List<CardEffe
         [
             new NestedCardEffectAbility
             {
-                AbilityText = $"get the following ability. \"{nestedEffect.EffectText}\"",
+                AbilityText = $"this card gets the following ability. \"{nestedEffect.EffectText}\"",
                 NestedEffect = nestedEffect,
                 IsUnmatched = nestedEffect.Abilities.Any(a => a.IsUnmatched)
             }

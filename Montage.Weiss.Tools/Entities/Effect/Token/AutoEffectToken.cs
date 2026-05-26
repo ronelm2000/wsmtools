@@ -362,8 +362,14 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                         result += $". Otherwise, {otherwiseText}";
                         continue;
                     }
-                    string connector;
                     var next = abilities[i].AbilityText;
+                    if (abilities[i] is ConditionalCardEffectAbility)
+                    {
+                        result = result.TrimEnd('.');
+                        result += $". {next}";
+                        continue;
+                    }
+                    string connector;
                     if (isAfterIfYouDo)
                     {
                         connector = " ";

@@ -266,7 +266,7 @@ For each `UnmatchedAbility` (or unmatched `CardEffectCondition`):
   - Condition text: do NOT include `"If"`, `"When"`, `"During"` prefixes — the framework prepends these from `ConditionType`.
   - Ability text: should be a full clause with proper casing (starts uppercase).
   - Labels: use the same values as existing CSV entries (e.g., `Assist`, `CXCOMBO`, `Brainstorm`).
-  - **Names and Traits are NOT translated** — preserve Japanese names (`「」`) and traits (`《》`) as-is in the English output. Keep the Japanese corner brackets `「」` around names; do not convert them to ASCII double quotes. If an existing CSV has a translated name, change the CSV entry back to the JP name.
+  - **Names and Traits are NOT translated** — preserve Japanese names (`「」`) and traits (`《》`) as-is in the English output. Convert the Japanese corner brackets `「」` to regular ASCII double quotes, but do not convert special Unicode double quotes to ASCII double quotes (when in doubt, check the escape sequence as they should still be U+201C and U+201D, respectively). If an existing CSV has a translated name, change the CSV entry back to the JP name.
 
 ### 4. Write the patch JSON
 

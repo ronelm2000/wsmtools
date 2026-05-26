@@ -32,8 +32,49 @@ internal class EventEffectToken : CardTextToken<CardEffect>
 
         Log.Debug("EventEffectToken: input='{Input}' labels='{Labels}'", input, (object)labels);
 
+        // Extract cost if present: ［...］
+        var costMatch = Regex.Match(input, @"^［(?<cost>.+?)］\s*(?<rest>.+)$");
+        string costTextJapanese = string.Empty;
+        string rest = input;
+
+        if (costMatch.Success)
+        {
+            costTextJapanese = costMatch.Groups["cost"].Value;
+            rest = costMatch.Groups["rest"].Value.Trim();
+        }
+
+        // Translate cost using Match API
+        var costAbilities = new List<CardEffectAbility>();
+        if (!string.IsNullOrEmpty(costTextJapanese))
+        {
+            var costRemaining = costTextJapanese;
+            while (!string.IsNullOrWhiteSpace(costRemaining))
+            {
+                var t = costRemaining.TrimStart();
+                var m = registry.EffectListRegistry.Match(t.AsMemory());
+                if (m == null) break;
+                var abils = m.Translate(registry);
+                costAbilities.AddRange(abils);
+                costRemaining = t[m.Match.Length..].TrimStart('、', ' ', '\t');
+            }
+        }
+
+        var costTexts = costAbilities.Select(a => a.AbilityText).ToList();
+        var costEnglish = "";
+        if (costTexts.Count > 0)
+        {
+            costEnglish = costTexts[0];
+            for (int i = 1; i < costTexts.Count; i++)
+            {
+                var sep = i == 1 && Regex.IsMatch(costTexts[0], @"^\(\d+\)$") ? " " : " & ";
+                var nextText = AutoEffectToken.CapitalizeFirstAlpha(costTexts[i]);
+                costEnglish += sep + nextText;
+            }
+            costEnglish = AutoEffectToken.CapitalizeFirstAlpha(costEnglish);
+        }
+
         // Attempt 1: MultiClauseEffectParser.Parse (handles multi-sentence text)
-        var parsedSentences = MultiClauseEffectParser.Parse(input, registry, MultiClauseEffectParser.DefaultPrefixMap);
+        var parsedSentences = MultiClauseEffectParser.Parse(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
         if (parsedSentences.Count > 1 || (parsedSentences.Count == 1 && (parsedSentences[0].Abilities.Count > 0 || parsedSentences[0].Conditions.Count > 0)))
         {
             var allAbilities = parsedSentences.SelectMany(s => s.Abilities).ToList();
@@ -46,16 +87,20 @@ internal class EventEffectToken : CardTextToken<CardEffect>
 
             if (parts.Count > 0)
             {
-            var joined = string.Join(". ", parts.Select(s => s.TrimEnd('.')));
-            joined = char.ToUpper(joined[0]) + joined[1..];
-            var trimmed = joined.TrimEnd('"');
-            if (!trimmed.EndsWith('.'))
-                joined += ".";
+                var joined = string.Join(". ", parts.Select(s => s.TrimEnd('.')));
+                joined = char.ToUpper(joined[0]) + joined[1..];
+                var trimmed = joined.TrimEnd('"');
+                if (!trimmed.EndsWith('.'))
+                    joined += ".";
+
+                var effectText = string.IsNullOrEmpty(costEnglish) ? joined : $"[{costEnglish}] {joined}";
 
                 return new EventCardEffect
                 {
                     Labels = labels,
-                    EffectText = joined,
+                    CostText = costEnglish,
+                    Cost = costAbilities,
+                    EffectText = effectText,
                     AbilityText = joined,
                     Abilities = allAbilities
                 };
@@ -63,22 +108,26 @@ internal class EventEffectToken : CardTextToken<CardEffect>
         }
 
         // Attempt 2: ParseSentence (single sentence with conditions + abilities)
-        var parsed = MultiClauseEffectParser.ParseSentence(input, registry, MultiClauseEffectParser.DefaultPrefixMap);
+        var parsed = MultiClauseEffectParser.ParseSentence(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
         if (parsed.Abilities.Count > 0 || parsed.Conditions.Count > 0)
         {
             Log.Debug("EventEffectToken: ParseSentence produced {abilCount} abilities", parsed.Abilities.Count);
 
+            var effectText = string.IsNullOrEmpty(costEnglish) ? parsed.Text : $"[{costEnglish}] {parsed.Text}";
+
             return new EventCardEffect
             {
                 Labels = labels,
-                EffectText = parsed.Text,
+                CostText = costEnglish,
+                Cost = costAbilities,
+                EffectText = effectText,
                 AbilityText = parsed.Text,
                 Abilities = parsed.Abilities
             };
         }
 
         // Attempt 3: Direct ability match (pure ability text, no conditions)
-        var abilMatch = registry.EffectListRegistry.Match(input.AsMemory());
+        var abilMatch = registry.EffectListRegistry.Match(rest.AsMemory());
         if (abilMatch != null)
         {
             var abils = abilMatch.Translate(registry);
@@ -86,10 +135,14 @@ internal class EventEffectToken : CardTextToken<CardEffect>
 
             Log.Debug("EventEffectToken: ability match produced {count} abilities", abils.Count);
 
+            var effectText = string.IsNullOrEmpty(costEnglish) ? abilityEnglish : $"[{costEnglish}] {abilityEnglish}";
+
             return new EventCardEffect
             {
                 Labels = labels,
-                EffectText = abilityEnglish,
+                CostText = costEnglish,
+                Cost = costAbilities,
+                EffectText = effectText,
                 AbilityText = abilityEnglish,
                 Abilities = abils
             };
@@ -97,14 +150,17 @@ internal class EventEffectToken : CardTextToken<CardEffect>
 
         // Fallback: unmatched ability
         Log.Debug("EventEffectToken: no match found, creating unmatched fallback");
+        var fallbackEffectText = string.IsNullOrEmpty(costEnglish) ? rest : $"[{costEnglish}] {rest}";
         return new EventCardEffect
         {
             Labels = labels,
-            EffectText = input,
-            AbilityText = input,
+            CostText = costEnglish,
+            Cost = costAbilities,
+            EffectText = fallbackEffectText,
+            AbilityText = rest,
             Abilities = [new UnmatchedAbility
             {
-                AbilityText = input,
+                AbilityText = rest,
                 IsUnmatched = true,
                 Suggestions = ["unmatched nested ability text"]
             }]

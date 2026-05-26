@@ -435,6 +435,20 @@ public partial class TranslationTests
 
     [TestMethod]
     [TestCategory("CI")]
+    public void Translate_EventEffect_HasCosts()
+    {
+        var japanese = "［手札のCXを1枚控え室に置く］ あなたはコストを払ってよい。そうしたら、あなたはバトル中のキャラを1枚選び、そのターン中、次の能力を与える。『【永】 このカードはプレイヤーにダメージを与えることができない。』";
+        var tree = _service.TranslateEffect(japanese);
+        var effect = tree as EventCardEffect;
+        MultiAssert.AllAreTrue([
+            () => Assert.IsNotNull(effect),
+            () => Assert.IsTrue(effect!.CostText == "Put a CX from your hand to your waiting room"),
+            () => Assert.AreEqual("[Put a CX from your hand to your waiting room] You may pay the cost. If you do, choose 1 character in battle, and that character gets the following ability until end of turn. \"[CONT] This card cannot deal damage to players.\"", effect!.EffectText),
+        ], Assert.Fail);
+    }
+
+    [TestMethod]
+    [TestCategory("CI")]
     [DynamicData(nameof(TranslateCsvCrossCheckAllData))]
     public void Translate_CSV_CrossCheckAll(string serial, string jpEffect, string enEffect, string labels)
     {

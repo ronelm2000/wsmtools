@@ -11,7 +11,7 @@ internal class CostPutCxFromHandToWaitingRoomToken : CardTextToken<List<CardEffe
         [
             new CardEffectAbility
             {
-                AbilityText = "Put 1 CX in your hand to your waiting room"
+                AbilityText = "Put a CX from your hand to your waiting room"
             }
         ];
     }

@@ -23,6 +23,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 ///   <item><description>あなたの {...} キャラの枚数[×N] → your [other] &lt;&lt;trait&gt;&gt; characters [×N]</description></item>
 ///   <item><description>相手の {...} キャラの枚数 → characters your opponent has</description></item>
 ///   <item><description>控え室に置かれたカードのレベルの合計 → total level of cards put this way</description></item>
+///   <item><description>あなたの宣言した数 → the declared number</description></item>
 /// </list>
 /// </remarks>
 internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
@@ -56,6 +57,8 @@ internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
                 $"X is equal to the number of characters your opponent has",
             _ when description.Contains("控え室に置かれたカードのレベルの合計") =>
                 "X is equal to the total level of the cards put to your waiting room by this effect",
+            _ when description == "あなたの宣言した数" =>
+                "X is equal to the declared number",
             _ => description
         };
         return

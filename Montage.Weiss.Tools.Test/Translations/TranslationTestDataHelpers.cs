@@ -142,16 +142,16 @@ public static class TranslationTestDataHelpers
 public partial class RegistryTests
 {
     private static IEnumerable<(Type tokenType, string regex)> GetTokenRegexValues()
-        => TranslationTestDataHelpers.GetTokenRegexValues(_service);
+        => TranslationTestDataHelpers.GetTokenRegexValues(Service);
 
     private static IEnumerable<(Type tokenType, string regex)> GetAbilityTokenRegexValues()
-        => TranslationTestDataHelpers.GetAbilityTokenRegexValues(_service);
+        => TranslationTestDataHelpers.GetAbilityTokenRegexValues(Service);
 
     private static IEnumerable<(Type tokenType, string regex)> GetAbilityTokenRegexValuesV2()
-        => TranslationTestDataHelpers.GetAbilityTokenRegexValuesV2(_service);
+        => TranslationTestDataHelpers.GetAbilityTokenRegexValuesV2(Service);
 
     private static IEnumerable<(string tokenName, CardTextToken<List<CardEffectCondition>> condition)> GetConditionTokenRegexValues()
-        => TranslationTestDataHelpers.GetConditionTokenRegexValues(_service);
+        => TranslationTestDataHelpers.GetConditionTokenRegexValues(Service);
 }
 
 public partial class TranslationTests

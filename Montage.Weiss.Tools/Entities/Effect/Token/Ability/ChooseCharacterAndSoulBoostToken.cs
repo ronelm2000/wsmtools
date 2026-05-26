@@ -2,18 +2,20 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ChooseCharacterAndSoulBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:あなたは)?(?:自分の)?キャラを(\d+)枚選び、そのターン中、ソウルを＋(\d+)(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたは)?(?:自分の)?キャラを(\d+)枚(?<upTo>まで)?選び、そのターン中、ソウルを＋(\d+)(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
         var count = int.Parse(match.Groups[1].Value);
+        var isUpTo = match.Groups["upTo"].Success;
         var soul = int.Parse(match.Groups[2].Value);
+        var upToText = isUpTo ? "up to " : "";
         return
         [
             new CardEffectAbility
             {
-                AbilityText = $"choose {count} of your characters"
+                AbilityText = $"choose {upToText}{count} of your characters"
             },
             new CardEffectAbility
             {

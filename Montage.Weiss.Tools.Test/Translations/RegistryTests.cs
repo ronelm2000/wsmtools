@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Montage.Card.API.Utilities;
 using Montage.Weiss.Tools.Entities.Effect;
@@ -15,7 +14,8 @@ namespace Montage.Weiss.Tools.Test.Translations;
 public partial class RegistryTests
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<RegistryTests>();
-    private static readonly WeissSchwarzCardTranslatorService _service = Global.Container.GetInstance<WeissSchwarzCardTranslatorService>();
+    private static WeissSchwarzCardTranslatorService? _service;
+    private static WeissSchwarzCardTranslatorService Service => _service ??= Global.Container.GetInstance<WeissSchwarzCardTranslatorService>();
 
     public TestContext TestContext { get; set; }
 

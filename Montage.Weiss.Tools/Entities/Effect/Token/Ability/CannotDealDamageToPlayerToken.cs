@@ -18,7 +18,7 @@ internal class CannotDealDamageToPlayerToken : CardTextToken<List<CardEffectAbil
         [
             new CardEffectAbility
             {
-                AbilityText = "This card cannot deal damage to a player."
+                AbilityText = "This card cannot deal damage to players."
             }
         ];
     }

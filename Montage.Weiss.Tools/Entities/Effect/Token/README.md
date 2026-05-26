@@ -386,6 +386,11 @@ Reminder text tokens parse parenthetical clarifications.
    - Include scope expansion notes for future variations
    - Follow the pattern established in existing tokens (e.g., `SimplePowerBoostToken.cs`)
 
+4. **Add `SampleMatches` for audit unit tests**:
+   - Provide 1 or more example Japanese inputs that should match this token
+   - Include all relevant variations needed for full code coverage
+   - This helps ensure the regex is correctly scoped and future changes don't break expected matches
+
 4. **Write the regex**:
    - Start with `^`
    - Use named capture groups for clarity
@@ -477,9 +482,32 @@ The no‑icon branch of `CxWithTriggerIconInCxAreaConditionToken` was changed fr
 3. Unit tests did not reference this string → no change needed.
 4. New token `CxExistsConditionToken` was dead code (its input is a subset of `CxWithTriggerIconInCxAreaConditionToken`'s pattern) → removed.
 
+### When Modifying an Existing Token (Code Changes)
+
+Changing a token's code — regex pattern, capture groups, or translation logic — requires updating related artifacts and verifying consistency across the codebase.
+
+#### Checklist
+
+1. **Update `SampleMatches`** — If the regex changed, the `SampleMatches` entries (used by `Registry_AllTokensHaveSampleMatches` and similar audit tests) must reflect the new pattern. Add new examples for any added alternatives and remove examples that no longer match.
+
+2. **Update XML documentation** — Keep the class-level `<remarks>` in sync with the current regex, captures, and output format. Stale docs mislead future maintainers.
+
+3. **Regression test & usage audit** — Run the full CSV cross-check to catch regressions:
+   ```bash
+   dotnet test --filter "Translate_CSV_CrossCheckAll"
+   ```
+   Then find all references to the modified token to audit callers:
+   ```bash
+   grep -rn "YourTokenName" Montage.Weiss.Tools/ Montage.Weiss.Tools.Test/
+   ```
+   Check each usage for:
+   - Direct instantiation in test assertions or mock registries
+   - Registration in `WeissSchwarzCardTranslatorService`
+   - Overlapping regex coverage with sibling tokens (dead-code risk)
+
 #### Common pitfalls
 
-- **Dead code from overlapping regex**: A new token with a narrower regex that is a strict subset of an earlier-registered token's regex will never match. Remove it.
+- **Dead code from overlapping regex**: A new (or modified) token with a narrower regex that is a strict subset of an earlier-registered token's regex will never match. Remove it.
 - **Baked-in `if` / `When` prefixes**: Condition tokens must NOT include `"if"`, `"When"`, `"During"` etc. in their `ConditionText`. These prefixes are prepended by `CardEffectConditionExtensions.AggregateToString` based on `ConditionType`. Baking them in produces double-prefix output like `"If if there is a CX"`.
 - **Trailing period**: `JoinAbilityPartsFromSentences` appends a trailing `.` to ability text when absent. If a unit test asserts `AbilityText` without a trailing period, it must be updated to include it.
 - **Single-character glyphs**: `×` (U+00D7, multiplication sign), `x` (U+0078, ASCII x), and `Ｘ` (U+FF38, full-width X) look nearly identical in some fonts but are distinct code points. Use byte-level inspection to confirm them.

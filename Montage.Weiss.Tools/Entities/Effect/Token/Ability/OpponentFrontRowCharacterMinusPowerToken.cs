@@ -4,8 +4,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// Matches "choose 1 opponent front row character and give -power" clauses.
 /// </summary>
 /// <remarks>
-/// <para><b>Expected Input:</b> <c>相手の前列のキャラを1枚選び、そのターン中、パワーをー2000。</c></para>
-/// <para><b>Regex:</b> ^相手の前列のキャラを1枚選び、そのターン中、パワーを[ー\-](\d+)(?:\.|,|、|。)?</para>
+/// <para><b>Expected Input:</b> <c>相手の前列のキャラを1枚選び、そのターン中、パワーをー2000。</c> or <c>相手の前列のキャラを1枚選び、そのターン中、パワーを－6000。</c></para>
+/// <para><b>Regex:</b> ^相手の前列のキャラを1枚選び、そのターン中、パワーを[ー－\-](\d+)(?:\.|,|、|。)?</para>
 /// <para><b>Captures:</b></para>
 /// <list type="bullet">
 ///   <item><description>Group 1: Power reduction value</description></item>
@@ -14,8 +14,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class OpponentFrontRowCharacterMinusPowerToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^相手の前列のキャラを1枚選び、そのターン中、パワーを[ー\-](\d+)(?:\.|,|、|。)?");
-    public override IEnumerable<string> SampleMatches => ["相手の前列のキャラを1枚選び、そのターン中、パワーをー2000。"];
+    public override Regex Matcher => new(@"^相手の前列のキャラを1枚選び、そのターン中、パワーを[ー－\-](\d+)(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["相手の前列のキャラを1枚選び、そのターン中、パワーをー2000。", "相手の前列のキャラを1枚選び、そのターン中、パワーを－6000。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -25,7 +25,7 @@ internal class OpponentFrontRowCharacterMinusPowerToken : CardTextToken<List<Car
         [
             new CardEffectAbility
             {
-                AbilityText = $"choose 1 of your opponent's center stage characters, and that character gets -{power} power until end of turn"
+                AbilityText = $"choose 1 of your opponent's characters in their center stage, and that character gets -{power} power until end of turn"
             }
         ];
     }

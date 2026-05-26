@@ -18,7 +18,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class LookAtTopCardsToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:あなたは(?:自分の|相手の)?|相手の)?山札を上から(Ｘ|\d+)枚(?:まで)?見て(?:、(?<follow>山札の上に(?:好きな順番で|元の順番で)置く|山札の上か控え室に置[くき]))?(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたは(?:自分の|相手の)?|相手の)?山札を上から(Ｘ|\d+)枚(?:まで)?見て(?:、(?<follow>山札の上に(?:好きな順番で|元の順番で)置く|山札の上か(?:下か)?控え室に置[くき]))?(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -46,7 +46,11 @@ internal class LookAtTopCardsToken : CardTextToken<List<CardEffectAbility>>
         {
             var pronoun = isOpponent ? "their" : "your";
             string putText;
-            if (followUp.Contains("上か控え室に"))
+            if (followUp.Contains("上か下か控え室に"))
+            {
+                putText = $"put that card on the top of {pronoun} deck, the bottom of {pronoun} deck, or into your waiting room";
+            }
+            else if (followUp.Contains("上か控え室に"))
             {
                 putText = $"put it on top of {pronoun} deck or to your waiting room";
             }

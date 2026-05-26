@@ -13,8 +13,11 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 ///   <item><description>e2: Second quoted effect text</description></item>
 /// </list>
 /// <para><b>Output:</b> <c>choose 1 of the following effects, and perform it. "effect1" "effect2"</c></para>
+/// <para><b>Implementation Note:</b> Before translating, <c>［(N)］</c> cost label prefixes are stripped from each inner quoted effect.<br/>
+/// This handles card variants where each choice is prefixed with <c>［(1)］</c>, <c>［(2)］</c>, etc. (e.g., SMP/W137-092).</para>
 /// <para><b>Scope Expansion:</b> To support variations, add alternative patterns for:
-/// - More than 2 effects</para>
+/// - More than 2 effects
+/// - Different cost label formats (ASCII brackets, different numbering)</para>
 /// </remarks>
 internal class ChooseOneFromManyEffectsToken : CardTextToken<List<CardEffectAbility>>
 {
@@ -28,6 +31,10 @@ internal class ChooseOneFromManyEffectsToken : CardTextToken<List<CardEffectAbil
         var count = match.Groups[1].Value;
         var e1 = match.Groups["e1"].Value;
         var e2 = match.Groups["e2"].Value;
+        // Agent Notice: **Do not** strip costs. If you translate the JP text yourself and find a discrepancy in the resulting English text output, you're doing it wrong.
+        //// Strip ［(N)］ cost labels that prefix inner effects in some variants
+        //e1 = System.Text.RegularExpressions.Regex.Replace(e1, @"^［[^］]+］\s*", "");
+        //e2 = System.Text.RegularExpressions.Regex.Replace(e2, @"^［[^］]+］\s*", "");
         var nestedEffect1 = PowerBoostWithFollowingAbilityToken.TranslateNested(registry, e1);
         var nestedEffect2 = PowerBoostWithFollowingAbilityToken.TranslateNested(registry, e2);
         return

@@ -119,6 +119,10 @@ Use `Log.Debug(...)` for parsing diagnostics, token match traces, and intermedia
 - If a class lacks debug logs and you need to understand its behavior, add them before making changes.
 - Log intermediate values, branch decisions, and unexpected states to visualize execution flow.
 
+## Plans
+
+Save implementation plans in `.opencode/plans/` by default. Use descriptive kebab-case filenames (e.g., `fix-csv-crosscheck-failures.md`). Plans are created before starting multi-step implementation work to outline approach and verify understanding.
+
 ## Pre-Implementation
 
 Before starting any implementation work:

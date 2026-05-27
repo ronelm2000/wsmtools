@@ -23,11 +23,11 @@ Limit coverage to the test classes of added/modified unit tests using `FullyQual
 dotnet test --filter FullyQualifiedName~NewExporterTest
 ```
 
-Note: `IDE0005` (unnecessary using directive) is already configured as an error in `.editorconfig` (line ~222). The `pre-commit` hook (`.githooks/pre-commit`) runs `dotnet format --include` on staged `.cs` files and re-stages them automatically.
+Note: `IDE0005` (unnecessary using directive) is already configured as an error in `.editorconfig` (line ~222). The `dotnet format --include <files>` pre-commit step will automatically fix these.
 
 ### Pre-push
 
-Build and full non-manual test suite run automatically via `pre-push` hook (`.githooks/pre-push`). To run manually:
+Build and full non-manual test suite run automatically via `pre-push` hook. To run manually:
 
 ```ps
 dotnet build
@@ -40,6 +40,28 @@ If hooks fail unexpectedly (e.g. running outside a repo), skip them with `--no-v
 git commit --no-verify
 git push --no-verify
 ```
+
+### Git Hooks Setup
+
+Sample hook scripts are in `agent-docs/samples/`:
+- `agent-docs/samples/pre-commit` — runs `dotnet format` on staged `.cs` files
+- `agent-docs/samples/pre-push` — runs `dotnet build` + `dotnet test --filter TestCategory!=Manual`
+
+Before working, check if hooks are installed in `.git/hooks/`:
+
+```ps
+ls .git/hooks/pre-commit .git/hooks/pre-push
+```
+
+If missing, copy them from samples and make executable:
+
+```ps
+cp agent-docs/samples/pre-commit .git/hooks/pre-commit
+cp agent-docs/samples/pre-push .git/hooks/pre-push
+chmod +x .git/hooks/pre-commit .git/hooks/pre-push
+```
+
+On fresh clones, always run this setup step. Hooks outside `.git/` are not tracked by Git — `agent-docs/samples/` preserves them in version control.
 
 ## Projects
 

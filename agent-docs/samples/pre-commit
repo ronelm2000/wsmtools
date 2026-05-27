@@ -5,17 +5,16 @@
 
 echo "=== Pre-commit: Running dotnet format ==="
 
-# Get staged .cs files
-STAGED_CS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.cs$' | tr '\n' ' ')
+STAGED_CS_FILES=$(git diff --cached --name-only --diff-filter=ACM -- '*.cs')
 
 if [ -n "$STAGED_CS_FILES" ]; then
-    dotnet format --include "$STAGED_CS_FILES"
+    echo "$STAGED_CS_FILES" | xargs -d '\n' dotnet format --include
     if [ $? -ne 0 ]; then
         echo "WARNING: dotnet format encountered issues on staged files."
     fi
 
     # Re-stage any files that were modified by dotnet format
-    git add $STAGED_CS_FILES
+    echo "$STAGED_CS_FILES" | xargs -d '\n' git add
 fi
 
 echo "=== Pre-commit: Formatting complete ==="

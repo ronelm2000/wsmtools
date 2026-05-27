@@ -494,4 +494,21 @@ public partial class TranslationTests
             () => CollectionAssert.AreEqual(expectedLabels, tree.Labels, $"[{serial}]{Environment.NewLine}Expected: {string.Join(", ", expectedLabels)}{Environment.NewLine}Actual: {string.Join(", ", tree.Labels)}{Environment.NewLine}Labels mismatched")
         ], Assert.Fail);
     }
+
+    [TestMethod]
+    [TestCategory("CI")]
+    public void Translate_BondWithReminderText_RemindersDetectedAsUnmatched()
+    {
+        var japanese = "【自】 絆／「魂魄妖夢」 ［手札を1枚控え室に置く］ （このカードが、手札から舞台またはプレイされて舞台に置かれた時、あなたはコストを払ってよい。そうしたら、あなたは自分の控え室の「魂魄妖夢」を1枚選び、手札に戻す）";
+        var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
+
+        var auto = ex.Effect as AutoCardEffect;
+        Assert.IsNotNull(auto);
+        Assert.IsFalse(string.IsNullOrEmpty(auto.ReminderText));
+        Assert.IsTrue(auto.ReminderText.Contains('「'));
+        Assert.IsTrue(auto.ReminderText.Contains("魂魄妖夢"));
+        Assert.IsTrue(auto.Abilities.Any(a => a.IsUnmatched));
+        Assert.IsTrue(auto.Reminders.Any(r => r.IsUnmatched));
+        Assert.IsTrue(ex.Message.Contains("[reminder(s):"));
+    }
 }

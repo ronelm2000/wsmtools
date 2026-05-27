@@ -459,6 +459,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         string reminderTextJapanese = string.Empty;
         string reminderTextEnglish = string.Empty;
 
+        var reminders = new List<CardReminder>();
+
         if (reminderMatch.Success)
         {
             reminderTextJapanese = reminderMatch.Groups["reminder"].Value;
@@ -473,9 +475,15 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
                 var iconText = reminderTextJapanese.Substring(iconFullMatch.Length);
                 var english = TranslateTriggerIconReminderText(icon, iconName, iconText);
                 if (english != null)
+                {
                     reminderTextEnglish = english;
+                    reminders.Add(new CardReminder { OriginalText = reminderTextJapanese, TranslatedText = english, IsUnmatched = false });
+                }
                 else
+                {
                     reminderTextEnglish = reminderTextJapanese;
+                    reminders.Add(new CardReminder { OriginalText = reminderTextJapanese, TranslatedText = reminderTextJapanese, IsUnmatched = true });
+                }
             }
             else
             {
@@ -489,6 +497,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
                     {
                         var translatedSentence = matchResult.Translate(this);
                         translated.Add(translatedSentence);
+                        reminders.Add(new CardReminder { OriginalText = sentence, TranslatedText = translatedSentence, IsUnmatched = false });
                     }
                     else
                     {
@@ -501,13 +510,20 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
                             var iconText = sentence.Substring(iconMatch.Length);
                             var english = TranslateTriggerIconReminderText(icon, iconName, iconText);
                             if (english != null)
+                            {
                                 translated.Add(english);
+                                reminders.Add(new CardReminder { OriginalText = sentence, TranslatedText = english, IsUnmatched = false });
+                            }
                             else
+                            {
                                 translated.Add(sentence);
+                                reminders.Add(new CardReminder { OriginalText = sentence, TranslatedText = sentence, IsUnmatched = true });
+                            }
                         }
                         else
                         {
                             translated.Add(sentence);
+                            reminders.Add(new CardReminder { OriginalText = sentence, TranslatedText = sentence, IsUnmatched = true });
                         }
                     }
                 }
@@ -531,6 +547,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
                  ?? new EventEffectToken().Translate(this, japaneseEffectText.AsMemory());
 
         effect.ReminderText = reminderTextEnglish;
+        effect.Reminders = reminders;
         if (!string.IsNullOrEmpty(reminderTextEnglish))
         {
             var effectText = effect.EffectText.TrimEnd('.');
@@ -552,13 +569,15 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         var unmatchedCosts = effect is ICostedCardEffect costed
             ? costed.Cost.Where(a => a.IsUnmatched).ToList()
             : [];
+        var unmatchedReminders = effect.Reminders.Where(r => r.IsUnmatched).ToList();
 
-        if (unmatchedConditions.Count > 0 || unmatchedAbilities.Count > 0 || unmatchedCosts.Count > 0)
+        if (unmatchedConditions.Count > 0 || unmatchedAbilities.Count > 0 || unmatchedCosts.Count > 0 || unmatchedReminders.Count > 0)
         {
             throw new TranslationNotImplementedException(
                 $"Unrecognized [condition(s): {string.Join(" / ", unmatchedConditions.Select(c => c.ConditionText))}]" +
                 $"[ability(ies): {string.Join(" / ", unmatchedAbilities.Select(a => a.AbilityText))}]" +
-                $"[cost(s): {string.Join(" / ", unmatchedCosts.Select(a => a.AbilityText))}]",
+                $"[cost(s): {string.Join(" / ", unmatchedCosts.Select(a => a.AbilityText))}]" +
+                $"[reminder(s): {string.Join(" / ", unmatchedReminders.Select(r => r.OriginalText))}]",
                 effect);
         }
 

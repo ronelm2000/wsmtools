@@ -5,7 +5,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </summary>
 /// <remarks>
 /// <para><b>Expected Input:</b> <c>あなたは自分の手札を1枚選び、控え室に置いてよい</c></para>
-/// <para><b>Regex:</b> ^(?:あなたは)?自分の手札を([Ｘ\d]+)枚選び、控え室に置(?:いて|き|く)(?:よい)?(?:\.|,|、|。)?</para>
+/// <para><b>Regex:</b> ^(?:あなたは)?(?:自分の)?手札を([Ｘ\d]+)枚選び、控え室に置(?:いて|き|く)(?:よい)?(?:\.|,|、|。)?</para>
 /// <para><b>Captures:</b></para>
 /// <list type="bullet">
 ///   <item><description>Group 1: Number of cards (numeric or "Ｘ")</description></item>
@@ -20,7 +20,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class ChooseCardAndPutInWaitingRoomToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:あなたは)?自分の手札を([Ｘ\d]+)枚選び、控え室に置(?:いて|き|く)(?:よい)?(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたは)?(?:自分の)?手札を([Ｘ\d]+)枚選び、控え室に置(?:いて|き|く)(?:よい)?(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

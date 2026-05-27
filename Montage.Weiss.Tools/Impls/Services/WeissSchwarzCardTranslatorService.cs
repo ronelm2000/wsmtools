@@ -90,6 +90,10 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new CardWithMarkerPlacedToWaitingRoomFromStageConditionToken());
         _conditionListRegistry.Register(new CardPlacedToWaitingRoomFromStageConditionToken());
         _conditionListRegistry.Register(new NoTraitExistsConditionToken());
+        _conditionListRegistry.Register(new AnotherCharacterExistsConditionToken());
+        _conditionListRegistry.Register(new CardWithTriggerIconTriggeredConditionToken());
+        _conditionListRegistry.Register(new RevealedCountConditionToken());
+        _conditionListRegistry.Register(new RevealedCardsContainCxConditionToken());
         _conditionListRegistry.Register(new NoOtherCharacterExistsConditionToken());
         _conditionListRegistry.Register(new EncoreStepStartConditionToken());
         _conditionListRegistry.Register(new ThisCardMarkerCountConditionToken());
@@ -175,6 +179,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ChooseMarkerAndThisCardAndPlaceAsMarkerToken());
         _effectListRegistry.Register(new BrainstormToken());
         _effectListRegistry.Register(new RevealUpToNFromDeckChooseTraitOrEventAddToHandToken());
+        _effectListRegistry.Register(new RevealUpToNAndMayToken());
+        _effectListRegistry.Register(new ChooseFromRevealedCardsAddToHandToken());
         _effectListRegistry.Register(new RevealTopCardsToken());
         _effectListRegistry.Register(new RevealTopCardAndIfEventOrTraitAddToHandToken());
         _effectListRegistry.Register(new RevealTopCardAndIfTraitAddToHandAndDiscardToken());
@@ -382,6 +388,14 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new CannotUseActUntilEndOfTurnToken());
         _effectListRegistry.Register(new PutTopXCardsToWrToken());
         _effectListRegistry.Register(new ReverseThatCharacterToken());
+        _effectListRegistry.Register(new BondToken());
+        _effectListRegistry.Register(new ChooseNamedAndBoostPowerSoulAndGrantAbilityToken());
+        _effectListRegistry.Register(new ChooseHandLevelOrLowerPlaceStageAndPowerBoostToken());
+        _effectListRegistry.Register(new ChooseWrLevelXOrLowerToStockGiveAllSoulBoostToken());
+        _effectListRegistry.Register(new MayRevealUpToThenConditionalChainToken());
+        _effectListRegistry.Register(new OpponentCenterStageCost0OrLowerToWrToken());
+        _effectListRegistry.Register(new PowerBoostPerOtherNamedCharacterToken());
+        _effectListRegistry.Register(new SameCardNameAnyNumberInDeckToken());
         _effectListRegistry.Register(new OpponentCenterStageCost0OrLowerToBottomOfDeckToken());
         _effectListRegistry.Register(new ChooseClockCharToBottomOfDeckToken());
         _effectListRegistry.Register(new ReturnAllWrToDeckAndShuffleToken());
@@ -409,6 +423,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectRegistry.Register(new EventEffectToken());
 
         // Register reminder text tokens
+        _reminderTextRegistry.Register(new BondReminderPart1Token());
+        _reminderTextRegistry.Register(new BondReminderPart2Token());
         _reminderTextRegistry.Register(new CxLevelZeroToken());
         _reminderTextRegistry.Register(new ReturnToOriginalPositionToken());
         _reminderTextRegistry.Register(new ReturnToOriginalPositionOtherwiseToken());

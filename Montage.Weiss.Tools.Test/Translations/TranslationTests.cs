@@ -497,18 +497,16 @@ public partial class TranslationTests
 
     [TestMethod]
     [TestCategory("CI")]
-    public void Translate_BondWithReminderText_RemindersDetectedAsUnmatched()
+    public void Translate_BondWithReminderText_RemindersAreTranslated()
     {
         var japanese = "【自】 絆／「魂魄妖夢」 ［手札を1枚控え室に置く］ （このカードが、手札から舞台またはプレイされて舞台に置かれた時、あなたはコストを払ってよい。そうしたら、あなたは自分の控え室の「魂魄妖夢」を1枚選び、手札に戻す）";
-        var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
+        var effect = _service.TranslateEffect(japanese);
 
-        var auto = ex.Effect as AutoCardEffect;
+        var auto = effect as AutoCardEffect;
         Assert.IsNotNull(auto);
         Assert.IsFalse(string.IsNullOrEmpty(auto.ReminderText));
-        Assert.IsTrue(auto.ReminderText.Contains('「'));
-        Assert.IsTrue(auto.ReminderText.Contains("魂魄妖夢"));
-        Assert.IsTrue(auto.Abilities.Any(a => a.IsUnmatched));
-        Assert.IsTrue(auto.Reminders.Any(r => r.IsUnmatched));
-        Assert.IsTrue(ex.Message.Contains("[reminder(s):"));
+        Assert.IsFalse(auto.Reminders.Any(r => r.IsUnmatched));
+        StringAssert.Contains(auto.ReminderText, "When this card is placed on the stage from your hand or played and placed on the stage, you may pay the cost");
+        StringAssert.Contains(auto.ReminderText, "If you do, choose 1 \"魂魄妖夢\" in your waiting room, and return it to your hand");
     }
 }

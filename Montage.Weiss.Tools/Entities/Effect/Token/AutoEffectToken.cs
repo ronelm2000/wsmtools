@@ -74,6 +74,14 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             break;
         }
 
+        // Handle bond prefix: 絆／「name」
+        var bondMatch = Regex.Match(mainText, @"^絆／「(.+?)」\s*");
+        string bondLabel = string.Empty;
+        if (bondMatch.Success)
+        {
+            bondLabel = $"Bond / \"{bondMatch.Groups[1].Value}\"";
+        }
+
         // Handle keyword prefixes (加速=Accelerate, アンコール=Encore)
         var hasAccelerate = mainText.StartsWith("加速", StringComparison.Ordinal);
         if (hasAccelerate)
@@ -182,6 +190,9 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
             }
             costEnglish = CapitalizeFirstAlpha(costEnglish);
         }
+
+        if (!string.IsNullOrEmpty(bondLabel))
+            nonBracketLabels.Add(bondLabel);
 
         var labelPrefix = formatLabels.Count > 0 ? $"[{string.Join("][", formatLabels)}]" : "";
         var nonBracketPrefix = nonBracketLabels.Count > 0 ? $" {string.Join(" ", nonBracketLabels)}" : "";

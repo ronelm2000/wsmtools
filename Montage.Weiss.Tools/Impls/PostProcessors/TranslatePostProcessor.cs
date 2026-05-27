@@ -75,6 +75,19 @@ public class TranslatePostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISki
 
             foreach (var effectText in card.Effect)
             {
+                if (string.IsNullOrWhiteSpace(effectText))
+                {
+                    Log.Debug("Skipping empty/whitespace effect for {serial}", card.Serial);
+                    continue;
+                }
+
+                var trimmed = effectText.Trim();
+                if (trimmed.Length == 1 && IsNoEffectCharacter(trimmed[0]))
+                {
+                    Log.Debug("Skipping no-effect indicator for {serial}: [{trimmed}]", card.Serial, trimmed);
+                    continue;
+                }
+
                 try
                 {
                     var effect = _translator.TranslateEffect(effectText);
@@ -139,6 +152,8 @@ public class TranslatePostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISki
                 new AggregateException(innerExceptions));
         }
     }
+
+    private static bool IsNoEffectCharacter(char c) => c is '-' or '－' or 'ー' or '―' or '—' or '–';
 }
 
 public record FailedTranslationReport

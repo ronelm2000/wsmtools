@@ -18,7 +18,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 /// </remarks>
 internal class LevelThresholdConditionToken : CardTextToken<List<CardEffectCondition>>
 {
-    public override Regex Matcher => new(@"^(あなたの)?レベルが(\d+)(以上|以下)なら");
+    public override Regex Matcher => new(@"^(あなたの)?レベルが(\d+)(以上|以下)(?:なら|で)");
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

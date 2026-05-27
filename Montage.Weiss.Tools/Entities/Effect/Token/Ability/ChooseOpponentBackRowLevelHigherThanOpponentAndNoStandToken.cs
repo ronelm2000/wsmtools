@@ -10,7 +10,7 @@ internal class ChooseOpponentBackRowLevelHigherThanOpponentAndNoStandToken : Car
         [
             new CardEffectAbility
             {
-                AbilityText = "choose 1 of your opponent's back row characters whose level is higher than your opponent's level / that character does not [STAND] during your opponent's next stand phase"
+                AbilityText = "choose 1 of your opponent's back stage characters with level higher than your opponent's level, and that character does not [STAND] during your opponent's next stand phase"
             }
         ];
     }

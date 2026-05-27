@@ -66,6 +66,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new TraitCharacterCountConditionToken());
         _conditionListRegistry.Register(new CompoundCardInLevelConditionToken());
         _conditionListRegistry.Register(new AttackEndWithCxNameCompoundConditionToken());
+        _conditionListRegistry.Register(new EndOfAttackConditionToken());
         _conditionListRegistry.Register(new ExperienceConditionToken());
         _conditionListRegistry.Register(new TraitCountConditionToken());
         _conditionListRegistry.Register(new TraitCountBelowThresholdConditionToken());
@@ -85,6 +86,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new OtherCharacterAttackConditionToken());
         _conditionListRegistry.Register(new AttackConditionToken());
         _conditionListRegistry.Register(new CxPhaseStartConditionToken());
+        _conditionListRegistry.Register(new DuringYourCxPhaseConditionToken());
         _conditionListRegistry.Register(new OpponentAttackPhaseStartConditionToken());
         _conditionListRegistry.Register(new WhenBackupUsedConditionToken());
         _conditionListRegistry.Register(new CxNamedInCxAreaConditionToken());
@@ -185,6 +187,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ShotDamageBoostToken());
         _effectListRegistry.Register(new ChooseTraitCharacterRestAndMoveToOpenBackRowToken());
         _effectListRegistry.Register(new ChooseTraitCharacterAndPowerBoostToken());
+        _effectListRegistry.Register(new ChooseTraitCharacterSoulBoostToken());
         _effectListRegistry.Register(new ChooseMarkerAndThisCardAndPlaceAsMarkerToken());
         _effectListRegistry.Register(new BrainstormToken());
         _effectListRegistry.Register(new RevealUpToNFromDeckChooseTraitOrEventAddToHandToken());
@@ -212,6 +215,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new CostPutTraitCharacterFromHandToWaitingRoomToken());
         _effectListRegistry.Register(new CostPutTraitCharactersFromStageToWrToken());
         _effectListRegistry.Register(new CostPutTraitCharacterFromStageToWaitingRoomToken());
+        _effectListRegistry.Register(new CostPutCharacterFromStageToWaitingRoomToken());
         _effectListRegistry.Register(new CostRestTraitCharactersToken());
         _effectListRegistry.Register(new CostRestStandNikkeCharacterToken());
         _effectListRegistry.Register(new CostRestTwoNikkeCharactersToken());
@@ -250,6 +254,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ChooseNamedCardFromWrReturnToHandToken());
         _effectListRegistry.Register(new ChooseWrCardPutInSlotToken());
         _effectListRegistry.Register(new ChooseFromHandToSlotToken());
+        _effectListRegistry.Register(new ChooseNamedCardFromHandPutOnStageToken());
         _effectListRegistry.Register(new ChooseYourOtherCenterStageLevel0OrLowerCharToWrToken());
         _effectListRegistry.Register(new ChooseOpponentCharToMemoryThenFromMemoryToStageToken());
         _effectListRegistry.Register(new ChooseOtherCharacterAndGiveAbilityToken());
@@ -434,6 +439,17 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ChooseFromMarkerPutOnStageOrBackToken());
         _effectListRegistry.Register(new ChooseOneAbilityToGainToken());
         _effectListRegistry.Register(new EitherPlayerTopCardsToWrToken());
+        _effectListRegistry.Register(new ChooseOpponentBackRowLevelHigherThanOpponentToken());
+        _effectListRegistry.Register(new ThatCharacterNoStandNextOpponentStandPhaseToken());
+        _effectListRegistry.Register(new NoReturnNoMoveNoMemoryToken());
+        _effectListRegistry.Register(new OpponentCharNoAutoDamageToken());
+        _effectListRegistry.Register(new OpponentCharPowerMinus2000Token());
+        _effectListRegistry.Register(new RandomHandToMemoryToken());
+        _effectListRegistry.Register(new PutTopDeckInOrderThenPowerBoostToken());
+        _effectListRegistry.Register(new UnnamedCardFromWrPutAsMarkerFaceDownToken());
+        _effectListRegistry.Register(new MarkerFaceUpPlaceToken());
+        _effectListRegistry.Register(new PutTopStockToWaitingRoomToken());
+        _effectListRegistry.Register(new DrawOrBounceAbilityToken());
         
         // Register effect type tokens (most to least specific)
         _effectRegistry.Register(new SubAbilityToken());
@@ -457,6 +473,9 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _reminderTextRegistry.Register(new EncoreReminderPart1Token());
         _reminderTextRegistry.Register(new EncoreReminderPart2Token());
         _reminderTextRegistry.Register(new EncoreReminderToken());
+        _reminderTextRegistry.Register(new BounceGifReminderToken());
+        _reminderTextRegistry.Register(new ReturnToOriginalPlaceReminderToken());
+        _reminderTextRegistry.Register(new XorElseReturnReminderToken());
     }
 
     public IComponentRegistry<List<CardEffectAbility>> EffectListRegistry => _effectListRegistry;
@@ -622,17 +641,18 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
        return effect;
     }
 
- private static string? TranslateTriggerIconReminderText(string icon, string iconName, string japaneseText)
+    private static string? TranslateTriggerIconReminderText(string icon, string iconName, string japaneseText)
     {
         return icon.ToLowerInvariant() switch
         {
-            "gate.gif" => $"([{iconName}]: When this card triggers, you may choose 1 CX in your waiting room, and return it to your hand)",
-            "choice.gif" => $"([{iconName}]: When this card triggers, you may choose a character with [SOUL] in its trigger icon in your waiting room, and return it to your hand or put it to your stock)",
-            "shot.gif" => $"([{iconName}]: During this turn, when the next damage dealt by the attacking character that triggered this card is canceled, deal 1 damage to your opponent)",
-            "treasure.gif" => $"([{iconName}]: When this card triggers, return this card to your hand. You may put the top card of your deck to your stock)",
-            "standby.gif" => $"([{iconName}]: When this card triggers, you may choose 1 character with a level equal to or less than your level +1 in your waiting room, and put it on any position of your stage as[REST])",
-            "salvage.gif" => $"([{iconName}]: When this card triggers, you may choose 1 character in your waiting room, and return it to your hand)",
-            "stock.gif" => $"([{iconName}]: When this card triggers, you may put the top card of your deck to your stock)",
+            "gate.gif" => $"[{iconName}]: When this card triggers, you may choose 1 CX in your waiting room, and return it to your hand",
+            "choice.gif" => $"[{iconName}]: When this card triggers, you may choose a character with [SOUL] in its trigger icon in your waiting room, and return it to your hand or put it to your stock",
+            "shot.gif" => $"[{iconName}]: During this turn, when the next damage dealt by the attacking character that triggered this card is canceled, deal 1 damage to your opponent",
+            "treasure.gif" => $"[{iconName}]: When this card triggers, return this card to your hand. You may put the top card of your deck to your stock",
+            "standby.gif" => $"[{iconName}]: When this card triggers, you may choose 1 character with a level equal to or less than your level +1 in your waiting room, and put it on any position of your stage as[REST]",
+            "salvage.gif" => $"[{iconName}]: When this card triggers, you may choose 1 character in your waiting room, and return it to your hand",
+            "stock.gif" => $"[{iconName}]: When this card triggers, you may put the top card of your deck to your stock",
+            "bounce.gif" => $"[{iconName}]: When this card triggers, you may choose 1 of your opponent's characters, and return it to your hand",
             _ => null
         };
     }

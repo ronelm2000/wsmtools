@@ -1,5 +1,3 @@
-using Montage.Weiss.Tools.Entities.Effect.Token.Ability;
-
 namespace Montage.Weiss.Tools.Entities.Effect.Token;
 
 /// <summary>

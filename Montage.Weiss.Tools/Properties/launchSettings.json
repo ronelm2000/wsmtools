@@ -128,9 +128,13 @@
       "commandName": "Project",
       "commandLineArgs": "update S48 yyt"
     },
-    "Parse Summer Pockets Anime": {
+    "Parse Touhou BP": {
       "commandName": "Project",
-      "commandLineArgs": "parse https://ws-tcg.com/cardlist/search/?expansion=548 --with translations"
+      "commandLineArgs": "parse https://ws-tcg.com/cardlist/search/?expansion=552 --with translations"
+    },
+    "Parse Touhou TD": {
+      "commandName": "Project",
+      "commandLineArgs": "parse https://ws-tcg.com/cardlist/search/?expansion=553 --with translations"
     }
   }
 }

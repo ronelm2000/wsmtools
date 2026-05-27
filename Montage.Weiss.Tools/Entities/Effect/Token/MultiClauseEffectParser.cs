@@ -113,6 +113,7 @@ public static class MultiClauseEffectParser
                     trimmed.Length >= condMatch.Match.Length &&
                     (trimmed[..condMatch.Match.Length].Contains("し、ないなら") ||
                      trimmed[..condMatch.Match.Length].Contains("選び、") ||
+                     trimmed[..condMatch.Match.Length].Contains("マーカーすべてを、") ||
                      trimmed[..condMatch.Match.Length].Contains("他のあなたのカード名に") ||
                      Regex.IsMatch(trimmed[..condMatch.Match.Length], @"カード名.*に「.+」を含むキャラがいるなら")))  // let ConditionalAbilityToken handle this
                 {

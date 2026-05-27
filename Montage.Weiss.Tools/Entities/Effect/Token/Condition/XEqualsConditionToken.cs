@@ -59,6 +59,8 @@ internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
                 $"X is equal to the number of your {(description.Contains("他の") ? "other " : "")}{ExtractTrait(description, registry)} characters{FormatMultiplier(description)}",
             _ when description.Contains("相手の") && description.Contains("キャラの枚数") =>
                 $"X is equal to the number of characters your opponent has",
+            _ when description.Contains("あなたが選んだキャラのレベル") =>
+                "X is equal to the level of the character you chose minus 1",
             _ when description.Contains("控え室に置かれたカードのレベルの合計") =>
                 "X is equal to the total level of the cards put to your waiting room by this effect",
             _ when description == "あなたの宣言した数" =>

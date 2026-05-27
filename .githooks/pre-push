@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Pre-push hook: build and run all non-manual tests before pushing
+# If build or tests fail, the push is aborted.
+
+echo "=== Pre-push: Building and running non-manual tests ==="
+
+dotnet build
+if [ $? -ne 0 ]; then
+    echo "ERROR: Build failed. Push aborted."
+    exit 1
+fi
+
+dotnet test --filter TestCategory!=Manual
+if [ $? -ne 0 ]; then
+    echo "ERROR: Tests failed. Push aborted."
+    exit 1
+fi
+
+echo "=== Pre-push: Build and tests passed ==="
+exit 0

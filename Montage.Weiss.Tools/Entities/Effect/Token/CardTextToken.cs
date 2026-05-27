@@ -39,7 +39,7 @@ public record TokenMatchResult<E>(
 /// </list>
 /// <para>See <c>README.md</c> in this directory for detailed documentation on expected clauses per token category.</para>
 /// </remarks>
-public abstract class CardTextToken<E>
+public abstract class CardTextToken<E> : ICardTextToken
 {
     /// <summary>
     /// Regex pattern that matches the Japanese text clause this token recognizes.
@@ -62,6 +62,23 @@ public abstract class CardTextToken<E>
     /// <param name="match">The matched text span from the regex</param>
     /// <returns>The translated representation of type E</returns>
     public abstract E Translate(ITokenRegistry registry, ReadOnlyMemory<char> match);
+}
+
+public interface ICardTextToken
+{
+    /// <summary>
+    /// Regex pattern that matches the Japanese text clause this token recognizes.
+    /// Must start with ^ anchor. Ability tokens must end with (?:\.|,|、|。)?
+    /// </summary>
+    public Regex Matcher { get; }
+
+    /// <summary>
+    /// Example input strings that this token's <see cref="Matcher"/> should match.
+    /// Used by audit tests to verify <see cref="ITokenRegistry.MatchNameFragment"/> is called
+    /// for any extracted names or traits.
+    /// Token classes that capture names/traits from card text SHOULD override this.
+    /// </summary>
+    public IEnumerable<string> SampleMatches { get; }
 }
 
 /// <summary>

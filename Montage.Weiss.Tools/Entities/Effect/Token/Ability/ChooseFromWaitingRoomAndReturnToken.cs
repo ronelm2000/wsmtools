@@ -22,7 +22,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
 {
     private static readonly ILogger Log = Serilog.Log.ForContext<ChooseFromWaitingRoomAndReturnToken>();
 
-    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?(?:自分の)?控え室の(?:(?:(?:レベル(?<level>[Ｘ\d]+)以下の)?《(.+?)》の)?キャラ|トリガーアイコンが\[\[(.+?)\]\]のCX|CX)を([Ｘ\d]+)枚(?:まで)?選び、(?<action>手札に戻してよい|手札に戻す|手札に戻し|このカードの下にマーカーとして表向きに置いてよい)(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?(?:自分の)?控え室の(?:『(?<keyword>.+?)』を持つ)?(?:(?:(?:レベル(?<level>[Ｘ\d]+)以下の)?《(.+?)》の)?キャラ|トリガーアイコンが\[\[(.+?)\]\]のCX|CX)を([Ｘ\d]+)枚(?:まで)?選び、(?<action>手札に戻してよい|手札に戻す|手札に戻し|このカードの下にマーカーとして表向きに置いてよい)(?:\.|,|、|。)?");
 
     public override IEnumerable<string> SampleMatches => ["あなたは自分の控え室のレベル1以下の《★TESTTRAIT★》のキャラを1枚選び、手札に戻す。"];
 
@@ -39,6 +39,8 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
         }
         
         var level = match.Groups["level"].Success ? match.Groups["level"].Value : null;
+        var keyword = match.Groups["keyword"].Success ? registry.MatchLabels($"【{match.Groups["keyword"].Value}】").FirstOrDefault() : null;
+        
         var trait = match.Groups[1].Success ? registry.MatchNameFragment(match.Groups[1].Value) : "";
         var triggerIcon = match.Groups[2].Value;
         // Strip .gif extension if present
@@ -55,6 +57,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
         
         var countText = isUpTo ? (isVariableX ? "up to X" : $"up to {count}") : (isVariableX ? "X" : count.ToString());
         var levelText = level != null ? $" level {level.Replace("Ｘ", "X")} or lower" : "";
+        var keywordText = keyword != null ? $" with \"{keyword}\"" : "";
         var pronoun = isPlural ? "them" : "it";
         
         if (action.Contains("マーカーとして", StringComparison.Ordinal))
@@ -78,7 +81,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
             [
                 new CardEffectAbility
                 {
-                    AbilityText = $"{mayText}choose {countText}{traitTextForMarker} {(isPlural ? "characters" : "character")} in your waiting room"
+                    AbilityText = $"{mayText}choose {countText}{traitTextForMarker} {(isPlural ? "characters" : "character")}{keywordText} in your waiting room"
                 },
                 new CardEffectAbility
                 {
@@ -106,7 +109,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
         {
             var hasCharacter = string.IsNullOrEmpty(triggerIcon) && match.Value.Contains("キャラ");
             var chooseText = hasCharacter
-                ? $"{mayText}choose {countText} {(isPlural ? "characters" : "character")} in your waiting room"
+                ? $"{mayText}choose {countText} {(isPlural ? "characters" : "character")}{keywordText} in your waiting room"
                 : $"{mayText}choose {countText} CX in your waiting room";
             return
             [
@@ -125,7 +128,7 @@ internal class ChooseFromWaitingRoomAndReturnToken : CardTextToken<List<CardEffe
         [
             new CardEffectAbility
             {
-                AbilityText = $"{mayText}choose {countText}{levelText} <<{trait}>> {(isPlural ? "characters" : "character")} in your waiting room"
+                AbilityText = $"{mayText}choose {countText}{levelText} <<{trait}>> {(isPlural ? "characters" : "character")}{keywordText} in your waiting room"
             },
             new CardEffectAbility
             {

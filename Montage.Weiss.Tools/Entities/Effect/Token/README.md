@@ -488,7 +488,7 @@ Changing a token's code — regex pattern, capture groups, or translation logic 
 
 #### Checklist
 
-1. **Update `SampleMatches`** — If the regex changed, the `SampleMatches` entries (used by `Registry_AllTokensHaveSampleMatches` and similar audit tests) must reflect the new pattern. Add new examples for any added alternatives and remove examples that no longer match.
+1. **Update `SampleMatches`** — If the regex changed, the `SampleMatches` entries (used by `Registry_SampleMatchesMustMatchRegex` and similar audit tests) must reflect the new pattern. Add new examples for any added alternatives and remove examples that no longer match.
 
 2. **Update XML documentation** — Keep the class-level `<remarks>` in sync with the current regex, captures, and output format. Stale docs mislead future maintainers.
 

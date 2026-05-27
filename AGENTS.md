@@ -23,15 +23,22 @@ Limit coverage to the test classes of added/modified unit tests using `FullyQual
 dotnet test --filter FullyQualifiedName~NewExporterTest
 ```
 
-Note: `IDE0005` (unnecessary using directive) is already configured as an error in `.editorconfig` (line ~222). The `dotnet format --include <files>` pre-commit step will automatically fix these.
+Note: `IDE0005` (unnecessary using directive) is already configured as an error in `.editorconfig` (line ~222). The `pre-commit` hook (`.githooks/pre-commit`) runs `dotnet format --include` on staged `.cs` files and re-stages them automatically.
 
-### Pre-commit
+### Pre-push
 
-Run full non-manual test suite before committing (the `dotnet format --include <files>` pre-commit step will automatically fix `IDE0005` and other formatting issues):
+Build and full non-manual test suite run automatically via `pre-push` hook (`.githooks/pre-push`). To run manually:
 
 ```ps
 dotnet build
 dotnet test --filter TestCategory!=Manual
+```
+
+If hooks fail unexpectedly (e.g. running outside a repo), skip them with `--no-verify`:
+
+```ps
+git commit --no-verify
+git push --no-verify
 ```
 
 ## Projects

@@ -112,7 +112,8 @@ public static class MultiClauseEffectParser
                 if (condMatch.Match.Token == nameof(Condition.CatchAllConditionToken) &&
                     trimmed.Length >= condMatch.Match.Length &&
                     (trimmed[..condMatch.Match.Length].Contains("し、ないなら") ||
-                     trimmed[..condMatch.Match.Length].Contains("選び、")))  // verb chain e.g. clock-pick + condition
+                     trimmed[..condMatch.Match.Length].Contains("選び、") ||
+                     trimmed[..condMatch.Match.Length].Contains("他のあなたのカード名に")))  // let ConditionalAbilityToken handle this
                 {
                     Log.Debug("ParseSentence: CatchAllConditionToken matched compound ability pattern, breaking to ability loop. trimmed='{Trimmed}'", trimmed);
                     break;

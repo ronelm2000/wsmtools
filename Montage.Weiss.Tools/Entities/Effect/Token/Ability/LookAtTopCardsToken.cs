@@ -7,7 +7,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </summary>
 /// <remarks>
 /// <para><b>Expected Input:</b> <c>山札を上から2枚まで見て、山札の上に好きな順番で置く</c> or <c>あなたは自分の山札を上から1枚見て、山札の上か控え室に置き</c></para>
-/// <para><b>Regex:</b> ^(?:あなたは(?:自分の|相手の)?|相手の)?山札を上から(Ｘ|\d+)枚(?:まで)?見て(?:、(?&lt;follow&gt;山札の上に(?:好きな順番で|元の順番で)置く|山札の上か控え室に置[くき]))?(?:\.|,|、|。)?</para>
+/// <para><b>Regex:</b> ^(?:あなたは(?:自分の|相手の)?|相手の)?山札を上から(Ｘ|\d+)枚(?:まで)?見て(?:、(?&lt;follow&gt;山札の上に(?:好きな順番で|元の順番で)置く|山札の上か(?:下か)?控え室に置[くき]|山札の上か下に置く))?(?:\.|,|、|。)?</para>
 /// <para><b>Captures:</b></para>
 /// <list type="bullet">
 ///   <item><description>Group 1: Card count (e.g., "2" or "X")</description></item>
@@ -18,7 +18,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class LookAtTopCardsToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:あなたは(?:自分の|相手の)?|相手の)?山札を上から(Ｘ|\d+)枚(?:まで)?見て(?:、(?<follow>山札の上に(?:好きな順番で|元の順番で)置く|山札の上か(?:下か)?控え室に置[くき]))?(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたは(?:自分の|相手の)?|相手の)?山札を上から(Ｘ|\d+)枚(?:まで)?見て(?:、(?<follow>山札の上に(?:好きな順番で|元の順番で)置く|山札の上か(?:下か)?控え室に置[くき]|山札の上か下に置く))?(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -61,6 +61,10 @@ internal class LookAtTopCardsToken : CardTextToken<List<CardEffectAbility>>
             else if (followUp.Contains("元の順番で"))
             {
                 putText = $"put them on the top of {pronoun} deck in the original order";
+            }
+            else if (followUp.Contains("上か下に置く"))
+            {
+                putText = $"put it on the top of {pronoun} deck or the bottom of {pronoun} deck";
             }
             else
             {

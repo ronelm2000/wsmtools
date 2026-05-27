@@ -7,8 +7,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// plural-aware pronouns based on the pick count.
 /// </summary>
 /// <remarks>
-/// <para><b>Expected Input:</b> <c>自分の山札を上から4枚まで見て、《NIKKE》のキャラを1枚まで選んで相手に見せ、手札に加え、残りのカードを控え室に置く</c></para>
-/// <para><b>Regex:</b> ^(?:あなたは)?自分の山札を上から(Ｘ|\d+)枚まで見て、(.+?)を(\d+)枚まで選(?:んで相手に見せ|び)、手札に加え、残りのカードを控え室に置く(?:\.|,|、|。)?</para>
+/// <para><b>Expected Input:</b> <c>自分の山札を上から4枚まで見て、《NIKKE》のキャラを1枚まで選んで相手に見せ、手札に加え、残りのカードを控え室に置く</c> or <c>...残りのカードを山札の上に好きな順番で置く</c></para>
+/// <para><b>Regex:</b> ^(?:あなたは)?自分の山札を上から(Ｘ|\d+)枚まで見て、(.+?)を(\d+)枚まで選(?:んで相手に見せ|び)、手札に加え、残りのカードを(?:控え室に置[くき]|山札の上に好きな順番で置く)(?:、|\.|,|。)?</para>
 /// <para><b>Captures:</b></para>
 /// <list type="bullet">
 ///   <item><description>Group 1: Look count (e.g., "4", "Ｘ")</description></item>
@@ -42,7 +42,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class LookAtDeckChooseCardRevealAddToHandRestToWrToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:あなたは)?自分の山札を上から(Ｘ|\d+)枚まで見て、(.+?)を(\d+)枚まで選(?:んで相手に見せ|び)、手札に加え、残りのカードを控え室に置く(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたは)?自分の山札を上から(Ｘ|\d+)枚まで見て、(.+?)を(\d+)枚まで選(?:んで相手に見せ|び)、手札に加え、残りのカードを(?:控え室に置[くき]|山札の上に好きな順番で置く)(?:\.|,|、|。)?");
     public override IEnumerable<string> SampleMatches => ["自分の山札を上から4枚まで見て、《★TESTTRAIT★》のキャラを1枚まで選んで相手に見せ、手札に加え、残りのカードを控え室に置く。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
@@ -78,7 +78,10 @@ internal class LookAtDeckChooseCardRevealAddToHandRestToWrToken : CardTextToken<
         if (hasReveal)
             result.Add(new CardEffectAbility { AbilityText = $"reveal {pronoun} to your opponent" });
         result.Add(new CardEffectAbility { AbilityText = $"put {pronoun} to your hand" });
-        result.Add(new CardEffectAbility { AbilityText = "put the rest to your waiting room" });
+        var restAction = match.Value.Contains("山札の上に好きな順番で置く")
+            ? "put the rest on the top of your deck in any order"
+            : "put the rest to your waiting room";
+        result.Add(new CardEffectAbility { AbilityText = restAction });
         return result;
     }
 }

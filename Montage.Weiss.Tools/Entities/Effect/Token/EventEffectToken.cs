@@ -87,8 +87,15 @@ internal class EventEffectToken : CardTextToken<CardEffect>
 
             if (parts.Count > 0)
             {
-                var joined = string.Join(". ", parts.Select(s => s.TrimEnd('.')));
-                joined = char.ToUpper(joined[0]) + joined[1..];
+                var parts2 = parts.Select(s => s.TrimEnd('.')).ToArray();
+                var joined = parts2[0];
+                for (int i = 1; i < parts2.Length; i++)
+                {
+                    var next = parts2[i];
+                    if (next.Length > 0 && char.IsUpper(next[0]))
+                        next = char.ToLower(next[0]) + next[1..];
+                    joined += ". " + next;
+                }
                 var trimmed = joined.TrimEnd('"');
                 if (!trimmed.EndsWith('.'))
                     joined += ".";

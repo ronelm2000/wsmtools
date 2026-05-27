@@ -384,6 +384,17 @@ public partial class TranslationTests
         Assert.IsInstanceOfType<AutoCardEffect>(ex.Effect);
     }
 
+
+    [TestMethod]
+    [TestCategory("CI")]
+    public void Translate_ActEffect_NonExistentAbilityMustCrash()
+    {
+        var japanese = "【起】［(1) このカードを山札の下に置く］ 他のあなたのカード名RANDOM_TEXT_HERE_THAT_IS_INVALIDに「NOU」を含むキャラがいるなら、あなたは自分の控え室の「“向日葵の種” しろは」を1枚選び、手札に戻し、自分の手札の「“向日葵の種” しろは」を1枚まで選び、このカードがいた枠に置く。";
+        var ex = Assert.ThrowsExactly<TranslationNotImplementedException>(() => _service.TranslateEffect(japanese));
+        Assert.IsNotNull(ex.Effect);
+        Assert.IsInstanceOfType<ActCardEffect>(ex.Effect);
+    }
+
     /// <summary>
     /// SMP/W137-075: 【自】 that grants an inner 【永】 ability.
     /// Verifies that TranslateNested catches the inner ContEffectToken exception
@@ -392,7 +403,7 @@ public partial class TranslationTests
     /// partial tree preserving the full outer context.
     /// </summary>
     [TestMethod]
-    [TestCategory("Manual")]
+    [TestCategory("CI")]
     public void Translate_AutoEffect_GrantContAbility_Misclassified()
     {
         var japanese = "【自】 このカードが手札から舞台に置かれた時、あなたは自分のクロック置場のキャラを1枚まで選び、控え室に置き、他のあなたの《サマポケ》のキャラが4枚以上なら、次の相手のターンの終わりまで、このカードは次の能力を得る。『【永】 このカードの正面のキャラキャラキャラのソウルを－1。』";

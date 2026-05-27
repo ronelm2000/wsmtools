@@ -51,19 +51,33 @@ internal class ActEffectToken : CardTextToken<CardEffect>
 
         string costEnglish;
         string abilityEnglish;
+        string conditionEnglish = "";
         List<ParsedSentence> parsedList;
 
         // Handle backup/counter pattern: 助太刀{N} レベル{M}［{cost}］
         // where cost is embedded inside the ［...］ rather than being at the start of mainText
-        var backupMatch = Regex.Match(rest, @"^助太刀(\d+)\s*レベル(\d+)\s*［(?:\((\d+)\)\s*)?(.+)］$");
+        var backupMatch = Regex.Match(rest, @"^助太刀([Ｘ\d]+)\s*レベル(\d+)\s*［(?:\((\d+)\)\s*)?(.+?)］(?:\s*(?<postcondition>.+))?$");
         var isBackup = backupMatch.Success;
         string backupPower = "", backupLevel = "";
         if (isBackup)
         {
-            backupPower = backupMatch.Groups[1].Value;
+            backupPower = backupMatch.Groups[1].Value.Replace("Ｘ", "X");
             backupLevel = backupMatch.Groups[2].Value;
             var stockCost = backupMatch.Groups[3].Success ? $"({backupMatch.Groups[3].Value}) " : "";
+            var postCondition = backupMatch.Groups["postcondition"].Success ? backupMatch.Groups["postcondition"].Value.Trim() : "";
             abilityEnglish = $"[{stockCost}Put this card in your hand to your waiting room]";
+            if (!string.IsNullOrEmpty(postCondition))
+            {
+                var postMatch = registry.ConditionListRegistry.Match(postCondition.AsMemory());
+                if (postMatch != null)
+                {
+                    var postConds = postMatch.Translate(registry).Where(c => c.Type == ConditionType.PostCondition).ToList();
+                    if (postConds.Count > 0)
+                    {
+                        abilityEnglish += " " + string.Join(". ", postConds.Select(c => c.ConditionText));
+                    }
+                }
+            }
             costEnglish = "";
             parsedList = [];
             tokenLog.Add("Abil:BackupPrefix");
@@ -82,6 +96,14 @@ internal class ActEffectToken : CardTextToken<CardEffect>
 
             abilityEnglish = AutoEffectToken.JoinAbilityPartsFromSentences(parsedList);
 
+            // Extract first-sentence conditions for effect text
+            var firstSentenceConditions = parsedList.Count > 0
+                ? parsedList[0].Conditions.Where(c => c.Type != ConditionType.PostCondition).ToList()
+                : [];
+            conditionEnglish = firstSentenceConditions.Count > 0
+                ? firstSentenceConditions.AggregateToString()
+                : "";
+
             var costTexts = costAbilities.Select(a => a.AbilityText).ToList();
             costEnglish = "";
             if (costTexts.Count > 0)
@@ -98,25 +120,26 @@ internal class ActEffectToken : CardTextToken<CardEffect>
         }
 
         // Build label list (MatchLabels already returns correct format, e.g. "[COUNTER]" or "Brainstorm")
-        var finalLabelList = new List<string>(labels);
-        if (hasBrainstorm)
-            finalLabelList.Add("Brainstorm");
-        if (isBackup)
-            finalLabelList.Add($"Backup {backupPower}, Level {backupLevel}");
-        var finalLabels = finalLabelList.ToArray();
-
         // Build effect text: [ACT][bracket-labels] raw-label [cost] ability.
         // Bracket-enclosed labels (e.g. [COUNTER]) are joined as [ACT][COUNTER];
         // raw labels (e.g. "Backup 1000, Level 1") appear after with a space;
         // Brainstorm appears as space-separated, not in ][ format.
         var bracketLabels = new List<string> { "ACT" };
         var rawLabels = new List<string>();
-        foreach (var lbl in finalLabels)
+        foreach (var lbl in labels)
         {
             if (lbl.StartsWith('[') && lbl.EndsWith(']'))
                 bracketLabels.Add(lbl.Trim('[', ']'));
             else
                 rawLabels.Add(lbl);
+        }
+        if (hasBrainstorm)
+        {
+            rawLabels.Add("Brainstorm");
+        }
+        if (isBackup)
+        {
+            rawLabels.Add($"Backup {backupPower}, Level {backupLevel}");
         }
         var effectText = $"[{string.Join("][", bracketLabels)}]";
         if (rawLabels.Count > 0)
@@ -129,15 +152,26 @@ internal class ActEffectToken : CardTextToken<CardEffect>
         if (!string.IsNullOrEmpty(abilityEnglish))
         {
             var abilityForEffect = abilityEnglish;
-            if (abilityForEffect.Length > 0)
-                abilityForEffect = char.ToUpper(abilityForEffect[0]) + abilityForEffect[1..];
+            if (!string.IsNullOrEmpty(conditionEnglish))
+            {
+                var condUpper = char.ToUpper(conditionEnglish[0]) + conditionEnglish[1..];
+                var secondPart = abilityForEffect.Length > 0 && char.IsUpper(abilityForEffect[0])
+                    ? char.ToLower(abilityForEffect[0]) + abilityForEffect[1..]
+                    : abilityForEffect;
+                abilityForEffect = $"{condUpper}, {secondPart}";
+            }
+            else
+            {
+                if (abilityForEffect.Length > 0)
+                    abilityForEffect = char.ToUpper(abilityForEffect[0]) + abilityForEffect[1..];
+            }
             effectText += $" {abilityForEffect}";
         }
         if (!effectText.TrimEnd().EndsWith(".") && !effectText.EndsWith("]") && !effectText.EndsWith("\""))
             effectText += ".";
 
         return new ActCardEffect {
-                Labels = finalLabels,
+                Labels = labels,
                 CostText = costEnglish,
                 Cost = costAbilities,
                 Abilities = parsedList.SelectMany(p => p.Abilities).ToList(),

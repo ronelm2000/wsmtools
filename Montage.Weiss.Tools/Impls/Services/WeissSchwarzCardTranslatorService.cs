@@ -102,6 +102,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new NoCardInMemoryConditionToken());
         _conditionListRegistry.Register(new MemoryCountConditionToken());
         _conditionListRegistry.Register(new MemoryTraitCountConditionToken());
+        _conditionListRegistry.Register(new MemoryCardCountConditionToken());
         _conditionListRegistry.Register(new CompoundMemoryNamedCardAndTraitCountConditionToken());
         _conditionListRegistry.Register(new CardInMemoryNamedConditionToken());
         _conditionListRegistry.Register(new CardExistsInMemoryConditionToken());
@@ -184,6 +185,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ClockToWaitingRoomToken());
         _effectListRegistry.Register(new ChooseClockCharAndPutToWaitingRoomAbilityToken());
         _effectListRegistry.Register(new PutCardFromHandAndThisToBottomToken());
+        _effectListRegistry.Register(new PutThisCardToBottomOfDeckToken());
         _effectListRegistry.Register(new PutCardFromHandToWaitingRoomToken());
         _effectListRegistry.Register(new CostPutTriggerCxFromHandToWaitingRoomToken());
         _effectListRegistry.Register(new CostPutCxFromCxAreaToWaitingRoomToken());
@@ -229,6 +231,9 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ChooseFromWaitingRoomAndReturnToDeckToken());
         _effectListRegistry.Register(new ChooseOpponentCardsFromWrAndReturnToDeckToken());
         _effectListRegistry.Register(new ChooseFromWaitingRoomAndReturnToken());
+        _effectListRegistry.Register(new ChooseNamedCardFromWrReturnToHandToken());
+        _effectListRegistry.Register(new ChooseWrCardPutInSlotToken());
+        _effectListRegistry.Register(new ChooseFromHandToSlotToken());
         _effectListRegistry.Register(new ChooseYourOtherCenterStageLevel0OrLowerCharToWrToken());
         _effectListRegistry.Register(new ChooseOpponentCharToMemoryThenFromMemoryToStageToken());
         _effectListRegistry.Register(new ChooseOtherCharacterAndGiveAbilityToken());
@@ -281,6 +286,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new DealDamageXTimesToken());
         _effectListRegistry.Register(new DealXDamageToken());
         _effectListRegistry.Register(new DeclareSoulAndDealXDamageToken());
+        _effectListRegistry.Register(new DeclareNumberDealXDamageToken());
         _effectListRegistry.Register(new GiveAbilitiesToken());
         _effectListRegistry.Register(new GainQuotedAbilityToken());
         _effectListRegistry.Register(new GainFollowingAbilityToken());
@@ -311,6 +317,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new AllZonesTriggerIconGainToken());
         _effectListRegistry.Register(new PerformTriggerIconEffectAbilityToken());
         _effectListRegistry.Register(new PerformFollowingActionToken());
+        _effectListRegistry.Register(new PerformEffectsInAnyOrderToken());
         _effectListRegistry.Register(new CannotPlayEventsOrBackupFromHandToken());
         _effectListRegistry.Register(new AllTraitCharactersBoostToken());
         _effectListRegistry.Register(new AllOtherTraitCharactersBoostToken());
@@ -392,6 +399,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ChooseNamedCardFromHandToCxAreaToken());
         
         // Register effect type tokens (most to least specific)
+        _effectRegistry.Register(new SubAbilityToken());
         _effectRegistry.Register(new ContEffectToken());
         _effectRegistry.Register(new AutoEffectToken());
         _effectRegistry.Register(new ActEffectToken());
@@ -438,6 +446,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
             "集中" => "Brainstorm",
             "CXコンボ" => "[CXCOMBO]",
             "カウンター" => "[COUNTER]",
+            "継承" => "Inheritance",
             _ => label
         }).ToArray();
     }

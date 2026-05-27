@@ -54,4 +54,20 @@ public partial class RegistryTests
         Assert.IsFalse(result!.Any(e => e.ConditionText.Contains("during", StringComparison.OrdinalIgnoreCase) && e.ConditionText.Contains("if", StringComparison.OrdinalIgnoreCase)),
             $"Token {tokenName} must be designed to capture atomic conditions without including conjunctions or multiple conditions. Result: {result.Select(e => e.ConditionText).ConcatAsString(";")}");
     }
+
+    [TestMethod]
+    [TestCategory("CI")]
+    [DynamicData(nameof(GetTokensWithSampleMatches))]
+    public void Registry_SampleMatchesMustMatchRegex(Type type, List<string> sampleMatches)
+    {
+        var token = type.GetConstructor([])?.Invoke([]) as ICardTextToken;
+        var nonMatchingSamples = sampleMatches
+            .Where(sample => !token!.Matcher.IsMatch(sample))
+            .ToList();
+
+        if (nonMatchingSamples.Any())
+        {
+            Assert.Fail($"Some sample matches for token {type.Name} do not match the regex. Non-matching samples: {nonMatchingSamples.ConcatAsString(", ")}. Regex: {token.Matcher}");
+        }
+    }
 }

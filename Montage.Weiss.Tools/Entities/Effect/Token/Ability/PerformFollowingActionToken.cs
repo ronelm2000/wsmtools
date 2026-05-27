@@ -6,7 +6,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </summary>
 /// <remarks>
 /// <para><b>Expected Input:</b> <c>次の行動を2回行う。『あなたは自分の山札の上から1枚を公開する。…』</c></para>
-/// <para><b>Regex:</b> ^次の行動を(?:(?&lt;count&gt;\d+)回)?行う。『(?&lt;inner&gt;.+?)』(?:\.|,|、|。)?</para>
+/// <para><b>Regex:</b> ^次の行動を(?:(?&lt;count&gt;[Ｘ\d]+)回)?行(?:う|ってよい)。『(?&lt;inner&gt;.+?)』(?:\.|,|、|。)?</para>
 /// <para><b>Captures:</b></para>
 /// <list type="bullet">
 ///   <item><description>count: Optional repeat count (e.g., "2")</description></item>
@@ -16,14 +16,14 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class PerformFollowingActionToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^次の行動を(?:(?<count>\d+)回)?行(?:う|ってよい)。『(?<inner>.+?)』(?:\.|,|、|。)?");
-    public override IEnumerable<string> SampleMatches => ["次の行動を行う。『あなたは自分の控え室の《★TESTTRAIT★》のキャラを1枚選び、手札に戻す。』"];
+    public override Regex Matcher => new(@"^次の行動を(?:(?<count>[Ｘ\d]+)回)?行(?:う|ってよい)。『(?<inner>.+?)』(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["次の行動を行う。『あなたは自分の控え室の《★TESTTRAIT★》のキャラを1枚選び、手札に戻す。』", "次の行動をＸ回行う。『あなたは自分の《★TESTTRAIT★》のキャラを1枚選び、そのターン中、パワーを＋1000。』"];
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var fullText = span.ToString();
         var match = Matcher.Match(fullText);
         var inner = match.Groups["inner"].Value;
-        var count = match.Groups["count"] is Group cg && cg.Success ? cg.Value : null;
+        var count = match.Groups["count"] is Group cg && cg.Success ? cg.Value.Replace("Ｘ", "X") : null;
         var isOptional = fullText.Contains("行ってよい");
         var innerEffect = PowerBoostWithFollowingAbilityToken.TranslateNested(registry, inner);
         var verbText = isOptional ? "you may perform" : "perform";

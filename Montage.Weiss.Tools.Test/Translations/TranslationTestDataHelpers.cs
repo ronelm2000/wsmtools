@@ -29,6 +29,31 @@ public static class TranslationTestDataHelpers
             "ChooseOtherCharacterAndGiveAbilityToken",
             "PowerBoostWithFollowingAbilitiesToken",
         };
+    /// <summary>
+    /// Returns all token types with their sample matches for testing regex patterns against known matching strings.
+    /// </summary>
+    /// <param name="service"></param>
+    /// <returns></returns>
+    public static IEnumerable<(Type, List<string> sampleMatches)> GetTokensWithSampleMatches(WeissSchwarzCardTranslatorService service)
+    {
+        var conditionList = service.ConditionListRegistry.GetAllTokens()
+                      .Where(t => t.SampleMatches.Count() > 0)
+                      .Select(t => (t.GetType(), t.SampleMatches.ToList()));
+        var effectList = service.EffectListRegistry.GetAllTokens()
+                                  .Where(t => t.SampleMatches.Count() > 0)
+
+                      .Select(t => (t.GetType(), t.SampleMatches.ToList()));
+        var effects = service.EffectRegistry.GetAllTokens()
+                                  .Where(t => t.SampleMatches.Count() > 0)
+
+                      .Select(t => (t.GetType(), t.SampleMatches.ToList()));
+        var reminders = service.ReminderTextRegistry.GetAllTokens()
+                                  .Where(t => t.SampleMatches.Count() > 0)
+
+                      .Select(t => (t.GetType(), t.SampleMatches.ToList()));
+        var all = conditionList.Concat(effectList).Concat(effects).Concat(reminders);
+        return all;
+    }
 
     /// <summary>
     /// Returns all token types with their regex patterns for registry validation.
@@ -152,6 +177,9 @@ public partial class RegistryTests
 
     private static IEnumerable<(string tokenName, CardTextToken<List<CardEffectCondition>> condition)> GetConditionTokenRegexValues()
         => TranslationTestDataHelpers.GetConditionTokenRegexValues(Service);
+
+    private static IEnumerable<(Type tokenType, List<string> sampleMatches)> GetTokensWithSampleMatches()
+        => TranslationTestDataHelpers.GetTokensWithSampleMatches(Service);
 }
 
 public partial class TranslationTests

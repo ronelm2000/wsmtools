@@ -25,6 +25,13 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 ///   <item><description>Sub-translates remaining ability text via <see cref="ITokenRegistry.EffectListRegistry"/></description></item>
 ///   <item><description>Returns <see cref="ConditionalCardEffectAbility"/> wrapping the condition and ability</description></item>
 /// </list>
+/// <para><b>Condition patterns handled in TranslateCondition:</b></para>
+/// <list type="bullet">
+///   <item><description>Trait count: <c>《trait》のキャラがN枚以上</c> → <c>you have N or more <<trait>> characters</c></description></item>
+///   <item><description>Trait absence: <c>《trait》のキャラがいない</c> → <c>you have no <<trait>> character</c></description></item>
+///   <item><description>Level threshold: <c>レベルがN(以上|以下)</c> → <c>that card is level N (or higher|or lower)</c></description></item>
+///   <item><description>Name contains: <c>カード名に「name」を含むキャラがいる</c> → <c>you have (a|another) character with "name" in its card name</c></description></item>
+/// </list>
 /// <para><b>Scope Expansion:</b> To support additional condition patterns, add new branches in
 /// <see cref="TranslateCondition"/> (e.g., stock count, CX existence). For new duration prefixes,
 /// add entries to <see cref="DurationMap"/>.</para>
@@ -106,12 +113,19 @@ internal class ConditionalAbilityToken : CardTextToken<List<CardEffectAbility>>
     {
         var otherPhrase = hasOther ? " other" : "";
 
-        var traitMatch = System.Text.RegularExpressions.Regex.Match(conditionText, @"^《(.+?)》のキャラが(\d+)枚以上");
-        if (traitMatch.Success)
+        var traitCountMatch = System.Text.RegularExpressions.Regex.Match(conditionText, @"^《(.+?)》のキャラが(\d+)枚以上");
+        if (traitCountMatch.Success)
         {
-            var trait = registry.MatchNameFragment(traitMatch.Groups[1].Value);
-            var count = traitMatch.Groups[2].Value;
+            var trait = registry.MatchNameFragment(traitCountMatch.Groups[1].Value);
+            var count = traitCountMatch.Groups[2].Value;
             return $"you have {count} or more{otherPhrase} <<{trait}>> characters";
+        }
+
+        var traitAbsentMatch = System.Text.RegularExpressions.Regex.Match(conditionText, @"^《(.+?)》のキャラがいない");
+        if (traitAbsentMatch.Success)
+        {
+            var trait = registry.MatchNameFragment(traitAbsentMatch.Groups[1].Value);
+            return $"you have no{otherPhrase} <<{trait}>> character";
         }
 
         var levelMatch = System.Text.RegularExpressions.Regex.Match(conditionText, @"レベルが(\d+)(以上|以下)");
@@ -120,6 +134,14 @@ internal class ConditionalAbilityToken : CardTextToken<List<CardEffectAbility>>
             var level = levelMatch.Groups[1].Value;
             var comparison = levelMatch.Groups[2].Value == "以上" ? "or higher" : "or lower";
             return $"that card is level {level} {comparison}";
+        }
+
+        var nameContainsMatch = System.Text.RegularExpressions.Regex.Match(conditionText, @"カード名に「(.+?)」を含むキャラがいる");
+        if (nameContainsMatch.Success)
+        {
+            var name = registry.MatchNameFragment(nameContainsMatch.Groups[1].Value);
+            var prefix = hasOther ? "another" : "a";
+            return $"you have {prefix} character with \"{name}\" in its card name";
         }
 
         return conditionText;

@@ -5,10 +5,10 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </summary>
 /// <remarks>
 /// <para><b>Expected Input:</b> <c>あなたは自分の手札を1枚選び、控え室に置いてよい</c></para>
-/// <para><b>Regex:</b> ^(?:あなたは)?自分の手札を(\d+)枚選び、控え室に置(?:いて|き|く)(?:よい)?(?:\.|,|、|。)?</para>
+/// <para><b>Regex:</b> ^(?:あなたは)?自分の手札を([Ｘ\d]+)枚選び、控え室に置(?:いて|き|く)(?:よい)?(?:\.|,|、|。)?</para>
 /// <para><b>Captures:</b></para>
 /// <list type="bullet">
-///   <item><description>Group 1: Number of cards (e.g., "1")</description></item>
+///   <item><description>Group 1: Number of cards (numeric or "Ｘ")</description></item>
 /// </list>
 /// <para><b>Output (may):</b> <c>you may choose 1 card in your hand and put it to your waiting room</c> (single atomic ability)</para>
 /// <para><b>Output (forced):</b> <c>choose 1 card in your hand</c> + <c>put it to your waiting room</c> (two atomic abilities)</para>
@@ -20,21 +20,25 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class ChooseCardAndPutInWaitingRoomToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:あなたは)?自分の手札を(\d+)枚選び、控え室に置(?:いて|き|く)(?:よい)?(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたは)?自分の手札を([Ｘ\d]+)枚選び、控え室に置(?:いて|き|く)(?:よい)?(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var count = int.Parse(match.Groups[1].Value);
+        var countRaw = match.Groups[1].Value;
+        var isVariableX = countRaw == "Ｘ" || countRaw == "X";
+        var count = isVariableX ? 0 : int.Parse(countRaw);
+        var countText = isVariableX ? "X" : count.ToString();
         var isMay = match.Value.Contains("よい");
         var mayText = isMay ? "you may " : "";
+        var pronoun = isVariableX || count > 1 ? "them" : "it";
         if (isMay)
         {
             return
             [
                 new CardEffectAbility
                 {
-                    AbilityText = $"{mayText}choose {count} card{(count > 1 ? "s" : "")} in your hand and put {(count == 1 ? "it" : "them")} to your waiting room"
+                    AbilityText = $"{mayText}choose {countText} card{(isVariableX || count > 1 ? "s" : "")} in your hand and put {pronoun} to your waiting room"
                 }
             ];
         }
@@ -42,11 +46,11 @@ internal class ChooseCardAndPutInWaitingRoomToken : CardTextToken<List<CardEffec
         [
             new CardEffectAbility
             {
-                AbilityText = $"choose {count} card{(count > 1 ? "s" : "")} in your hand"
+                AbilityText = $"choose {countText} card{(isVariableX || count > 1 ? "s" : "")} in your hand"
             },
             new CardEffectAbility
             {
-                AbilityText = $"put {(count == 1 ? "it" : "them")} to your waiting room"
+                AbilityText = $"put {pronoun} to your waiting room"
             }
         ];
     }

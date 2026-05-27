@@ -12,9 +12,9 @@ internal class BattleOpponentCostConditionToken : CardTextToken<List<CardEffectC
             var matchedValue = match.Value;
             var conditionText = matchedValue switch
             {
-                _ when matchedValue.Contains("0") && matchedValue.Contains("以下") => "this card's battle opponent's cost is 0 or lower",
-                _ when Regex.IsMatch(matchedValue, @"\d+\s*以下") => $"this card's battle opponent's cost is {Regex.Match(matchedValue, @"\d+").Value} or lower",
-                _ => "this card's battle opponent's cost is 0 or lower"
+                _ when matchedValue.Contains("0") && matchedValue.Contains("以下") => "this card's battle opponent is cost 0 or less",
+                _ when Regex.IsMatch(matchedValue, @"\d+\s*以下") => $"this card's battle opponent is cost {Regex.Match(matchedValue, @"\d+").Value} or less",
+                _ => "this card's battle opponent is cost 0 or less"
             };
             return
             [

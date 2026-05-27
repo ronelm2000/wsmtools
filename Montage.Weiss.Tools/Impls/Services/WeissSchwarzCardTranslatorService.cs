@@ -421,6 +421,19 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new SearchDeckForCxToken());
         _effectListRegistry.Register(new ChooseCardFromHandAndPutToStockToken());
         _effectListRegistry.Register(new ChooseNamedCardFromHandToCxAreaToken());
+        _effectListRegistry.Register(new ChooseNamedCardFromWrPutAsMarkerToken());
+        _effectListRegistry.Register(new ChooseNamedCardFromWrPutOnStageToken());
+        _effectListRegistry.Register(new SearchDeckForNamedCardPutOnStageToken());
+        _effectListRegistry.Register(new ChooseOtherCharToStockToken());
+        _effectListRegistry.Register(new AllOtherLevel0OrLowerBoostToken());
+        _effectListRegistry.Register(new LookAtBothDeckBottomToken());
+        _effectListRegistry.Register(new ChooseOpponentBackRowLevelHigherThanOpponentAndNoStandToken());
+        _effectListRegistry.Register(new GiveHandLimitPlusOneAbilityToken());
+        _effectListRegistry.Register(new AllPlayersTraitGainToken());
+        _effectListRegistry.Register(new GiveEncoreToFacingCharacterToken());
+        _effectListRegistry.Register(new ChooseFromMarkerPutOnStageOrBackToken());
+        _effectListRegistry.Register(new ChooseOneAbilityToGainToken());
+        _effectListRegistry.Register(new EitherPlayerTopCardsToWrToken());
         
         // Register effect type tokens (most to least specific)
         _effectRegistry.Register(new SubAbilityToken());

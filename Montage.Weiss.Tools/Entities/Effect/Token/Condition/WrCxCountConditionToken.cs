@@ -13,7 +13,7 @@ internal class WrCxCountConditionToken : CardTextToken<List<CardEffectCondition>
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = $"there are {count} or fewer CX in your or your opponent's waiting room"
+                ConditionText = $"you or your opponent has {count} or fewer CX in your waiting room"
             }
         ];
     }

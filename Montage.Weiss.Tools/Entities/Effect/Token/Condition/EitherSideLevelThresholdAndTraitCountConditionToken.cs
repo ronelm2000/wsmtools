@@ -15,7 +15,7 @@ internal class EitherSideLevelThresholdAndTraitCountConditionToken : CardTextTok
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = $"there is a level {level} or higher character in your or your opponent's stage, and you have {count} or more other <<{trait}>> characters"
+                ConditionText = $"you or your opponent has a level {level} or higher character, and you have {count} or more other <<{trait}>> characters"
             }
         ];
     }

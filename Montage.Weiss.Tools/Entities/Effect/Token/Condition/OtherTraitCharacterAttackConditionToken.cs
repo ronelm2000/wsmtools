@@ -15,7 +15,7 @@ internal class OtherTraitCharacterAttackConditionToken : CardTextToken<List<Card
             new CardEffectCondition
             {
                 Type = ConditionType.When,
-                ConditionText = $"your other <<{trait}>> character attacks"
+                ConditionText = $"another of your <<{trait}>> characters attacks"
             }
         ];
     }

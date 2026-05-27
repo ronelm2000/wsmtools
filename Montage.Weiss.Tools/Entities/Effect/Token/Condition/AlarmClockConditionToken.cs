@@ -11,7 +11,7 @@ internal class AlarmClockConditionToken : CardTextToken<List<CardEffectCondition
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = "this card is at the top of your clock"
+                ConditionText = "this card is on top of your clock"
             }
         ];
     }

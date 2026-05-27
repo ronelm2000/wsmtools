@@ -28,9 +28,7 @@ internal class CxAreaCxWithIconConditionToken : CardTextToken<List<CardEffectCon
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = hasAnataNo
-                    ? $"a CX with [{iconName}] in its trigger icon is in your CX area"
-                    : $"a CX with [{iconName}] in its trigger icon is in the CX area"
+                ConditionText = $"your CX area has a CX with [{iconName}] in its trigger icon"
             }
         ];
     }

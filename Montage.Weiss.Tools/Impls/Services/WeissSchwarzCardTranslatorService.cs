@@ -28,6 +28,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new ReverseAndOpponentLevelConditionToken());
         _conditionListRegistry.Register(new TurnAndTraitCharacterCountConditionToken());
         _conditionListRegistry.Register(new AllCharactersAreTraitConditionToken());
+        _conditionListRegistry.Register(new OtherTraitFrontalAttackedConditionToken());
         _conditionListRegistry.Register(new AnotherCharacterWithTraitExistsConditionToken());
         _conditionListRegistry.Register(new SimpleTraitExistsConditionToken());
         _conditionListRegistry.Register(new DuringOpponentTurnAllCharactersAreTraitConditionToken());
@@ -257,6 +258,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ChooseWrCardPutInSlotToken());
         _effectListRegistry.Register(new ChooseFromHandToSlotToken());
         _effectListRegistry.Register(new ChooseNamedCardFromHandPutOnStageToken());
+        _effectListRegistry.Register(new ChooseNamedMarkerPutOnStageToken());
         _effectListRegistry.Register(new ChooseYourOtherCenterStageLevel0OrLowerCharToWrToken());
         _effectListRegistry.Register(new ChooseOpponentCharToMemoryThenFromMemoryToStageToken());
         _effectListRegistry.Register(new ChooseOtherCharacterAndGiveAbilityToken());
@@ -444,6 +446,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new GiveEncoreToFacingCharacterToken());
         _effectListRegistry.Register(new ChooseFromMarkerPutOnStageOrBackToken());
         _effectListRegistry.Register(new ChooseOneAbilityToGainToken());
+        _effectListRegistry.Register(new MoveToEmptyCenterStageFacingOpponentToken());
         _effectListRegistry.Register(new EitherPlayerTopCardsToWrToken());
         _effectListRegistry.Register(new ChooseOpponentBackRowLevelHigherThanOpponentToken());
         _effectListRegistry.Register(new ThatCharacterNoStandNextOpponentStandPhaseToken());

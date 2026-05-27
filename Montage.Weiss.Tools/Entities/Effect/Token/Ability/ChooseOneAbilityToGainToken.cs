@@ -18,12 +18,6 @@ internal class ChooseOneAbilityToGainToken : CardTextToken<List<CardEffectAbilit
                 AbilityText = $"this card gets one of the following two abilities of your choice. \"{translated1.EffectText}\" \"{translated2.EffectText}\"",
                 NestedEffect = translated1,
                 IsUnmatched = translated1.Abilities.Any(a => a.IsUnmatched)
-            },
-            new NestedCardEffectAbility
-            {
-                AbilityText = $"\"{translated2.EffectText}\"",
-                NestedEffect = translated2,
-                IsUnmatched = translated2.Abilities.Any(a => a.IsUnmatched)
             }
         ];
     }

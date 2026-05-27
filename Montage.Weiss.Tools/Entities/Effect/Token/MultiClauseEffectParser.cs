@@ -386,9 +386,18 @@ public static class MultiClauseEffectParser
                 var nextAbility = abilities[i].AbilityText;
                 if (nextAbility.Length > 0 && char.IsUpper(nextAbility[0]) && nextAbility[0] != 'X')
                     nextAbility = char.ToLower(nextAbility[0]) + nextAbility[1..];
-                var connector = (i == abilities.Count - 1 && abilities[i].Prefix != AbilityPrefix.Continuation) ? ", and " : ", ";
-                if (abilities[i - 1].Prefix == AbilityPrefix.Continuation)
-                    connector = ", and ";
+                string connector;
+                if (abilities[i].Prefix == AbilityPrefix.AfterCannotBePlayed)
+                {
+                    connector = ". ";
+                    nextAbility = char.ToUpper(nextAbility[0]) + nextAbility[1..];
+                }
+                else
+                {
+                    connector = (i == abilities.Count - 1 && abilities[i].Prefix != AbilityPrefix.Continuation) ? ", and " : ", ";
+                    if (abilities[i - 1].Prefix == AbilityPrefix.Continuation)
+                        connector = ", and ";
+                }
                 result += connector + nextAbility;
             }
         }
@@ -404,9 +413,18 @@ public static class MultiClauseEffectParser
                 var nextAbility = abilities[i].AbilityText;
                 if (nextAbility.Length > 0 && char.IsUpper(nextAbility[0]) && nextAbility[0] != 'X')
                     nextAbility = char.ToLower(nextAbility[0]) + nextAbility[1..];
-                var connector = (i == abilities.Count - 1 && abilities[i].Prefix != AbilityPrefix.Continuation) ? ", and " : ", ";
-                if (abilities[i - 1].Prefix == AbilityPrefix.Continuation)
-                    connector = ", and ";
+                string connector;
+                if (abilities[i].Prefix == AbilityPrefix.AfterCannotBePlayed)
+                {
+                    connector = ". ";
+                    nextAbility = char.ToUpper(nextAbility[0]) + nextAbility[1..];
+                }
+                else
+                {
+                    connector = (i == abilities.Count - 1 && abilities[i].Prefix != AbilityPrefix.Continuation) ? ", and " : ", ";
+                    if (abilities[i - 1].Prefix == AbilityPrefix.Continuation)
+                        connector = ", and ";
+                }
                 result += connector + nextAbility;
             }
             result = char.ToUpper(result[0]) + result[1..];

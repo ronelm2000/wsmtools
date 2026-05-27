@@ -11,7 +11,8 @@ internal class CannotPlayFromHandToken : CardTextToken<List<CardEffectAbility>>
         [
             new CardEffectAbility
             {
-                AbilityText = "this card cannot be played in your hand"
+                AbilityText = "this card cannot be played in your hand",
+                Prefix = AbilityPrefix.AfterCannotBePlayed
             }
         ];
     }

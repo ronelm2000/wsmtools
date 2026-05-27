@@ -78,12 +78,13 @@ internal class EventEffectToken : CardTextToken<CardEffect>
         if (parsedSentences.Count > 1 || (parsedSentences.Count == 1 && (parsedSentences[0].Abilities.Count > 0 || parsedSentences[0].Conditions.Count > 0)))
         {
             var allAbilities = parsedSentences.SelectMany(s => s.Abilities).ToList();
+            var allConditions = parsedSentences.SelectMany(s => s.Conditions).ToList();
             var parts = parsedSentences
                 .Where(s => s.Abilities.Count > 0 || s.Conditions.Count > 0)
                 .Select(s => s.Text)
                 .ToList();
 
-            Log.Debug("EventEffectToken: Parse produced {count} parts, {abilCount} abilities", parts.Count, allAbilities.Count);
+            Log.Debug("EventEffectToken: Parse produced {count} parts, {abilCount} abilities, {condCount} conditions", parts.Count, allAbilities.Count, allConditions.Count);
 
             if (parts.Count > 0)
             {
@@ -107,7 +108,9 @@ internal class EventEffectToken : CardTextToken<CardEffect>
                     Cost = costAbilities,
                     EffectText = effectText,
                     AbilityText = joined,
-                    Abilities = allAbilities
+                    Abilities = allAbilities,
+                    Condition = allConditions,
+                    ConditionText = allConditions.AggregateToString()
                 };
             }
         }
@@ -116,7 +119,7 @@ internal class EventEffectToken : CardTextToken<CardEffect>
         var parsed = MultiClauseEffectParser.ParseSentence(rest, registry, MultiClauseEffectParser.DefaultPrefixMap);
         if (parsed.Abilities.Count > 0 || parsed.Conditions.Count > 0)
         {
-            Log.Debug("EventEffectToken: ParseSentence produced {abilCount} abilities", parsed.Abilities.Count);
+            Log.Debug("EventEffectToken: ParseSentence produced {abilCount} abilities, {condCount} conditions", parsed.Abilities.Count, parsed.Conditions.Count);
 
             var effectText = string.IsNullOrEmpty(costEnglish) ? parsed.Text : $"[{costEnglish}] {parsed.Text}";
 
@@ -127,7 +130,9 @@ internal class EventEffectToken : CardTextToken<CardEffect>
                 Cost = costAbilities,
                 EffectText = effectText,
                 AbilityText = parsed.Text,
-                Abilities = parsed.Abilities
+                Abilities = parsed.Abilities,
+                Condition = parsed.Conditions,
+                ConditionText = parsed.Conditions.AggregateToString()
             };
         }
 
@@ -149,7 +154,9 @@ internal class EventEffectToken : CardTextToken<CardEffect>
                 Cost = costAbilities,
                 EffectText = effectText,
                 AbilityText = abilityEnglish,
-                Abilities = abils
+                Abilities = abils,
+                Condition = [],
+                ConditionText = ""
             };
         }
 
@@ -168,7 +175,9 @@ internal class EventEffectToken : CardTextToken<CardEffect>
                 AbilityText = rest,
                 IsUnmatched = true,
                 Suggestions = ["unmatched nested ability text"]
-            }]
+            }],
+            Condition = [],
+            ConditionText = ""
         };
     }
 }

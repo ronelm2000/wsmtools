@@ -354,6 +354,14 @@ internal class AutoEffectToken : CardTextToken<CardEffect>
                         result += afterThatText;
                         continue;
                     }
+                    if (prefix == AbilityPrefix.AfterCannotBePlayed)
+                    {
+                        var capText = abilities[i].AbilityText;
+                        if (capText.Length > 0 && char.IsLower(capText[0]) && capText[0] != 'X')
+                            capText = char.ToUpper(capText[0]) + capText[1..];
+                        result += $". {capText}";
+                        continue;
+                    }
                     if (prefix == AbilityPrefix.Otherwise)
                     {
                         var otherwiseText = abilities[i].AbilityText;

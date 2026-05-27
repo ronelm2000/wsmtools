@@ -16,6 +16,8 @@ public enum AbilityPrefix
     AfterThat,
     /// <summary>`あなたは` / `自分の` — subject prefix with no special conjunction. Output: "you ..."</summary>
     Subject,
+    /// <summary>Restriction prefix for "cannot be played" — forces a period before the next ability.</summary>
+    AfterCannotBePlayed,
 }
 
 [JsonDerivedType(typeof(UnmatchedAbility), "Unmatched")]
@@ -35,6 +37,7 @@ public record CardEffectAbility : ICardAbility
             AbilityPrefix.IfYouDo => ". If you do, ",
             AbilityPrefix.Otherwise => ". Otherwise, ",
             AbilityPrefix.AfterThat => ". After that, ",
+            AbilityPrefix.AfterCannotBePlayed => ". ",
             AbilityPrefix.Continuation => ", and ",
             AbilityPrefix.Subject => ", ",
             _ => ", ",

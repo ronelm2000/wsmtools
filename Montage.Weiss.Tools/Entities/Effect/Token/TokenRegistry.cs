@@ -57,7 +57,7 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
         if (nonZeroMatches.Count > 0)
         {
             var minIndex = nonZeroMatches.Min(m => m.Index);
-            Log.Debug(
+            Log.Warning(
                 "No token matched at index 0. {Count} token(s) matched mid-string. Skipped text: '{Skipped}'. Input: '{Input}'. Matches: {Matches}",
                 nonZeroMatches.Count,
                 inputStr[..minIndex],
@@ -66,7 +66,7 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
         }
         else
         {
-            Log.Debug("No token matched at all for input: '{Input}'", inputStr);
+            Log.Warning("No token matched at all for input: '{Input}'", inputStr);
         }
 
         return null;

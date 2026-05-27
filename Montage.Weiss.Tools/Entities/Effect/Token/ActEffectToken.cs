@@ -170,6 +170,8 @@ internal class ActEffectToken : CardTextToken<CardEffect>
         if (!effectText.TrimEnd().EndsWith(".") && !effectText.EndsWith("]") && !effectText.EndsWith("\""))
             effectText += ".";
 
+        var allConditions = parsedList.SelectMany(p => p.Conditions).ToList();
+
         return new ActCardEffect {
                 Labels = [.. labels, .. rawLabels],
                 CostText = costEnglish,
@@ -177,7 +179,9 @@ internal class ActEffectToken : CardTextToken<CardEffect>
                 Abilities = parsedList.SelectMany(p => p.Abilities).ToList(),
                 AbilityText = abilityEnglish,
                 EffectText = effectText,
-                TokenLog = tokenLog
+                TokenLog = tokenLog,
+                Condition = allConditions,
+                ConditionText = conditionEnglish
         };
     }
 }

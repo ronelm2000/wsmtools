@@ -26,6 +26,9 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
 
     public TokenMatchResult<E>? Match(ReadOnlyMemory<char> input)
     {
+        if (input.IsEmpty || input.Span.IsEmpty)
+            return null;
+
         TokenMatch? bestAtZero = null;
         Func<ITokenRegistry, E>? bestTranslate = null;
         var nonZeroMatches = new List<(string Token, int Index)>();
@@ -54,7 +57,7 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
         if (nonZeroMatches.Count > 0)
         {
             var minIndex = nonZeroMatches.Min(m => m.Index);
-            Log.Warning(
+            Log.Debug(
                 "No token matched at index 0. {Count} token(s) matched mid-string. Skipped text: '{Skipped}'. Input: '{Input}'. Matches: {Matches}",
                 nonZeroMatches.Count,
                 inputStr[..minIndex],
@@ -63,7 +66,7 @@ internal class ComponentRegistry<E> : IComponentRegistry<E>
         }
         else
         {
-            Log.Warning("No token matched at all for input: '{Input}'", inputStr);
+            Log.Debug("No token matched at all for input: '{Input}'", inputStr);
         }
 
         return null;

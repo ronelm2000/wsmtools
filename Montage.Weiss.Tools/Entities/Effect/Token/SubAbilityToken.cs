@@ -34,6 +34,17 @@ internal class SubAbilityToken : CardTextToken<CardEffect>
         var match = Matcher.Match(span.ToString());
         var innerText = match.Groups[1].Value.Trim();
 
+        if (string.IsNullOrEmpty(innerText))
+        {
+            return new EventCardEffect
+            {
+                Labels = [],
+                EffectText = "",
+                AbilityText = "",
+                Abilities = []
+            };
+        }
+
         var effectMatch = registry.EffectRegistry.Match(innerText.AsMemory());
         if (effectMatch != null)
         {

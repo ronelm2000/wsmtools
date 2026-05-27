@@ -274,7 +274,10 @@ public static class MultiClauseEffectParser
         }
 
         // Step 4: After all abilities, try matching post-conditions (e.g. X is equal to...)
-        var postConditionMatch = registry.ConditionListRegistry.Match(remainingText.TrimStart().AsMemory());
+        var remainingTrimmed = remainingText.TrimStart();
+        TokenMatchResult<List<CardEffectCondition>>? postConditionMatch = null;
+        if (remainingTrimmed.Length > 0)
+            postConditionMatch = registry.ConditionListRegistry.Match(remainingTrimmed.AsMemory());
         if (postConditionMatch != null)
         {
             var postCondList = postConditionMatch.Translate(registry);

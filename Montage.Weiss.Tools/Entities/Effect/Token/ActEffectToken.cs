@@ -171,7 +171,7 @@ internal class ActEffectToken : CardTextToken<CardEffect>
             effectText += ".";
 
         return new ActCardEffect {
-                Labels = labels,
+                Labels = [.. labels, .. rawLabels],
                 CostText = costEnglish,
                 Cost = costAbilities,
                 Abilities = parsedList.SelectMany(p => p.Abilities).ToList(),

@@ -221,6 +221,8 @@ Large exporters (1000+ LoC OR 5+ inner classes): use nested package `<OriginPlat
 
 Example: `Montage.Weiss.Tools/Impls/Exporter/Deck/TTS/TTSDeckExporter.cs`
 
+> **Design Flaw:** `EventCardEffect` does not implement `IConditionalCardEffect`, but recent changes give events built-in costs and condition-parsing via `MultiClauseEffectParser`. This means `EventCardEffect` should now implement `IConditionalCardEffect` so the translator service's unmatched-condition scan (in `WeissSchwarzCardTranslatorService.Translate`) can properly flag unresolved conditions in event text. Without it, the `?: []` branch silently ignores unmatched conditions for events.
+
 ## HOTC Parsing Corrections
 
 When Heart of the Cards (HOTC) has incorrect data, add manual overrides in `Montage.Weiss.Tools/Impls/Parsers/Cards/HeartOfTheCardsURLParser.cs`.

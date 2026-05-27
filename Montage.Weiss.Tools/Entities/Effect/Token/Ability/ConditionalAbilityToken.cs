@@ -24,6 +24,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 ///   <item><description>Strips subject prefix (e.g., "このカードは") from ability text</description></item>
 ///   <item><description>Sub-translates remaining ability text via <see cref="ITokenRegistry.EffectListRegistry"/></description></item>
 ///   <item><description>Returns <see cref="ConditionalCardEffectAbility"/> wrapping the condition and ability</description></item>
+///   <item><description>Sets <c>IsUnmatched = true</c> when <c>TranslateCondition</c> returns the raw Japanese text (no pattern matched)</description></item>
 /// </list>
 /// <para><b>Condition patterns handled in TranslateCondition:</b></para>
 /// <list type="bullet">
@@ -58,7 +59,8 @@ internal class ConditionalAbilityToken : CardTextToken<List<CardEffectAbility>>
 
     public override IEnumerable<string> SampleMatches =>
     [
-        "他のあなたの《サマポケ》のキャラが4枚以上なら、次の相手のターンの終わりまで、このカードは次の能力を得る。『【永】 このカードの正面のキャラのソウルを－1。』"
+        "他のあなたの《サマポケ》のキャラが4枚以上なら、次の相手のターンの終わりまで、このカードは次の能力を得る。『【永】 このカードの正面のキャラのソウルを－1。』",
+        "他のあなたのカード名に「七海」を含むキャラがいるなら、あなたは自分の控え室の「\"向日葵の種\" しろは」を1枚選び、手札に戻す。"
     ];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
@@ -97,6 +99,8 @@ internal class ConditionalAbilityToken : CardTextToken<List<CardEffectAbility>>
             }
         };
 
+        var isUnmatched = conditionEnglish == conditionText;
+
         return
         [
             new ConditionalCardEffectAbility
@@ -104,7 +108,8 @@ internal class ConditionalAbilityToken : CardTextToken<List<CardEffectAbility>>
                 ConditionText = conditionEnglish,
                 Condition = conditions,
                 ActualAbilityText = abilityEnglish,
-                AbilityText = abilityEnglish
+                AbilityText = abilityEnglish,
+                IsUnmatched = isUnmatched
             }
         ];
     }

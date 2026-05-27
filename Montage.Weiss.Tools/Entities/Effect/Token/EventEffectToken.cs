@@ -92,8 +92,6 @@ internal class EventEffectToken : CardTextToken<CardEffect>
                 for (int i = 1; i < parts2.Length; i++)
                 {
                     var next = parts2[i];
-                    if (next.Length > 0 && char.IsUpper(next[0]))
-                        next = char.ToLower(next[0]) + next[1..];
                     joined += ". " + next;
                 }
                 var trimmed = joined.TrimEnd('"');

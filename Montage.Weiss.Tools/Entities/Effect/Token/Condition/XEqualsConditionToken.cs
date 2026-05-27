@@ -2,7 +2,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 
 /// <summary>
 /// Matches "X is equal to ..." post-condition clauses. Detects the optional <c>他の</c> prefix
-/// for "your other" vs "your" trait character counts, and appends <c>×N</c> multipliers.
+/// for "your other" vs "your" trait character counts, <c>あなたのレベル</c> for level-based X,
+/// and appends <c>×N</c> multipliers.
 /// </summary>
 /// <remarks>
 /// <para><b>Expected Input:</b> <c>Ｘは他のあなたの《NIKKE》のキャラの枚数×500に等しい。</c></para>
@@ -24,12 +25,13 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 ///   <item><description>相手の {...} キャラの枚数 → characters your opponent has</description></item>
 ///   <item><description>控え室に置かれたカードのレベルの合計 → total level of cards put this way</description></item>
 ///   <item><description>あなたの宣言した数 → the declared number</description></item>
+///   <item><description>あなたのレベル → your level</description></item>
 /// </list>
 /// </remarks>
 internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
 {
     public override Regex Matcher => new(@"^[XＸ]\s*は\s*(?<description>.+?)\s*に等しい(?:\.|,|、|。)?");
-    public override IEnumerable<string> SampleMatches => ["Xはあなたの《★TESTTRAIT★》のキャラの枚数に等しい。"];
+    public override IEnumerable<string> SampleMatches => ["Xはあなたの《★TESTTRAIT★》のキャラの枚数に等しい。", "Xはあなたのレベルに等しい。"];
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -51,6 +53,8 @@ internal class XEqualsConditionToken : CardTextToken<List<CardEffectCondition>>
                 $"X is equal to that character's level {Regex.Match(description, @"[×x]\d+").Value}",
             _ when description.Contains("それらのカードの") =>
                 $"X is equal to the number of {ExtractTrait(description, registry)} characters put this way",
+            _ when description == "あなたのレベル" =>
+                "X is equal to your level",
             _ when description.Contains("あなたの") && description.Contains("キャラの枚数") =>
                 $"X is equal to the number of your {(description.Contains("他の") ? "other " : "")}{ExtractTrait(description, registry)} characters{FormatMultiplier(description)}",
             _ when description.Contains("相手の") && description.Contains("キャラの枚数") =>

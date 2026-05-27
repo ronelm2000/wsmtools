@@ -15,19 +15,22 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Condition;
 /// </remarks>
 internal class CxAreaCxWithIconConditionToken : CardTextToken<List<CardEffectCondition>>
 {
-    public override Regex Matcher => new(@"^あなたのCX置場にトリガーアイコンが\[\[(.+?)\]\]のCXがあり");
+    public override Regex Matcher => new(@"^(?:あなたの)?CX置場にトリガーアイコンが\[\[(?<icon>.+?)\]\]のCXがあり");
 
     public override List<CardEffectCondition> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());
-        var icon = match.Groups[1].Value;
+        var icon = match.Groups["icon"].Value;
         var iconName = TriggerIconHelper.GetIconName(icon);
+        var hasAnataNo = match.Value.StartsWith("あなたの");
         return
         [
             new CardEffectCondition
             {
                 Type = ConditionType.If,
-                ConditionText = $"a CX with [{iconName}] in its trigger icon is in your CX area"
+                ConditionText = hasAnataNo
+                    ? $"a CX with [{iconName}] in its trigger icon is in your CX area"
+                    : $"a CX with [{iconName}] in its trigger icon is in the CX area"
             }
         ];
     }

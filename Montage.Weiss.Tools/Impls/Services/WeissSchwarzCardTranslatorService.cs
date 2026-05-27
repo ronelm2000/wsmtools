@@ -42,6 +42,9 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new YourCxWithTriggerIconTriggeredConditionToken());
         _conditionListRegistry.Register(new YourCxWithTriggerIconPlacedConditionToken());
         _conditionListRegistry.Register(new CxPlacedConditionToken());
+        _conditionListRegistry.Register(new CardPlacedFromHandOrActEffectConditionToken());
+        _conditionListRegistry.Register(new CardPlacedFromHandOrAutoEffectConditionToken());
+        _conditionListRegistry.Register(new CardPlacedFromHandOrStageToWrConditionToken());
         _conditionListRegistry.Register(new CardPlacedFromHandOrAttackConditionToken());
         _conditionListRegistry.Register(new CardPlacedFromHandConditionToken());
         _conditionListRegistry.Register(new CardPlacedFromWaitingRoomConditionToken());
@@ -148,6 +151,12 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _conditionListRegistry.Register(new OtherCharacterPlacedFromHandConditionToken());
         _conditionListRegistry.Register(new OtherTraitCharacterPlacedFromHandConditionToken());
         _conditionListRegistry.Register(new MarkerUnderCharacterNotExistsConditionToken());
+        _conditionListRegistry.Register(new BattleOpponentCostConditionToken());
+        _conditionListRegistry.Register(new OtherTraitCharacterAttackConditionToken());
+        _conditionListRegistry.Register(new YourCxTriggeredConditionToken());
+        _conditionListRegistry.Register(new WrCxCountConditionToken());
+        _conditionListRegistry.Register(new EitherSideLevelThresholdAndTraitCountConditionToken());
+        _conditionListRegistry.Register(new AlarmClockConditionToken());
         _conditionListRegistry.Register(new CatchAllConditionToken());
 
         // Register ability tokens (most to least specific)

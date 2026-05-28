@@ -465,6 +465,9 @@ public static class MultiClauseEffectParser
             var lowerAbility = abilityText.Length > 0 ? char.ToLower(abilityText[0]) + abilityText[1..] : abilityText;
             return $"{dur}, {lowerAbility}";
         }
+        var quoteIndex = abilityText.IndexOf(" \"");
+        if (quoteIndex >= 0)
+            return abilityText.Insert(quoteIndex, duration);
         return abilityText + duration;
     }
 }

@@ -258,6 +258,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ChooseWrCardPutInSlotToken());
         _effectListRegistry.Register(new ChooseFromHandToSlotToken());
         _effectListRegistry.Register(new ChooseNamedCardFromHandPutOnStageToken());
+        _effectListRegistry.Register(new ChooseNamedFromWrPutOnStageNoFourthAttackToken());
         _effectListRegistry.Register(new ChooseNamedMarkerPutOnStageToken());
         _effectListRegistry.Register(new ChooseYourOtherCenterStageLevel0OrLowerCharToWrToken());
         _effectListRegistry.Register(new ChooseOpponentCharToMemoryThenFromMemoryToStageToken());

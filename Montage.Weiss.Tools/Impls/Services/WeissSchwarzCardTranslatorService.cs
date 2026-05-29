@@ -230,6 +230,8 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new CostPutBlueCharacterFromWaitingRoomToClockBottomToken());
         _effectListRegistry.Register(new ChooseFromWrPutToMemoryToken());
         _effectListRegistry.Register(new ChooseTraitFromWrPutToStockToken());
+        _effectListRegistry.Register(new ChooseFromWrReturnToHandOrStockToken());
+        _effectListRegistry.Register(new RevealedCardConditionalGrantToken());
         _effectListRegistry.Register(new ChooseCharacterFromWaitingRoomToken());
         _effectListRegistry.Register(new LookAtDeckChooseCardRevealAddToHandRestToWrToken());
         _effectListRegistry.Register(new LookAtTopCardsToken());
@@ -262,6 +264,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ChooseNamedMarkerPutOnStageToken());
         _effectListRegistry.Register(new ChooseYourOtherCenterStageLevel0OrLowerCharToWrToken());
         _effectListRegistry.Register(new ChooseOpponentCharToMemoryThenFromMemoryToStageToken());
+        _effectListRegistry.Register(new ChooseOpponentCharStandSwapAndGrantAbilityToken());
         _effectListRegistry.Register(new ChooseOtherCharacterAndGiveAbilityToken());
         _effectListRegistry.Register(new ChooseOtherTraitCharPowerAndGrantAbilityToken());
         _effectListRegistry.Register(new AllCenterStageExceptThisCardGiveAbilityToken());
@@ -274,6 +277,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
         _effectListRegistry.Register(new ConditionalPutInHandToken());
         _effectListRegistry.Register(new LoseTraitToken());
         _effectListRegistry.Register(new GetFollowingAbilitiesToken());
+        _effectListRegistry.Register(new GainTwoAbilitiesToken());
         _effectListRegistry.Register(new PutAllMarkersToWrThenDealDamageToken());
         _effectListRegistry.Register(new ConditionalAbilityToken());
         _effectListRegistry.Register(new ChooseCardAndPutInWaitingRoomToken());

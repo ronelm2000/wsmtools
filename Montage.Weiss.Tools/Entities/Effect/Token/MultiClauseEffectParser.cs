@@ -205,7 +205,18 @@ public static class MultiClauseEffectParser
                 {
                     // Check if this is a duration prefix
                     var durationKey = prefix.TrimEnd('、');
-                    if (DurationTextMap.TryGetValue(durationKey, out var durText))
+                    if (!DurationTextMap.TryGetValue(durationKey, out var durText))
+                    {
+                        foreach (var (dk, dt) in DurationTextMap)
+                        {
+                            if (prefix.StartsWith(dk))
+                            {
+                                durText = dt;
+                                break;
+                            }
+                        }
+                    }
+                    if (durText != null)
                     {
                         pendingDuration = durText;
                         Log.Debug("ParseSentence: detected duration prefix '{Prefix}' -> '{DurationText}'", prefix, durText);
@@ -467,7 +478,11 @@ public static class MultiClauseEffectParser
         }
         var quoteIndex = abilityText.IndexOf(" \"");
         if (quoteIndex >= 0)
+        {
+            if (quoteIndex > 0 && abilityText[quoteIndex - 1] == '.')
+                return abilityText.Insert(quoteIndex - 1, duration);
             return abilityText.Insert(quoteIndex, duration);
+        }
         return abilityText + duration;
     }
 }

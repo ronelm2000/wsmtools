@@ -112,6 +112,14 @@ public class TranslatePostProcessor : ICardPostProcessor<WeissSchwarzCard>, ISki
             card.Effect = translatedEffects.ToArray();
             card.AddOptionalInfo("translation.tree", new CardEffectTree { Effects = cardEffects });
 
+            var errata = ErrataLoader.Load();
+            if (errata?.Serials?.TryGetValue(card.Serial, out var entry) == true
+                && entry.Effect?.En is { Length: > 0 } enEffects)
+            {
+                Log.Debug("Applying EN errata override for {serial}", card.Serial);
+                card.Effect = enEffects;
+            }
+
             if (cardFailures.Count > 0)
                 failuresByCard[card.Serial] = cardFailures;
 

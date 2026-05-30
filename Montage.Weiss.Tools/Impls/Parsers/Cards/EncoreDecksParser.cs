@@ -243,6 +243,7 @@ public class EncoreDecksParser : ICardSetParser<WeissSchwarzCard>
             "shot" => Trigger.Shot,
             "return" => Trigger.Bounce,
             "wind" => Trigger.Bounce,
+            "bounce" => Trigger.Bounce,
             "choice" => Trigger.Choice,
             // Green
             "treasure" => Trigger.GoldBar,

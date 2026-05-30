@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class GiveHandLimitPlusOneAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?キャラを1枚選び、(?:そのターン中、)?(?:そのターンの)?次のターンの終わりまで、次の能力を与える。『【永】 あなたの手札の枚数上限を＋1。』(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?キャラを1枚選び、(?:そのターン中、)?(?:そのターンの)?次のターンの終わりまで、次の能力を与える。『【永】\sあなたの手札の枚数上限を＋1。』(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

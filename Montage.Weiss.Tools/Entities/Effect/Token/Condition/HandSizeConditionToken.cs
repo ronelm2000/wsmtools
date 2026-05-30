@@ -30,7 +30,7 @@ internal class HandSizeConditionToken : CardTextToken<List<CardEffectCondition>>
         var isOrMore = match.Groups[2].Value == "以上";
         var conditionText = isOrMore
             ? $"you have {count} or more cards in your hand"
-            : $"your hand is {count} or fewer cards";
+            : $"your hand has {count} or less cards";
         return
         [
             new CardEffectCondition

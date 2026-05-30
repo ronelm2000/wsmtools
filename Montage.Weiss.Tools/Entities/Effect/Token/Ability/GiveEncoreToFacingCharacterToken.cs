@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class GiveEncoreToFacingCharacterToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?このカードの正面のキャラに、『【自】 アンコール ［\((\d+)\)］』を与える(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?このカードの正面のキャラに、『【自】\sアンコール\s［\((\d+)\)］』を与える(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {

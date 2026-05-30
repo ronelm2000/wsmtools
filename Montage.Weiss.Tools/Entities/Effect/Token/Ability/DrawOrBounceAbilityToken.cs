@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class DrawOrBounceAbilityToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(\d+)枚まで引くか相手のキャラを(\d+)枚まで選び、手札に戻す(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^(?:あなたは)?(\d+)枚まで引くか相手のキャラを(\d+)枚まで選び、手札に戻す(?:\.|,|、|。)?");
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());

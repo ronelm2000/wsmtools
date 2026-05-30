@@ -1,12 +1,12 @@
 namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 /// <summary>
-/// Matches "cannot be moved to other slots" clauses.
+/// Matches "cannot move to another position of the stage" clauses.
 /// </summary>
 /// <remarks>
 /// <para><b>Expected Input:</b> <c>このカードは他の枠に動かせない。</c></para>
 /// <para><b>Regex:</b> ^このカードは他の枠に動かせない</para>
-/// <para><b>Output:</b> <c>This card cannot be moved to other slots.</c></para>
+/// <para><b>Output:</b> <c>This card cannot move to another position of the stage.</c></para>
 /// </remarks>
 internal class CannotMoveToAnotherPositionToken : CardTextToken<List<CardEffectAbility>>
 {
@@ -18,7 +18,7 @@ internal class CannotMoveToAnotherPositionToken : CardTextToken<List<CardEffectA
         [
             new CardEffectAbility
             {
-                AbilityText = "This card cannot be moved to other slots."
+                AbilityText = "This card cannot move to another position of the stage."
             }
         ];
     }

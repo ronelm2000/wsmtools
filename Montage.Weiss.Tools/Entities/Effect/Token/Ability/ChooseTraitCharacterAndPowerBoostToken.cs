@@ -26,8 +26,8 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class ChooseTraitCharacterAndPowerBoostToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:他の)?《(.+?)》のキャラを(\d+)枚(まで)?選び、そのターン中、パワーを[＋\+]([Ｘ\d]+)(?:\.|,|、|。)?");
-    public override IEnumerable<string> SampleMatches => ["自分の《★TESTTRAIT★》のキャラを1枚選び、そのターン中、パワーを＋2000。"];
+    public override Regex Matcher => new(@"^(?:他の)?(?:自分の)?《(.+?)》のキャラを(\d+)枚(まで)?選び、そのターン中、パワーを[＋\+]([Ｘ\d]+)(?:。Ｘは他のあなたの《(.+?)》のキャラの枚数×(\d+)に等しい)?(?:\.|,|、|。)?");
+    public override IEnumerable<string> SampleMatches => ["他の自分の《★TESTTRAIT★》のキャラを1枚選び、そのターン中、パワーを＋2000。", "他の自分の《★TESTTRAIT★》のキャラを1枚選び、そのターン中、パワーを＋Ｘ。Ｘは他のあなたの《★TESTTRAIT★》のキャラの枚数×500に等しい。"];
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
@@ -40,6 +40,14 @@ internal class ChooseTraitCharacterAndPowerBoostToken : CardTextToken<List<CardE
         var hasOther = match.Value.Contains("他の", StringComparison.Ordinal);
         var otherText = hasOther ? "other " : "";
         var verb = count == 1 ? "that character gets" : "those characters get";
+        var hasXDescription = match.Groups[5].Success;
+        var xDescription = "";
+        if (hasXDescription)
+        {
+            var xTrait = registry.MatchNameFragment(match.Groups[5].Value);
+            var xMultiplier = match.Groups[6].Value;
+            xDescription = $". {power} is equal to the number of your other <<{xTrait}>> characters ×{xMultiplier}";
+        }
         return
         [
             new CardEffectAbility
@@ -49,7 +57,7 @@ internal class ChooseTraitCharacterAndPowerBoostToken : CardTextToken<List<CardE
             },
             new CardEffectAbility
             {
-                AbilityText = $"{verb} +{power} power until end of turn",
+                AbilityText = $"{verb} +{power} power until end of turn{xDescription}",
                 Prefix = AbilityPrefix.And
             }
         ];

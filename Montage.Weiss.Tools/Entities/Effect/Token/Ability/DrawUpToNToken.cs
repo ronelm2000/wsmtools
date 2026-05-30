@@ -14,7 +14,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 /// </remarks>
 internal class DrawUpToNToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^(?:あなたは)?(\d+)枚まで引き、|^(?:あなたは)?(\d+)枚まで引く(?:[\.\。,、]|\z)");
+    public override Regex Matcher => new(@"^(?:(?:あなたは)?(\d+)枚まで引き、|(?:あなたは)?(\d+)枚まで引く(?!か))(?:\.|,|、|。)?");
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
         var match = Matcher.Match(span.ToString());

@@ -629,7 +629,7 @@ public class WeissSchwarzCardTranslatorService : ITokenRegistry
             }
             else
             {
-                effect.EffectText = reminderTextEnglish;
+                effect.EffectText = "(" + reminderTextEnglish + ")";
             }
         }
 

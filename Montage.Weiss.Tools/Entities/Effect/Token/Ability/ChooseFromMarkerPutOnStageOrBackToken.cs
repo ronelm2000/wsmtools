@@ -2,7 +2,7 @@ namespace Montage.Weiss.Tools.Entities.Effect.Token.Ability;
 
 internal class ChooseFromMarkerPutOnStageOrBackToken : CardTextToken<List<CardEffectAbility>>
 {
-    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?このカードのマーカーの「(.+?)」を1枚選び、舞台の好きな枠に置く / そのキャラを(?:このカードの下に)?マーカーとして表向きに置いてよい(?:\.|,|、|。)?");
+    public override Regex Matcher => new(@"^[、,]?(?:あなたは)?このカードのマーカーの「(.+?)」を1枚選び、舞台の好きな枠に置く\s*/\s*そのキャラを(?:このカードの下に)?マーカーとして表向きに置いてよい(?:\.|,|、|。)?");
 
     public override List<CardEffectAbility> Translate(ITokenRegistry registry, ReadOnlyMemory<char> span)
     {
